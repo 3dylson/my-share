@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/DashboardFragment"
         android:name="pt.ms.myshare.DashboardFragment"
-        android:label="@string/dashboard_fragment_label"
+        android:label="@string/empty_string"
         tools:layout="@layout/fragment_dashboard">
 
         <action

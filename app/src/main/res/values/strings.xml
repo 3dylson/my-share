@@ -1,11 +1,28 @@
 <resources>
     <string name="app_name">My Share</string>
-    <string name="action_settings">Settings</string>
+
+
     <!-- Strings used for fragments for navigation -->
     <string name="dashboard_fragment_label">Dashboard Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
+
+
+    <!--Settings Screen-->
+    <string name="action_settings">Settings</string>
+    <string name="content_description_settings">App settings</string>
+
+
+    <!--Dashboard Screen-->
+    <string name="dashboard_label">Dashboard</string>
+    <string name="stocks_label">Stocks</string>
+    <string name="crypto_label">Crypto</string>
+    <string name="savings_label">Savings</string>
+
+
+    <!--Generic labels-->
     <string name="next">Next</string>
     <string name="previous">Previous</string>
+    <string name="empty_string" />
 
 
 </resources>
