@@ -7,7 +7,7 @@
 
         <variable
             name="category"
-            type="pt.ms.myshare.data.User" />
+            type="String" />
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -34,13 +34,14 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="@{category}"
                     tools:text="@string/stocks_label" />
 
                 <TextView
                     style="@style/TextAppearance.Material3.TitleLarge"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    tools:text="300.00€" />
+                    android:text="300.00€" />
 
 
             </LinearLayout>

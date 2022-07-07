@@ -4,7 +4,6 @@
 
     <!-- Strings used for fragments for navigation -->
     <string name="dashboard_fragment_label">Dashboard Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
 
 
     <!--Settings Screen-->
