@@ -9,6 +9,7 @@
     <!--Settings Screen-->
     <string name="action_settings">Settings</string>
     <string name="content_description_settings">App settings</string>
+    <string name="title_activity_settings">SettingsActivity</string>
 
 
     <!--Dashboard Screen-->
@@ -18,10 +19,29 @@
     <string name="savings_label">Savings</string>
 
 
+    <!--Edit Profile Screen-->
+    <string name="edit_profile_label">Edit Profile</string>
+
+
     <!--Generic labels-->
     <string name="next">Next</string>
     <string name="previous">Previous</string>
     <string name="empty_string" />
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
 
 </resources>

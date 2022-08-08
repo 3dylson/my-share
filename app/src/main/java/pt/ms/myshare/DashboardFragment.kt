@@ -30,16 +30,11 @@ class DashboardFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
-        //toolbar?.title = "Hello\nEdylson Frederico"
-
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //(requireActivity() as MainActivity).supportActionBar?.title = "Hello\nEdylson Frederico"
-        //(activity as MainActivity).getMainActivityBinding().toolbar.setTitle("Hello\nEdylson Frederico")
         binding.tvToday.text = TimeUtils.monthDayAndYear(today)
         rvCategoryGrid = binding.categoryGrid
         categoryAdapter = CategoryGridAdapter()
@@ -58,10 +53,7 @@ class DashboardFragment : BaseFragment() {
         }*/
     }
 
-    override fun onStart() {
-        super.onStart()
-        (activity as MainActivity).getMainActivityBinding().toolbar.setTitle("Hello\nEdylson Frederico")
-    }
+    override fun toolbarTitle(): String = "Hello\nEdylson Frederico"
 
     override fun onDestroyView() {
         super.onDestroyView()
