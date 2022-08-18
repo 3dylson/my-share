@@ -1,9 +1,12 @@
 package pt.ms.myshare
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import pt.ms.myshare.databinding.FragmentDashboardBinding
 import pt.ms.myshare.utils.BaseFragment
@@ -13,25 +16,14 @@ import java.time.LocalDate
 /**
  * The default destination in the navigation.
  */
-class DashboardFragment : BaseFragment() {
+class DashboardFragment :
+    BaseFragment<FragmentDashboardBinding>(FragmentDashboardBinding::inflate) {
 
-    private var _binding: FragmentDashboardBinding? = null
     private val today = LocalDate.now()
 
     private lateinit var rvCategoryGrid: RecyclerView
     private lateinit var categoryAdapter: CategoryGridAdapter
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentDashboardBinding.inflate(inflater, container, false)
-        return binding.root
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -53,10 +45,32 @@ class DashboardFragment : BaseFragment() {
         }*/
     }
 
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        super.onCreateMenu(menu, menuInflater)
+        // Add menu items here
+        menuInflater.inflate(R.menu.menu_dashboard, menu)
+    }
+
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        // Handle the menu selection
+        return when (menuItem.itemId) {
+            R.id.EditProfileFragment -> navToEditProfile()
+            R.id.action_settings -> openSettings()
+            else -> true
+        }
+    }
+
+    private fun navToEditProfile(): Boolean {
+        findNavController().navigate(R.id.action_DashboardFragment_to_editProfileFragment)
+        return true
+    }
+
+    private fun openSettings(): Boolean {
+        val intent = Intent(requireActivity(), SettingsActivity::class.java)
+        startActivity(intent)
+        return true
+    }
+
     override fun toolbarTitle(): String = "Hello\nEdylson Frederico"
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
 }

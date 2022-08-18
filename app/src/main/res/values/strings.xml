@@ -19,14 +19,11 @@
     <string name="savings_label">Savings</string>
 
 
-    <!--Edit Profile Screen-->
-    <string name="edit_profile_label">Edit Profile</string>
-
-
     <!--Generic labels-->
     <string name="next">Next</string>
     <string name="previous">Previous</string>
     <string name="empty_string" />
+
 
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
@@ -42,6 +39,19 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+
+    <!--Edit Profile Screen-->
+    <string name="edit_profile_label">Edit Profile</string>
+    <string name="edit_profile_toolbar_title">Edit Profile</string>
+    <string name="your_net_salary_label">Your net salary</string>
+    <string name="salary_net_hint">700.99 €</string>
+    <string name="investments_savings_percentage_label">Percentage of net salary you want to consider for investments/savings</string>
+    <string name="_20_percent_hint">20 %</string>
+    <string name="_60_percent_hint">60 %</string>
+    <string name="percentage_stocks_label">Percentage to consider for <b>Stocks</b></string>
+    <string name="percentage_crypto_label">Percentage to consider for <b>Crypto</b></string>
+    <string name="percentage_savings_label">Percentage to consider for <b>Savings</b></string>
 
 
 </resources>

@@ -9,5 +9,14 @@
         android:id="@+id/DashboardFragment"
         android:name="pt.ms.myshare.DashboardFragment"
         android:label="@string/empty_string"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_dashboard" >
+        <action
+            android:id="@+id/action_DashboardFragment_to_editProfileFragment"
+            app:destination="@id/EditProfileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/EditProfileFragment"
+        android:name="pt.ms.myshare.EditProfileFragment"
+        android:label="@string/empty_string"
+        tools:layout="@layout/fragment_edit_profile" />
 </navigation>
