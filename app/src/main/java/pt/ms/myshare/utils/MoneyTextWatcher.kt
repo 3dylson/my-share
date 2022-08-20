@@ -3,9 +3,8 @@ package pt.ms.myshare.utils
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
-import android.util.Log
 import android.widget.EditText
-import java.lang.String.format
+import pt.ms.myshare.utils.StringUtils.parseCurrencyValue
 import java.lang.ref.WeakReference
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -54,30 +53,14 @@ class MoneyTextWatcher(editText: EditText?) : TextWatcher {
             return
         }
 
-        val parsed: BigDecimal = parseCurrencyValue(editText.text.toString())
+        val parsed: BigDecimal = parseCurrencyValue(editText.text.toString(), numberFormat)
         val formatted: String = numberFormat.format(parsed)
 
         editText.setText(formatted)
-        editText.filters = emptyArray()
+        editText.filters =
+            arrayOf(InputFilter.LengthFilter(15))
         editText.setSelection(formatted.length - 2)
         editText.addTextChangedListener(this)
     }
 
-
-    fun parseCurrencyValue(value: String): BigDecimal {
-        try {
-            val replaceRegex = format(
-                "[%s,\\s]",
-                numberFormat.currency!!.displayName
-            )
-            val currencyValue =
-                value.replace(replaceRegex.toRegex(), StringUtils.EMPTY_STRING).replace(
-                    numberFormat.currency!!.symbol, StringUtils.EMPTY_STRING
-                )
-            return BigDecimal(currencyValue)
-        } catch (e: Exception) {
-            Log.e(TAG, e.message, e)
-        }
-        return BigDecimal.ZERO
-    }
 }

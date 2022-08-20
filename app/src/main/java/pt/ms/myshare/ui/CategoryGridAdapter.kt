@@ -1,4 +1,4 @@
-package pt.ms.myshare
+package pt.ms.myshare.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

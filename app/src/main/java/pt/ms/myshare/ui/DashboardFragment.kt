@@ -1,4 +1,4 @@
-package pt.ms.myshare
+package pt.ms.myshare.ui
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import pt.ms.myshare.R
 import pt.ms.myshare.databinding.FragmentDashboardBinding
 import pt.ms.myshare.utils.BaseFragment
 import pt.ms.myshare.utils.TimeUtils

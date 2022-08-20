@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="pt.ms.myshare">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <!--    <uses-permission android:name="android.permission.INTERNET" />-->
 
     <application
         android:allowBackup="true"
@@ -16,16 +16,16 @@
         android:theme="@style/Theme.MyShare"
         tools:targetApi="31">
         <activity
-            android:name=".SettingsActivity"
+            android:name=".ui.SettingsActivity"
             android:exported="false"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".ui.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".ui.MainActivity" />
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/Theme.MyShare">

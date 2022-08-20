@@ -1,9 +1,10 @@
-package pt.ms.myshare
+package pt.ms.myshare.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import pt.ms.myshare.R
 
 private const val TITLE_TAG = "settingsActivityTitle"
 
