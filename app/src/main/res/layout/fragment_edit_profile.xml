@@ -4,12 +4,11 @@
     android:id="@+id/nested_scroll_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipToPadding="false"
     android:fillViewport="true"
-    android:fitsSystemWindows="true"
     tools:context=".ui.EditProfileFragment">
 
     <LinearLayout
+        android:id="@+id/scroll_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center|top"
@@ -95,6 +94,8 @@
             android:hint="@string/_20_percent_hint"
             android:importantForAutofill="no"
             android:inputType="number" />
+
+        <include layout="@layout/bottom_loading_btn" />
 
     </LinearLayout>
 

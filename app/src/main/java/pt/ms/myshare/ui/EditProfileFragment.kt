@@ -17,6 +17,11 @@ class EditProfileFragment :
 
     }
 
+    override fun getFragmentTAG(): String = "EditProfileFragment"
+
+    override fun toolbarTitle(): String = getString(R.string.edit_profile_toolbar_title)
+
+
     private fun setupUI() {
         with(binding) {
             netSalary.addTextChangedListener(MoneyTextWatcher(netSalary))
@@ -44,8 +49,5 @@ class EditProfileFragment :
             )
         }
     }
-
-    override fun toolbarTitle(): String = getString(R.string.edit_profile_toolbar_title)
-
 
 }

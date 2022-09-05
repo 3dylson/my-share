@@ -52,6 +52,11 @@
     <string name="percentage_stocks_label">Percentage to consider for <b>Stocks</b></string>
     <string name="percentage_crypto_label">Percentage to consider for <b>Crypto</b></string>
     <string name="percentage_savings_label">Percentage to consider for <b>Savings</b></string>
+    <string name="pref_key_net_salary_value" translatable="false">nsv</string>
+    <string name="pref_key_investments_savings_percentage_value" translatable="false">ispv</string>
+    <string name="pref_key_percentage_stocks_value" translatable="false">psv</string>
+    <string name="pref_key_percentage_crypto_value" translatable="false">pcv</string>
+    <string name="pref_key_percentage_savings_value" translatable="false">psv</string>
 
 
 </resources>
