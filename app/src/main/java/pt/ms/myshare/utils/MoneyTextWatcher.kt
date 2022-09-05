@@ -14,6 +14,9 @@ import java.util.*
 private const val TAG = "MoneyTextWatcher"
 private const val DECIMAL_DIGITS = 2
 
+/**
+ * @author @3dylson
+ * */
 class MoneyTextWatcher(editText: EditText?) : TextWatcher {
     private val numberFormat: NumberFormat = NumberFormat.getCurrencyInstance(
         Locale.getDefault()

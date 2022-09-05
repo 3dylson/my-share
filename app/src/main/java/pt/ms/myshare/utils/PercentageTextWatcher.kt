@@ -13,6 +13,9 @@ private const val MAX_INPUT_LENGTH = 5 // ex: 100 %
 private const val MAX_PERCENTAGE = "100"
 private const val MIN_PERCENTAGE = "1"
 
+/**
+ * @author @3dylson
+ * */
 class PercentageTextWatcher(editText: EditText?) : TextWatcher {
 
     private var editTextWeakReference: WeakReference<EditText>? = null

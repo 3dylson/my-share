@@ -1,5 +1,6 @@
 package pt.ms.myshare.utils
 
+import android.text.TextUtils
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
@@ -12,11 +13,13 @@ import com.google.android.material.appbar.AppBarLayout
 object Utils {
 
     /**
-     * Adds an onFocusChangeListener so a scroll view can scroll to the position of the clicked EditText´s label
+     * Adds an onFocusChangeListener so a scroll view can scroll to the position
+     * of the clicked EditText´s label and the [appBarLayout] changed accordingly.
      * @param textInputs The list of inputs
      * @param textInputsLabels The list of the label in the same order as the [textInputs]
      * @param scrollView The Scroll View responsible to make the scroll
      * @param appBarLayout The activity app bar
+     * @author @3dylson
      * */
     fun setScrollOnFocus(
         textInputs: Array<EditText>,
@@ -50,5 +53,13 @@ object Utils {
                     }
                 }
         }
+    }
+
+    fun isAnyInputEmpty(textInputs: Array<EditText>): Boolean {
+        textInputs.forEach {
+            if (TextUtils.isEmpty(it.text.toString())) return true
+        }
+
+        return false
     }
 }

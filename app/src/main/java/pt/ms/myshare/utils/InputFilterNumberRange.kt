@@ -6,6 +6,9 @@ import android.util.Log
 
 private const val TAG = "InputFilterNumberRange"
 
+/**
+ * @author @3dylson
+ * */
 class InputFilterNumberRange : InputFilter {
     private var min: Int
     private var max: Int

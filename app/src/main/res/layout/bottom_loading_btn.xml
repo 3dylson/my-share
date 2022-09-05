@@ -11,9 +11,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:enabled="false"
+        android:textAllCaps="false"
         tools:enabled="true"
-        tools:text="Click here"
-        android:textAllCaps="false" />
+        tools:text="Click here" />
 
     <ProgressBar
         android:id="@+id/progressBar"

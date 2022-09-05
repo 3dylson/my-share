@@ -57,6 +57,7 @@
     <string name="pref_key_percentage_stocks_value" translatable="false">psv</string>
     <string name="pref_key_percentage_crypto_value" translatable="false">pcv</string>
     <string name="pref_key_percentage_savings_value" translatable="false">psv</string>
+    <string name="btn_ep_confirm_text">Confirm</string>
 
 
 </resources>

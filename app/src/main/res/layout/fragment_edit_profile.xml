@@ -95,7 +95,9 @@
             android:importantForAutofill="no"
             android:inputType="number" />
 
-        <include layout="@layout/bottom_loading_btn" />
+        <include
+            android:id="@+id/confirm_button"
+            layout="@layout/bottom_loading_btn" />
 
     </LinearLayout>
 

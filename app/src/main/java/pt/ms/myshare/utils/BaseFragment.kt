@@ -65,6 +65,8 @@ open class BaseFragment<viewBinding : ViewBinding>(private val inflate: Inflate<
         setupToolbarScroll()
     }
 
+    private fun getParentActivity(): MainActivity = requireActivity() as MainActivity
+
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         setToolbarTitle(toolbarTitle())
         // override to add menu to the fragment
@@ -122,6 +124,14 @@ open class BaseFragment<viewBinding : ViewBinding>(private val inflate: Inflate<
         collapsingToolbar.layoutParams = params
     }
 
+    /**
+     * Sets the logic of inputs when clicked or the keyboard receives "IME_ACTION_NEXT"
+     * so the scroll is done correctly.
+     * @param textInputs
+     * @param textInputsLabels
+     * @param scrollView
+     * @author @3dylson
+     * */
     fun setupInputsLogic(
         textInputs: Array<EditText>,
         textInputsLabels: Array<TextView>,
@@ -130,7 +140,6 @@ open class BaseFragment<viewBinding : ViewBinding>(private val inflate: Inflate<
         Utils.setScrollOnFocus(textInputs, textInputsLabels, scrollView, appBarLayout)
     }
 
-    private fun getParentActivity(): MainActivity = requireActivity() as MainActivity
 
     override fun onDestroyView() {
         super.onDestroyView()

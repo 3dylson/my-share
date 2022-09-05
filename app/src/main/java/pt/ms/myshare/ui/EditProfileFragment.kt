@@ -1,12 +1,15 @@
 package pt.ms.myshare.ui
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.View
+import android.widget.EditText
 import pt.ms.myshare.R
 import pt.ms.myshare.databinding.FragmentEditProfileBinding
-import pt.ms.myshare.utils.BaseFragment
-import pt.ms.myshare.utils.MoneyTextWatcher
-import pt.ms.myshare.utils.PercentageTextWatcher
+import pt.ms.myshare.utils.*
+import java.math.BigDecimal
+import java.text.NumberFormat
+import java.util.*
 
 class EditProfileFragment :
     BaseFragment<FragmentEditProfileBinding>(FragmentEditProfileBinding::inflate) {
@@ -29,15 +32,11 @@ class EditProfileFragment :
             stockPercentage.addTextChangedListener(PercentageTextWatcher(stockPercentage))
             cryptoPercentage.addTextChangedListener(PercentageTextWatcher(cryptoPercentage))
             savingsPercentage.addTextChangedListener(PercentageTextWatcher(savingsPercentage))
+            confirmButton.bottomBtn.setupEnableWithInputValidation(getScreenInputs()) { validateForm() }
+            confirmButton.bottomBtn.text = resources.getString(R.string.btn_ep_confirm_text)
 
             setupInputsLogic(
-                arrayOf(
-                    netSalary,
-                    netSalaryPercentage,
-                    stockPercentage,
-                    cryptoPercentage,
-                    savingsPercentage
-                ),
+                getScreenInputs(),
                 arrayOf(
                     netSalaryLabel,
                     netSalaryPercentageLabel,
@@ -48,6 +47,31 @@ class EditProfileFragment :
                 nestedScrollView
             )
         }
+    }
+
+    private fun validateForm(): Boolean {
+        var isValid = true
+
+        if (TextUtils.isEmpty(binding.netSalary.text.toString()) || StringUtils.parseCurrencyValue(
+                binding.netSalary.text.toString(),
+                NumberFormat.getCurrencyInstance(Locale.getDefault())
+            ) == BigDecimal.ZERO
+        ) return false
+
+        if (Utils.isAnyInputEmpty(getScreenInputs())) isValid = false
+
+
+        return isValid
+    }
+
+    private fun getScreenInputs(): Array<EditText> {
+        return arrayOf(
+            binding.netSalary,
+            binding.netSalaryPercentage,
+            binding.stockPercentage,
+            binding.cryptoPercentage,
+            binding.savingsPercentage
+        )
     }
 
 }
