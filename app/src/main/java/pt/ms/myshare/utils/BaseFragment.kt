@@ -32,8 +32,6 @@ open class BaseFragment<viewBinding : ViewBinding>(private val inflate: Inflate<
     private val appBarLayout: AppBarLayout
         get() = getParentActivity().appBar
 
-    private val shouldResizeInputPan get() = getParentActivity().shouldResize
-
     private var _binding: viewBinding? = null
     val binding get() = _binding!!
 
@@ -45,19 +43,8 @@ open class BaseFragment<viewBinding : ViewBinding>(private val inflate: Inflate<
         _binding = inflate.invoke(inflater, container, false)
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
-        val view = binding.root
 
-        if (shouldResizeInputPan) {
-            view.setOnApplyWindowInsetsListener { _, windowInsets ->
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    val imeHeight = windowInsets.getInsets(WindowInsets.Type.ime()).bottom
-                    view.setPadding(0, 0, 0, imeHeight)
-                }
-                windowInsets
-            }
-        }
-
-        return view
+        return binding.root
     }
 
     override fun onStart() {
@@ -108,11 +95,7 @@ open class BaseFragment<viewBinding : ViewBinding>(private val inflate: Inflate<
     }
 
     private fun disableToolBarScrolling() {
-        val params: AppBarLayout.LayoutParams =
-            collapsingToolbar.layoutParams as AppBarLayout.LayoutParams
-        params.scrollFlags = 0
-        params.scrollFlags = (SCROLL_FLAG_EXIT_UNTIL_COLLAPSED or SCROLL_FLAG_SNAP)
-        collapsingToolbar.layoutParams = params
+        Utils.disableToolbarScroll(collapsingToolbar)
     }
 
     private fun enableToolBarScrolling() {

@@ -8,6 +8,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.widget.NestedScrollView
 import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.appbar.CollapsingToolbarLayout
 
 /** Utility class to provide helper methods.  */
 object Utils {
@@ -61,5 +62,15 @@ object Utils {
         }
 
         return false
+    }
+
+
+    fun disableToolbarScroll(collapsingToolbar: CollapsingToolbarLayout) {
+        val params: AppBarLayout.LayoutParams =
+            collapsingToolbar.layoutParams as AppBarLayout.LayoutParams
+        params.scrollFlags = 0
+        params.scrollFlags =
+            (AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED or AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP)
+        collapsingToolbar.layoutParams = params
     }
 }

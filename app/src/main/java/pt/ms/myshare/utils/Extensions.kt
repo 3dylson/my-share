@@ -4,6 +4,8 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.Button
 import android.widget.EditText
+import androidx.core.view.ViewCompat
+import pt.ms.myshare.utils.insetsCallBack.InsetsWithKeyboardAnimationCallback
 
 fun Button.setupEnableWithInputValidation(
     textInputs: Array<EditText>,
@@ -29,4 +31,9 @@ fun Button.setupEnableWithInputValidation(
     }
 
 
+}
+
+fun Button.addResizeAnimation() {
+    val insetsWithKeyboardAnimationCallback = InsetsWithKeyboardAnimationCallback(this)
+    ViewCompat.setWindowInsetsAnimationCallback(this, insetsWithKeyboardAnimationCallback)
 }

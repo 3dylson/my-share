@@ -1,10 +1,12 @@
-package pt.ms.myshare.utils
+package pt.ms.myshare.utils.textWatcher
 
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
 import android.util.Log
 import android.widget.EditText
+import pt.ms.myshare.utils.InputFilterNumberRange
+import pt.ms.myshare.utils.StringUtils
 import pt.ms.myshare.utils.StringUtils.parsePercentageValue
 import java.lang.ref.WeakReference
 

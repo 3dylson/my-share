@@ -3,9 +3,12 @@ package pt.ms.myshare.utils
 import android.content.Context
 import androidx.annotation.StringRes
 import androidx.preference.PreferenceManager
+import java.util.*
 
 /** Utility class to retrieve shared preferences. */
 object PreferenceUtils {
+
+    fun getCurrency(): Locale = Locale.FRANCE
 
     fun saveStringPreference(context: Context, @StringRes prefKeyId: Int, value: String?) {
         PreferenceManager.getDefaultSharedPreferences(context)

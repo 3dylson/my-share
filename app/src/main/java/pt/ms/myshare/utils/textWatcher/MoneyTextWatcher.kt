@@ -1,10 +1,14 @@
-package pt.ms.myshare.utils
+package pt.ms.myshare.utils.textWatcher
 
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
+import android.util.Log
 import android.widget.EditText
+import pt.ms.myshare.utils.PreferenceUtils
+import pt.ms.myshare.utils.StringUtils
 import pt.ms.myshare.utils.StringUtils.parseCurrencyValue
+import pt.ms.myshare.utils.TimeUtils
 import java.lang.ref.WeakReference
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -13,13 +17,15 @@ import java.util.*
 
 private const val TAG = "MoneyTextWatcher"
 private const val DECIMAL_DIGITS = 2
+private const val MAX_DIGITS = 10
+private const val PT_NUMBER_FORMAT = "pt_PT"
 
 /**
  * @author @3dylson
  * */
 class MoneyTextWatcher(editText: EditText?) : TextWatcher {
     private val numberFormat: NumberFormat = NumberFormat.getCurrencyInstance(
-        Locale.getDefault()
+        PreferenceUtils.getCurrency()
     )
     private var editTextWeakReference: WeakReference<EditText>? = null
 
@@ -27,6 +33,10 @@ class MoneyTextWatcher(editText: EditText?) : TextWatcher {
         editTextWeakReference = WeakReference(editText)
         numberFormat.maximumFractionDigits = 0
         numberFormat.roundingMode = RoundingMode.FLOOR
+        Log.d(
+            TAG,
+            "NumberFormat By Device -> ${Locale.getDefault()} | NumberFormat By Default -> ${PreferenceUtils.getCurrency()}"
+        )
     }
 
     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -61,7 +71,7 @@ class MoneyTextWatcher(editText: EditText?) : TextWatcher {
 
         editText.setText(formatted)
         editText.filters =
-            arrayOf(InputFilter.LengthFilter(15))
+            arrayOf(InputFilter.LengthFilter(MAX_DIGITS))
         editText.setSelection(formatted.length - 2)
         editText.addTextChangedListener(this)
     }

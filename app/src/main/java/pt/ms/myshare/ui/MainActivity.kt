@@ -2,11 +2,10 @@ package pt.ms.myshare.ui
 
 import android.os.Build
 import android.os.Bundle
-import android.view.WindowManager
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.WindowCompat
+import androidx.core.view.ViewCompat
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -16,6 +15,9 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import pt.ms.myshare.R
 import pt.ms.myshare.databinding.ActivityMainBinding
+import pt.ms.myshare.utils.insetsCallBack.InsetsWithKeyboardCallback
+
+private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,19 +30,10 @@ class MainActivity : AppCompatActivity() {
         (supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment).navController
     }
 
-    // Soft Input Adjust Resize
-    var shouldResize = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            WindowCompat.setDecorFitsSystemWindows(window, shouldResize)
-            shouldResize = shouldResize.not()
-        } else {
-            @Suppress("DEPRECATION")
-            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-        }
+        Log.d(TAG, "SDK version: ${Build.VERSION.SDK_INT}")
         super.onCreate(savedInstanceState)
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -48,6 +41,10 @@ class MainActivity : AppCompatActivity() {
         collapsingToolbar = binding.collapsingToolbar
         toolbar = binding.toolbar
         setSupportActionBar(toolbar)
+
+        val insetsWithKeyboardCallback = InsetsWithKeyboardCallback(window, collapsingToolbar)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root, insetsWithKeyboardCallback)
+        ViewCompat.setWindowInsetsAnimationCallback(binding.root, insetsWithKeyboardCallback)
 
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)

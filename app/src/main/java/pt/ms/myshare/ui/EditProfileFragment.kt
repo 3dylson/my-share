@@ -7,6 +7,8 @@ import android.widget.EditText
 import pt.ms.myshare.R
 import pt.ms.myshare.databinding.FragmentEditProfileBinding
 import pt.ms.myshare.utils.*
+import pt.ms.myshare.utils.textWatcher.MoneyTextWatcher
+import pt.ms.myshare.utils.textWatcher.PercentageTextWatcher
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.*
@@ -33,6 +35,7 @@ class EditProfileFragment :
             cryptoPercentage.addTextChangedListener(PercentageTextWatcher(cryptoPercentage))
             savingsPercentage.addTextChangedListener(PercentageTextWatcher(savingsPercentage))
             confirmButton.bottomBtn.setupEnableWithInputValidation(getScreenInputs()) { validateForm() }
+            confirmButton.bottomBtn.addResizeAnimation()
             confirmButton.bottomBtn.text = resources.getString(R.string.btn_ep_confirm_text)
 
             setupInputsLogic(
@@ -54,7 +57,7 @@ class EditProfileFragment :
 
         if (TextUtils.isEmpty(binding.netSalary.text.toString()) || StringUtils.parseCurrencyValue(
                 binding.netSalary.text.toString(),
-                NumberFormat.getCurrencyInstance(Locale.getDefault())
+                NumberFormat.getCurrencyInstance(PreferenceUtils.getCurrency())
             ) == BigDecimal.ZERO
         ) return false
 
