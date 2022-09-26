@@ -2,8 +2,11 @@ package pt.ms.myshare.utils
 
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ProgressBar
+import android.widget.RelativeLayout
 import androidx.core.view.ViewCompat
 import pt.ms.myshare.utils.insetsCallBack.InsetsWithKeyboardAnimationCallback
 
@@ -36,4 +39,20 @@ fun Button.setupEnableWithInputValidation(
 fun Button.addResizeAnimation() {
     val insetsWithKeyboardAnimationCallback = InsetsWithKeyboardAnimationCallback(this)
     ViewCompat.setWindowInsetsAnimationCallback(this, insetsWithKeyboardAnimationCallback)
+}
+
+fun RelativeLayout.showBtnLoading() {
+    val button: Button = getChildAt(0) as Button
+    val progressBar: ProgressBar = getChildAt(1) as ProgressBar
+    button.isEnabled = false
+    button.text = StringUtils.EMPTY_STRING
+    progressBar.visibility = View.VISIBLE
+}
+
+fun RelativeLayout.hideBtnLoading(buttonLabel: String) {
+    val button: Button = getChildAt(0) as Button
+    val progressBar: ProgressBar = getChildAt(1) as ProgressBar
+    progressBar.visibility = View.GONE
+    button.text = buttonLabel
+    //button.isEnabled = true
 }

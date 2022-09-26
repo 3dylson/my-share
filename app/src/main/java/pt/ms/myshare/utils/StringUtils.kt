@@ -12,12 +12,14 @@ object StringUtils {
     const val DOT = "."
     const val PERCENTAGE = "%"
     const val ZERO = "0"
+    val CURRENCY: String =
+        NumberFormat.getCurrencyInstance(PreferenceUtils.getCurrency()).currency!!.symbol
 
     fun parsePercentageValue(value: String): String {
         val formatted = value.replace(PERCENTAGE, EMPTY_STRING)
             .replace(SPACE, EMPTY_STRING)
 
-        if (formatted == DOT) {
+        if (formatted == DOT || formatted == COMMA) {
             return ZERO
         }
 
@@ -40,4 +42,22 @@ object StringUtils {
         }
         return BigDecimal.ZERO
     }
+
+    fun isPercentageValue(value: String): Boolean {
+        return value.contains(PERCENTAGE)
+    }
+
+    fun isCurrencyValue(value: String): Boolean {
+        return value.contains(CURRENCY)
+    }
+
+    fun getRawInputText(inputText: String) =
+        if (isCurrencyValue(inputText)) inputText.replace(
+            CURRENCY,
+            EMPTY_STRING
+        ).replace(SPACE, EMPTY_STRING)
+            .trim() else if (isPercentageValue(inputText)) inputText.replace(
+            PERCENTAGE,
+            EMPTY_STRING
+        ).replace(SPACE, EMPTY_STRING).trim() else inputText.replace(SPACE, EMPTY_STRING).trim()
 }

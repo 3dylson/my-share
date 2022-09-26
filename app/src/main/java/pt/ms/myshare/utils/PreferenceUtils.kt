@@ -10,10 +10,17 @@ object PreferenceUtils {
 
     fun getCurrency(): Locale = Locale.FRANCE
 
-    fun saveStringPreference(context: Context, @StringRes prefKeyId: Int, value: String?) {
+    fun saveStringPreference(context: Context, prefKeyId: Int, value: String?) {
         PreferenceManager.getDefaultSharedPreferences(context)
             .edit()
-            .putString(context.getString(prefKeyId), value)
+            .putString(prefKeyId.toString(), value)
+            .apply()
+    }
+
+    fun saveIntPreference(context: Context, @StringRes prefKeyId: Int, value: Int) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+            .edit()
+            .putInt(context.getString(prefKeyId), value)
             .apply()
     }
 
@@ -23,13 +30,13 @@ object PreferenceUtils {
         return sharedPreferences.getInt(prefKey, defaultValue)
     }
 
-    private fun getStringPref(
+    fun getStringPref(
         context: Context,
-        @StringRes prefKeyId: Int,
+        prefKeyId: Int,
         defaultValue: String?
     ): String? {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        val prefKey = context.getString(prefKeyId)
+        val prefKey = prefKeyId.toString()
         return sharedPreferences.getString(prefKey, defaultValue)
     }
 

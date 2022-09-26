@@ -1,6 +1,5 @@
 package pt.ms.myshare.utils
 
-import android.text.TextUtils
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
@@ -34,6 +33,11 @@ object Utils {
                     appBarLayout.setExpanded(false)
                     textInputs[editText + 1].requestFocus()
                 }
+                if (actionID == EditorInfo.IME_ACTION_DONE) {
+                    InputUtils.hideKeyboard(scrollView)
+                    appBarLayout.setExpanded(false)
+                    if (scrollView is NestedScrollView) scrollView.fullScroll(ScrollView.FOCUS_DOWN)
+                }
                 true
             }
             textInputs[editText].onFocusChangeListener =
@@ -56,15 +60,6 @@ object Utils {
         }
     }
 
-    fun isAnyInputEmpty(textInputs: Array<EditText>): Boolean {
-        textInputs.forEach {
-            if (TextUtils.isEmpty(it.text.toString())) return true
-        }
-
-        return false
-    }
-
-
     fun disableToolbarScroll(collapsingToolbar: CollapsingToolbarLayout) {
         val params: AppBarLayout.LayoutParams =
             collapsingToolbar.layoutParams as AppBarLayout.LayoutParams
@@ -73,4 +68,9 @@ object Utils {
             (AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED or AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP)
         collapsingToolbar.layoutParams = params
     }
+
+    fun getPercentOfNumber(value: Int, percentage : Float) : Int {
+        return (value * (percentage / 100.0f)).toInt()
+    }
+
 }

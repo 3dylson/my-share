@@ -58,6 +58,11 @@
     <string name="pref_key_percentage_crypto_value" translatable="false">pcv</string>
     <string name="pref_key_percentage_savings_value" translatable="false">psv</string>
     <string name="btn_ep_confirm_text">Confirm</string>
+    <string name="snackbar_saved_text">Successfully saved</string>
+    <string name="amount_to_invest">amount_to_invest</string>
+    <string name="amount_for_stocks">amount_for_stocks</string>
+    <string name="amount_for_crypto">amount_for_crypto</string>
+    <string name="amount_for_savings">amount_for_savings</string>
 
 
 </resources>
