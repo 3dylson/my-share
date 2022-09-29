@@ -6,8 +6,9 @@
     <data>
 
         <variable
-            name="category"
-            type="String" />
+            name="investAmount"
+            type="pt.ms.myshare.data.InvestAmount" />
+
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -21,6 +22,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             android:padding="@dimen/margin_normal"
             tools:layout_height="80dp">
@@ -34,14 +36,15 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{category}"
+                    android:text="@{investAmount.category}"
                     tools:text="@string/stocks_label" />
 
                 <TextView
                     style="@style/TextAppearance.Material3.TitleLarge"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="300.00€" />
+                    android:text="@{investAmount.value}"
+                    tools:text="300€" />
 
 
             </LinearLayout>

@@ -5,7 +5,6 @@ import android.text.TextUtils
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import pt.ms.myshare.R
 
 object InputUtils {
 
@@ -14,14 +13,17 @@ object InputUtils {
             val inputText = it.text.toString()
             val rawValue = StringUtils.getRawInputText(inputText)
 
-            PreferenceUtils.saveStringPreference(context, it.id, rawValue)
+            PreferenceUtils.setInputValue(context, it.id, rawValue)
         }
     }
 
     fun getInputsData(screenInputs: Array<EditText>, context: Context) {
         screenInputs.forEach {
-            val value = PreferenceUtils.getStringPref(context, it.id, StringUtils.EMPTY_STRING)
-            it.setText(value)
+            val value = PreferenceUtils.getInputValue(context, it.id, StringUtils.EMPTY_STRING)
+            if (value != null) {
+                if (value.isNotEmpty())
+                    it.setText(value)
+            }
         }
     }
 
@@ -29,7 +31,7 @@ object InputUtils {
         val hasChanged = false
         screenInputs.forEach {
             val savedData =
-                PreferenceUtils.getStringPref(context, it.id, StringUtils.EMPTY_STRING)
+                PreferenceUtils.getInputValue(context, it.id, StringUtils.EMPTY_STRING)
             val currentData = StringUtils.getRawInputText(it.text.toString())
             if (currentData != savedData) return true
         }
@@ -50,19 +52,5 @@ object InputUtils {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    fun saveAmountToInvest(amountToInvest: Int, context: Context) {
-        PreferenceUtils.saveIntPreference(context, R.string.amount_to_invest, amountToInvest)
-    }
 
-    fun saveAmountForStocks(amountForStocks: Int, context: Context) {
-        PreferenceUtils.saveIntPreference(context, R.string.amount_for_stocks, amountForStocks)
-    }
-
-    fun saveAmountForCrypto(amountForCrypto: Int, context: Context) {
-        PreferenceUtils.saveIntPreference(context, R.string.amount_for_crypto, amountForCrypto)
-    }
-
-    fun saveAmountForSavings(amountForSavings: Int, context: Context) {
-        PreferenceUtils.saveIntPreference(context, R.string.amount_for_savings, amountForSavings)
-    }
 }

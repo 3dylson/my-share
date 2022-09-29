@@ -9,8 +9,10 @@ import android.view.View
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import pt.ms.myshare.R
+import pt.ms.myshare.data.InvestAmount
 import pt.ms.myshare.databinding.FragmentDashboardBinding
 import pt.ms.myshare.utils.BaseFragment
+import pt.ms.myshare.utils.PreferenceUtils
 import pt.ms.myshare.utils.TimeUtils
 import java.time.LocalDate
 
@@ -33,11 +35,31 @@ class DashboardFragment :
         categoryAdapter = CategoryGridAdapter()
         rvCategoryGrid.adapter = categoryAdapter
         val adapter = rvCategoryGrid.adapter as CategoryGridAdapter
+
+
         adapter.submitList(
             arrayListOf(
-                getString(R.string.stocks_label),
-                getString(R.string.crypto_label),
-                getString(R.string.savings_label)
+                InvestAmount(
+                    getString(R.string.stocks_label),
+                    PreferenceUtils.getAmountToInvest(
+                        requireContext(),
+                        R.string.id_amount_for_stocks
+                    )
+                ),
+                InvestAmount(
+                    getString(R.string.crypto_label),
+                    PreferenceUtils.getAmountToInvest(
+                        requireContext(),
+                        R.string.id_amount_for_crypto
+                    )
+                ),
+                InvestAmount(
+                    getString(R.string.savings_label),
+                    PreferenceUtils.getAmountToInvest(
+                        requireContext(),
+                        R.string.id_amount_for_savings
+                    )
+                )
             )
         )
 

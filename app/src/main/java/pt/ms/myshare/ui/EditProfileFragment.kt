@@ -37,15 +37,15 @@ class EditProfileFragment :
             )
         )
 
+        val incomePercentageTextWatcher = PercentageTextWatcher(
+            arrayOf(
+                binding.netSalaryPercentage
+            )
+        )
+
         with(binding) {
             netSalary.addTextChangedListener(MoneyTextWatcher(netSalary))
-            netSalaryPercentage.addTextChangedListener(
-                PercentageTextWatcher(
-                    arrayOf(
-                        netSalaryPercentage
-                    )
-                )
-            )
+            netSalaryPercentage.addTextChangedListener(incomePercentageTextWatcher)
             stockPercentage.addTextChangedListener(percentageTextWatcher)
             cryptoPercentage.addTextChangedListener(percentageTextWatcher)
             savingsPercentage.addTextChangedListener(percentageTextWatcher)
@@ -65,6 +65,10 @@ class EditProfileFragment :
 
             fillInputWithSavedData()
 
+
+            incomePercentageTextWatcher.isBuildingView = false
+            percentageTextWatcher.isBuildingView = false
+
         }
     }
 
@@ -76,10 +80,10 @@ class EditProfileFragment :
         val context = requireContext()
         InputUtils.saveInputsData(getScreenInputs(), context)
         val amountToInvest = getAmountToInvest()
-        InputUtils.saveAmountToInvest(amountToInvest, context)
-        InputUtils.saveAmountForStocks(getAmountForStocks(amountToInvest), context)
-        InputUtils.saveAmountForCrypto(getAmountForCrypto(amountToInvest), context)
-        InputUtils.saveAmountForSavings(getAmountForSavings(amountToInvest), context)
+        PreferenceUtils.setAmountToInvest(amountToInvest, context)
+        PreferenceUtils.setAmountForStocks(getAmountForStocks(amountToInvest), context)
+        PreferenceUtils.setAmountForCrypto(getAmountForCrypto(amountToInvest), context)
+        PreferenceUtils.setAmountForSavings(getAmountForSavings(amountToInvest), context)
     }
 
     private fun getAmountForSavings(amountToInvest: Int): Int {

@@ -24,6 +24,9 @@ class PercentageTextWatcher(editTexts: Array<EditText?>) : TextWatcher {
     private var editTextWeakReferences: Array<WeakReference<EditText>?> =
         arrayOfNulls(numberOfIteration)
 
+    //Flag to know when to start caring about empty string input
+    var isBuildingView = true
+
     init {
         editTexts.forEachIndexed { index, editText ->
             editTextWeakReferences[index] = WeakReference(editText)
@@ -54,7 +57,7 @@ class PercentageTextWatcher(editTexts: Array<EditText?>) : TextWatcher {
 
         val inputText = editText?.text.toString()
 
-        if (editText == null) {
+        if (editText == null || isBuildingView) {
             return
         }
         editText.removeTextChangedListener(this)
