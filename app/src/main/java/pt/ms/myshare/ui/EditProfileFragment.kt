@@ -73,12 +73,13 @@ class EditProfileFragment :
     }
 
     private fun saveInputValues() {
-        InputUtils.saveInputsData(getScreenInputs(), requireContext())
+        val context = requireContext()
+        InputUtils.saveInputsData(getScreenInputs(), context)
         val amountToInvest = getAmountToInvest()
-        InputUtils.saveAmountToInvest(amountToInvest, requireContext())
-        InputUtils.saveAmountForStocks(getAmountForStocks(amountToInvest), requireContext())
-        InputUtils.saveAmountForCrypto(getAmountForCrypto(amountToInvest), requireContext())
-        InputUtils.saveAmountForSavings(getAmountForSavings(amountToInvest), requireContext())
+        InputUtils.saveAmountToInvest(amountToInvest, context)
+        InputUtils.saveAmountForStocks(getAmountForStocks(amountToInvest), context)
+        InputUtils.saveAmountForCrypto(getAmountForCrypto(amountToInvest), context)
+        InputUtils.saveAmountForSavings(getAmountForSavings(amountToInvest), context)
     }
 
     private fun getAmountForSavings(amountToInvest: Int): Int {
