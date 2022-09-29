@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">My Share</string>
+
+    <!--Settings Screen-->
+    <string name="action_settings">Definições</string>
+    <string name="content_description_settings">Definições da App</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+
+    <!--Dashboard Screen-->
+    <string name="dashboard_label">Dashboard</string>
+    <string name="stocks_label">Ações</string>
+    <string name="crypto_label">Cripto</string>
+    <string name="savings_label">Poupança</string>
+
+
+    <!--Generic labels-->
+    <string name="next">Seguinte</string>
+    <string name="previous">Anterior</string>
+
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Mensagens</string>
+    <string name="sync_header">Sincronizar</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+
+    <!--Edit Profile Screen-->
+    <string name="edit_profile_label">Editar Perfil</string>
+    <string name="edit_profile_toolbar_title">Editar Perfil</string>
+    <string name="your_net_salary_label">Seu salário líquido</string>
+    <string name="investments_savings_percentage_label">Porcentagem do salário líquido que você deseja considerar para investimentos/poupanças</string>
+    <string name="percentage_stocks_label">Porcentagem a ser considerada para <b>Ações</b></string>
+    <string name="percentage_crypto_label">Porcentagem a ser considerada para <b>Cripto</b></string>
+    <string name="percentage_savings_label">Porcentagem a ser considerada para <b>Poupança</b></string>
+    <string name="btn_ep_confirm_text">Confirmar dados</string>
+    <string name="snackbar_saved_text">Salvo com sucesso</string>
+</resources>

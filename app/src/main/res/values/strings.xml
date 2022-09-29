@@ -3,7 +3,7 @@
 
 
     <!-- Strings used for fragments for navigation -->
-    <string name="dashboard_fragment_label">Dashboard Fragment</string>
+    <string name="dashboard_fragment_label" translatable="false">Dashboard Fragment</string>
 
 
     <!--Settings Screen-->
@@ -22,7 +22,7 @@
     <!--Generic labels-->
     <string name="next">Next</string>
     <string name="previous">Previous</string>
-    <string name="empty_string" />
+    <string name="empty_string" translatable="false" />
 
 
     <!-- Preference Titles -->
@@ -45,10 +45,10 @@
     <string name="edit_profile_label">Edit Profile</string>
     <string name="edit_profile_toolbar_title">Edit Profile</string>
     <string name="your_net_salary_label">Your net salary</string>
-    <string name="salary_net_hint">700.99 €</string>
+    <string name="salary_net_hint" translatable="false">700.99 €</string>
     <string name="investments_savings_percentage_label">Percentage of net salary you want to consider for investments/savings</string>
-    <string name="_20_percent_hint">20 %</string>
-    <string name="_60_percent_hint">60 %</string>
+    <string name="_20_percent_hint" translatable="false">20 %</string>
+    <string name="_60_percent_hint" translatable="false">60 %</string>
     <string name="percentage_stocks_label">Percentage to consider for <b>Stocks</b></string>
     <string name="percentage_crypto_label">Percentage to consider for <b>Crypto</b></string>
     <string name="percentage_savings_label">Percentage to consider for <b>Savings</b></string>
@@ -59,10 +59,10 @@
     <string name="pref_key_percentage_savings_value" translatable="false">psv</string>
     <string name="btn_ep_confirm_text">Confirm</string>
     <string name="snackbar_saved_text">Successfully saved</string>
-    <string name="id_amount_to_invest">amount_to_invest</string>
-    <string name="id_amount_for_stocks">amount_for_stocks</string>
-    <string name="id_amount_for_crypto">amount_for_crypto</string>
-    <string name="id_amount_for_savings">amount_for_savings</string>
+    <string name="id_amount_to_invest" translatable="false">amount_to_invest</string>
+    <string name="id_amount_for_stocks" translatable="false">amount_for_stocks</string>
+    <string name="id_amount_for_crypto" translatable="false">amount_for_crypto</string>
+    <string name="id_amount_for_savings" translatable="false">amount_for_savings</string>
 
 
 </resources>
