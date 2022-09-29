@@ -16,6 +16,8 @@ object StringUtils {
         NumberFormat.getCurrencyInstance(PreferenceUtils.getCurrency()).currency!!.symbol
 
     fun parsePercentageValue(value: String): String {
+        if (value == EMPTY_STRING) return ZERO
+
         val formatted = value.replace(PERCENTAGE, EMPTY_STRING)
             .replace(SPACE, EMPTY_STRING)
 
@@ -43,21 +45,18 @@ object StringUtils {
         return BigDecimal.ZERO
     }
 
-    fun isPercentageValue(value: String): Boolean {
+    private fun isPercentageValue(value: String): Boolean {
         return value.contains(PERCENTAGE)
     }
 
-    fun isCurrencyValue(value: String): Boolean {
+    private fun isCurrencyValue(value: String): Boolean {
         return value.contains(CURRENCY)
     }
 
     fun getRawInputText(inputText: String) =
-        if (isCurrencyValue(inputText)) inputText.replace(
-            CURRENCY,
-            EMPTY_STRING
-        ).replace(SPACE, EMPTY_STRING)
-            .trim() else if (isPercentageValue(inputText)) inputText.replace(
-            PERCENTAGE,
-            EMPTY_STRING
-        ).replace(SPACE, EMPTY_STRING).trim() else inputText.replace(SPACE, EMPTY_STRING).trim()
+        if (isCurrencyValue(inputText)) {
+            inputText.replace(CURRENCY, EMPTY_STRING).filter { !it.isWhitespace() }
+        } else if (isPercentageValue(inputText)) {
+            inputText.replace(PERCENTAGE, EMPTY_STRING).filter { !it.isWhitespace() }
+        } else inputText.replace(SPACE, EMPTY_STRING).filter { !it.isWhitespace() }
 }

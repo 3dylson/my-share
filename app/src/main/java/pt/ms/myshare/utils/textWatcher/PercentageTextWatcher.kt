@@ -12,52 +12,81 @@ import java.lang.ref.WeakReference
 
 private const val TAG = "PercentageTextWatcher"
 private const val MAX_INPUT_LENGTH = 5 // ex: 100 %
-private const val MAX_PERCENTAGE = "100"
-private const val MIN_PERCENTAGE = "1"
+private const val MAX_PERCENTAGE = 100
+private const val MIN_PERCENTAGE = 0
 
 /**
  * @author @3dylson
  * */
-class PercentageTextWatcher(editText: EditText?) : TextWatcher {
+class PercentageTextWatcher(editTexts: Array<EditText?>) : TextWatcher {
 
-    private var editTextWeakReference: WeakReference<EditText>? = null
+    private var numberOfIteration = editTexts.size
+    private var editTextWeakReferences: Array<WeakReference<EditText>?> =
+        arrayOfNulls(numberOfIteration)
 
     init {
-        editTextWeakReference = WeakReference(editText)
+        editTexts.forEachIndexed { index, editText ->
+            editTextWeakReferences[index] = WeakReference(editText)
+        }
     }
 
     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-        val editText: EditText = editTextWeakReference?.get() ?: return
-        editText.filters =
-            arrayOf(
-                InputFilter.LengthFilter(MAX_INPUT_LENGTH), InputFilterNumberRange(
-                    MIN_PERCENTAGE, MAX_PERCENTAGE
+        for (i in 0 until numberOfIteration) {
+            val editText: EditText = editTextWeakReferences[i]?.get() ?: return
+            editText.filters =
+                arrayOf(
+                    InputFilter.LengthFilter(MAX_INPUT_LENGTH), InputFilterNumberRange(
+                        MIN_PERCENTAGE.toString(), MAX_PERCENTAGE.toString()
+                    )
                 )
-            )
+        }
 
     }
 
-    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        // Not needed
+    }
 
     override fun afterTextChanged(s: Editable?) {
-        val editText: EditText? = editTextWeakReference?.get()
-        if (editText == null || editText.text.toString() == StringUtils.EMPTY_STRING) {
+        val editText: EditText? =
+            editTextWeakReferences.find { weakReference -> weakReference!!.get()!!.editableText!! == s }
+                ?.get()
+
+        val inputText = editText?.text.toString()
+
+        if (editText == null) {
             return
         }
         editText.removeTextChangedListener(this)
 
-        val parsed: String = parsePercentageValue(editText.text.toString())
+        var parsed: String = parsePercentageValue(inputText)
 
-        if (parsed.toFloatOrNull() != null && parsed.toFloat() > 100) {
+
+        if (parsed != StringUtils.EMPTY_STRING && (parsed.toFloatOrNull() != null && parsed.toFloat() > MAX_PERCENTAGE)
+        ) {
             editText.addTextChangedListener(this)
             return
         }
 
+
         if (parsed == StringUtils.EMPTY_STRING) {
             editText.setText(parsed)
         } else {
+            if (parsed.first().toString() == StringUtils.ZERO) {
+                parsed = StringUtils.ZERO
+            }
+
+            //TODO fill the rest with the amount available also consider adding error label
+            if (sumOfPercentage() > MAX_PERCENTAGE) {
+                parsed = parsed.dropLast(1)
+                if (parsed == StringUtils.EMPTY_STRING) {
+                    parsed = StringUtils.ZERO
+                }
+            }
+
             try {
-                val formatted: String = parsed.plus(StringUtils.SPACE).plus(StringUtils.PERCENTAGE)
+                val formatted: String =
+                    parsed.plus(StringUtils.SPACE).plus(StringUtils.PERCENTAGE)
                 editText.setText(formatted)
                 editText.setSelection(formatted.length - 2)
             } catch (e: IndexOutOfBoundsException) {
@@ -67,6 +96,16 @@ class PercentageTextWatcher(editText: EditText?) : TextWatcher {
 
         editText.addTextChangedListener(this)
 
+
+    }
+
+
+    private fun sumOfPercentage(): Float {
+        var sum = 0f
+        editTextWeakReferences.forEach {
+            sum += parsePercentageValue(it!!.get()!!.text!!.toString()).toFloat()
+        }
+        return sum
     }
 
 

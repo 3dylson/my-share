@@ -29,12 +29,26 @@ class EditProfileFragment :
 
 
     private fun setupUI() {
+        val percentageTextWatcher = PercentageTextWatcher(
+            arrayOf(
+                binding.stockPercentage,
+                binding.cryptoPercentage,
+                binding.savingsPercentage
+            )
+        )
+
         with(binding) {
             netSalary.addTextChangedListener(MoneyTextWatcher(netSalary))
-            netSalaryPercentage.addTextChangedListener(PercentageTextWatcher(netSalaryPercentage))
-            stockPercentage.addTextChangedListener(PercentageTextWatcher(stockPercentage))
-            cryptoPercentage.addTextChangedListener(PercentageTextWatcher(cryptoPercentage))
-            savingsPercentage.addTextChangedListener(PercentageTextWatcher(savingsPercentage))
+            netSalaryPercentage.addTextChangedListener(
+                PercentageTextWatcher(
+                    arrayOf(
+                        netSalaryPercentage
+                    )
+                )
+            )
+            stockPercentage.addTextChangedListener(percentageTextWatcher)
+            cryptoPercentage.addTextChangedListener(percentageTextWatcher)
+            savingsPercentage.addTextChangedListener(percentageTextWatcher)
             confirmButton.bottomBtn.setupEnableWithInputValidation(getScreenInputs()) { validateForm() }
             confirmButton.bottomBtn.addResizeAnimation()
             confirmButton.bottomBtn.text = resources.getString(R.string.btn_ep_confirm_text)
@@ -46,11 +60,7 @@ class EditProfileFragment :
             )
 
             confirmButton.bottomBtn.setOnClickListener {
-                confirmButton.root.showBtnLoading()
-                saveInputValues()
-                confirmButton.root.hideBtnLoading(resources.getString(R.string.btn_ep_confirm_text))
-                Snackbar.make(it, getString(R.string.snackbar_saved_text), Snackbar.LENGTH_SHORT)
-                    .setAnchorView(it).show()
+                onConfirmClick(it)
             }
 
             fillInputWithSavedData()
@@ -133,4 +143,16 @@ class EditProfileFragment :
         )
     }
 
+    private fun onConfirmClick(button: View) {
+        InputUtils.hideKeyboard(requireView())
+        binding.confirmButton.root.showBtnLoading()
+        saveInputValues()
+        binding.confirmButton.root.hideBtnLoading(getString(R.string.btn_ep_confirm_text))
+        Snackbar.make(
+            button,
+            getString(R.string.snackbar_saved_text),
+            Snackbar.LENGTH_SHORT
+        ).setAnchorView(button).show()
+    }
 }
+
