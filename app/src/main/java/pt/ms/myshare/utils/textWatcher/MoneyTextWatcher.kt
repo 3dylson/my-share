@@ -3,14 +3,11 @@ package pt.ms.myshare.utils.textWatcher
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
-import android.util.Log
 import android.widget.EditText
 import pt.ms.myshare.utils.PreferenceUtils
 import pt.ms.myshare.utils.StringUtils
-import pt.ms.myshare.utils.StringUtils.parseCurrencyValue
-import pt.ms.myshare.utils.TimeUtils
+import timber.log.Timber
 import java.lang.ref.WeakReference
-import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.NumberFormat
 import java.util.*
@@ -33,8 +30,7 @@ class MoneyTextWatcher(editText: EditText?) : TextWatcher {
         editTextWeakReference = WeakReference(editText)
         numberFormat.maximumFractionDigits = 0
         numberFormat.roundingMode = RoundingMode.FLOOR
-        Log.d(
-            TAG,
+        Timber.i(
             "NumberFormat By Device -> ${Locale.getDefault()} | NumberFormat By Default -> ${PreferenceUtils.getCurrency()}"
         )
     }

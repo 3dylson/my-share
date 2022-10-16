@@ -2,7 +2,6 @@ package pt.ms.myshare.ui
 
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
@@ -16,6 +15,7 @@ import com.google.android.material.appbar.CollapsingToolbarLayout
 import pt.ms.myshare.R
 import pt.ms.myshare.databinding.ActivityMainBinding
 import pt.ms.myshare.utils.insetsCallBack.InsetsWithKeyboardCallback
+import timber.log.Timber
 
 private const val TAG = "MainActivity"
 
@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d(TAG, "SDK version: ${Build.VERSION.SDK_INT}")
+        Timber.tag("SDK version").i("${Build.VERSION.SDK_INT}")
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)

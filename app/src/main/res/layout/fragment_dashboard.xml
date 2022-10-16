@@ -42,7 +42,8 @@
                     android:text="@string/dashboard_label"
                     app:checkedIconEnabled="false" />
 
-                <com.google.android.material.chip.Chip
+                <!--TODO Implement other dashboard filters chips-->
+                <!--<com.google.android.material.chip.Chip
                     android:id="@+id/chip_stocks"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
@@ -65,7 +66,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="@dimen/margin_normal"
                     android:text="@string/savings_label"
-                    app:checkedIconEnabled="false" />
+                    app:checkedIconEnabled="false" />-->
 
 
             </com.google.android.material.chip.ChipGroup>

@@ -10,6 +10,7 @@
 
     <!--Dashboard Screen-->
     <string name="hello_message">Olá</string>
+    <string name="dashboard_message">Acompanhe seus investimentos!</string>
     <string name="dashboard_label">Dashboard</string>
     <string name="stocks_label">Ações</string>
     <string name="crypto_label">Cripto</string>

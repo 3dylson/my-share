@@ -6,6 +6,7 @@ plugins {
     id 'kotlin-kapt'
     id 'kotlin-android'
     id 'kotlin-parcelize'
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
@@ -66,6 +67,7 @@ dependencies {
     // https://firebase.google.com/docs/android/setup#available-libraries
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'com.google.firebase:firebase-firestore-ktx'
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
 
     // ViewModel and LiveData
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
@@ -90,4 +92,7 @@ dependencies {
     //glide dependency
     implementation 'com.github.bumptech.glide:glide:4.13.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.13.0'
+
+    //Timber
+    implementation 'com.jakewharton.timber:timber:5.0.1'
 }

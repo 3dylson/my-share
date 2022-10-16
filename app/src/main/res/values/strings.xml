@@ -14,6 +14,7 @@
 
     <!--Dashboard Screen-->
     <string name="hello_message">Hello</string>
+    <string name="dashboard_message">Keep track of your investments!</string>
     <string name="dashboard_label">Dashboard</string>
     <string name="stocks_label">Stocks</string>
     <string name="crypto_label">Crypto</string>

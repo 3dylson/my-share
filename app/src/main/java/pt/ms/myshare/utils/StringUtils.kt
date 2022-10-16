@@ -11,6 +11,7 @@ object StringUtils {
     const val SPACE = " "
     const val COMMA = ","
     const val DOT = "."
+    const val PARAGRAPH = "\n"
     const val PERCENTAGE = "%"
     const val ZERO = "0"
     private val numberFormat: NumberFormat = NumberFormat.getCurrencyInstance(

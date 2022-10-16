@@ -84,7 +84,7 @@ class DashboardFragment :
         // Handle the menu selection
         return when (menuItem.itemId) {
             R.id.EditProfileFragment -> navToEditProfile()
-            R.id.action_settings -> openSettings()
+            //R.id.action_settings -> openSettings()
             else -> true
         }
     }
@@ -103,10 +103,12 @@ class DashboardFragment :
     override fun toolbarTitle(): String {
         val username = PreferenceUtils.getUsername(requireContext(), R.string.id_username)
         var helloMsg = getString(R.string.hello_message)
+        val dashboardMsg = getString(R.string.dashboard_message)
 
-        if (username != null && username.isNotBlank()) {
-            helloMsg += StringUtils.SPACE
-            helloMsg += username
+        helloMsg += if (username != null && username.isNotBlank()) {
+            StringUtils.SPACE + username + StringUtils.COMMA + StringUtils.PARAGRAPH + dashboardMsg
+        } else {
+            StringUtils.COMMA + StringUtils.PARAGRAPH + dashboardMsg
         }
 
         return helloMsg
