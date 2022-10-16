@@ -63,22 +63,24 @@ class EditProfileFragment :
                 onConfirmClick(it)
             }
 
-            fillInputWithSavedData()
-
-
             incomePercentageTextWatcher.isBuildingView = false
             percentageTextWatcher.isBuildingView = false
+
+            fillInputWithSavedData()
 
         }
     }
 
     private fun fillInputWithSavedData() {
+        val username = PreferenceUtils.getUsername(requireContext(), R.string.id_username)
+        binding.username.setText(username)
         InputUtils.getInputsData(getScreenInputs(), requireContext())
     }
 
     private fun saveInputValues() {
         val context = requireContext()
         InputUtils.saveInputsData(getScreenInputs(), context)
+        PreferenceUtils.setUsername(binding.username, context)
         val amountToInvest = getAmountToInvest()
         PreferenceUtils.setAmountToInvest(amountToInvest, context)
         PreferenceUtils.setAmountForStocks(getAmountForStocks(amountToInvest), context)

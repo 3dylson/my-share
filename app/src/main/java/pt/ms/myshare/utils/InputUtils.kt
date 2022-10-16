@@ -20,9 +20,8 @@ object InputUtils {
     fun getInputsData(screenInputs: Array<EditText>, context: Context) {
         screenInputs.forEach {
             val value = PreferenceUtils.getInputValue(context, it.id, StringUtils.EMPTY_STRING)
-            if (value != null) {
-                if (value.isNotEmpty())
-                    it.setText(value)
+            when {
+                value != null && value.isNotEmpty() -> it.setText(value)
             }
         }
     }

@@ -16,6 +16,23 @@
         android:padding="@dimen/margin_normal">
 
         <TextView
+            android:id="@+id/username_label"
+            style="@style/TextAppearance.Material3.TitleMedium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:text="@string/username_label" />
+
+        <EditText
+            android:id="@+id/username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_large"
+            android:autofillHints="textPersonName"
+            android:inputType="textPersonName"
+            tools:text="Edylson Frederico" />
+
+        <TextView
             android:id="@+id/net_salary_label"
             style="@style/TextAppearance.Material3.TitleMedium"
             android:layout_width="match_parent"

@@ -2,6 +2,7 @@ package pt.ms.myshare.utils
 
 import android.util.Log
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.text.NumberFormat
 
 object StringUtils {
@@ -12,8 +13,10 @@ object StringUtils {
     const val DOT = "."
     const val PERCENTAGE = "%"
     const val ZERO = "0"
-    val CURRENCY: String =
-        NumberFormat.getCurrencyInstance(PreferenceUtils.getCurrency()).currency!!.symbol
+    private val numberFormat: NumberFormat = NumberFormat.getCurrencyInstance(
+        PreferenceUtils.getCurrency()
+    )
+    val CURRENCY_SYMBOL: String = numberFormat.currency!!.symbol
 
     fun parsePercentageValue(value: String): String {
         if (value == EMPTY_STRING) return ZERO
@@ -50,13 +53,23 @@ object StringUtils {
     }
 
     private fun isCurrencyValue(value: String): Boolean {
-        return value.contains(CURRENCY)
+        return value.contains(CURRENCY_SYMBOL)
     }
 
     fun getRawInputText(inputText: String) =
         if (isCurrencyValue(inputText)) {
-            inputText.replace(CURRENCY, EMPTY_STRING).filter { !it.isWhitespace() }
+            inputText.replace(CURRENCY_SYMBOL, EMPTY_STRING).filter { !it.isWhitespace() }
         } else if (isPercentageValue(inputText)) {
             inputText.replace(PERCENTAGE, EMPTY_STRING).filter { !it.isWhitespace() }
         } else inputText.replace(SPACE, EMPTY_STRING).filter { !it.isWhitespace() }
+
+    fun formatCurrency(value: String): String {
+        val formatter = numberFormat
+        formatter.apply {
+            maximumFractionDigits = 0
+            roundingMode = RoundingMode.FLOOR
+        }
+        val parsed: BigDecimal = parseCurrencyValue(value, formatter)
+        return formatter.format(parsed)
+    }
 }

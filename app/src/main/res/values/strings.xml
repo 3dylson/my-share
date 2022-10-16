@@ -13,6 +13,7 @@
 
 
     <!--Dashboard Screen-->
+    <string name="hello_message">Hello</string>
     <string name="dashboard_label">Dashboard</string>
     <string name="stocks_label">Stocks</string>
     <string name="crypto_label">Crypto</string>
@@ -45,6 +46,7 @@
     <string name="edit_profile_label">Edit Profile</string>
     <string name="edit_profile_toolbar_title">Edit Profile</string>
     <string name="your_net_salary_label">Your net salary</string>
+    <string name="username_label">What\'s your name?</string>
     <string name="salary_net_hint" translatable="false">700.99 €</string>
     <string name="investments_savings_percentage_label">Percentage of net salary you want to consider for investments/savings</string>
     <string name="_20_percent_hint" translatable="false">20 %</string>
@@ -59,6 +61,7 @@
     <string name="pref_key_percentage_savings_value" translatable="false">psv</string>
     <string name="btn_ep_confirm_text">Confirm</string>
     <string name="snackbar_saved_text">Successfully saved</string>
+    <string name="id_username" translatable="false">username</string>
     <string name="id_amount_to_invest" translatable="false">amount_to_invest</string>
     <string name="id_amount_for_stocks" translatable="false">amount_for_stocks</string>
     <string name="id_amount_for_crypto" translatable="false">amount_for_crypto</string>

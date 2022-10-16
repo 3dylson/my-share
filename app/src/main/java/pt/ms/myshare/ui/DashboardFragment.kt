@@ -1,11 +1,13 @@
 package pt.ms.myshare.ui
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import pt.ms.myshare.R
@@ -13,6 +15,7 @@ import pt.ms.myshare.data.InvestAmount
 import pt.ms.myshare.databinding.FragmentDashboardBinding
 import pt.ms.myshare.utils.BaseFragment
 import pt.ms.myshare.utils.PreferenceUtils
+import pt.ms.myshare.utils.StringUtils
 import pt.ms.myshare.utils.TimeUtils
 import java.time.LocalDate
 
@@ -22,6 +25,7 @@ import java.time.LocalDate
 class DashboardFragment :
     BaseFragment<FragmentDashboardBinding>(FragmentDashboardBinding::inflate) {
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private val today = LocalDate.now()
 
     private lateinit var rvCategoryGrid: RecyclerView
@@ -30,7 +34,9 @@ class DashboardFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.tvToday.text = TimeUtils.monthDayAndYear(today)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            binding.tvToday.text = TimeUtils.monthDayAndYear(today)
+        }
         rvCategoryGrid = binding.categoryGrid
         categoryAdapter = CategoryGridAdapter()
         rvCategoryGrid.adapter = categoryAdapter
@@ -94,6 +100,16 @@ class DashboardFragment :
         return true
     }
 
-    override fun toolbarTitle(): String = "Hello\nEdylson Frederico"
+    override fun toolbarTitle(): String {
+        val username = PreferenceUtils.getUsername(requireContext(), R.string.id_username)
+        var helloMsg = getString(R.string.hello_message)
+
+        if (username != null && username.isNotBlank()) {
+            helloMsg += StringUtils.SPACE
+            helloMsg += username
+        }
+
+        return helloMsg
+    }
 
 }

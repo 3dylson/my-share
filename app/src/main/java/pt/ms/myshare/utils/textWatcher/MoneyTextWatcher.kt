@@ -66,8 +66,7 @@ class MoneyTextWatcher(editText: EditText?) : TextWatcher {
             return
         }
 
-        val parsed: BigDecimal = parseCurrencyValue(editText.text.toString(), numberFormat)
-        val formatted: String = numberFormat.format(parsed)
+        val formatted: String = StringUtils.formatCurrency(editText.text.toString())
 
         editText.setText(formatted)
         editText.filters =

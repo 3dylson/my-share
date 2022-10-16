@@ -1,6 +1,7 @@
 package pt.ms.myshare.utils
 
 import android.content.Context
+import android.widget.EditText
 import androidx.annotation.StringRes
 import androidx.preference.PreferenceManager
 import pt.ms.myshare.R
@@ -13,7 +14,7 @@ object PreferenceUtils {
 
     fun getAmountToInvest(context: Context, @StringRes category: Int): String {
         val amount = getIntPref(context, category, 0)
-        return amount.toString().plus(StringUtils.SPACE).plus(StringUtils.CURRENCY)
+        return StringUtils.formatCurrency(amount.toString())
     }
 
     fun setAmountToInvest(amountToInvest: Int, context: Context) {
@@ -37,7 +38,7 @@ object PreferenceUtils {
     }
 
     fun getInputValue(context: Context, prefKeyId: Int, defaultValue: String?): String? {
-        return getStringPref(context, prefKeyId, defaultValue)
+        return getStringWithIdPref(context, prefKeyId, defaultValue)
     }
 
 
@@ -82,6 +83,16 @@ object PreferenceUtils {
 
     private fun getStringPref(
         context: Context,
+        @StringRes prefKeyId: Int,
+        defaultValue: String?
+    ): String? {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+        val prefKey = context.getString(prefKeyId)
+        return sharedPreferences.getString(prefKey, defaultValue)
+    }
+
+    private fun getStringWithIdPref(
+        context: Context,
         prefKeyId: Int,
         defaultValue: String?
     ): String? {
@@ -97,4 +108,15 @@ object PreferenceUtils {
     ): Boolean =
         PreferenceManager.getDefaultSharedPreferences(context)
             .getBoolean(context.getString(prefKeyId), defaultValue)
+
+    fun setUsername(username: EditText, context: Context) {
+        val name = username.text.toString()
+        if (name.isNotBlank()) {
+            saveStringResPreference(context, R.string.id_username, name)
+        }
+    }
+
+    fun getUsername(context: Context, @StringRes prefKeyId: Int): String? {
+        return getStringPref(context, prefKeyId, StringUtils.EMPTY_STRING)
+    }
 }
