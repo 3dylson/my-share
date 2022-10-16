@@ -15,7 +15,7 @@
         style="@style/Widget.Material3.CardView.Elevated"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_normal"
+        android:layout_margin="@dimen/spacing_normal"
         android:minHeight="80dp">
 
 
@@ -63,7 +63,7 @@
                     android:adjustViewBounds="true"
                     android:padding="2dp"
                     android:scaleType="centerCrop"
-                    app:srcCompat="@drawable/ic_baseline_show_chart" />
+                    app:imageResource="@{investAmount.chipIcon}" />
 
 
             </LinearLayout>

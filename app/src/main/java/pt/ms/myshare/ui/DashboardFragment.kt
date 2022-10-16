@@ -49,22 +49,25 @@ class DashboardFragment :
                     getString(R.string.stocks_label),
                     PreferenceUtils.getAmountToInvest(
                         requireContext(),
-                        R.string.id_amount_for_stocks
-                    )
+                        R.string.id_amount_for_stocks,
+                    ),
+                    R.drawable.ic_baseline_show_chart
                 ),
                 InvestAmount(
                     getString(R.string.crypto_label),
                     PreferenceUtils.getAmountToInvest(
                         requireContext(),
                         R.string.id_amount_for_crypto
-                    )
+                    ),
+                    R.drawable.ic_baseline_currency_bitcoin
                 ),
                 InvestAmount(
                     getString(R.string.savings_label),
                     PreferenceUtils.getAmountToInvest(
                         requireContext(),
                         R.string.id_amount_for_savings
-                    )
+                    ),
+                    R.drawable.savings_48px
                 )
             )
         )

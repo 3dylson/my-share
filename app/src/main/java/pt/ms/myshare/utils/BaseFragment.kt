@@ -73,6 +73,8 @@ open class BaseFragment<viewBinding : ViewBinding>(private val inflate: Inflate<
 
 
     private fun setupToolbarScroll() {
+        appBarLayout.setExpanded(true)
+        disableToolBarScrolling()
         val view = binding.root
 
         if (view is NestedScrollView) {

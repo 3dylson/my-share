@@ -110,7 +110,7 @@ object PreferenceUtils {
             .getBoolean(context.getString(prefKeyId), defaultValue)
 
     fun setUsername(username: EditText, context: Context) {
-        val name = username.text.toString()
+        val name = username.text.toString().trim()
         if (name.isNotBlank()) {
             saveStringResPreference(context, R.string.id_username, name)
         }

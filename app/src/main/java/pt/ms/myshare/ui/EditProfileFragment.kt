@@ -49,7 +49,7 @@ class EditProfileFragment :
             stockPercentage.addTextChangedListener(percentageTextWatcher)
             cryptoPercentage.addTextChangedListener(percentageTextWatcher)
             savingsPercentage.addTextChangedListener(percentageTextWatcher)
-            confirmButton.bottomBtn.setupEnableWithInputValidation(getScreenInputs()) { validateForm() }
+            confirmButton.bottomBtn.setupEnableWithInputValidation(getScreenInputs(true)) { validateForm() }
             confirmButton.bottomBtn.addResizeAnimation()
             confirmButton.bottomBtn.text = resources.getString(R.string.btn_ep_confirm_text)
 
@@ -72,10 +72,11 @@ class EditProfileFragment :
     }
 
     private fun fillInputWithSavedData() {
-        val username = PreferenceUtils.getUsername(requireContext(), R.string.id_username)
-        binding.username.setText(username)
+        binding.username.setText(getUsername())
         InputUtils.getInputsData(getScreenInputs(), requireContext())
     }
+
+    private fun getUsername() = PreferenceUtils.getUsername(requireContext(), R.string.id_username)
 
     private fun saveInputValues() {
         val context = requireContext()
@@ -114,7 +115,7 @@ class EditProfileFragment :
     }
 
     private fun validateForm(): Boolean {
-        var isValid = true
+        var enableConfirmBtn: Boolean
 
         if (TextUtils.isEmpty(binding.netSalary.text.toString()) || StringUtils.parseCurrencyValue(
                 binding.netSalary.text.toString(),
@@ -124,14 +125,23 @@ class EditProfileFragment :
 
         if (InputUtils.isAnyInputEmpty(getScreenInputs())) return false
 
-        isValid = InputUtils.inputDataChanged(getScreenInputs(), requireContext())
+        val usernameChanged = getUsername() != binding.username.text.toString().trim()
 
-        return isValid
+        enableConfirmBtn = usernameChanged || InputUtils.inputDataChanged(getScreenInputs(), requireContext())
+
+        return enableConfirmBtn
     }
 
 
-    private fun getScreenInputs(): Array<EditText> {
-        return arrayOf(
+    private fun getScreenInputs(isUsernameIncluded: Boolean? = false): Array<EditText> {
+        return if (isUsernameIncluded == true) arrayOf(
+            binding.netSalary,
+            binding.netSalaryPercentage,
+            binding.stockPercentage,
+            binding.cryptoPercentage,
+            binding.savingsPercentage,
+            binding.username
+        ) else arrayOf(
             binding.netSalary,
             binding.netSalaryPercentage,
             binding.stockPercentage,
