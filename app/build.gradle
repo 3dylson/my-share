@@ -77,6 +77,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'com.google.firebase:firebase-firestore-ktx'
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation("com.google.firebase:firebase-inappmessaging-display-ktx")
 
     // ViewModel and LiveData
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'

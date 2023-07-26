@@ -1,5 +1,7 @@
 package pt.ms.myshare.utils
 
+import android.content.Context
+import android.content.res.Configuration
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -55,4 +57,8 @@ fun RelativeLayout.hideBtnLoading(buttonLabel: String) {
     progressBar.visibility = View.GONE
     button.text = buttonLabel
     //button.isEnabled = true
+}
+
+fun Context.isDarkTheme(): Boolean {
+    return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
 }

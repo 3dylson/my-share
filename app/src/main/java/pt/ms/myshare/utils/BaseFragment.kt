@@ -2,7 +2,12 @@ package pt.ms.myshare.utils
 
 import android.os.Build
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.ActionBar
@@ -14,9 +19,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.appbar.AppBarLayout.LayoutParams.*
+import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED
+import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
+import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import pt.ms.myshare.ui.MainActivity
+import pt.ms.myshare.utils.logs.FirebaseUtils
 
 typealias Inflate<T> = (LayoutInflater, ViewGroup?, Boolean) -> T
 
@@ -38,7 +46,7 @@ open class BaseFragment<viewBinding : ViewBinding>(private val inflate: Inflate<
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         _binding = inflate.invoke(inflater, container, false)
         val menuHost: MenuHost = requireActivity()
@@ -50,6 +58,11 @@ open class BaseFragment<viewBinding : ViewBinding>(private val inflate: Inflate<
     override fun onStart() {
         super.onStart()
         setupToolbarScroll()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        FirebaseUtils.logScreen(getFragmentTAG())
     }
 
     private fun getParentActivity(): MainActivity = requireActivity() as MainActivity
@@ -71,7 +84,6 @@ open class BaseFragment<viewBinding : ViewBinding>(private val inflate: Inflate<
         collapsingToolbar.title = title
     }
 
-
     private fun setupToolbarScroll() {
         appBarLayout.setExpanded(true)
         disableToolBarScrolling()
@@ -84,8 +96,11 @@ open class BaseFragment<viewBinding : ViewBinding>(private val inflate: Inflate<
                     val scrollUp = scrollY <= oldScrollY
                     val scrollDown = scrollY >= oldScrollY
 
-                    if (scrollUp || scrollDown) enableToolBarScrolling()
-                    else disableToolBarScrolling()
+                    if (scrollUp || scrollDown) {
+                        enableToolBarScrolling()
+                    } else {
+                        disableToolBarScrolling()
+                    }
                 }
             }
         }
@@ -104,8 +119,10 @@ open class BaseFragment<viewBinding : ViewBinding>(private val inflate: Inflate<
         val params: AppBarLayout.LayoutParams =
             collapsingToolbar.layoutParams as AppBarLayout.LayoutParams
         params.scrollFlags = 0
-        params.scrollFlags = (SCROLL_FLAG_SCROLL
-                or SCROLL_FLAG_EXIT_UNTIL_COLLAPSED or SCROLL_FLAG_SNAP)
+        params.scrollFlags = (
+            SCROLL_FLAG_SCROLL
+                or SCROLL_FLAG_EXIT_UNTIL_COLLAPSED or SCROLL_FLAG_SNAP
+            )
         collapsingToolbar.layoutParams = params
     }
 
@@ -120,11 +137,10 @@ open class BaseFragment<viewBinding : ViewBinding>(private val inflate: Inflate<
     fun setupInputsLogic(
         textInputs: Array<EditText>,
         textInputsLabels: Array<TextView>,
-        scrollView: View
+        scrollView: View,
     ) {
         Utils.setScrollOnFocus(textInputs, textInputsLabels, scrollView, appBarLayout)
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

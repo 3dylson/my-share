@@ -15,7 +15,10 @@ import com.google.android.material.appbar.CollapsingToolbarLayout
 import pt.ms.myshare.R
 import pt.ms.myshare.databinding.ActivityMainBinding
 import pt.ms.myshare.utils.insetsCallBack.InsetsWithKeyboardCallback
+import pt.ms.myshare.utils.isDarkTheme
+import pt.ms.myshare.utils.logs.FirebaseUtils
 import timber.log.Timber
+import java.util.Locale
 
 private const val TAG = "MainActivity"
 
@@ -29,7 +32,6 @@ class MainActivity : AppCompatActivity() {
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment).navController
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.tag("SDK version").i("${Build.VERSION.SDK_INT}")
@@ -49,19 +51,22 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
 
-        /*binding.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAnchorView(R.id.fab)
-                .setAction("Action", null).show()
-        }*/
+        logAppStart()
     }
 
+    private fun logAppStart() {
+        FirebaseUtils.logEvent(
+            "app_start",
+            Bundle().apply {
+                putString("device_language", Locale.getDefault().language)
+                putString("is_system_dark_theme", this@MainActivity.isDarkTheme().toString())
+            },
+        )
+    }
 
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
-        return navController.navigateUp(appBarConfiguration)
-                || super.onSupportNavigateUp()
+        return navController.navigateUp(appBarConfiguration) ||
+            super.onSupportNavigateUp()
     }
-
-
 }

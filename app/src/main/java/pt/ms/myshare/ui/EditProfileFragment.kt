@@ -8,7 +8,16 @@ import android.widget.TextView
 import com.google.android.material.snackbar.Snackbar
 import pt.ms.myshare.R
 import pt.ms.myshare.databinding.FragmentEditProfileBinding
-import pt.ms.myshare.utils.*
+import pt.ms.myshare.utils.BaseFragment
+import pt.ms.myshare.utils.InputUtils
+import pt.ms.myshare.utils.PreferenceUtils
+import pt.ms.myshare.utils.StringUtils
+import pt.ms.myshare.utils.Utils
+import pt.ms.myshare.utils.addResizeAnimation
+import pt.ms.myshare.utils.hideBtnLoading
+import pt.ms.myshare.utils.logs.FirebaseUtils
+import pt.ms.myshare.utils.setupEnableWithInputValidation
+import pt.ms.myshare.utils.showBtnLoading
 import pt.ms.myshare.utils.textWatcher.MoneyTextWatcher
 import pt.ms.myshare.utils.textWatcher.PercentageTextWatcher
 import java.math.BigDecimal
@@ -20,27 +29,25 @@ class EditProfileFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupUI()
-
     }
 
     override fun getFragmentTAG(): String = "EditProfileFragment"
 
     override fun toolbarTitle(): String = getString(R.string.edit_profile_toolbar_title)
 
-
     private fun setupUI() {
         val percentageTextWatcher = PercentageTextWatcher(
             arrayOf(
                 binding.stockPercentage,
                 binding.cryptoPercentage,
-                binding.savingsPercentage
-            )
+                binding.savingsPercentage,
+            ),
         )
 
         val incomePercentageTextWatcher = PercentageTextWatcher(
             arrayOf(
-                binding.netSalaryPercentage
-            )
+                binding.netSalaryPercentage,
+            ),
         )
 
         with(binding) {
@@ -56,7 +63,7 @@ class EditProfileFragment :
             setupInputsLogic(
                 getScreenInputs(),
                 getInputsLabel(),
-                nestedScrollView
+                nestedScrollView,
             )
 
             confirmButton.bottomBtn.setOnClickListener {
@@ -67,7 +74,6 @@ class EditProfileFragment :
             percentageTextWatcher.isBuildingView = false
 
             fillInputWithSavedData()
-
         }
     }
 
@@ -119,35 +125,41 @@ class EditProfileFragment :
 
         if (TextUtils.isEmpty(binding.netSalary.text.toString()) || StringUtils.parseCurrencyValue(
                 binding.netSalary.text.toString(),
-                NumberFormat.getCurrencyInstance(PreferenceUtils.getCurrency())
+                NumberFormat.getCurrencyInstance(PreferenceUtils.getCurrency()),
             ) == BigDecimal.ZERO
-        ) return false
+        ) {
+            return false
+        }
 
         if (InputUtils.isAnyInputEmpty(getScreenInputs())) return false
 
         val usernameChanged = getUsername() != binding.username.text.toString().trim()
 
-        enableConfirmBtn = usernameChanged || InputUtils.inputDataChanged(getScreenInputs(), requireContext())
+        enableConfirmBtn =
+            usernameChanged || InputUtils.inputDataChanged(getScreenInputs(), requireContext())
 
         return enableConfirmBtn
     }
 
-
     private fun getScreenInputs(isUsernameIncluded: Boolean? = false): Array<EditText> {
-        return if (isUsernameIncluded == true) arrayOf(
-            binding.netSalary,
-            binding.netSalaryPercentage,
-            binding.stockPercentage,
-            binding.cryptoPercentage,
-            binding.savingsPercentage,
-            binding.username
-        ) else arrayOf(
-            binding.netSalary,
-            binding.netSalaryPercentage,
-            binding.stockPercentage,
-            binding.cryptoPercentage,
-            binding.savingsPercentage
-        )
+        return if (isUsernameIncluded == true) {
+            arrayOf(
+                binding.netSalary,
+                binding.netSalaryPercentage,
+                binding.stockPercentage,
+                binding.cryptoPercentage,
+                binding.savingsPercentage,
+                binding.username,
+            )
+        } else {
+            arrayOf(
+                binding.netSalary,
+                binding.netSalaryPercentage,
+                binding.stockPercentage,
+                binding.cryptoPercentage,
+                binding.savingsPercentage,
+            )
+        }
     }
 
     private fun getInputsLabel(): Array<TextView> {
@@ -156,7 +168,7 @@ class EditProfileFragment :
             binding.netSalaryPercentageLabel,
             binding.stockPercentageLabel,
             binding.cryptoPercentageLabel,
-            binding.savingsPercentageLabel
+            binding.savingsPercentageLabel,
         )
     }
 
@@ -168,8 +180,11 @@ class EditProfileFragment :
         Snackbar.make(
             button,
             getString(R.string.snackbar_saved_text),
-            Snackbar.LENGTH_SHORT
+            Snackbar.LENGTH_SHORT,
         ).setAnchorView(button).show()
+        FirebaseUtils.logButtonClickEvent(
+            binding.confirmButton.bottomBtn.text.toString(),
+            getFragmentTAG(),
+        )
     }
 }
-
