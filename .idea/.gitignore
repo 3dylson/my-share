@@ -6,3 +6,10 @@
 /sonarlint/issuestore/
 /kotlinc.xml
 /sonarlint/securityhotspotstore/index.pb
+/deploymentTargetSelector.xml
+/git_toolbox_blame.xml
+/runConfigurations.xml
+/studiobot.xml
+/sonarlint/securityhotspotstore
+/migrations.xml
+/appInsightsSettings.xml

@@ -51,6 +51,8 @@ class EditProfileFragment :
         )
 
         with(binding) {
+            netSalaryLabel.text =
+                resources.getString(R.string.your_net_salary_label, StringUtils.CURRENCY_SYMBOL)
             netSalary.addTextChangedListener(MoneyTextWatcher(netSalary))
             netSalaryPercentage.addTextChangedListener(incomePercentageTextWatcher)
             stockPercentage.addTextChangedListener(percentageTextWatcher)
@@ -114,10 +116,10 @@ class EditProfileFragment :
     }
 
     private fun getAmountToInvest(): Int {
-        val value = StringUtils.getRawInputText(binding.netSalary.text.toString()).toInt()
+        val value = StringUtils.getRawInputText(binding.netSalary.text.toString()).toFloat()
         val percentage =
             StringUtils.parsePercentageValue(binding.netSalaryPercentage.text.toString()).toFloat()
-        return Utils.getPercentOfNumber(value, percentage)
+        return Utils.getPercentOfNumber(value.toInt(), percentage)
     }
 
     private fun validateForm(): Boolean {
@@ -125,7 +127,7 @@ class EditProfileFragment :
 
         if (TextUtils.isEmpty(binding.netSalary.text.toString()) || StringUtils.parseCurrencyValue(
                 binding.netSalary.text.toString(),
-                NumberFormat.getCurrencyInstance(PreferenceUtils.getCurrency()),
+                NumberFormat.getCurrencyInstance(PreferenceUtils.getLocale()),
             ) == BigDecimal.ZERO
         ) {
             return false

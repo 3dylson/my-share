@@ -26,9 +26,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
-    lateinit var appBar: AppBarLayout
-    lateinit var collapsingToolbar: CollapsingToolbarLayout
-    lateinit var toolbar: Toolbar
+    val appBar: AppBarLayout by lazy { binding.appBarLayout }
+    val collapsingToolbar: CollapsingToolbarLayout by lazy { binding.collapsingToolbar }
+    val toolbar: Toolbar by lazy { binding.toolbar }
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment).navController
     }
@@ -39,9 +39,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        appBar = binding.appBarLayout
-        collapsingToolbar = binding.collapsingToolbar
-        toolbar = binding.toolbar
         setSupportActionBar(toolbar)
 
         val insetsWithKeyboardCallback = InsetsWithKeyboardCallback(window, collapsingToolbar)

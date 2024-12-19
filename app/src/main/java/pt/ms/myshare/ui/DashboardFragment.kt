@@ -1,13 +1,11 @@
 package pt.ms.myshare.ui
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.annotation.RequiresApi
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import pt.ms.myshare.R
@@ -26,7 +24,6 @@ import java.time.LocalDate
 class DashboardFragment :
     BaseFragment<FragmentDashboardBinding>(FragmentDashboardBinding::inflate) {
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private val today = LocalDate.now()
 
     private lateinit var rvCategoryGrid: RecyclerView
@@ -36,9 +33,8 @@ class DashboardFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            binding.tvToday.text = TimeUtils.monthDayAndYear(today)
-        }
+        binding.tvToday.text = TimeUtils.monthDayAndYear(today)
+
         rvCategoryGrid = binding.categoryGrid
         categoryAdapter = CategoryGridAdapter()
         rvCategoryGrid.adapter = categoryAdapter

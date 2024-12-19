@@ -22,7 +22,7 @@ private const val PT_NUMBER_FORMAT = "pt_PT"
  * */
 class MoneyTextWatcher(editText: EditText?) : TextWatcher {
     private val numberFormat: NumberFormat = NumberFormat.getCurrencyInstance(
-        PreferenceUtils.getCurrency()
+        PreferenceUtils.getLocale()
     )
     private var editTextWeakReference: WeakReference<EditText>? = null
 
@@ -31,7 +31,7 @@ class MoneyTextWatcher(editText: EditText?) : TextWatcher {
         numberFormat.maximumFractionDigits = 0
         numberFormat.roundingMode = RoundingMode.FLOOR
         Timber.i(
-            "NumberFormat By Device -> ${Locale.getDefault()} | NumberFormat By Default -> ${PreferenceUtils.getCurrency()}"
+            "NumberFormat By Device -> ${Locale.getDefault()} | NumberFormat By Default -> ${PreferenceUtils.getLocale()}"
         )
     }
 
@@ -70,5 +70,4 @@ class MoneyTextWatcher(editText: EditText?) : TextWatcher {
         editText.setSelection(formatted.length - 2)
         editText.addTextChangedListener(this)
     }
-
 }

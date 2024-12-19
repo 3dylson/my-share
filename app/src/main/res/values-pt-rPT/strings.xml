@@ -41,7 +41,7 @@
     <!--Edit Profile Screen-->
     <string name="edit_profile_label">Editar Perfil</string>
     <string name="edit_profile_toolbar_title">Editar Perfil</string>
-    <string name="your_net_salary_label">Seu salário líquido</string>
+    <string name="your_net_salary_label">Seu salário líquido %1s</string>
     <string name="username_label">Como se chama?</string>
     <string name="investments_savings_percentage_label">Porcentagem do salário líquido que você deseja considerar para investimentos/poupanças</string>
     <string name="percentage_stocks_label">Porcentagem a ser considerada para <b>Ações</b></string>

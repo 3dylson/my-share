@@ -37,15 +37,13 @@
             android:id="@+id/net_salary_label"
             style="@style/TextAppearance.Material3.TitleMedium"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/your_net_salary_label" />
+            android:layout_height="wrap_content" />
 
         <EditText
             android:id="@+id/net_salary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/margin_normal"
-            android:hint="@string/salary_net_hint"
             android:importantForAutofill="no"
             android:inputType="numberDecimal" />
 

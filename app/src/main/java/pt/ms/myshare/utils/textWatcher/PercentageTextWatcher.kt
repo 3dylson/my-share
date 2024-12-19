@@ -8,6 +8,7 @@ import android.widget.EditText
 import pt.ms.myshare.utils.InputFilterNumberRange
 import pt.ms.myshare.utils.StringUtils
 import pt.ms.myshare.utils.StringUtils.parsePercentageValue
+import timber.log.Timber
 import java.lang.ref.WeakReference
 
 private const val TAG = "PercentageTextWatcher"
@@ -93,7 +94,7 @@ class PercentageTextWatcher(editTexts: Array<EditText?>) : TextWatcher {
                 editText.setText(formatted)
                 editText.setSelection(formatted.length - 2)
             } catch (e: IndexOutOfBoundsException) {
-                Log.w(TAG, e.message, e)
+                Timber.tag(TAG).w(e)
             }
         }
 

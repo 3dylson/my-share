@@ -46,12 +46,12 @@
     <!--Edit Profile Screen-->
     <string name="edit_profile_label">Edit Profile</string>
     <string name="edit_profile_toolbar_title">Edit Profile</string>
-    <string name="your_net_salary_label">Your net salary</string>
+    <string name="your_net_salary_label">Your net salary %1s</string>
     <string name="username_label">What\'s your name?</string>
     <string name="salary_net_hint" translatable="false">700.99 €</string>
     <string name="investments_savings_percentage_label">Percentage of net salary you want to consider for investments/savings</string>
-    <string name="_20_percent_hint" translatable="false">20 %</string>
-    <string name="_60_percent_hint" translatable="false">60 %</string>
+    <string name="_20_percent_hint" translatable="false">ex: 20 %</string>
+    <string name="_60_percent_hint" translatable="false">ex: 60 %</string>
     <string name="percentage_stocks_label">Percentage to consider for <b>Stocks</b></string>
     <string name="percentage_crypto_label">Percentage to consider for <b>Crypto</b></string>
     <string name="percentage_savings_label">Percentage to consider for <b>Savings</b></string>

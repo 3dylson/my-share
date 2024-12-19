@@ -3,6 +3,7 @@ package pt.ms.myshare.utils
 import android.text.InputFilter
 import android.text.Spanned
 import android.util.Log
+import timber.log.Timber
 
 private const val TAG = "InputFilterNumberRange"
 
@@ -36,7 +37,7 @@ class InputFilterNumberRange : InputFilter {
             val input = (StringUtils.parsePercentageValue(dest.toString()) + StringUtils.parsePercentageValue(source.toString())).toInt()
             if (isInRange(min, max, input)) return null
         } catch (nfe: NumberFormatException) {
-            Log.w(TAG, nfe.message, nfe)
+            Timber.tag(TAG).w(nfe)
         }
         return StringUtils.EMPTY_STRING
     }

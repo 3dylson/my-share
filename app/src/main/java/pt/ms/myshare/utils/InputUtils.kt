@@ -21,7 +21,7 @@ object InputUtils {
         screenInputs.forEach {
             val value = PreferenceUtils.getInputValue(context, it.id, StringUtils.EMPTY_STRING)
             when {
-                value != null && value.isNotEmpty() -> it.setText(value)
+                !value.isNullOrEmpty() -> it.setText(value)
             }
         }
     }

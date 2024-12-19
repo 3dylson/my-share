@@ -1,6 +1,6 @@
 package pt.ms.myshare.utils
 
-import android.util.Log
+import timber.log.Timber
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.NumberFormat
@@ -15,7 +15,7 @@ object StringUtils {
     const val PERCENTAGE = "%"
     const val ZERO = "0"
     private val numberFormat: NumberFormat = NumberFormat.getCurrencyInstance(
-        PreferenceUtils.getCurrency()
+        PreferenceUtils.getLocale()
     )
     val CURRENCY_SYMBOL: String = numberFormat.currency!!.symbol
 
@@ -44,7 +44,7 @@ object StringUtils {
                 )
             return BigDecimal(currencyValue)
         } catch (e: Exception) {
-            Log.w(TAG, e.message, e)
+            Timber.tag(TAG).w(e)
         }
         return BigDecimal.ZERO
     }
