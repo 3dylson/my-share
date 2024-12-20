@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?><resources>
+      
+  <string name="app_name" translatable="false">My Share</string>
+      
+  <!-- Strings used for fragments for navigation -->
+      
+  <string name="dashboard_fragment_label" translatable="false">Dashboard Fragment</string>
+      
+  <!--Settings Screen-->
+      
+  <string name="action_settings">Paramètres</string>
+      
+  <string name="content_description_settings">Paramètres de l\'application</string>
+      
+  <string name="title_activity_settings">ParamètresActivité</string>
+      
+  <!--Dashboard Screen-->
+      
+  <string name="hello_message">Bonjour</string>
+      
+  <string name="dashboard_message">Gardez un œil sur vos investissements !</string>
+      
+  <string name="dashboard_label">Tableau de bord</string>
+      
+  <string name="stocks_label">Actions</string>
+      
+  <string name="crypto_label">Crypto</string>
+      
+  <string name="savings_label">Économies</string>
+      
+  <!--Generic labels-->
+      
+  <string name="next">Suivant</string>
+      
+  <string name="previous">Précédent</string>
+      
+  <string name="empty_string" translatable="false"/>
+      
+  <!-- Preference Titles -->
+      
+  <string name="messages_header">Messages</string>
+      
+  <string name="sync_header">Synchroniser</string>
+      
+  <!-- Messages Preferences -->
+      
+  <string name="signature_title">Votre signature</string>
+      
+  <string name="reply_title">Action de réponse par défaut</string>
+      
+  <!-- Sync Preferences -->
+      
+  <string name="sync_title">Synchroniser périodiquement les e-mails</string>
+      
+  <string name="attachment_title">Télécharger les pièces jointes entrantes</string>
+      
+  <string name="attachment_summary_on">Télécharger automatiquement les pièces jointes des e-mails entrants</string>
+      
+  <string name="attachment_summary_off">Téléchargez les pièces jointes uniquement lorsque cela est demandé manuellement</string>
+      
+  <!--Edit Profile Screen-->
+      
+  <string name="edit_profile_label">Modifier le profil</string>
+      
+  <string name="edit_profile_toolbar_title">Modifier le profil</string>
+      
+  <string name="your_net_salary_label">Votre salaire net %1s</string>
+      
+  <string name="username_label">Quel est ton nom?</string>
+      
+  <string name="salary_net_hint" translatable="false">700.99 €</string>
+      
+  <string name="investments_savings_percentage_label">Pourcentage du salaire net que vous souhaitez envisager pour les investissements/épargnes</string>
+      
+  <string name="_20_percent_hint" translatable="false">ex: 20 %</string>
+      
+  <string name="_60_percent_hint" translatable="false">ex: 60 %</string>
+      
+  <string name="percentage_stocks_label">
+    Pourcentage à prendre en compte pour les 
+    <b>actions</b>
+  </string>
+      
+  <string name="percentage_crypto_label">
+    Pourcentage à prendre en compte pour 
+    <b>Crypto</b>
+  </string>
+      
+  <string name="percentage_savings_label">
+    Pourcentage à prendre en compte pour les 
+    <b>économies</b>
+  </string>
+      
+  <string name="pref_key_net_salary_value" translatable="false">nsv</string>
+      
+  <string name="pref_key_investments_savings_percentage_value" translatable="false">ispv</string>
+      
+  <string name="pref_key_percentage_stocks_value" translatable="false">psv</string>
+      
+  <string name="pref_key_percentage_crypto_value" translatable="false">pcv</string>
+      
+  <string name="pref_key_percentage_savings_value" translatable="false">psv</string>
+      
+  <string name="btn_ep_confirm_text">Confirmer</string>
+      
+  <string name="snackbar_saved_text">Enregistré avec succès</string>
+      
+  <string name="id_username" translatable="false">username</string>
+      
+  <string name="id_amount_to_invest" translatable="false">amount_to_invest</string>
+      
+  <string name="id_amount_for_stocks" translatable="false">amount_for_stocks</string>
+      
+  <string name="id_amount_for_crypto" translatable="false">amount_for_crypto</string>
+      
+  <string name="id_amount_for_savings" translatable="false">amount_for_savings</string>
+  
+</resources>

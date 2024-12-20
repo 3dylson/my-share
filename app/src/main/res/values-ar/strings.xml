@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?><resources>
+      
+  <string name="app_name" translatable="false">My Share</string>
+      
+  <!-- Strings used for fragments for navigation -->
+      
+  <string name="dashboard_fragment_label" translatable="false">Dashboard Fragment</string>
+      
+  <!--Settings Screen-->
+      
+  <string name="action_settings">إعدادات</string>
+      
+  <string name="content_description_settings">إعدادات التطبيق</string>
+      
+  <string name="title_activity_settings">الإعداداتالنشاط</string>
+      
+  <!--Dashboard Screen-->
+      
+  <string name="hello_message">مرحبًا</string>
+      
+  <string name="dashboard_message">تتبع استثماراتك!</string>
+      
+  <string name="dashboard_label">لوحة القيادة</string>
+      
+  <string name="stocks_label">الأسهم</string>
+      
+  <string name="crypto_label">العملات المشفرة</string>
+      
+  <string name="savings_label">الادخار</string>
+      
+  <!--Generic labels-->
+      
+  <string name="next">التالي</string>
+      
+  <string name="previous">سابق</string>
+      
+  <string name="empty_string" translatable="false"/>
+      
+  <!-- Preference Titles -->
+      
+  <string name="messages_header">رسائل</string>
+      
+  <string name="sync_header">المزامنة</string>
+      
+  <!-- Messages Preferences -->
+      
+  <string name="signature_title">توقيعك</string>
+      
+  <string name="reply_title">إجراء الرد الافتراضي</string>
+      
+  <!-- Sync Preferences -->
+      
+  <string name="sync_title">مزامنة البريد الإلكتروني بشكل دوري</string>
+      
+  <string name="attachment_title">تنزيل المرفقات الواردة</string>
+      
+  <string name="attachment_summary_on">تنزيل المرفقات تلقائيًا للرسائل الإلكترونية الواردة</string>
+      
+  <string name="attachment_summary_off">قم بتنزيل المرفقات فقط عند الطلب يدويًا</string>
+      
+  <!--Edit Profile Screen-->
+      
+  <string name="edit_profile_label">تعديل الملف الشخصي</string>
+      
+  <string name="edit_profile_toolbar_title">تعديل الملف الشخصي</string>
+      
+  <string name="your_net_salary_label">راتبك الصافي%1s</string>
+      
+  <string name="username_label">ما اسمك؟</string>
+      
+  <string name="salary_net_hint" translatable="false">700.99 €</string>
+      
+  <string name="investments_savings_percentage_label">نسبة الراتب الصافي الذي تريد أخذه في الاعتبار للاستثمارات/الادخار</string>
+      
+  <string name="_20_percent_hint" translatable="false">ex: 20 %</string>
+      
+  <string name="_60_percent_hint" translatable="false">ex: 60 %</string>
+      
+  <string name="percentage_stocks_label">
+    النسبة المئوية التي يجب مراعاتها في 
+    <b>الأسهم</b>
+  </string>
+      
+  <string name="percentage_crypto_label">
+    النسبة المئوية التي يجب مراعاتها
+    <b>العملات المشفرة</b>
+  </string>
+      
+  <string name="percentage_savings_label">
+    النسبة المئوية التي يجب مراعاتها
+    <b>الادخار</b>
+  </string>
+      
+  <string name="pref_key_net_salary_value" translatable="false">nsv</string>
+      
+  <string name="pref_key_investments_savings_percentage_value" translatable="false">ispv</string>
+      
+  <string name="pref_key_percentage_stocks_value" translatable="false">psv</string>
+      
+  <string name="pref_key_percentage_crypto_value" translatable="false">pcv</string>
+      
+  <string name="pref_key_percentage_savings_value" translatable="false">psv</string>
+      
+  <string name="btn_ep_confirm_text">يتأكد</string>
+      
+  <string name="snackbar_saved_text">تم الحفظ بنجاح</string>
+      
+  <string name="id_username" translatable="false">username</string>
+      
+  <string name="id_amount_to_invest" translatable="false">amount_to_invest</string>
+      
+  <string name="id_amount_for_stocks" translatable="false">amount_for_stocks</string>
+      
+  <string name="id_amount_for_crypto" translatable="false">amount_for_crypto</string>
+      
+  <string name="id_amount_for_savings" translatable="false">amount_for_savings</string>
+  
+</resources>

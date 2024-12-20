@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Share</string>
+    <string name="app_name" translatable="false">My Share</string>
 
 
     <!-- Strings used for fragments for navigation -->

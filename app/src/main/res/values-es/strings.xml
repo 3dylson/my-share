@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?><resources>
+      
+  <string name="app_name" translatable="false">My Share</string>
+      
+  <!-- Strings used for fragments for navigation -->
+      
+  <string name="dashboard_fragment_label" translatable="false">Dashboard Fragment</string>
+      
+  <!--Settings Screen-->
+      
+  <string name="action_settings">Ajustes</string>
+      
+  <string name="content_description_settings">Configuración de la aplicación</string>
+      
+  <string name="title_activity_settings">ConfiguracionesActividad</string>
+      
+  <!--Dashboard Screen-->
+      
+  <string name="hello_message">Hola</string>
+      
+  <string name="dashboard_message">¡Mantén el control de tus inversiones!</string>
+      
+  <string name="dashboard_label">Panel</string>
+      
+  <string name="stocks_label">Cepo</string>
+      
+  <string name="crypto_label">Criptomoneda</string>
+      
+  <string name="savings_label">Ahorros</string>
+      
+  <!--Generic labels-->
+      
+  <string name="next">Próximo</string>
+      
+  <string name="previous">Anterior</string>
+      
+  <string name="empty_string" translatable="false"/>
+      
+  <!-- Preference Titles -->
+      
+  <string name="messages_header">Mensajes</string>
+      
+  <string name="sync_header">Sincronizar</string>
+      
+  <!-- Messages Preferences -->
+      
+  <string name="signature_title">Tu firma</string>
+      
+  <string name="reply_title">Acción de respuesta predeterminada</string>
+      
+  <!-- Sync Preferences -->
+      
+  <string name="sync_title">Sincronizar el correo electrónico periódicamente</string>
+      
+  <string name="attachment_title">Descargar archivos adjuntos entrantes</string>
+      
+  <string name="attachment_summary_on">Descargar automáticamente archivos adjuntos para correos electrónicos entrantes</string>
+      
+  <string name="attachment_summary_off">Descargue archivos adjuntos solo cuando se lo solicite manualmente</string>
+      
+  <!--Edit Profile Screen-->
+      
+  <string name="edit_profile_label">Editar perfil</string>
+      
+  <string name="edit_profile_toolbar_title">Editar perfil</string>
+      
+  <string name="your_net_salary_label">Su salario neto %1s</string>
+      
+  <string name="username_label">¿Cómo te llamas?</string>
+      
+  <string name="salary_net_hint" translatable="false">700.99 €</string>
+      
+  <string name="investments_savings_percentage_label">Porcentaje del salario neto que desea considerar para inversiones/ahorros</string>
+      
+  <string name="_20_percent_hint" translatable="false">ex: 20 %</string>
+      
+  <string name="_60_percent_hint" translatable="false">ex: 60 %</string>
+      
+  <string name="percentage_stocks_label">
+    Porcentaje a tener en cuenta para las 
+    <b>acciones</b>
+  </string>
+      
+  <string name="percentage_crypto_label">
+    Porcentaje a tener en cuenta para las 
+    <b>criptomonedas</b>
+  </string>
+      
+  <string name="percentage_savings_label">
+    Porcentaje a considerar para el 
+    <b>ahorro</b>
+  </string>
+      
+  <string name="pref_key_net_salary_value" translatable="false">nsv</string>
+      
+  <string name="pref_key_investments_savings_percentage_value" translatable="false">ispv</string>
+      
+  <string name="pref_key_percentage_stocks_value" translatable="false">psv</string>
+      
+  <string name="pref_key_percentage_crypto_value" translatable="false">pcv</string>
+      
+  <string name="pref_key_percentage_savings_value" translatable="false">psv</string>
+      
+  <string name="btn_ep_confirm_text">Confirmar</string>
+      
+  <string name="snackbar_saved_text">Guardado exitosamente</string>
+      
+  <string name="id_username" translatable="false">username</string>
+      
+  <string name="id_amount_to_invest" translatable="false">amount_to_invest</string>
+      
+  <string name="id_amount_for_stocks" translatable="false">amount_for_stocks</string>
+      
+  <string name="id_amount_for_crypto" translatable="false">amount_for_crypto</string>
+      
+  <string name="id_amount_for_savings" translatable="false">amount_for_savings</string>
+  
+</resources>

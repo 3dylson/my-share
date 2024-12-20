@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">My Share</string>
+    <string name="app_name" translatable="false">My Share</string>
 
     <!--Settings Screen-->
     <string name="action_settings">Definições</string>
