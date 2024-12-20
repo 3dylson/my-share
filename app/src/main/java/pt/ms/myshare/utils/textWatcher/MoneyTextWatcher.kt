@@ -15,7 +15,7 @@ import java.util.Locale
 /**
  * @author @3dylson
  * */
-class MoneyTextWatcher(private val editText: EditText?) : TextWatcher {
+class MoneyTextWatcher(private val editText: EditText) : TextWatcher {
 
     companion object {
         private const val TAG = "MoneyTextWatcher"
@@ -31,6 +31,23 @@ class MoneyTextWatcher(private val editText: EditText?) : TextWatcher {
 
     private var isEditing: Boolean = false
 
+    private val lengthFilter = InputFilter { source, start, end, dest, dstart, dend ->
+        val newText = dest.toString().substring(0, dstart) +
+                source.toString().substring(start, end) +
+                dest.toString().substring(dend)
+
+        val rawInput = getRawInput(newText)
+        if (rawInput.length <= MAX_DIGITS) {
+            null
+        } else {
+            ""
+        }
+    }
+
+    init {
+        editText.filters = arrayOf(lengthFilter)
+    }
+
     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
         // No operation needed
     }
@@ -40,17 +57,17 @@ class MoneyTextWatcher(private val editText: EditText?) : TextWatcher {
     }
 
     override fun afterTextChanged(s: Editable?) {
-        if (isEditing) return // Prevent recursive calls
+        if (isEditing) return
         isEditing = true
 
         try {
             val currentText = s?.toString() ?: ""
-            if (editText == null || currentText.isEmpty()) {
+            if (currentText.isEmpty()) {
+                editText.setText("")
                 isEditing = false
                 return
             }
 
-            // Remove all formatting characters except the decimal separator
             val rawInput = getRawInput(currentText)
             if (rawInput.isEmpty()) {
                 editText.setText("")
@@ -58,58 +75,34 @@ class MoneyTextWatcher(private val editText: EditText?) : TextWatcher {
                 return
             }
 
-            // Check if the user is entering or removing the decimal separator
             val hasDecimal = rawInput.contains(getDecimalSeparator(numberFormat))
             val parsedValue = rawInput.replace(getDecimalSeparator(numberFormat), ".").toDoubleOrNull() ?: 0.0
 
-            // Format based on whether the decimal is present
             val formatted = if (hasDecimal) {
                 formatWithDecimal(parsedValue, rawInput)
             } else {
                 numberFormat.format(parsedValue)
             }
 
-            // Update the EditText
             editText.setText(formatted)
             editText.setSelection(formatted.length)
         } catch (e: Exception) {
-            Timber.tag(TAG).e(e, "Error formatting text")
+            Timber.tag(this::class.java.simpleName).e(e, "Error formatting text")
         } finally {
             isEditing = false
         }
     }
 
-    private fun getRawInput(currentText: String) =
-        currentText.replace(
-            "[^\\d${escapeRegexSpecialChars(getDecimalSeparator(numberFormat))}]".toRegex(),
-            ""
-        )
-
-    /**
-     * Escapes regex special characters for use in dynamic regex patterns.
-     */
-    private fun escapeRegexSpecialChars(input: String): String {
-        return Regex.escape(input)
+    private fun getRawInput(currentText: String): String {
+        val allowedChars = "0123456789" + getDecimalSeparator(numberFormat)
+        return currentText.filter { it in allowedChars }
     }
 
-    /**
-     * Formats the number while keeping the decimal part as the user types.
-     */
     private fun formatWithDecimal(parsedValue: Double, rawInput: String): String {
-        val parts = rawInput.split(getDecimalSeparator(numberFormat))
-        val integerPart = parts.getOrNull(0)?.toIntOrNull() ?: 0
-        val decimalPart = parts.getOrNull(1) ?: ""
-
-        // Format the integer part
-        val formattedInteger = numberFormat.format(integerPart.toDouble())
-
-        // Return formatted value with the user-typed decimal part
-        return if (decimalPart.isEmpty()) {
-            "$formattedInteger${getDecimalSeparator(numberFormat)}"
-        } else {
-            "$formattedInteger${getDecimalSeparator(numberFormat)}$decimalPart"
+        val formatted = numberFormat.format(parsedValue)
+        if (rawInput.endsWith(getDecimalSeparator(numberFormat))) {
+            return formatted + getDecimalSeparator(numberFormat)
         }
+        return formatted
     }
 }
-
-
