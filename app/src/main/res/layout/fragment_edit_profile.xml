@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/margin_normal"
             android:importantForAutofill="no"
-            android:inputType="numberDecimal" />
+            android:inputType="numberDecimal|number" />
 
         <TextView
             android:id="@+id/net_salary_percentage_label"

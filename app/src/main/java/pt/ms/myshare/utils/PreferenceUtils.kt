@@ -10,7 +10,7 @@ import java.util.*
 /** Utility class to retrieve shared preferences. */
 object PreferenceUtils {
 
-    fun getLocale(): Locale = Locale.FRANCE
+    fun getLocale(): Locale = Locale.getDefault()
 
     fun getAmountToInvest(context: Context, @StringRes category: Int): String {
         val amount = getIntPref(context, category, 0)

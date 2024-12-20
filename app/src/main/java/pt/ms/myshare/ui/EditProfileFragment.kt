@@ -13,6 +13,7 @@ import pt.ms.myshare.utils.InputUtils
 import pt.ms.myshare.utils.PreferenceUtils
 import pt.ms.myshare.utils.StringUtils
 import pt.ms.myshare.utils.Utils
+import pt.ms.myshare.utils.Utils.getDecimalSeparator
 import pt.ms.myshare.utils.addResizeAnimation
 import pt.ms.myshare.utils.hideBtnLoading
 import pt.ms.myshare.utils.logs.FirebaseUtils
@@ -20,8 +21,10 @@ import pt.ms.myshare.utils.setupEnableWithInputValidation
 import pt.ms.myshare.utils.showBtnLoading
 import pt.ms.myshare.utils.textWatcher.MoneyTextWatcher
 import pt.ms.myshare.utils.textWatcher.PercentageTextWatcher
+import timber.log.Timber
 import java.math.BigDecimal
 import java.text.NumberFormat
+import java.text.ParseException
 
 class EditProfileFragment :
     BaseFragment<FragmentEditProfileBinding>(FragmentEditProfileBinding::inflate) {
@@ -116,14 +119,26 @@ class EditProfileFragment :
     }
 
     private fun getAmountToInvest(): Int {
-        val value = StringUtils.getRawInputText(binding.netSalary.text.toString()).toFloat()
+        val numberFormat = NumberFormat.getNumberInstance(PreferenceUtils.getLocale())
+        val value = StringUtils.getRawInputText(binding.netSalary.text.toString())
         val percentage =
             StringUtils.parsePercentageValue(binding.netSalaryPercentage.text.toString()).toFloat()
-        return Utils.getPercentOfNumber(value.toInt(), percentage)
+
+        return try {
+            // Parse the string using the locale-specific number format
+            val parsedNumber = numberFormat.parse(value) ?: BigDecimal.ZERO
+
+            // Convert the parsed number to a float
+            val floatNumber = parsedNumber.toFloat()
+            Utils.getPercentOfNumber(floatNumber.toInt(), percentage)
+        } catch (e: ParseException) {
+           Timber.tag("EditProfileFragment").e(e)
+           StringUtils.ZERO.toInt()
+        }
     }
 
     private fun validateForm(): Boolean {
-        var enableConfirmBtn: Boolean
+        val enableConfirmBtn: Boolean
 
         if (TextUtils.isEmpty(binding.netSalary.text.toString()) || StringUtils.parseCurrencyValue(
                 binding.netSalary.text.toString(),
@@ -176,6 +191,8 @@ class EditProfileFragment :
 
     private fun onConfirmClick(button: View) {
         InputUtils.hideKeyboard(requireView())
+        removeDecimalSeparatorIfLast()
+        requireView().clearFocus()
         binding.confirmButton.root.showBtnLoading()
         saveInputValues()
         binding.confirmButton.root.hideBtnLoading(getString(R.string.btn_ep_confirm_text))
@@ -188,5 +205,12 @@ class EditProfileFragment :
             binding.confirmButton.bottomBtn.text.toString(),
             getFragmentTAG(),
         )
+    }
+
+    private fun removeDecimalSeparatorIfLast() {
+        val value = binding.netSalary.text.toString()
+        if (value.endsWith(getDecimalSeparator(NumberFormat.getCurrencyInstance(PreferenceUtils.getLocale())))) {
+            binding.netSalary.setText(value.dropLast(1))
+        }
     }
 }
