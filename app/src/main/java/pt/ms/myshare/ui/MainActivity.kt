@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
-    val appBar: AppBarLayout by lazy { binding.appBarLayout }
+    val appBar: AppBarLayout? by lazy { if (::binding.isInitialized) binding.appBarLayout else null }
     val collapsingToolbar: CollapsingToolbarLayout by lazy { binding.collapsingToolbar }
     val toolbar: Toolbar by lazy { binding.toolbar }
     private val navController by lazy {

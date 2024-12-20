@@ -27,17 +27,17 @@ object Utils {
         textInputs: Array<EditText>,
         textInputsLabels: Array<TextView>,
         scrollView: View,
-        appBarLayout: AppBarLayout
+        appBarLayout: AppBarLayout?
     ) {
         for (editText in textInputs.indices) {
             textInputs[editText].setOnEditorActionListener { textView, actionID, keyEvent ->
                 if (actionID == EditorInfo.IME_ACTION_NEXT) {
-                    appBarLayout.setExpanded(false)
+                    appBarLayout?.setExpanded(false)
                     textInputs[editText + 1].requestFocus()
                 }
                 if (actionID == EditorInfo.IME_ACTION_DONE) {
                     InputUtils.hideKeyboard(scrollView)
-                    appBarLayout.setExpanded(false)
+                    appBarLayout?.setExpanded(false)
                     if (scrollView is NestedScrollView) scrollView.fullScroll(ScrollView.FOCUS_DOWN)
                 }
                 true
