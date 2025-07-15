@@ -67,6 +67,7 @@
     <string name="id_amount_for_stocks" translatable="false">amount_for_stocks</string>
     <string name="id_amount_for_crypto" translatable="false">amount_for_crypto</string>
     <string name="id_amount_for_savings" translatable="false">amount_for_savings</string>
+    <string name="admob_banner_ad_unit_id" translatable="false">ca-app-pub-9538602323287593/2154982867</string>
 
 
 </resources>

@@ -8,6 +8,8 @@ import android.view.MenuItem
 import android.view.View
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
 import pt.ms.myshare.R
 import pt.ms.myshare.data.InvestAmount
 import pt.ms.myshare.databinding.FragmentDashboardBinding
@@ -33,6 +35,11 @@ class DashboardFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val adView: AdView = binding.adView
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
+
         binding.tvToday.text = TimeUtils.monthDayAndYear(today)
 
         rvCategoryGrid = binding.categoryGrid
