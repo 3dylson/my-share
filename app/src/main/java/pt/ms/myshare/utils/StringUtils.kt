@@ -4,6 +4,7 @@ import timber.log.Timber
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.NumberFormat
+import java.util.Locale
 
 object StringUtils {
     private const val TAG = "StringUtils"
@@ -15,7 +16,7 @@ object StringUtils {
     const val PERCENTAGE = "%"
     const val ZERO = "0"
     private val numberFormat: NumberFormat = NumberFormat.getCurrencyInstance(
-        PreferenceUtils.getLocale()
+        Locale.getDefault()
     )
     val CURRENCY_SYMBOL: String = numberFormat.currency!!.symbol
 

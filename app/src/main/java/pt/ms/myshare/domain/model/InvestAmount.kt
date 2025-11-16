@@ -1,4 +1,4 @@
-package pt.ms.myshare.data
+package pt.ms.myshare.domain.model
 
 import androidx.annotation.DrawableRes
 import pt.ms.myshare.R

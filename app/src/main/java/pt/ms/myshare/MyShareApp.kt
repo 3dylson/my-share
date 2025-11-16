@@ -4,11 +4,13 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import com.google.android.gms.ads.MobileAds
+import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pt.ms.myshare.utils.logs.FirebaseUtils
 
+@HiltAndroidApp
 class MyShareApp : Application(), Application.ActivityLifecycleCallbacks {
 
     private var currentActivity: Activity? = null
