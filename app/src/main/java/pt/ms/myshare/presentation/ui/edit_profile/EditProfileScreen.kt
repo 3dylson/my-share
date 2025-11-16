@@ -135,6 +135,7 @@ fun EditProfileScreen(
                 value = uiState.netSalaryPercentage,
                 onValueChange = onNetSalaryPercentageChange,
                 label = { Text(stringResource(id = R.string.investments_savings_percentage_label)) },
+                visualTransformation = PercentageVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -157,8 +158,11 @@ fun EditProfileScreen(
                 value = uiState.stockPercentage,
                 onValueChange = onStockPercentageChange,
                 label = { Text(stockAnnotatedString) },
+                visualTransformation = PercentageVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = uiState.stockPercentageError != null,
+                supportingText = { uiState.stockPercentageError?.let { Text(it) } }
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -179,8 +183,11 @@ fun EditProfileScreen(
                 value = uiState.cryptoPercentage,
                 onValueChange = onCryptoPercentageChange,
                 label = { Text(cryptoAnnotatedString) },
+                visualTransformation = PercentageVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = uiState.cryptoPercentageError != null,
+                supportingText = { uiState.cryptoPercentageError?.let { Text(it) } }
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -201,8 +208,11 @@ fun EditProfileScreen(
                 value = uiState.savingsPercentage,
                 onValueChange = onSavingsPercentageChange,
                 label = { Text(savingsAnnotatedString) },
+                visualTransformation = PercentageVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = uiState.savingsPercentageError != null,
+                supportingText = { uiState.savingsPercentageError?.let { Text(it) } }
             )
 
             Spacer(modifier = Modifier.height(32.dp))

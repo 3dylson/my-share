@@ -8,5 +8,8 @@ data class EditProfileState(
     val savingsPercentage: String = "",
     val isLoading: Boolean = false,
     val isSaved: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val stockPercentageError: String? = null,
+    val cryptoPercentageError: String? = null,
+    val savingsPercentageError: String? = null
 )

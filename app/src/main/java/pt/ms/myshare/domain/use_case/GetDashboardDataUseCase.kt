@@ -18,18 +18,21 @@ class GetDashboardDataUseCase @Inject constructor(
     operator fun invoke(): Flow<DashboardState> {
         return userDataRepository.getUserData().map { userProfile ->
             val netSalary = userProfile.netSalary.toBigDecimalOrNull() ?: BigDecimal.ZERO
+            val netSalaryPercentage = userProfile.netSalaryPercentage.toBigDecimalOrNull() ?: BigDecimal.ZERO
             val stockPercentage = userProfile.stockPercentage.toBigDecimalOrNull() ?: BigDecimal.ZERO
             val cryptoPercentage = userProfile.cryptoPercentage.toBigDecimalOrNull() ?: BigDecimal.ZERO
             val savingsPercentage = userProfile.savingsPercentage.toBigDecimalOrNull() ?: BigDecimal.ZERO
 
             val oneHundred = BigDecimal(100)
 
-            val stockAmount = netSalary.multiply(stockPercentage).divide(oneHundred)
-            val cryptoAmount = netSalary.multiply(cryptoPercentage).divide(oneHundred)
-            val savingsAmount = netSalary.multiply(savingsPercentage).divide(oneHundred)
+            val investmentAmount = netSalary.multiply(netSalaryPercentage).divide(oneHundred)
+
+            val stockAmount = investmentAmount.multiply(stockPercentage).divide(oneHundred)
+            val cryptoAmount = investmentAmount.multiply(cryptoPercentage).divide(oneHundred)
+            val savingsAmount = investmentAmount.multiply(savingsPercentage).divide(oneHundred)
 
             val investments = listOf(
-                InvestAmount("Stocks", stockAmount, chipIcon =  R.drawable.ic_baseline_show_chart),
+                InvestAmount("Stocks", stockAmount, chipIcon = R.drawable.ic_baseline_show_chart),
                 InvestAmount("Crypto", cryptoAmount, R.drawable.ic_baseline_currency_bitcoin),
                 InvestAmount("Savings", savingsAmount, R.drawable.savings_48px)
             )
