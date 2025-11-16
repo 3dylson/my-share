@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 
     <application
         android:name=".MyShareApp"
@@ -15,10 +15,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyShare">
+        <activity
+            android:name=".ui.MainComposeActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyShare" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-9538602323287593~1471105513"/>
+            android:value="ca-app-pub-9538602323287593~1471105513" />
 
         <activity
             android:name=".ui.SettingsActivity"
@@ -37,6 +41,7 @@
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
