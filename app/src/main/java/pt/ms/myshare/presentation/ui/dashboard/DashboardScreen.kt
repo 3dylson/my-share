@@ -1,5 +1,6 @@
 package pt.ms.myshare.presentation.ui.dashboard
 
+import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,6 +40,8 @@ import com.google.android.gms.ads.AdView
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.InvestAmount
 import pt.ms.myshare.presentation.ui.theme.MyShareTheme
+import java.math.BigDecimal
+import java.text.NumberFormat
 
 @Composable
 fun DashboardRoute(
@@ -107,6 +111,14 @@ fun DashboardScreen(
 
 @Composable
 fun InvestmentCard(investment: InvestAmount) {
+    val locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        LocalConfiguration.current.locales[0]
+    } else {
+        @Suppress("DEPRECATION")
+        LocalConfiguration.current.locale
+    }
+    val currencyFormatter = NumberFormat.getCurrencyInstance(locale)
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -118,7 +130,10 @@ fun InvestmentCard(investment: InvestAmount) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(text = investment.category, style = MaterialTheme.typography.titleMedium)
-                Text(text = investment.value ?: "", style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    text = currencyFormatter.format(investment.value.divide(BigDecimal(100))),
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
             investment.chipIcon?.let {
                 Image(
@@ -153,21 +168,9 @@ fun DashboardScreenPreview() {
         DashboardScreen(
             uiState = DashboardState(
                 investments = listOf(
-                    InvestAmount(
-                        category = "Stocks",
-                        value = "$1,234.56",
-                        chipIcon = R.drawable.ic_baseline_show_chart
-                    ),
-                    InvestAmount(
-                        category = "Crypto",
-                        value = "$5,678.90",
-                        chipIcon = R.drawable.ic_baseline_currency_bitcoin
-                    ),
-                    InvestAmount(
-                        category = "Savings",
-                        value = "$2,000.00",
-                        chipIcon = R.drawable.savings_48px
-                    )
+                    InvestAmount(category = "Stocks", value = BigDecimal("123456"), chipIcon = R.drawable.ic_baseline_show_chart),
+                    InvestAmount(category = "Crypto", value = BigDecimal("567890"), chipIcon = R.drawable.ic_baseline_currency_bitcoin),
+                    InvestAmount(category = "Savings", value = BigDecimal("200000"), chipIcon = R.drawable.savings_48px)
                 ),
                 date = "October 26, 2023"
             ),
