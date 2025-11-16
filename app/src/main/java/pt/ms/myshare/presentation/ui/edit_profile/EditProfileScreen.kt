@@ -1,5 +1,6 @@
 package pt.ms.myshare.presentation.ui.edit_profile
 
+import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -29,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -78,6 +80,12 @@ fun EditProfileScreen(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val savedMessage = stringResource(id = R.string.snackbar_saved_text)
+    val locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        LocalConfiguration.current.locales[0]
+    } else {
+        @Suppress("DEPRECATION")
+        LocalConfiguration.current.locale
+    }
 
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) {
@@ -118,7 +126,7 @@ fun EditProfileScreen(
                 value = uiState.netSalary,
                 onValueChange = onNetSalaryChange,
                 label = { Text(stringResource(id = R.string.your_net_salary_label, "")) },
-                visualTransformation = CurrencyVisualTransformation(),
+                visualTransformation = CurrencyVisualTransformation(locale),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
