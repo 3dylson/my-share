@@ -4,9 +4,6 @@ import pt.ms.myshare.presentation.ui.edit_profile.EditProfileState
 
 class EditProfileUseCase {
     fun validate(state: EditProfileState): ValidationResult {
-        if (state.username.isBlank()) {
-            return ValidationResult(false, "Username can't be empty")
-        }
         if (state.netSalary.isBlank()) {
             return ValidationResult(false, "Net salary can't be empty")
         }
@@ -56,9 +53,9 @@ class EditProfileUseCase {
         return ValidationResult(true)
     }
 
-data class ValidationResult(
-    val isValid: Boolean,
-    val errorMessage: String? = null
-)
+    data class ValidationResult(
+        val isValid: Boolean,
+        val errorMessage: String? = null
+    )
 
 }

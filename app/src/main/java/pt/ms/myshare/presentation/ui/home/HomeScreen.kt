@@ -45,7 +45,7 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = stringResource(id = R.string.hello_message) + " ${uiState.userName}") },
+                title = { Text(text = stringResource(id = R.string.hello_message)) },
                 actions = {
                     IconButton(onClick = onSettingsClick) {
                         Icon(Icons.Filled.Settings, contentDescription = "Settings")
@@ -64,7 +64,7 @@ fun HomeScreen(
 fun HomeScreenPreview() {
     MyShareTheme {
         HomeScreen(
-            uiState = HomeState(userName = "Preview User"),
+            uiState = HomeState(),
             onSettingsClick = {}
         )
     }

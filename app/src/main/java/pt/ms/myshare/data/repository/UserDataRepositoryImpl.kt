@@ -17,7 +17,6 @@ class UserDataRepositoryImpl @Inject constructor(
     private val prefs = PreferenceManager.getDefaultSharedPreferences(context)
 
     override fun getUserData(): Flow<EditProfileState> = flow {
-        val username = prefs.getString(context.getString(R.string.id_username), "") ?: ""
         val netSalary = prefs.getString(context.getString(R.string.pref_key_net_salary_value), "") ?: ""
         val netSalaryPercentage = prefs.getString(context.getString(R.string.pref_key_investments_savings_percentage_value), "") ?: ""
         val stockPercentage = prefs.getString(context.getString(R.string.pref_key_percentage_stocks_value), "") ?: ""
@@ -25,7 +24,6 @@ class UserDataRepositoryImpl @Inject constructor(
         val savingsPercentage = prefs.getString(context.getString(R.string.pref_key_percentage_savings_value), "") ?: ""
 
         emit(EditProfileState(
-            username = username,
             netSalary = netSalary,
             netSalaryPercentage = netSalaryPercentage,
             stockPercentage = stockPercentage,
@@ -36,7 +34,6 @@ class UserDataRepositoryImpl @Inject constructor(
 
     override suspend fun saveUserData(data: EditProfileState) {
         prefs.edit().apply {
-            putString(context.getString(R.string.id_username), data.username)
             putString(context.getString(R.string.pref_key_net_salary_value), data.netSalary)
             putString(context.getString(R.string.pref_key_investments_savings_percentage_value), data.netSalaryPercentage)
             putString(context.getString(R.string.pref_key_percentage_stocks_value), data.stockPercentage)

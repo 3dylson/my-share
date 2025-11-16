@@ -9,7 +9,6 @@ import dagger.hilt.components.SingletonComponent
 import pt.ms.myshare.data.repository.UserDataRepositoryImpl
 import pt.ms.myshare.domain.repository.UserDataRepository
 import pt.ms.myshare.domain.use_case.GetDashboardDataUseCase
-import pt.ms.myshare.domain.use_case.GetHomeDataUseCase
 import pt.ms.myshare.domain.use_case.edit_profile.EditProfileUseCase
 import javax.inject.Singleton
 
@@ -21,11 +20,6 @@ object AppModule {
     @Singleton
     fun provideUserDataRepository(@ApplicationContext context: Context): UserDataRepository {
         return UserDataRepositoryImpl(context)
-    }
-
-    @Provides
-    fun provideGetHomeDataUseCase(repository: UserDataRepository): GetHomeDataUseCase {
-        return GetHomeDataUseCase(repository)
     }
 
     @Provides

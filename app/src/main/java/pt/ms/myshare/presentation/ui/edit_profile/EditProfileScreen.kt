@@ -53,7 +53,6 @@ fun EditProfileRoute(
     EditProfileScreen(
         modifier = modifier,
         uiState = uiState,
-        onUsernameChange = viewModel::onUsernameChange,
         onNetSalaryChange = viewModel::onNetSalaryChange,
         onNetSalaryPercentageChange = viewModel::onNetSalaryPercentageChange,
         onStockPercentageChange = viewModel::onStockPercentageChange,
@@ -69,7 +68,6 @@ fun EditProfileRoute(
 fun EditProfileScreen(
     modifier: Modifier = Modifier,
     uiState: EditProfileState,
-    onUsernameChange: (String) -> Unit,
     onNetSalaryChange: (String) -> Unit,
     onNetSalaryPercentageChange: (String) -> Unit,
     onStockPercentageChange: (String) -> Unit,
@@ -116,13 +114,6 @@ fun EditProfileScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            OutlinedTextField(
-                value = uiState.username,
-                onValueChange = onUsernameChange,
-                label = { Text(stringResource(id = R.string.username_label)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(
                 value = uiState.netSalary,
                 onValueChange = onNetSalaryChange,
@@ -232,7 +223,6 @@ fun EditProfileScreenPreview() {
     MyShareTheme {
         EditProfileScreen(
             uiState = EditProfileState(),
-            onUsernameChange = {},
             onNetSalaryChange = {},
             onNetSalaryPercentageChange = {},
             onStockPercentageChange = {},

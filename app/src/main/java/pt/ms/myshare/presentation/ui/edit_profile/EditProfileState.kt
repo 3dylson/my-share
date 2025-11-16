@@ -1,7 +1,6 @@
 package pt.ms.myshare.presentation.ui.edit_profile
 
 data class EditProfileState(
-    val username: String = "",
     val netSalary: String = "",
     val netSalaryPercentage: String = "",
     val stockPercentage: String = "",
