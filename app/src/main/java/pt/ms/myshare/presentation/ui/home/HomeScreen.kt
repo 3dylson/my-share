@@ -1,4 +1,4 @@
-package pt.ms.myshare.ui.home
+package pt.ms.myshare.presentation.ui.home
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -18,8 +18,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import pt.ms.myshare.R
-import pt.ms.myshare.ui.dashboard.DashboardRoute
-import pt.ms.myshare.ui.theme.MyShareTheme
+import pt.ms.myshare.presentation.ui.dashboard.DashboardRoute
+import pt.ms.myshare.presentation.ui.theme.MyShareTheme
 
 @Composable
 fun HomeRoute(

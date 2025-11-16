@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.map
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.InvestAmount
 import pt.ms.myshare.domain.repository.UserDataRepository
-import pt.ms.myshare.ui.dashboard.DashboardState
+import pt.ms.myshare.presentation.ui.dashboard.DashboardState
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

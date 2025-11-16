@@ -1,4 +1,4 @@
-package pt.ms.myshare.ui
+package pt.ms.myshare.presentation.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -6,13 +6,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
-import pt.ms.myshare.ui.theme.MyShareTheme
+import pt.ms.myshare.presentation.ui.theme.MyShareTheme
 import pt.ms.myshare.utils.isDarkTheme
 import pt.ms.myshare.utils.logs.FirebaseUtils
 import java.util.Locale
@@ -24,7 +22,10 @@ class MainComposeActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyShareTheme {
-                Surface(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+                Surface(
+                    modifier = Modifier.fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
+                ) {
                     AppNavigation()
                 }
             }

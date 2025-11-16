@@ -1,4 +1,4 @@
-package pt.ms.myshare.ui.dashboard
+package pt.ms.myshare.presentation.ui.dashboard
 
 import androidx.annotation.StringRes
 import pt.ms.myshare.R

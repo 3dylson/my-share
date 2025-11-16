@@ -3,7 +3,7 @@ package pt.ms.myshare.domain.use_case
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import pt.ms.myshare.domain.repository.UserDataRepository
-import pt.ms.myshare.ui.home.HomeState
+import pt.ms.myshare.presentation.ui.home.HomeState
 import javax.inject.Inject
 
 class GetHomeDataUseCase @Inject constructor(

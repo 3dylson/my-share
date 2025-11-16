@@ -1,4 +1,4 @@
-package pt.ms.myshare.ui.theme
+package pt.ms.myshare.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -1,4 +1,4 @@
-package pt.ms.myshare.ui.edit_profile
+package pt.ms.myshare.presentation.ui.edit_profile
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,7 +41,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import pt.ms.myshare.R
-import pt.ms.myshare.ui.theme.MyShareTheme
+import pt.ms.myshare.presentation.ui.theme.MyShareTheme
 
 @Composable
 fun EditProfileRoute(

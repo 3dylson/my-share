@@ -1,4 +1,4 @@
-package pt.ms.myshare.ui.dashboard
+package pt.ms.myshare.presentation.ui.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import pt.ms.myshare.domain.model.InvestAmount
 import pt.ms.myshare.domain.use_case.GetDashboardDataUseCase
 import javax.inject.Inject
 
@@ -19,7 +20,7 @@ class DashboardViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(DashboardState())
     val uiState: StateFlow<DashboardState> = _uiState.asStateFlow()
-    private var allInvestments: List<pt.ms.myshare.domain.model.InvestAmount> = emptyList()
+    private var allInvestments: List<InvestAmount> = emptyList()
 
     init {
         getDashboardData()
@@ -47,7 +48,7 @@ class DashboardViewModel @Inject constructor(
         }
     }
 
-    private fun filterInvestments(chipId: String, investments: List<pt.ms.myshare.domain.model.InvestAmount>): List<pt.ms.myshare.domain.model.InvestAmount> {
+    private fun filterInvestments(chipId: String, investments: List<InvestAmount>): List<InvestAmount> {
         return when (chipId) {
             "Dashboard" -> investments
             else -> investments.filter { it.category == chipId }

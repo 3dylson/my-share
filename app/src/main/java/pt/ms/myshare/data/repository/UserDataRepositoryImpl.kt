@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.repository.UserDataRepository
-import pt.ms.myshare.ui.edit_profile.EditProfileState
+import pt.ms.myshare.presentation.ui.edit_profile.EditProfileState
 import javax.inject.Inject
 
 class UserDataRepositoryImpl @Inject constructor(

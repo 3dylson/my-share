@@ -1,4 +1,4 @@
-package pt.ms.myshare.ui.theme
+package pt.ms.myshare.presentation.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

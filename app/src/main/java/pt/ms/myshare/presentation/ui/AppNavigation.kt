@@ -1,11 +1,11 @@
-package pt.ms.myshare.ui
+package pt.ms.myshare.presentation.ui
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import pt.ms.myshare.ui.edit_profile.EditProfileRoute
-import pt.ms.myshare.ui.home.HomeRoute
+import pt.ms.myshare.presentation.ui.edit_profile.EditProfileRoute
+import pt.ms.myshare.presentation.ui.home.HomeRoute
 
 @Composable
 fun AppNavigation() {

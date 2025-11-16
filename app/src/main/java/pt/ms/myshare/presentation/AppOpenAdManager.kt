@@ -1,9 +1,8 @@
-package pt.ms.myshare
+package pt.ms.myshare.presentation
 
 import android.app.Activity
 import android.app.Application
 import android.content.Context
-import android.util.Log
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback

@@ -1,4 +1,4 @@
-package pt.ms.myshare.ui.home
+package pt.ms.myshare.presentation.ui.home
 
 data class HomeState(
     val userName: String = "",

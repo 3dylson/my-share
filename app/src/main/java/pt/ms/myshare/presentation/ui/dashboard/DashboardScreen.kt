@@ -1,4 +1,4 @@
-package pt.ms.myshare.ui.dashboard
+package pt.ms.myshare.presentation.ui.dashboard
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -34,9 +34,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.InvestAmount
-import pt.ms.myshare.ui.theme.MyShareTheme
+import pt.ms.myshare.presentation.ui.theme.MyShareTheme
 
 @Composable
 fun DashboardRoute(
@@ -135,7 +136,7 @@ fun AdvertView(modifier: Modifier = Modifier) {
     AndroidView(
         modifier = modifier.fillMaxWidth(),
         factory = { context ->
-            com.google.android.gms.ads.AdView(context).apply {
+            AdView(context).apply {
                 setAdSize(AdSize.BANNER)
                 adUnitId = context.getString(R.string.admob_banner_ad_unit_id)
                 loadAd(AdRequest.Builder().build())
@@ -152,9 +153,21 @@ fun DashboardScreenPreview() {
         DashboardScreen(
             uiState = DashboardState(
                 investments = listOf(
-                    InvestAmount(category = "Stocks", value = "$1,234.56", chipIcon = R.drawable.ic_baseline_show_chart),
-                    InvestAmount(category = "Crypto", value = "$5,678.90", chipIcon = R.drawable.ic_baseline_currency_bitcoin),
-                    InvestAmount(category = "Savings", value = "$2,000.00", chipIcon = R.drawable.savings_48px)
+                    InvestAmount(
+                        category = "Stocks",
+                        value = "$1,234.56",
+                        chipIcon = R.drawable.ic_baseline_show_chart
+                    ),
+                    InvestAmount(
+                        category = "Crypto",
+                        value = "$5,678.90",
+                        chipIcon = R.drawable.ic_baseline_currency_bitcoin
+                    ),
+                    InvestAmount(
+                        category = "Savings",
+                        value = "$2,000.00",
+                        chipIcon = R.drawable.savings_48px
+                    )
                 ),
                 date = "October 26, 2023"
             ),

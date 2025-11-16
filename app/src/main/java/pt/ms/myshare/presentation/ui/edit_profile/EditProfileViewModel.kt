@@ -1,4 +1,4 @@
-package pt.ms.myshare.ui.edit_profile
+package pt.ms.myshare.presentation.ui.edit_profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

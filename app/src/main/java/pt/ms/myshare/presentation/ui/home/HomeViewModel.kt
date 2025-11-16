@@ -1,4 +1,4 @@
-package pt.ms.myshare.ui.home
+package pt.ms.myshare.presentation.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

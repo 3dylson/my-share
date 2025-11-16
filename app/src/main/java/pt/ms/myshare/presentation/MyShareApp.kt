@@ -1,4 +1,4 @@
-package pt.ms.myshare
+package pt.ms.myshare.presentation
 
 import android.app.Activity
 import android.app.Application

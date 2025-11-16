@@ -1,4 +1,4 @@
-package pt.ms.myshare.ui.edit_profile
+package pt.ms.myshare.presentation.ui.edit_profile
 
 data class EditProfileState(
     val username: String = "",

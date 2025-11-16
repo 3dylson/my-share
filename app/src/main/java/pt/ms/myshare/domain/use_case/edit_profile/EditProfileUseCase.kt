@@ -1,6 +1,6 @@
 package pt.ms.myshare.domain.use_case.edit_profile
 
-import pt.ms.myshare.ui.edit_profile.EditProfileState
+import pt.ms.myshare.presentation.ui.edit_profile.EditProfileState
 
 class EditProfileUseCase {
     fun validate(state: EditProfileState): ValidationResult {
