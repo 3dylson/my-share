@@ -8,14 +8,15 @@ data class ChipOption(@StringRes val labelRes: Int, val id: String)
 
 data class DashboardState(
     val investments: List<InvestAmount> = emptyList(),
+    val allInvestments: List<InvestAmount> = emptyList(),
     val chipOptions: List<ChipOption> = listOf(
         ChipOption(R.string.dashboard_label, "Dashboard"),
         ChipOption(R.string.stocks_label, "Stocks"),
         ChipOption(R.string.crypto_label, "Crypto"),
         ChipOption(R.string.savings_label, "Savings")
     ),
-    val selectedChipId: String = "Dashboard",
+    val selectedChipId: String = "all",
     val date: String = "",
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val error: String? = null
 )
