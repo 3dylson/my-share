@@ -2,7 +2,6 @@ package pt.ms.myshare.utils.logs
 
 import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import pt.ms.myshare.utils.StringUtils
 import timber.log.Timber
 
 class CrashlyticsTree : Timber.Tree() {
@@ -13,7 +12,7 @@ class CrashlyticsTree : Timber.Tree() {
         }
         val crashlytics = FirebaseCrashlytics.getInstance()
         crashlytics.setCustomKey(CRASHLYTICS_KEY_PRIORITY, priority)
-        crashlytics.setCustomKey(CRASHLYTICS_KEY_TAG, tag ?: StringUtils.EMPTY_STRING)
+        crashlytics.setCustomKey(CRASHLYTICS_KEY_TAG, tag ?: "NO_TAG")
         crashlytics.setCustomKey(CRASHLYTICS_KEY_MESSAGE, message)
 
         if (t == null) {

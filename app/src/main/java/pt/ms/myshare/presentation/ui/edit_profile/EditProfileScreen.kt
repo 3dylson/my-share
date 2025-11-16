@@ -118,6 +118,7 @@ fun EditProfileScreen(
                 value = uiState.netSalary,
                 onValueChange = onNetSalaryChange,
                 label = { Text(stringResource(id = R.string.your_net_salary_label, "")) },
+                visualTransformation = CurrencyVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )

@@ -34,7 +34,9 @@ class EditProfileViewModel @Inject constructor(
     }
 
     fun onNetSalaryChange(value: String) {
-        _uiState.update { it.copy(netSalary = value) }
+        // Only allow digits
+        val digitsOnly = value.filter { it.isDigit() }
+        _uiState.update { it.copy(netSalary = digitsOnly) }
     }
 
     fun onNetSalaryPercentageChange(value: String) {
@@ -57,7 +59,7 @@ class EditProfileViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             saveEditProfileDataUseCase(
-                _uiState.value.copy()
+                _uiState.value
             ).onEach { result ->
                 _uiState.value = result
             }.launchIn(viewModelScope)
