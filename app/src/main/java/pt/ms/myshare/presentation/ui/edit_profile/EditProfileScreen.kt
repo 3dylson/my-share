@@ -1,6 +1,9 @@
 package pt.ms.myshare.presentation.ui.edit_profile
 
 import android.os.Build
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -30,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -114,120 +118,140 @@ fun EditProfileScreen(
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            OutlinedTextField(
-                value = uiState.netSalary,
-                onValueChange = onNetSalaryChange,
-                label = { Text(stringResource(id = R.string.your_net_salary_label, "")) },
-                visualTransformation = CurrencyVisualTransformation(locale),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            OutlinedTextField(
-                value = uiState.netSalaryPercentage,
-                onValueChange = onNetSalaryPercentageChange,
-                label = { Text(stringResource(id = R.string.investments_savings_percentage_label)) },
-                visualTransformation = PercentageVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                OutlinedTextField(
+                    value = uiState.netSalary,
+                    onValueChange = onNetSalaryChange,
+                    label = { Text(stringResource(id = R.string.your_net_salary_label, "")) },
+                    visualTransformation = CurrencyVisualTransformation(locale),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !uiState.isLoading
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                OutlinedTextField(
+                    value = uiState.netSalaryPercentage,
+                    onValueChange = onNetSalaryPercentageChange,
+                    label = { Text(stringResource(id = R.string.investments_savings_percentage_label)) },
+                    visualTransformation = PercentageVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = uiState.netSalaryPercentageError != null,
+                    supportingText = { uiState.netSalaryPercentageError?.let { Text(it) } },
+                    enabled = !uiState.isLoading
+                )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            val stockLabel = stringResource(id = R.string.percentage_stocks_label)
-            val stockAnnotatedString = buildAnnotatedString {
-                val parts = stockLabel.split("<b>", "</b>")
-                append(parts[0])
-                if (parts.size > 1) {
-                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append(parts[1])
+                val stockLabel = stringResource(id = R.string.percentage_stocks_label)
+                val stockAnnotatedString = buildAnnotatedString {
+                    val parts = stockLabel.split("<b>", "</b>")
+                    append(parts[0])
+                    if (parts.size > 1) {
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(parts[1])
+                        }
+                        if (parts.size > 2) {
+                            append(parts[2])
+                        }
                     }
-                    if (parts.size > 2) {
-                        append(parts[2])
+                }
+                OutlinedTextField(
+                    value = uiState.stockPercentage,
+                    onValueChange = onStockPercentageChange,
+                    label = { Text(stockAnnotatedString) },
+                    visualTransformation = PercentageVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = uiState.stockPercentageError != null,
+                    supportingText = { uiState.stockPercentageError?.let { Text(it) } },
+                    enabled = !uiState.isLoading
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                val cryptoLabel = stringResource(id = R.string.percentage_crypto_label)
+                val cryptoAnnotatedString = buildAnnotatedString {
+                    val parts = cryptoLabel.split("<b>", "</b>")
+                    append(parts[0])
+                    if (parts.size > 1) {
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(parts[1])
+                        }
+                        if (parts.size > 2) {
+                            append(parts[2])
+                        }
+                    }
+                }
+                OutlinedTextField(
+                    value = uiState.cryptoPercentage,
+                    onValueChange = onCryptoPercentageChange,
+                    label = { Text(cryptoAnnotatedString) },
+                    visualTransformation = PercentageVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = uiState.cryptoPercentageError != null,
+                    supportingText = { uiState.cryptoPercentageError?.let { Text(it) } },
+                    enabled = !uiState.isLoading
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                val savingsLabel = stringResource(id = R.string.percentage_savings_label)
+                val savingsAnnotatedString = buildAnnotatedString {
+                    val parts = savingsLabel.split("<b>", "</b>")
+                    append(parts[0])
+                    if (parts.size > 1) {
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(parts[1])
+                        }
+                        if (parts.size > 2) {
+                            append(parts[2])
+                        }
+                    }
+                }
+                OutlinedTextField(
+                    value = uiState.savingsPercentage,
+                    onValueChange = onSavingsPercentageChange,
+                    label = { Text(savingsAnnotatedString) },
+                    visualTransformation = PercentageVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = uiState.savingsPercentageError != null,
+                    supportingText = { uiState.savingsPercentageError?.let { Text(it) } },
+                    enabled = !uiState.isLoading
+                )
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Box(contentAlignment = Alignment.Center) {
+                    Button(
+                        onClick = onSave,
+                        enabled = !uiState.isLoading,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                    ) {
+                        Text(text = stringResource(id = R.string.btn_ep_confirm_text))
                     }
                 }
             }
-            OutlinedTextField(
-                value = uiState.stockPercentage,
-                onValueChange = onStockPercentageChange,
-                label = { Text(stockAnnotatedString) },
-                visualTransformation = PercentageVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
-                isError = uiState.stockPercentageError != null,
-                supportingText = { uiState.stockPercentageError?.let { Text(it) } }
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            val cryptoLabel = stringResource(id = R.string.percentage_crypto_label)
-            val cryptoAnnotatedString = buildAnnotatedString {
-                val parts = cryptoLabel.split("<b>", "</b>")
-                append(parts[0])
-                if (parts.size > 1) {
-                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append(parts[1])
-                    }
-                    if (parts.size > 2) {
-                        append(parts[2])
-                    }
-                }
-            }
-            OutlinedTextField(
-                value = uiState.cryptoPercentage,
-                onValueChange = onCryptoPercentageChange,
-                label = { Text(cryptoAnnotatedString) },
-                visualTransformation = PercentageVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
-                isError = uiState.cryptoPercentageError != null,
-                supportingText = { uiState.cryptoPercentageError?.let { Text(it) } }
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            val savingsLabel = stringResource(id = R.string.percentage_savings_label)
-            val savingsAnnotatedString = buildAnnotatedString {
-                val parts = savingsLabel.split("<b>", "</b>")
-                append(parts[0])
-                if (parts.size > 1) {
-                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append(parts[1])
-                    }
-                    if (parts.size > 2) {
-                        append(parts[2])
-                    }
-                }
-            }
-            OutlinedTextField(
-                value = uiState.savingsPercentage,
-                onValueChange = onSavingsPercentageChange,
-                label = { Text(savingsAnnotatedString) },
-                visualTransformation = PercentageVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
-                isError = uiState.savingsPercentageError != null,
-                supportingText = { uiState.savingsPercentageError?.let { Text(it) } }
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Box(contentAlignment = Alignment.Center) {
-                Button(
-                    onClick = onSave,
-                    enabled = !uiState.isLoading,
+            if (uiState.isLoading) {
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.5f))
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {},
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(text = stringResource(id = R.string.btn_ep_confirm_text))
-                }
-                if (uiState.isLoading) {
                     CircularProgressIndicator()
                 }
             }
@@ -241,7 +265,7 @@ fun EditProfileScreen(
 fun EditProfileScreenPreview() {
     MyShareTheme {
         EditProfileScreen(
-            uiState = EditProfileState(),
+            uiState = EditProfileState(isLoading = true),
             onNetSalaryChange = {},
             onNetSalaryPercentageChange = {},
             onStockPercentageChange = {},

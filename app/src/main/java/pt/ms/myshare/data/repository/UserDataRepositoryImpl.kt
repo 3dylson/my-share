@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.flow
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.repository.UserDataRepository
 import pt.ms.myshare.presentation.ui.edit_profile.EditProfileState
+import timber.log.Timber
 import javax.inject.Inject
 
 class UserDataRepositoryImpl @Inject constructor(
@@ -17,29 +18,53 @@ class UserDataRepositoryImpl @Inject constructor(
     private val prefs = PreferenceManager.getDefaultSharedPreferences(context)
 
     override fun getUserData(): Flow<EditProfileState> = flow {
+        Timber.d("getUserData() called")
         val netSalary = prefs.getString(context.getString(R.string.pref_key_net_salary_value), "") ?: ""
         val netSalaryPercentage = prefs.getString(context.getString(R.string.pref_key_investments_savings_percentage_value), "") ?: ""
         val stockPercentage = prefs.getString(context.getString(R.string.pref_key_percentage_stocks_value), "") ?: ""
         val cryptoPercentage = prefs.getString(context.getString(R.string.pref_key_percentage_crypto_value), "") ?: ""
         val savingsPercentage = prefs.getString(context.getString(R.string.pref_key_percentage_savings_value), "") ?: ""
 
-        emit(EditProfileState(
+        val state = EditProfileState(
             netSalary = netSalary,
             netSalaryPercentage = netSalaryPercentage,
             stockPercentage = stockPercentage,
             cryptoPercentage = cryptoPercentage,
             savingsPercentage = savingsPercentage
-        ))
+        )
+        emit(state)
+        Timber.d("getUserData() success: $state")
     }
 
     override suspend fun saveUserData(data: EditProfileState) {
-        prefs.edit().apply {
-            putString(context.getString(R.string.pref_key_net_salary_value), data.netSalary)
-            putString(context.getString(R.string.pref_key_investments_savings_percentage_value), data.netSalaryPercentage)
-            putString(context.getString(R.string.pref_key_percentage_stocks_value), data.stockPercentage)
-            putString(context.getString(R.string.pref_key_percentage_crypto_value), data.cryptoPercentage)
-            putString(context.getString(R.string.pref_key_percentage_savings_value), data.savingsPercentage)
-            apply()
+        Timber.d("saveUserData() called with: $data")
+        val editor = prefs.edit()
+        if (data.netSalary.isEmpty()) {
+            editor.remove(context.getString(R.string.pref_key_net_salary_value))
+        } else {
+            editor.putString(context.getString(R.string.pref_key_net_salary_value), data.netSalary)
         }
+        if (data.netSalaryPercentage.isEmpty()) {
+            editor.remove(context.getString(R.string.pref_key_investments_savings_percentage_value))
+        } else {
+            editor.putString(context.getString(R.string.pref_key_investments_savings_percentage_value), data.netSalaryPercentage)
+        }
+        if (data.stockPercentage.isEmpty()) {
+            editor.remove(context.getString(R.string.pref_key_percentage_stocks_value))
+        } else {
+            editor.putString(context.getString(R.string.pref_key_percentage_stocks_value), data.stockPercentage)
+        }
+        if (data.cryptoPercentage.isEmpty()) {
+            editor.remove(context.getString(R.string.pref_key_percentage_crypto_value))
+        } else {
+            editor.putString(context.getString(R.string.pref_key_percentage_crypto_value), data.cryptoPercentage)
+        }
+        if (data.savingsPercentage.isEmpty()) {
+            editor.remove(context.getString(R.string.pref_key_percentage_savings_value))
+        } else {
+            editor.putString(context.getString(R.string.pref_key_percentage_savings_value), data.savingsPercentage)
+        }
+        val result = editor.commit()
+        Timber.d("saveUserData() commit result: $result")
     }
 }

@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pt.ms.myshare.domain.use_case.edit_profile.GetEditProfileDataUseCase
 import pt.ms.myshare.domain.use_case.edit_profile.SaveEditProfileDataUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,44 +32,61 @@ class EditProfileViewModel @Inject constructor(
     }
 
     private fun getEditProfileData() {
+        Timber.d("getEditProfileData() called")
         getDataJob?.cancel()
         getDataJob = getEditProfileDataUseCase().onEach {
             _uiState.value = it
+            Timber.d("getEditProfileData() success: $it")
         }.launchIn(viewModelScope)
     }
 
     fun onNetSalaryChange(value: String) {
+        Timber.d("onNetSalaryChange() called with: $value")
         val digitsOnly = value.filter { it.isDigit() }
         _uiState.update { it.copy(netSalary = digitsOnly) }
     }
 
     fun onNetSalaryPercentageChange(value: String) {
+        Timber.d("onNetSalaryPercentageChange() called with: $value")
         val digitsOnly = value.filter { it.isDigit() }
         if (digitsOnly.isEmpty()) {
-            _uiState.update { it.copy(netSalaryPercentage = "") }
+            _uiState.update { it.copy(netSalaryPercentage = "", netSalaryPercentageError = null) }
             return
         }
         val intValue = digitsOnly.toIntOrNull() ?: 0
-        val validatedValue = if (intValue > 100) 100 else intValue
-        _uiState.update { it.copy(netSalaryPercentage = validatedValue.toString()) }
+        if (intValue > 100) {
+            _uiState.update { it.copy(netSalaryPercentageError = "Cannot exceed 100%") }
+        } else {
+            _uiState.update { it.copy(netSalaryPercentage = intValue.toString(), netSalaryPercentageError = null) }
+        }
     }
 
     fun onStockPercentageChange(value: String) {
+        Timber.d("onStockPercentageChange() called with: $value")
         handlePercentageChange(value, "stock")
     }
 
     fun onCryptoPercentageChange(value: String) {
+        Timber.d("onCryptoPercentageChange() called with: $value")
         handlePercentageChange(value, "crypto")
     }
 
     fun onSavingsPercentageChange(value: String) {
+        Timber.d("onSavingsPercentageChange() called with: $value")
         handlePercentageChange(value, "savings")
     }
 
     private fun handlePercentageChange(value: String, field: String) {
         val digitsOnly = value.filter { it.isDigit() }
         if (digitsOnly.isEmpty()) {
-            updatePercentageField(field, "", null)
+            _uiState.update {
+                when (field) {
+                    "stock" -> it.copy(stockPercentage = "", stockPercentageError = null)
+                    "crypto" -> it.copy(cryptoPercentage = "", cryptoPercentageError = null)
+                    "savings" -> it.copy(savingsPercentage = "", savingsPercentageError = null)
+                    else -> it
+                }
+            }
             return
         }
 
@@ -86,39 +104,35 @@ class EditProfileViewModel @Inject constructor(
 
         if (intValue > maxAllowed) {
             val error = "Cannot exceed $maxAllowed%"
-            updatePercentageField(field, _uiState.value.getPercentageForField(field), error)
+            _uiState.update {
+                when (field) {
+                    "stock" -> it.copy(stockPercentageError = error)
+                    "crypto" -> it.copy(cryptoPercentageError = error)
+                    "savings" -> it.copy(savingsPercentageError = error)
+                    else -> it
+                }
+            }
         } else {
-            updatePercentageField(field, digitsOnly, null)
-        }
-    }
-
-    private fun updatePercentageField(field: String, value: String, error: String?) {
-        _uiState.update {
-            when (field) {
-                "stock" -> it.copy(stockPercentage = value, stockPercentageError = error, cryptoPercentageError = null, savingsPercentageError = null)
-                "crypto" -> it.copy(cryptoPercentage = value, cryptoPercentageError = error, stockPercentageError = null, savingsPercentageError = null)
-                "savings" -> it.copy(savingsPercentage = value, savingsPercentageError = error, stockPercentageError = null, cryptoPercentageError = null)
-                else -> it
+            _uiState.update {
+                when (field) {
+                    "stock" -> it.copy(stockPercentage = intValue.toString(), stockPercentageError = null)
+                    "crypto" -> it.copy(cryptoPercentage = intValue.toString(), cryptoPercentageError = null)
+                    "savings" -> it.copy(savingsPercentage = intValue.toString(), savingsPercentageError = null)
+                    else -> it
+                }
             }
         }
     }
 
-    private fun EditProfileState.getPercentageForField(field: String): String {
-        return when (field) {
-            "stock" -> this.stockPercentage
-            "crypto" -> this.cryptoPercentage
-            "savings" -> this.savingsPercentage
-            else -> ""
-        }
-    }
-
     fun onSave() {
+        Timber.d("onSave() called")
         val stock = _uiState.value.stockPercentage.toIntOrNull() ?: 0
         val crypto = _uiState.value.cryptoPercentage.toIntOrNull() ?: 0
         val savings = _uiState.value.savingsPercentage.toIntOrNull() ?: 0
 
-        if (stock + crypto + savings != 100) {
-            _uiState.update { it.copy(error = "Investment percentages must add up to 100%") }
+        if (stock + crypto + savings > 100) {
+            _uiState.update { it.copy(error = "Investment percentages cannot add up to more than 100%") }
+            Timber.w("onSave() failed: Investment percentages add up to more than 100%")
             return
         }
 
@@ -128,6 +142,7 @@ class EditProfileViewModel @Inject constructor(
                 _uiState.value
             ).onEach { result ->
                 _uiState.value = result
+                Timber.d("onSave() success: $result")
             }.launchIn(viewModelScope)
         }
     }
