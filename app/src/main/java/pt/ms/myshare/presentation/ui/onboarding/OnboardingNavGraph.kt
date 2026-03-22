@@ -69,6 +69,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
             FixedCostsScreen(
                 initialFixedCosts = state.monthlyFixedCosts,
                 initialPreset = state.preset,
+                error = state.error,
                 onBack = { navController.popBackStack() },
                 onNext = { fixedCosts, preset ->
                     if (viewModel.setFixedCostsAndBuild(fixedCosts, preset)) {

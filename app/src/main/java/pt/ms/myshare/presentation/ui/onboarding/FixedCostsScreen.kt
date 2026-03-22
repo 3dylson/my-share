@@ -34,6 +34,7 @@ import java.math.BigDecimal
 fun FixedCostsScreen(
     initialFixedCosts: BigDecimal?,
     initialPreset: AllocationPreset,
+    error: String? = null,
     onBack: () -> Unit,
     onNext: (BigDecimal, AllocationPreset) -> Unit
 ) {
@@ -58,15 +59,34 @@ fun FixedCostsScreen(
                 onValueChange = { fixedCostsText = it.replace(',', '.') },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Monthly fixed costs") },
+                placeholder = { Text("e.g. 1200.00") },
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                isError = fixedCostsText.isNotEmpty() && fixedCosts == null
             )
+
+            if (fixedCostsText.isNotEmpty() && fixedCosts == null) {
+                Text(
+                    text = "Please enter a valid number for costs.",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
 
             Text("Plan style", style = MaterialTheme.typography.titleMedium)
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
                 PresetChip("Conservative", preset == AllocationPreset.CONSERVATIVE) { preset = AllocationPreset.CONSERVATIVE }
                 PresetChip("Balanced", preset == AllocationPreset.BALANCED) { preset = AllocationPreset.BALANCED }
                 PresetChip("Growth", preset == AllocationPreset.GROWTH) { preset = AllocationPreset.GROWTH }
+            }
+
+            if (error != null) {
+                Text(
+                    text = error,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
             }
 
             Spacer(Modifier.weight(1f))
