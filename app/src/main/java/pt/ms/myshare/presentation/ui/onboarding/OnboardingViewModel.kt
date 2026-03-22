@@ -1,176 +1,218 @@
 package pt.ms.myshare.presentation.ui.onboarding
 
-import android.content.Context
+import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
-import pt.ms.myshare.domain.model.*
+import pt.ms.myshare.domain.model.AllocationPreset
+import pt.ms.myshare.domain.model.BillingPlan
+import pt.ms.myshare.domain.model.PayFrequency
+import pt.ms.myshare.domain.model.PlanningFocus
+import pt.ms.myshare.domain.model.ReminderCadence
+import pt.ms.myshare.domain.model.ReminderConfiguration
+import pt.ms.myshare.domain.model.SalaryPlan
 import pt.ms.myshare.domain.repository.EntitlementRepository
+import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
+import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
+import pt.ms.myshare.utils.logs.FirebaseUtils
+import timber.log.Timber
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.time.LocalTime
-import androidx.work.WorkManager
-import androidx.work.PeriodicWorkRequestBuilder
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
+import java.util.Locale
 import java.util.concurrent.TimeUnit
-import java.time.YearMonth
-import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
-    private val calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase,
+    private val plannerRepository: PlannerRepository,
     private val entitlementRepository: EntitlementRepository,
-    private val workManager: WorkManager,
-    @ApplicationContext private val appContext: Context
+    private val calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase,
+    private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase,
+    private val workManager: WorkManager
 ) : ViewModel() {
-    private val _state = MutableStateFlow(OnboardingState())
-    val state: StateFlow<OnboardingState> = _state.asStateFlow()
-    private var hasInteracted = false
 
-    val isPro: StateFlow<Boolean> = entitlementRepository.isPro
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
-
-    private var basePreview: PlanPreview? = null
+    private val state = MutableStateFlow(OnboardingState())
+    val uiState: StateFlow<OnboardingState> = state.asStateFlow()
 
     init {
-        // Decide whether to skip onboarding.
-        val completed = OnboardingPrefs.isOnboardingCompleted(appContext)
-        _state.update { it.copy(onboardingCompleted = completed) }
-    }
-
-    fun selectGoal(type: GoalType, amount: BigDecimal, label: String?) {
-        _state.update { it.copy(selectedGoalType = type, goalAmount = amount, goalLabel = label) }
-    }
-
-    fun setPreset(preset: AllocationPreset) {
-        _state.update { it.copy(preset = preset) }
-        // If the user already saw a preview, keep it live-updated.
-        if (_state.value.planPreview != null) {
-            recomputePreview(sliderExtra = _state.value.sliderValue)
+        val completed = plannerRepository.isOnboardingCompleted()
+        val pricing = resolvePricingStrategyUseCase.execute(Locale.getDefault())
+        state.update {
+            it.copy(
+                onboardingCompleted = completed,
+                pricingStrategy = pricing,
+                selectedBillingPlan = pricing.heroPlan
+            )
         }
-    }
-
-    fun enterSalaryAndSchedule(salary: BigDecimal, schedule: PaySchedule) {
-        _state.update { it.copy(netSalary = salary, paySchedule = schedule) }
-    }
-
-    fun seePlan() {
-        recomputePreview(sliderExtra = 0)
-    }
-
-    fun interact() {
-        hasInteracted = true
-    }
-
-    fun onSliderChanged(extra: Int) {
-        hasInteracted = true
-        _state.update { it.copy(sliderValue = extra) }
-        recomputePreview(sliderExtra = extra)
-    }
-
-    private fun recomputePreview(sliderExtra: Int) {
-        val s = _state.value
-        if (s.netSalary == null || s.paySchedule == null || s.goalAmount == null || s.selectedGoalType == null) return
-
-        val effectiveSalary = s.netSalary.add(BigDecimal(sliderExtra))
-        val input = PlanInput(
-            netSalary = effectiveSalary,
-            schedule = s.paySchedule,
-            preset = s.preset,
-            goal = Goal(amount = s.goalAmount, type = s.selectedGoalType, label = s.goalLabel)
-        )
-        val preview = calculatePlanPreviewUseCase.execute(input)
-        val monthsSooner = calculateMonthsSooner(basePreview, preview)
-
-        if (sliderExtra == 0) {
-            basePreview = preview
-        }
-
-        _state.update { it.copy(planPreview = preview, monthsSooner = monthsSooner) }
-        // Persist the latest plan so the reminder worker can use it.
-        OnboardingPrefs.savePlanInput(appContext, input)
-    }
-
-    private fun calculateMonthsSooner(base: PlanPreview?, current: PlanPreview?): Int? {
-        val b = base?.goalTargetDate ?: return null
-        val c = current?.goalTargetDate ?: return null
-        val diff = ChronoUnit.MONTHS.between(c.atDay(1), b.atDay(1)).toInt()
-        return diff.takeIf { it > 0 }
-    }
-
-    fun setSelectedPaywallPlan(plan: PaywallPlan) {
-        _state.update { it.copy(selectedPaywallPlan = plan) }
-    }
-
-    fun onAutopilotClicked(onShowPaywall: () -> Unit, onGoToReminderSetup: () -> Unit) {
         viewModelScope.launch {
-            val pro = isPro.value
-            val previewSeen = _state.value.planPreview != null
-            if (pro) {
-                onGoToReminderSetup()
-            } else if (previewSeen) {
-                onShowPaywall()
-            }
+            val isPremium = entitlementRepository.isPro.first()
+            state.update { current -> current.copy(isPremium = isPremium) }
         }
     }
 
-    fun purchaseSelectedPlan(onPurchased: () -> Unit) {
+    fun setFocus(focus: PlanningFocus, defaultGoalName: String, defaultGoalAmount: BigDecimal) {
+        state.update {
+            it.copy(
+                selectedFocus = focus,
+                goalName = defaultGoalName,
+                goalAmount = defaultGoalAmount
+            )
+        }
+    }
+
+    fun setGoal(goalName: String, goalAmount: BigDecimal) {
+        state.update { it.copy(goalName = goalName, goalAmount = goalAmount) }
+    }
+
+    fun setSalaryDetails(
+        incomePerPayday: BigDecimal,
+        monthlyFixedCosts: BigDecimal,
+        payFrequency: PayFrequency,
+        monthlyPayday: Int,
+        nextBiweeklyPaydayText: String,
+        preset: AllocationPreset
+    ) {
+        state.update {
+            it.copy(
+                netIncomePerPayday = incomePerPayday,
+                monthlyFixedCosts = monthlyFixedCosts,
+                payFrequency = payFrequency,
+                monthlyPayday = monthlyPayday,
+                nextBiweeklyPaydayText = nextBiweeklyPaydayText,
+                preset = preset,
+                error = null
+            )
+        }
+    }
+
+    fun buildPreview(): Boolean {
+        val current = state.value
+        val income = current.netIncomePerPayday ?: return false
+        val fixedCosts = current.monthlyFixedCosts ?: return false
+        val plan = buildPlan(current, income, fixedCosts) ?: return false
+        val preview = calculatePlanPreviewUseCase.execute(plan)
+        state.update { it.copy(planPreview = preview, error = null) }
         viewModelScope.launch {
-            // Placeholder: unlock immediately.
+            plannerRepository.savePlan(plan)
+            FirebaseUtils.logEvent("create_plan_completed", Bundle().apply {
+                putString("country_cluster", current.pricingStrategy?.marketCluster)
+                putString("language", Locale.getDefault().language)
+            })
+        }
+        return true
+    }
+
+    fun setSelectedBillingPlan(plan: BillingPlan) {
+        state.update { it.copy(selectedBillingPlan = plan) }
+    }
+
+    fun unlockPremium(onUnlocked: () -> Unit) {
+        viewModelScope.launch {
             entitlementRepository.setPro(true)
-            onPurchased()
+            state.update { it.copy(isPremium = true) }
+            FirebaseUtils.logEvent("trial_started", Bundle().apply {
+                putString("billing_plan", state.value.selectedBillingPlan.name.lowercase(Locale.US))
+                putString("price_cluster", state.value.pricingStrategy?.marketCluster)
+            })
+            onUnlocked()
         }
     }
 
-    fun restorePurchases() {
+
+    fun restorePurchases(onRestored: (Boolean) -> Unit) {
         viewModelScope.launch {
             entitlementRepository.restorePurchases()
+            val restored = entitlementRepository.isPro.first()
+            state.update { it.copy(isPremium = restored) }
+            onRestored(restored)
         }
     }
 
-    var reminderTime: LocalTime = LocalTime.of(9, 0)
-    var reminderSchedule: String = "MONTHLY"
-
-    fun setupReminder(time: LocalTime, schedule: String) {
-        reminderTime = time
-        reminderSchedule = schedule
-        schedulePaydayReminder()
-        OnboardingPrefs.setOnboardingCompleted(appContext, true)
-        _state.update { it.copy(onboardingCompleted = true) }
+    fun completeOnboardingWithoutPremium() {
+        viewModelScope.launch {
+            plannerRepository.setOnboardingCompleted(true)
+            state.update { it.copy(onboardingCompleted = true) }
+        }
     }
 
-    fun completeOnboardingWithoutAutopilot() {
-        OnboardingPrefs.setOnboardingCompleted(appContext, true)
-        _state.update { it.copy(onboardingCompleted = true) }
+    fun saveReminderConfiguration(time: LocalTime, cadence: ReminderCadence) {
+        viewModelScope.launch {
+            plannerRepository.saveReminderConfiguration(
+                ReminderConfiguration(
+                    enabled = true,
+                    hourOfDay = time.hour,
+                    minute = time.minute,
+                    cadence = cadence
+                )
+            )
+            scheduleReminderWork()
+            plannerRepository.setOnboardingCompleted(true)
+            state.update { it.copy(onboardingCompleted = true) }
+            FirebaseUtils.logEvent("reminder_enabled")
+        }
     }
 
-    private fun schedulePaydayReminder() {
-        // Cancel previous jobs
-        val request = PeriodicWorkRequestBuilder<ReminderWorker>(1, TimeUnit.DAYS)
-            .addTag("payday_reminder")
-            .build()
-        workManager.enqueueUniquePeriodicWork(
-            /* uniqueWorkName = */ "payday_reminder",
-            /* existingPeriodicWorkPolicy = */ ExistingPeriodicWorkPolicy.UPDATE,
-            /* periodicWork = */ request
+    fun skipReminderConfiguration() {
+        viewModelScope.launch {
+            plannerRepository.saveReminderConfiguration(ReminderConfiguration(enabled = false))
+            plannerRepository.setOnboardingCompleted(true)
+            state.update { it.copy(onboardingCompleted = true) }
+        }
+    }
+
+    fun logPaywallViewed() {
+        FirebaseUtils.logEvent("paywall_viewed", Bundle().apply {
+            putString("price_cluster", state.value.pricingStrategy?.marketCluster)
+            putString("billing_plan", state.value.selectedBillingPlan.name.lowercase(Locale.US))
+        })
+    }
+
+    private fun buildPlan(current: OnboardingState, income: BigDecimal, fixedCosts: BigDecimal): SalaryPlan? {
+        val nextBiweeklyPayday = if (current.payFrequency == PayFrequency.BIWEEKLY) {
+            runCatching { LocalDate.parse(current.nextBiweeklyPaydayText) }.getOrElse {
+                state.update { it.copy(error = "Use YYYY-MM-DD for the next biweekly payday.") }
+                return null
+            }
+        } else {
+            null
+        }
+        return SalaryPlan(
+            focus = current.selectedFocus,
+            netIncomePerPayday = income,
+            monthlyFixedCosts = fixedCosts,
+            payFrequency = current.payFrequency,
+            monthlyPayday = current.monthlyPayday.coerceIn(1, 28),
+            nextBiweeklyPayday = nextBiweeklyPayday,
+            preset = current.preset,
+            goalName = current.goalName,
+            goalAmount = current.goalAmount
         )
     }
 
-    fun updateReminderContent() {
-        // Call schedulePaydayReminder() to update content if salary/preset/goal changes
-        schedulePaydayReminder()
+    private fun scheduleReminderWork() {
+        val request = PeriodicWorkRequestBuilder<ReminderWorker>(1, TimeUnit.DAYS)
+            .addTag(ReminderWorker.UNIQUE_NAME)
+            .build()
+        workManager.enqueueUniquePeriodicWork(
+            ReminderWorker.UNIQUE_NAME,
+            ExistingPeriodicWorkPolicy.UPDATE,
+            request
+        )
+        Timber.tag(TAG).d("Reminder work scheduled")
     }
 
-    fun disableReminders() {
-        workManager.cancelUniqueWork("payday_reminder")
+    companion object {
+        private const val TAG = "OnboardingViewModel"
     }
 }

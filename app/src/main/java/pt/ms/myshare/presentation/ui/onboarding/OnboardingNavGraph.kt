@@ -10,17 +10,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
-/**
- * Nested onboarding navigation.
- *
- * Flow:
- * Welcome -> Goal -> Salary/Schedule -> Plan Preview (aha) -> Paywall -> Reminder setup -> Home
- */
 @Composable
 fun OnboardingEntryRoute(parentNavController: NavController) {
     val navController = rememberNavController()
     val viewModel: OnboardingViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.uiState.collectAsState()
 
     LaunchedEffect(state.onboardingCompleted) {
         if (state.onboardingCompleted) {
@@ -37,80 +31,84 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
         composable(OnboardingRoute.Welcome.route) {
             WelcomeScreen(
                 onContinue = { navController.navigate(OnboardingRoute.GoalPicker.route) },
-                onSkip = {
-                    viewModel.completeOnboardingWithoutAutopilot()
-                }
+                onSkip = { viewModel.completeOnboardingWithoutPremium() }
             )
         }
         composable(OnboardingRoute.GoalPicker.route) {
             GoalPickerScreen(
-                initialType = state.selectedGoalType,
-                initialAmount = state.goalAmount,
-                initialLabel = state.goalLabel,
+                initialFocus = state.selectedFocus,
+                initialGoalName = state.goalName,
+                initialGoalAmount = state.goalAmount,
                 onBack = { navController.popBackStack() },
-                onNext = { type, amount, label ->
-                    viewModel.selectGoal(type, amount, label)
+                onNext = { focus, goalName, goalAmount ->
+                    viewModel.setFocus(focus, goalName, goalAmount)
+                    viewModel.setGoal(goalName, goalAmount)
                     navController.navigate(OnboardingRoute.SalaryAndSchedule.route)
                 }
             )
         }
         composable(OnboardingRoute.SalaryAndSchedule.route) {
             SalaryAndScheduleScreen(
-                initialSalary = state.netSalary,
-                initialSchedule = state.paySchedule,
+                initialIncome = state.netIncomePerPayday,
+                initialFixedCosts = state.monthlyFixedCosts,
+                initialFrequency = state.payFrequency,
+                initialMonthlyPayday = state.monthlyPayday,
+                initialNextBiweeklyPaydayText = state.nextBiweeklyPaydayText,
                 initialPreset = state.preset,
                 onBack = { navController.popBackStack() },
-                onPresetSelected = { viewModel.setPreset(it) },
-                onSeePlan = { salary, schedule ->
-                    viewModel.enterSalaryAndSchedule(salary, schedule)
-                    viewModel.seePlan()
-                    navController.navigate(OnboardingRoute.PlanPreview.route)
-                }
-            )
-        }
-        composable(OnboardingRoute.PlanPreview.route) {
-            val isPro by viewModel.isPro.collectAsState()
-            PlanPreviewScreen(
-                planPreview = state.planPreview,
-                goalAmount = state.goalAmount,
-                currencySymbol = "€",
-                onSliderChange = { viewModel.onSliderChanged(it) },
-                sliderValue = state.sliderValue,
-                monthsSooner = state.monthsSooner,
-                onAutopilot = {
-                    viewModel.onAutopilotClicked(
-                        onShowPaywall = { navController.navigate(OnboardingRoute.Paywall.route) },
-                        onGoToReminderSetup = { navController.navigate(OnboardingRoute.ReminderSetup.route) }
+                onNext = { income, fixedCosts, frequency, monthlyPayday, biweeklyPayday, preset ->
+                    viewModel.setSalaryDetails(
+                        incomePerPayday = income,
+                        monthlyFixedCosts = fixedCosts,
+                        payFrequency = frequency,
+                        monthlyPayday = monthlyPayday,
+                        nextBiweeklyPaydayText = biweeklyPayday,
+                        preset = preset
                     )
-                },
-                onNotNow = {
-                    viewModel.completeOnboardingWithoutAutopilot()
-                }
-            )
-        }
-        composable(OnboardingRoute.Paywall.route) {
-            PaywallScreen(
-                annualPrice = "€49.99 / year",
-                monthlyPrice = "€5.99 / month",
-                trialAvailable = true,
-                selectedPlan = state.selectedPaywallPlan,
-                onPlanSelected = { viewModel.setSelectedPaywallPlan(it) },
-                onClose = { navController.popBackStack() },
-                onRestore = { viewModel.restorePurchases() },
-                onPurchaseSelected = {
-                    viewModel.purchaseSelectedPlan {
-                        navController.navigate(OnboardingRoute.ReminderSetup.route) {
-                            popUpTo(OnboardingRoute.PlanPreview.route) { inclusive = false }
-                        }
+                    if (viewModel.buildPreview()) {
+                        navController.navigate(OnboardingRoute.PlanPreview.route)
                     }
                 }
             )
         }
+        composable(OnboardingRoute.PlanPreview.route) {
+            val preview = state.planPreview
+            if (preview != null) {
+                PlanPreviewScreen(
+                    preview = preview,
+                    goalName = state.goalName,
+                    goalAmount = state.goalAmount,
+                    onAutopilot = {
+                        viewModel.logPaywallViewed()
+                        navController.navigate(OnboardingRoute.Paywall.route)
+                    },
+                    onNotNow = { viewModel.completeOnboardingWithoutPremium() }
+                )
+            }
+        }
+        composable(OnboardingRoute.Paywall.route) {
+            val pricing = state.pricingStrategy
+            if (pricing != null) {
+                PaywallScreen(
+                    pricingStrategy = pricing,
+                    selectedPlan = state.selectedBillingPlan,
+                    onPlanSelected = viewModel::setSelectedBillingPlan,
+                    onClose = { navController.popBackStack() },
+                    onRestore = {
+                        viewModel.restorePurchases { restored ->
+                            if (restored) {
+                                navController.navigate(OnboardingRoute.ReminderSetup.route)
+                            }
+                        }
+                    },
+                    onPurchaseSelected = { viewModel.unlockPremium { navController.navigate(OnboardingRoute.ReminderSetup.route) } }
+                )
+            }
+        }
         composable(OnboardingRoute.ReminderSetup.route) {
             ReminderSetupScreen(
-                onConfirm = { time, schedule ->
-                    viewModel.setupReminder(time, schedule)
-                }
+                onConfirm = { time, cadence -> viewModel.saveReminderConfiguration(time, cadence) },
+                onSkip = { viewModel.skipReminderConfiguration() }
             )
         }
     }

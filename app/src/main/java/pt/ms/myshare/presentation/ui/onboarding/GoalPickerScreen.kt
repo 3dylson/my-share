@@ -7,141 +7,135 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import pt.ms.myshare.domain.model.GoalType
+import pt.ms.myshare.domain.model.PlanningFocus
 import java.math.BigDecimal
 
 @Composable
 fun GoalPickerScreen(
-    initialType: GoalType?,
-    initialAmount: BigDecimal?,
-    initialLabel: String?,
+    initialFocus: PlanningFocus,
+    initialGoalName: String,
+    initialGoalAmount: BigDecimal,
     onBack: () -> Unit,
-    onNext: (GoalType, BigDecimal, String?) -> Unit
+    onNext: (PlanningFocus, String, BigDecimal) -> Unit
 ) {
-    var selected by remember { mutableStateOf(initialType ?: GoalType.EMERGENCY_FUND) }
-    var amountText by remember {
-        mutableStateOf(
-            initialAmount?.toPlainString()
-                ?: when (selected) {
-                    GoalType.EMERGENCY_FUND -> "3000"
-                    GoalType.INVEST_TARGET -> "10000"
-                    GoalType.CUSTOM -> "1000"
-                }
-        )
+    var selectedFocus by remember { mutableStateOf(initialFocus) }
+    var goalName by remember { mutableStateOf(initialGoalName) }
+    var goalAmountText by remember { mutableStateOf(initialGoalAmount.toPlainString()) }
+
+    fun setDefaultsForFocus(focus: PlanningFocus) {
+        selectedFocus = focus
+        when (focus) {
+            PlanningFocus.SAVE_WITHOUT_STRESS -> {
+                goalName = "Emergency fund"
+                goalAmountText = "3000"
+            }
+            PlanningFocus.INVEST_WITH_DISCIPLINE -> {
+                goalName = "Investing base"
+                goalAmountText = "10000"
+            }
+            PlanningFocus.STOP_OVERSPENDING -> {
+                goalName = "Cash buffer"
+                goalAmountText = "2000"
+            }
+            PlanningFocus.PLAN_TOGETHER -> {
+                goalName = "Shared safety net"
+                goalAmountText = "5000"
+            }
+        }
     }
-    var labelText by remember { mutableStateOf(initialLabel ?: "") }
 
-    fun parseAmount(): BigDecimal? = runCatching { BigDecimal(amountText.trim()) }.getOrNull()
+    val goalAmount = goalAmountText.toBigDecimalOrNull()
 
-    Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFFF6F8FA)) {
-        Column(Modifier.fillMaxSize().padding(24.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onClick = onBack) { Text("Back") }
-                Spacer(Modifier.weight(1f))
-            }
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            TextButton(onClick = onBack) { Text("Back") }
+            Text("What do you want to solve first?", style = MaterialTheme.typography.headlineMedium)
+            Text("This personalizes the plan and the premium story without adding heavy setup.", color = MaterialTheme.colorScheme.onSurfaceVariant)
 
-            Text("Choose your first goal", fontSize = 26.sp, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(8.dp))
-            Text("We’ll estimate a target date based on your plan.", color = Color(0xFF546E7A))
-            Spacer(Modifier.height(20.dp))
-
-            GoalCard(
-                title = "Emergency fund",
-                subtitle = "Feel safe with a cash buffer.",
-                selected = selected == GoalType.EMERGENCY_FUND,
-                onClick = {
-                    selected = GoalType.EMERGENCY_FUND
-                    if (amountText.isBlank()) amountText = "3000"
-                }
+            FocusCard(
+                title = "Save without stress",
+                subtitle = "More calm, fewer money surprises.",
+                selected = selectedFocus == PlanningFocus.SAVE_WITHOUT_STRESS,
+                onClick = { setDefaultsForFocus(PlanningFocus.SAVE_WITHOUT_STRESS) }
             )
-            Spacer(Modifier.height(12.dp))
-            GoalCard(
-                title = "Invest €10,000",
-                subtitle = "Build wealth consistently.",
-                selected = selected == GoalType.INVEST_TARGET,
-                onClick = {
-                    selected = GoalType.INVEST_TARGET
-                    if (amountText.isBlank()) amountText = "10000"
-                }
+            FocusCard(
+                title = "Invest with discipline",
+                subtitle = "Keep contributions consistent every payday.",
+                selected = selectedFocus == PlanningFocus.INVEST_WITH_DISCIPLINE,
+                onClick = { setDefaultsForFocus(PlanningFocus.INVEST_WITH_DISCIPLINE) }
             )
-            Spacer(Modifier.height(12.dp))
-            GoalCard(
-                title = "Save for something",
-                subtitle = "Trip, car, deposit — your call.",
-                selected = selected == GoalType.CUSTOM,
-                onClick = {
-                    selected = GoalType.CUSTOM
-                    if (amountText.isBlank()) amountText = "1000"
-                }
+            FocusCard(
+                title = "Stop the money leak",
+                subtitle = "Protect future money before flexible spending grows.",
+                selected = selectedFocus == PlanningFocus.STOP_OVERSPENDING,
+                onClick = { setDefaultsForFocus(PlanningFocus.STOP_OVERSPENDING) }
+            )
+            FocusCard(
+                title = "Plan together",
+                subtitle = "A clearer split for shared life and shared bills.",
+                selected = selectedFocus == PlanningFocus.PLAN_TOGETHER,
+                onClick = { setDefaultsForFocus(PlanningFocus.PLAN_TOGETHER) }
             )
 
-            Spacer(Modifier.height(20.dp))
             OutlinedTextField(
-                value = amountText,
-                onValueChange = { amountText = it.replace(',', '.') },
-                label = { Text("Goal amount") },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                modifier = Modifier.fillMaxWidth()
+                value = goalName,
+                onValueChange = { goalName = it },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Goal name") },
+                singleLine = true
             )
-            if (selected == GoalType.CUSTOM) {
-                Spacer(Modifier.height(12.dp))
-                OutlinedTextField(
-                    value = labelText,
-                    onValueChange = { labelText = it },
-                    label = { Text("Label (optional)") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+            OutlinedTextField(
+                value = goalAmountText,
+                onValueChange = { goalAmountText = it.replace(',', '.') },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Goal amount") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                singleLine = true
+            )
 
             Spacer(Modifier.weight(1f))
-
-            val amount = parseAmount()
             Button(
-                onClick = {
-                    onNext(selected, amount ?: BigDecimal.ZERO, labelText.takeIf { it.isNotBlank() })
-                },
-                enabled = amount != null && amount > BigDecimal.ZERO,
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.fillMaxWidth().height(56.dp)
+                onClick = { onNext(selectedFocus, goalName.ifBlank { "Emergency fund" }, goalAmount ?: BigDecimal.ZERO) },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = goalAmount != null && goalAmount > BigDecimal.ZERO
             ) {
-                Text("Next", fontSize = 18.sp)
+                Text("Continue")
             }
         }
     }
 }
 
 @Composable
-private fun GoalCard(
+private fun FocusCard(
     title: String,
     subtitle: String,
     selected: Boolean,
     onClick: () -> Unit
 ) {
-    val border = if (selected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
-    else BorderStroke(1.dp, Color(0xFFE0E0E0))
-    val bg = if (selected) Color(0xFFE3F2FD) else Color.White
-
     Card(
-        shape = RoundedCornerShape(20.dp),
-        border = border,
-        colors = CardDefaults.cardColors(containerColor = bg),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(
+            width = if (selected) 2.dp else 1.dp,
+            color = if (selected) MaterialTheme.colorScheme.primary else Color(0xFFD5DDE2)
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
+        )
     ) {
-        Column(Modifier.padding(18.dp)) {
-            Text(title, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(4.dp))
-            Text(subtitle, color = Color(0xFF607D8B))
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(title, fontWeight = FontWeight.SemiBold)
+            Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

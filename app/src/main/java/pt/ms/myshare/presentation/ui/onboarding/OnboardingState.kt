@@ -1,28 +1,27 @@
 package pt.ms.myshare.presentation.ui.onboarding
 
-import pt.ms.myshare.domain.model.*
+import pt.ms.myshare.domain.model.AllocationPreset
+import pt.ms.myshare.domain.model.BillingPlan
+import pt.ms.myshare.domain.model.PayFrequency
+import pt.ms.myshare.domain.model.PlanPreview
+import pt.ms.myshare.domain.model.PlanningFocus
+import pt.ms.myshare.domain.model.PricingStrategy
 import java.math.BigDecimal
 
-// Immutable onboarding state
- data class OnboardingState(
-    val selectedGoalType: GoalType? = null,
-    val goalAmount: BigDecimal? = null,
-    val goalLabel: String? = null,
-    val netSalary: BigDecimal? = null,
-    val paySchedule: PaySchedule? = null,
+data class OnboardingState(
+    val selectedFocus: PlanningFocus = PlanningFocus.SAVE_WITHOUT_STRESS,
+    val goalName: String = "Emergency fund",
+    val goalAmount: BigDecimal = BigDecimal("3000"),
+    val netIncomePerPayday: BigDecimal? = null,
+    val monthlyFixedCosts: BigDecimal? = null,
+    val payFrequency: PayFrequency = PayFrequency.MONTHLY,
+    val monthlyPayday: Int = 1,
+    val nextBiweeklyPaydayText: String = java.time.LocalDate.now().plusDays(14).toString(),
     val preset: AllocationPreset = AllocationPreset.BALANCED,
     val planPreview: PlanPreview? = null,
-    val sliderValue: Int = 0,
-    val monthsSooner: Int? = null,
-    val selectedPaywallPlan: PaywallPlan = PaywallPlan.Annual,
+    val pricingStrategy: PricingStrategy? = null,
+    val selectedBillingPlan: BillingPlan = BillingPlan.MONTHLY,
     val onboardingCompleted: Boolean = false,
-    val event: OnboardingEvent? = null
+    val isPremium: Boolean = false,
+    val error: String? = null
 )
-
-sealed class OnboardingEvent {
-    object NavigateNext : OnboardingEvent()
-    object ShowPaywall : OnboardingEvent()
-    object ClosePaywall : OnboardingEvent()
-    object SkipOnboarding : OnboardingEvent()
-}
-

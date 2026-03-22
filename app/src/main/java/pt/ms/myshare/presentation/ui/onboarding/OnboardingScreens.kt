@@ -1,360 +1,187 @@
 package pt.ms.myshare.presentation.ui.onboarding
 
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import pt.ms.myshare.R
+import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.PlanPreview
 import java.math.BigDecimal
-import java.math.RoundingMode
-import java.time.LocalDate
+import java.text.NumberFormat
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun PlanPreviewScreen(
-    planPreview: PlanPreview?,
-    goalAmount: BigDecimal?,
-    currencySymbol: String = "€",
-    onSliderChange: (Int) -> Unit,
-    sliderValue: Int,
-    monthsSooner: Int?,
+    preview: PlanPreview,
+    goalName: String,
+    goalAmount: BigDecimal,
     onAutopilot: () -> Unit,
     onNotNow: () -> Unit
 ) {
-    val today = LocalDate.now()
-    val formattedDate = today.format(DateTimeFormatter.ofPattern("d MMM yyyy"))
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF6F8FA))
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Header
-        Text("Here’s your plan", fontSize = 28.sp, fontWeight = FontWeight.Bold)
-        Spacer(Modifier.height(4.dp))
-        Text(formattedDate, fontSize = 16.sp, color = Color.Gray)
-        Spacer(Modifier.height(24.dp))
+    val locale = Locale.getDefault()
+    val currency = NumberFormat.getCurrencyInstance(locale)
+    val dateFormatter = DateTimeFormatter.ofPattern("d MMM", locale)
 
-        // Card A: This payday
-        Card(
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Column(Modifier.padding(20.dp)) {
-                Text("This payday", fontSize = 20.sp, fontWeight = FontWeight.Medium)
-                Spacer(Modifier.height(12.dp))
-                PaydayRow(iconRes = R.drawable.ic_baseline_show_chart, label = "Stocks", amount = planPreview?.perPaydayAmounts?.stocks, currencySymbol = currencySymbol)
-                PaydayRow(iconRes = R.drawable.ic_baseline_currency_bitcoin, label = "Crypto", amount = planPreview?.perPaydayAmounts?.crypto, currencySymbol = currencySymbol)
-                PaydayRow(iconRes = R.drawable.savings_48px, label = "Savings", amount = planPreview?.perPaydayAmounts?.savings, currencySymbol = currencySymbol)
+            Text("Here’s your payday plan", style = MaterialTheme.typography.headlineMedium)
+            Text(preview.summary, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            MetricCard(title = "Next payday ${preview.nextPayday.format(dateFormatter)}", value = currency.format(preview.incomePerPayday))
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                MetricCard(title = "Fixed costs", value = currency.format(preview.fixedCostsPerPayday), modifier = Modifier.weight(1f))
+                MetricCard(title = "Flexible spend", value = currency.format(preview.flexibleSpendPerPayday), modifier = Modifier.weight(1f))
             }
-        }
-
-        // Card B: Goal timeline
-        Card(
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-        ) {
-            Column(Modifier.padding(20.dp)) {
-                Text("Your goal timeline", fontSize = 20.sp, fontWeight = FontWeight.Medium)
-                Spacer(Modifier.height(12.dp))
-                if (goalAmount != null && planPreview?.goalTargetDate != null) {
-                    val ym = planPreview.goalTargetDate
-                    Text("Reach $currencySymbol${goalAmount.toPlainString()} by ${ym.month.name.lowercase().replaceFirstChar { it.uppercase() }} ${ym.year}", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                } else {
-                    Text("Set a goal to see your timeline", fontSize = 18.sp, color = Color.Gray)
-                }
-                Spacer(Modifier.height(16.dp))
-                TimelineProgressBar()
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                MetricCard(title = "Savings", value = currency.format(preview.savingsPerPayday), modifier = Modifier.weight(1f))
+                MetricCard(title = "Investing + crypto", value = currency.format(preview.investingPerPayday.add(preview.cryptoPerPayday)), modifier = Modifier.weight(1f))
             }
-        }
-
-        // Interactive teaser: slider
-        Card(
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-        ) {
-            Column(Modifier.padding(20.dp)) {
-                Text("Invest a bit more", fontSize = 18.sp, fontWeight = FontWeight.Medium)
-                Spacer(Modifier.height(8.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("+$currencySymbol$sliderValue", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                    Spacer(Modifier.width(12.dp))
-                    Slider(
-                        value = sliderValue.toFloat(),
-                        onValueChange = { onSliderChange(it.toInt()) },
-                        valueRange = 0f..200f,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-                if (monthsSooner != null && monthsSooner > 0) {
-                    Text("Reach your goal $monthsSooner months sooner", fontSize = 14.sp, color = Color(0xFF4CAF50))
-                }
-            }
-        }
-        Spacer(Modifier.height(24.dp))
-        // CTAs
-        Button(
-            onClick = onAutopilot,
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier.fillMaxWidth().height(56.dp)
-        ) {
-            Text("Turn on Autopilot", fontSize = 20.sp)
-        }
-        Spacer(Modifier.height(12.dp))
-        TextButton(
-            onClick = onNotNow,
-            modifier = Modifier.fillMaxWidth().height(56.dp)
-        ) {
-            Text("Not now", fontSize = 18.sp)
-        }
-    }
-}
-
-@Composable
-private fun PaydayRow(icon: String, label: String, amount: BigDecimal?, currencySymbol: String) {
-    // Deprecated signature kept to avoid breaking previews; use the iconRes overload.
-    PaydayRow(iconRes = null, label = label, amount = amount, currencySymbol = currencySymbol, fallbackText = icon)
-}
-
-@Composable
-private fun PaydayRow(iconRes: Int?, label: String, amount: BigDecimal?, currencySymbol: String, fallbackText: String = "") {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
-    ) {
-        Box(Modifier.size(32.dp), contentAlignment = Alignment.Center) {
-            if (iconRes != null) {
-                Icon(
-                    painter = painterResource(id = iconRes),
-                    contentDescription = label,
-                    tint = Color(0xFF37474F),
-                    modifier = Modifier.size(22.dp)
-                )
-            } else {
-                Text(fallbackText.take(1).uppercase(), fontWeight = FontWeight.Bold, color = Color.DarkGray)
-            }
-        }
-        Spacer(Modifier.width(12.dp))
-        Text(label, fontSize = 18.sp, modifier = Modifier.weight(1f))
-        Spacer(Modifier.width(12.dp))
-        Crossfade(targetState = amount) { value ->
-            Text(
-                "$currencySymbol${value?.setScale(2, RoundingMode.HALF_UP)?.toPlainString() ?: "-"}",
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.animateContentSize()
+            MetricCard(title = "Weekly spend guide", value = currency.format(preview.weeklyFlexibleSpend))
+            MetricCard(
+                title = goalName,
+                value = currency.format(goalAmount),
+                supporting = preview.goalTargetDate?.let { "At this pace you reach it by ${it.month.name.lowercase().replaceFirstChar(Char::titlecase)} ${it.year}" }
+                    ?: "Add more goal contribution later to bring the date forward"
             )
-        }
-    }
-}
-
-@Composable
-private fun TimelineProgressBar() {
-    Column {
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .height(12.dp)
-                .background(Color(0xFFE0E0E0), RoundedCornerShape(6.dp))
-        ) {
-            // Visual only, no progress logic
-            Row(Modifier.fillMaxSize()) {
-                Box(Modifier.weight(0.08f).fillMaxHeight().background(Color(0xFF4CAF50), RoundedCornerShape(6.dp)))
-                Spacer(Modifier.weight(0.92f))
+            Spacer(Modifier.weight(1f))
+            Button(onClick = onAutopilot, modifier = Modifier.fillMaxWidth()) {
+                Text("See premium automation")
             }
-        }
-        Spacer(Modifier.height(8.dp))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("1m", fontSize = 12.sp, color = Color.Gray)
-            Text("3m", fontSize = 12.sp, color = Color.Gray)
-            Text("6m", fontSize = 12.sp, color = Color.Gray)
-            Text("12m", fontSize = 12.sp, color = Color.Gray)
+            TextButton(onClick = onNotNow, modifier = Modifier.fillMaxWidth()) {
+                Text("Use the free plan first")
+            }
         }
     }
 }
 
 @Composable
 fun PaywallScreen(
-    annualPrice: String,
-    monthlyPrice: String,
-    trialAvailable: Boolean,
-    selectedPlan: PaywallPlan,
-    onPlanSelected: (PaywallPlan) -> Unit,
+    pricingStrategy: pt.ms.myshare.domain.model.PricingStrategy,
+    selectedPlan: BillingPlan,
+    onPlanSelected: (BillingPlan) -> Unit,
     onClose: () -> Unit,
     onRestore: () -> Unit,
-    onPurchaseSelected: (PaywallPlan) -> Unit
+    onPurchaseSelected: () -> Unit
 ) {
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = Color(0xFFF6F8FA)
-    ) {
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(0.dp),
-            verticalArrangement = Arrangement.Top
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Top bar
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = onClose) {
-                    Text("✕", fontSize = 22.sp, color = Color.Gray)
-                }
-                IconButton(onClick = onRestore) {
-                    Text("Restore", fontSize = 16.sp, color = Color(0xFF1976D2))
-                }
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                TextButton(onClick = onClose) { Text("Close") }
+                TextButton(onClick = onRestore) { Text("Restore") }
             }
-            Spacer(Modifier.height(16.dp))
-            // Headline
-            Text(
-                "Autopilot your plan",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-            Spacer(Modifier.height(8.dp))
-            Text(
-                "Stay consistent. Hit your goal faster.",
-                fontSize = 18.sp,
-                color = Color.Gray,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-            Spacer(Modifier.height(24.dp))
-            // Bullets
-            Column(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                PaywallBullet("Payday reminders with exact amounts", "💡")
-                PaywallBullet("Goal timeline + progress history", "📈")
-                PaywallBullet("Save strategies (custom categories & splits)", "🗂️")
-            }
-            Spacer(Modifier.height(32.dp))
-            // Plans
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
+            Text(pricingStrategy.paywallHeadline, style = MaterialTheme.typography.headlineMedium)
+            Text(pricingStrategy.paywallSubhead, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            HelperCard(title = "Premium gives you", body = "Recurring payday rules, salary-day reminders, weekly reviews, and more than one goal.")
+            HelperCard(title = "Trust first", body = "No ads in sensitive financial screens. Cancel in Google Play. Free stays useful with one plan and one goal.")
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
                 PaywallPlanCard(
-                    plan = PaywallPlan.Annual,
-                    price = annualPrice,
-                    selected = selectedPlan == PaywallPlan.Annual,
-                    recommended = true,
+                    title = "Monthly",
+                    price = pricingStrategy.monthlyLabel,
+                    selected = selectedPlan == BillingPlan.MONTHLY,
+                    highlighted = pricingStrategy.heroPlan == BillingPlan.MONTHLY,
                     modifier = Modifier.weight(1f),
-                    onClick = { onPlanSelected(PaywallPlan.Annual) }
+                    onClick = { onPlanSelected(BillingPlan.MONTHLY) }
                 )
                 PaywallPlanCard(
-                    plan = PaywallPlan.Monthly,
-                    price = monthlyPrice,
-                    selected = selectedPlan == PaywallPlan.Monthly,
-                    recommended = false,
+                    title = "Annual",
+                    price = pricingStrategy.annualLabel,
+                    selected = selectedPlan == BillingPlan.ANNUAL,
+                    highlighted = pricingStrategy.heroPlan == BillingPlan.ANNUAL,
                     modifier = Modifier.weight(1f),
-                    onClick = { onPlanSelected(PaywallPlan.Monthly) }
+                    onClick = { onPlanSelected(BillingPlan.ANNUAL) }
                 )
             }
-            Spacer(Modifier.height(32.dp))
-            // CTA
-            Button(
-                onClick = { onPurchaseSelected(selectedPlan) },
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).height(56.dp)
-            ) {
-                Text(if (trialAvailable) "Start free trial" else "Continue", fontSize = 20.sp)
-            }
-            Spacer(Modifier.height(16.dp))
-            // Disclosure
-            Card(
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)
-            ) {
-                Text(
-                    "Annual: $annualPrice billed yearly. Monthly: $monthlyPrice billed monthly. Auto-renewal applies. Cancel anytime in Google Play. Subscription is not required for basic calculator use.",
-                    fontSize = 12.sp,
-                    color = Color.Gray,
-                    modifier = Modifier.padding(12.dp)
-                )
+            Text("Free trial: ${pricingStrategy.trialDays} days. Cancel during the trial and you won’t be charged.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.weight(1f))
+            Button(onClick = onPurchaseSelected, modifier = Modifier.fillMaxWidth()) {
+                Text("Start ${pricingStrategy.trialDays}-day trial")
             }
         }
     }
 }
 
-enum class PaywallPlan { Annual, Monthly }
+@Composable
+private fun MetricCard(title: String, value: String, modifier: Modifier = Modifier, supporting: String? = null) {
+    Card(modifier = modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp)) {
+            Text(title, style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(8.dp))
+            Text(value, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            supporting?.let {
+                Spacer(Modifier.height(8.dp))
+                Text(it, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+    }
+}
 
 @Composable
-private fun PaywallBullet(text: String, icon: String) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(vertical = 4.dp)
-    ) {
-        Text(icon, fontSize = 18.sp, modifier = Modifier.padding(end = 8.dp))
-        Text(text, fontSize = 16.sp)
+private fun HelperCard(title: String, body: String) {
+    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
+        Column(Modifier.padding(16.dp)) {
+            Text(title, fontWeight = FontWeight.SemiBold)
+            Spacer(Modifier.height(6.dp))
+            Text(body)
+        }
     }
 }
 
 @Composable
 private fun PaywallPlanCard(
-    plan: PaywallPlan,
+    title: String,
     price: String,
     selected: Boolean,
-    recommended: Boolean,
-    modifier: Modifier = Modifier,
+    highlighted: Boolean,
+    modifier: Modifier,
     onClick: () -> Unit
 ) {
-    val borderColor = if (selected) Color(0xFF1976D2) else Color(0xFFE0E0E0)
-    val bgColor = if (selected) Color(0xFFE3F2FD) else Color.White
     Card(
+        modifier = modifier,
         shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(2.dp, borderColor),
-        colors = CardDefaults.cardColors(containerColor = bgColor),
-        modifier = modifier
-            .clickable { onClick() }
+        border = BorderStroke(
+            width = if (selected) 2.dp else 1.dp,
+            color = if (selected) MaterialTheme.colorScheme.primary else Color(0xFFD5DDE2)
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = if (selected) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface
+        ),
+        onClick = onClick
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(plan.name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(8.dp))
-            Text(price, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-            if (recommended) {
-                Spacer(Modifier.height(8.dp))
-                Text("Recommended", fontSize = 12.sp, color = Color(0xFF1976D2), fontWeight = FontWeight.Medium)
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(title, fontWeight = FontWeight.SemiBold)
+            Text(price, style = MaterialTheme.typography.titleMedium)
+            if (highlighted) {
+                FilterChip(selected = true, onClick = {}, label = { Text("Best entry point") })
             }
         }
     }
-}
-
-@Composable
-fun OnboardingFlow(
-    viewModel: OnboardingViewModel,
-    entitlementRepository: pt.ms.myshare.domain.repository.EntitlementRepository,
-    showPaywall: Boolean,
-    onShowPaywall: () -> Unit,
-    onGoToReminderSetup: () -> Unit
-) {
-    // Deprecated: the real onboarding flow is implemented via NavGraph in OnboardingNavGraph.kt
-}
-
-@Composable
-fun SettingsScreen(
-    remindersEnabled: Boolean,
-    onToggleReminders: (Boolean) -> Unit
-) {
-    // Deprecated: settings live in the existing preferences screen.
 }

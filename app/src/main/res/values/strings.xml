@@ -1,49 +1,26 @@
 <resources>
     <string name="app_name" translatable="false">My Share</string>
-
-
-    <!-- Strings used for fragments for navigation -->
     <string name="dashboard_fragment_label" translatable="false">Dashboard Fragment</string>
-
-
-    <!--Settings Screen-->
     <string name="action_settings">Settings</string>
     <string name="content_description_settings">App settings</string>
     <string name="title_activity_settings">SettingsActivity</string>
-
-
-    <!--Dashboard Screen-->
     <string name="hello_message">Hello</string>
     <string name="dashboard_message">Keep track of your investments!</string>
     <string name="dashboard_label">Dashboard</string>
     <string name="stocks_label">Stocks</string>
     <string name="crypto_label">Crypto</string>
     <string name="savings_label">Savings</string>
-
-
-    <!--Generic labels-->
     <string name="next">Next</string>
     <string name="previous">Previous</string>
     <string name="empty_string" translatable="false" />
-
-
-    <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>
-
-    <!-- Messages Preferences -->
     <string name="signature_title">Your signature</string>
     <string name="reply_title">Default reply action</string>
-
-    <!-- Sync Preferences -->
     <string name="sync_title">Sync email periodically</string>
     <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails</string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
-
-
-    <!--Edit Profile Screen-->
     <string name="edit_profile_label">Edit Profile</string>
     <string name="edit_profile_toolbar_title">Edit Profile</string>
     <string name="your_net_salary_label">Your net salary %1s</string>
@@ -68,6 +45,4 @@
     <string name="id_amount_for_crypto" translatable="false">amount_for_crypto</string>
     <string name="id_amount_for_savings" translatable="false">amount_for_savings</string>
     <string name="admob_banner_ad_unit_id" translatable="false">ca-app-pub-9538602323287593/2154982867</string>
-
-
 </resources>

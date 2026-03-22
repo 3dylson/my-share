@@ -1,64 +1,55 @@
 package pt.ms.myshare.domain.use_case
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
-import pt.ms.myshare.domain.model.*
+import pt.ms.myshare.domain.model.AllocationPreset
+import pt.ms.myshare.domain.model.PayFrequency
+import pt.ms.myshare.domain.model.PlanningFocus
+import pt.ms.myshare.domain.model.SalaryPlan
 import java.math.BigDecimal
-import java.time.LocalDate
 
 class CalculatePlanPreviewUseCaseTest {
-    private val useCase = pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase()
+
+    private val useCase = CalculatePlanPreviewUseCase()
 
     @Test
-    fun testZeroSalary() {
-        val input = PlanInput(
-            netSalary = BigDecimal.ZERO,
-            schedule = PaySchedule.Monthly(1),
+    fun `monthly plan keeps monthly fixed costs on the payday`() {
+        val plan = SalaryPlan(
+            focus = PlanningFocus.SAVE_WITHOUT_STRESS,
+            netIncomePerPayday = BigDecimal("1000"),
+            monthlyFixedCosts = BigDecimal("400"),
+            payFrequency = PayFrequency.MONTHLY,
+            monthlyPayday = 5,
             preset = AllocationPreset.BALANCED,
-            goal = Goal(BigDecimal("1000"), GoalType.EMERGENCY_FUND)
+            goalName = "Emergency fund",
+            goalAmount = BigDecimal("3000")
         )
-        val result = useCase.execute(input)
-        println("testZeroSalary result: $result")
-        assertEquals(BigDecimal.ZERO.setScale(0), result.totalPerMonth)
-        assertNull(result.goalTargetDate)
+
+        val preview = useCase.execute(plan)
+
+        assertEquals(BigDecimal("400.00"), preview.fixedCostsPerPayday)
+        assertEquals(BigDecimal("600.00"), preview.flexibleSpendPerPayday + preview.savingsPerPayday + preview.investingPerPayday + preview.cryptoPerPayday + preview.debtPerPayday)
+        assertTrue(preview.monthlyGoalContribution > BigDecimal.ZERO)
     }
 
     @Test
-    fun testTinySalaryHugeGoal() {
-        val input = PlanInput(
-            netSalary = BigDecimal("0.01"),
-            schedule = PaySchedule.Monthly(1),
+    fun `biweekly plan normalizes fixed costs across paydays`() {
+        val plan = SalaryPlan(
+            focus = PlanningFocus.INVEST_WITH_DISCIPLINE,
+            netIncomePerPayday = BigDecimal("900"),
+            monthlyFixedCosts = BigDecimal("780"),
+            payFrequency = PayFrequency.BIWEEKLY,
+            nextBiweeklyPayday = java.time.LocalDate.now().plusDays(14),
             preset = AllocationPreset.GROWTH,
-            goal = Goal(BigDecimal("1000000"), GoalType.INVEST_TARGET)
+            goalName = "Investing base",
+            goalAmount = BigDecimal("10000")
         )
-        val result = useCase.execute(input)
-        assertTrue(result.goalTargetDate != null)
-    }
 
-    @Test
-    fun testBiWeeklyNormalization() {
-        val input = PlanInput(
-            netSalary = BigDecimal("1000"),
-            schedule = PaySchedule.BiWeekly(LocalDate.now()),
-            preset = AllocationPreset.CONSERVATIVE,
-            goal = Goal(BigDecimal("12000"), GoalType.CUSTOM)
-        )
-        val result = useCase.execute(input)
-        // 1000 * 26 / 12 = 2166.66
-        assertEquals(BigDecimal("2166.66"), result.totalPerMonth)
-    }
+        val preview = useCase.execute(plan)
 
-    @Test
-    fun testBalancedAllocation() {
-        val input = PlanInput(
-            netSalary = BigDecimal("1000"),
-            schedule = PaySchedule.Monthly(1),
-            preset = AllocationPreset.BALANCED,
-            goal = Goal(BigDecimal("3000"), GoalType.CUSTOM)
-        )
-        val result = useCase.execute(input)
-        assertEquals(BigDecimal("300.00"), result.perPaydayAmounts.stocks)
-        assertEquals(BigDecimal("100.00"), result.perPaydayAmounts.crypto)
-        assertEquals(BigDecimal("600.00"), result.perPaydayAmounts.savings)
+        assertEquals(BigDecimal("360.00"), preview.fixedCostsPerPayday)
+        assertTrue(preview.weeklyFlexibleSpend > BigDecimal.ZERO)
+        assertTrue(preview.goalTargetDate != null)
     }
 }

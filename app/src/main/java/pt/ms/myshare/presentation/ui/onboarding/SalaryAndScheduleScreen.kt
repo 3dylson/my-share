@@ -2,228 +2,164 @@ package pt.ms.myshare.presentation.ui.onboarding
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import pt.ms.myshare.domain.model.AllocationPreset
-import pt.ms.myshare.domain.model.PaySchedule
+import pt.ms.myshare.domain.model.PayFrequency
 import java.math.BigDecimal
-import java.time.LocalDate
 
 @Composable
 fun SalaryAndScheduleScreen(
-    initialSalary: BigDecimal?,
-    initialSchedule: PaySchedule?,
+    initialIncome: BigDecimal?,
+    initialFixedCosts: BigDecimal?,
+    initialFrequency: PayFrequency,
+    initialMonthlyPayday: Int,
+    initialNextBiweeklyPaydayText: String,
     initialPreset: AllocationPreset,
     onBack: () -> Unit,
-    onPresetSelected: (AllocationPreset) -> Unit,
-    onSeePlan: (BigDecimal, PaySchedule) -> Unit
+    onNext: (BigDecimal, BigDecimal, PayFrequency, Int, String, AllocationPreset) -> Unit
 ) {
-    var salaryText by remember { mutableStateOf(initialSalary?.toPlainString() ?: "") }
-
-    var scheduleType by remember {
-        mutableStateOf(
-            when (initialSchedule) {
-                is PaySchedule.BiWeekly -> ScheduleType.BIWEEKLY
-                else -> ScheduleType.MONTHLY
-            }
-        )
-    }
-
-    var dayOfMonthText by remember {
-        mutableStateOf(
-            (initialSchedule as? PaySchedule.Monthly)?.dayOfMonth?.toString() ?: "1"
-        )
-    }
-    var nextPaydayText by remember {
-        mutableStateOf(
-            (initialSchedule as? PaySchedule.BiWeekly)?.nextPayday?.toString()
-                ?: LocalDate.now().plusDays(14).toString()
-        )
-    }
-
+    var incomeText by remember { mutableStateOf(initialIncome?.toPlainString() ?: "") }
+    var fixedCostsText by remember { mutableStateOf(initialFixedCosts?.toPlainString() ?: "") }
+    var payFrequency by remember { mutableStateOf(initialFrequency) }
+    var monthlyPaydayText by remember { mutableStateOf(initialMonthlyPayday.toString()) }
+    var nextBiweeklyPaydayText by remember { mutableStateOf(initialNextBiweeklyPaydayText) }
     var preset by remember { mutableStateOf(initialPreset) }
 
-    fun parseSalary(): BigDecimal? = runCatching { BigDecimal(salaryText.trim()) }.getOrNull()
+    val income = incomeText.toBigDecimalOrNull()
+    val fixedCosts = fixedCostsText.toBigDecimalOrNull()
 
-    fun buildSchedule(): PaySchedule? {
-        return when (scheduleType) {
-            ScheduleType.MONTHLY -> {
-                val day = dayOfMonthText.toIntOrNull()?.coerceIn(1, 31) ?: return null
-                PaySchedule.Monthly(dayOfMonth = day)
-            }
-            ScheduleType.BIWEEKLY -> {
-                val date = runCatching { LocalDate.parse(nextPaydayText.trim()) }.getOrNull() ?: return null
-                PaySchedule.BiWeekly(nextPayday = date)
-            }
-        }
-    }
-
-    Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFFF6F8FA)) {
-        Column(Modifier.fillMaxSize().padding(24.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onClick = onBack) { Text("Back") }
-                Spacer(Modifier.weight(1f))
-            }
-
-            Text("How much do you take home?", fontSize = 26.sp, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(8.dp))
-            Text("We’ll calculate your payday amounts.", color = Color(0xFF546E7A))
-            Spacer(Modifier.height(20.dp))
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            TextButton(onClick = onBack) { Text("Back") }
+            Text("Tell My Share about your payday", style = MaterialTheme.typography.headlineMedium)
+            Text("Keep it light. These are the only numbers needed to create a first useful plan.", color = MaterialTheme.colorScheme.onSurfaceVariant)
 
             OutlinedTextField(
-                value = salaryText,
-                onValueChange = { salaryText = it.replace(',', '.') },
-                label = { Text("Net salary (per payday)") },
+                value = incomeText,
+                onValueChange = { incomeText = it.replace(',', '.') },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Net income per payday") },
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                modifier = Modifier.fillMaxWidth()
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+            )
+            OutlinedTextField(
+                value = fixedCostsText,
+                onValueChange = { fixedCostsText = it.replace(',', '.') },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Monthly fixed costs") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )
 
-            Spacer(Modifier.height(16.dp))
-            Text("Pay schedule", fontWeight = FontWeight.SemiBold)
-            Spacer(Modifier.height(8.dp))
+            Text("Pay frequency", style = MaterialTheme.typography.titleMedium)
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                ChoiceChip(
-                    label = "Monthly",
-                    selected = scheduleType == ScheduleType.MONTHLY,
-                    onClick = { scheduleType = ScheduleType.MONTHLY }
+                ChoiceCard(
+                    text = "Monthly",
+                    selected = payFrequency == PayFrequency.MONTHLY,
+                    onClick = { payFrequency = PayFrequency.MONTHLY }
                 )
-                ChoiceChip(
-                    label = "Every 2 weeks",
-                    selected = scheduleType == ScheduleType.BIWEEKLY,
-                    onClick = { scheduleType = ScheduleType.BIWEEKLY }
+                ChoiceCard(
+                    text = "Every 2 weeks",
+                    selected = payFrequency == PayFrequency.BIWEEKLY,
+                    onClick = { payFrequency = PayFrequency.BIWEEKLY }
                 )
-            }
-            Spacer(Modifier.height(12.dp))
-            when (scheduleType) {
-                ScheduleType.MONTHLY -> {
-                    OutlinedTextField(
-                        value = dayOfMonthText,
-                        onValueChange = { dayOfMonthText = it.filter { ch -> ch.isDigit() } },
-                        label = { Text("Day of month (1–31)") },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-                ScheduleType.BIWEEKLY -> {
-                    OutlinedTextField(
-                        value = nextPaydayText,
-                        onValueChange = { nextPaydayText = it },
-                        label = { Text("Next payday (YYYY-MM-DD)") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
             }
 
-            Spacer(Modifier.height(20.dp))
-            Text("Style", fontWeight = FontWeight.SemiBold)
-            Spacer(Modifier.height(8.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                PresetCard(
-                    title = "Conservative",
-                    subtitle = "More savings",
-                    selected = preset == AllocationPreset.CONSERVATIVE,
-                    modifier = Modifier.weight(1f),
-                    onClick = {
-                        preset = AllocationPreset.CONSERVATIVE
-                        onPresetSelected(preset)
-                    }
+            if (payFrequency == PayFrequency.MONTHLY) {
+                OutlinedTextField(
+                    value = monthlyPaydayText,
+                    onValueChange = { monthlyPaydayText = it.filter(Char::isDigit) },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Typical payday day of month") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
-                PresetCard(
-                    title = "Balanced",
-                    subtitle = "Steady",
-                    selected = preset == AllocationPreset.BALANCED,
-                    modifier = Modifier.weight(1f),
-                    onClick = {
-                        preset = AllocationPreset.BALANCED
-                        onPresetSelected(preset)
-                    }
+            } else {
+                OutlinedTextField(
+                    value = nextBiweeklyPaydayText,
+                    onValueChange = { nextBiweeklyPaydayText = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Next payday (YYYY-MM-DD)") },
+                    singleLine = true
                 )
-                PresetCard(
-                    title = "Growth",
-                    subtitle = "More risk",
-                    selected = preset == AllocationPreset.GROWTH,
-                    modifier = Modifier.weight(1f),
-                    onClick = {
-                        preset = AllocationPreset.GROWTH
-                        onPresetSelected(preset)
-                    }
-                )
+            }
+
+            Text("Plan style", style = MaterialTheme.typography.titleMedium)
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                PresetChip("Conservative", preset == AllocationPreset.CONSERVATIVE) { preset = AllocationPreset.CONSERVATIVE }
+                PresetChip("Balanced", preset == AllocationPreset.BALANCED) { preset = AllocationPreset.BALANCED }
+                PresetChip("Growth", preset == AllocationPreset.GROWTH) { preset = AllocationPreset.GROWTH }
             }
 
             Spacer(Modifier.weight(1f))
-
-            val salary = parseSalary()
-            val schedule = buildSchedule()
             Button(
-                onClick = { onSeePlan(salary!!, schedule!!) },
-                enabled = salary != null && salary > BigDecimal.ZERO && schedule != null,
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.fillMaxWidth().height(56.dp)
+                onClick = {
+                    onNext(
+                        income ?: BigDecimal.ZERO,
+                        fixedCosts ?: BigDecimal.ZERO,
+                        payFrequency,
+                        monthlyPaydayText.toIntOrNull() ?: 1,
+                        nextBiweeklyPaydayText,
+                        preset
+                    )
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = income != null && income > BigDecimal.ZERO && fixedCosts != null && fixedCosts >= BigDecimal.ZERO
             ) {
-                Text("See my plan", fontSize = 18.sp)
+                Text("See my plan")
             }
         }
     }
 }
 
-private enum class ScheduleType { MONTHLY, BIWEEKLY }
-
 @Composable
-private fun ChoiceChip(label: String, selected: Boolean, onClick: () -> Unit) {
-    val border = if (selected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
-    else BorderStroke(1.dp, Color(0xFFE0E0E0))
-    val bg = if (selected) Color(0xFFE3F2FD) else Color.White
-
+private fun ChoiceCard(text: String, selected: Boolean, onClick: () -> Unit) {
     Card(
-        shape = RoundedCornerShape(16.dp),
-        border = border,
-        colors = CardDefaults.cardColors(containerColor = bg),
-        modifier = Modifier
-            .height(44.dp)
-            .clickable { onClick() }
+        modifier = Modifier.clickable(onClick = onClick),
+        shape = RoundedCornerShape(14.dp),
+        border = BorderStroke(
+            width = if (selected) 2.dp else 1.dp,
+            color = if (selected) MaterialTheme.colorScheme.primary else Color(0xFFD5DDE2)
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
+        )
     ) {
-        Box(Modifier.padding(horizontal = 14.dp), contentAlignment = Alignment.Center) {
-            Text(label, fontWeight = FontWeight.SemiBold)
-        }
+        Text(text, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp))
     }
 }
 
 @Composable
-private fun PresetCard(
-    title: String,
-    subtitle: String,
-    selected: Boolean,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    val border = if (selected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
-    else BorderStroke(1.dp, Color(0xFFE0E0E0))
-    val bg = if (selected) Color(0xFFE3F2FD) else Color.White
-
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        border = border,
-        colors = CardDefaults.cardColors(containerColor = bg),
-        modifier = modifier
-            .clickable { onClick() }
-    ) {
-        Column(Modifier.padding(12.dp)) {
-            Text(title, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(4.dp))
-            Text(subtitle, fontSize = 12.sp, color = Color(0xFF607D8B))
-        }
-    }
+private fun PresetChip(text: String, selected: Boolean, onClick: () -> Unit) {
+    ChoiceCard(text = text, selected = selected, onClick = onClick)
 }
