@@ -235,6 +235,8 @@ private fun MoreTab(
             Button(onClick = onUnlockPremium, modifier = Modifier.fillMaxWidth()) {
                 Text("Unlock recurring rules")
             }
+            Spacer(Modifier.height(16.dp))
+            pt.ms.myshare.presentation.ui.ads.SafeAdBanner(isPremium = false)
         } else {
             MetricCard(title = "Premium active", value = "Recurring rules, reminders, and deeper review are unlocked.")
         }

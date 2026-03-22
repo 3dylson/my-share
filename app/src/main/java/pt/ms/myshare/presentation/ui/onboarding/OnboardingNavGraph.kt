@@ -88,7 +88,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                         viewModel.logPaywallViewed()
                         navController.navigate(OnboardingRoute.Paywall.route)
                     },
-                    onNotNow = { viewModel.completeOnboardingWithoutPremium() }
+                    onNotNow = { navController.navigate(OnboardingRoute.ReminderSetup.route) }
                 )
             }
         }

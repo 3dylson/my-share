@@ -9,16 +9,29 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.google.android.gms.ads.MobileAds
 import dagger.hilt.android.AndroidEntryPoint
 import pt.ms.myshare.presentation.ui.theme.MyShareTheme
+import pt.ms.myshare.utils.ads.ConsentManager
 import pt.ms.myshare.utils.isDarkTheme
 import pt.ms.myshare.utils.logs.FirebaseUtils
 import java.util.Locale
 
 @AndroidEntryPoint
 class MainComposeActivity : ComponentActivity() {
+    private lateinit var consentManager: ConsentManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        consentManager = ConsentManager(this)
+        consentManager.requestConsent(this) { canRequestAds ->
+            if (canRequestAds) {
+                // Initialize the Mobile Ads SDK immediately after consent
+                MobileAds.initialize(this) {}
+            }
+        }
+        
         enableEdgeToEdge()
         setContent {
             MyShareTheme {
