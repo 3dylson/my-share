@@ -39,14 +39,15 @@ fun SafeAdBanner(
             AdView(context).apply {
                 setAdSize(AdSize.BANNER)
                 adUnitId = context.getString(R.string.admob_banner_ad_unit_id)
+                adListener = object : com.google.android.gms.ads.AdListener() {
+                    override fun onAdImpression() {
+                        super.onAdImpression()
+                        FirebaseUtils.logEvent("ad_impression", android.os.Bundle().apply {
+                            putString("surface", "more_tab")
+                        })
+                    }
+                }
                 loadAd(AdRequest.Builder().build())
-            }
-        },
-        update = { view ->
-            if (view is AdView) {
-                FirebaseUtils.logEvent("ad_impression", android.os.Bundle().apply {
-                     putString("surface", "more_tab")
-                })
             }
         }
     )

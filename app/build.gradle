@@ -14,10 +14,13 @@ plugins {
 android {
     signingConfigs {
         release {
-            storeFile file('../app/release/credentials/release.keystore')
-            storePassword 'android'
-            keyAlias 'upload'
-            keyPassword 'android'
+            def storeFilePath = project.findProperty("MYSHARE_RELEASE_STORE_FILE")
+            if (storeFilePath != null) {
+                storeFile file(storeFilePath)
+                storePassword project.findProperty("MYSHARE_RELEASE_STORE_PASSWORD")
+                keyAlias project.findProperty("MYSHARE_RELEASE_KEY_ALIAS")
+                keyPassword project.findProperty("MYSHARE_RELEASE_KEY_PASSWORD")
+            }
         }
     }
     compileSdk 36
