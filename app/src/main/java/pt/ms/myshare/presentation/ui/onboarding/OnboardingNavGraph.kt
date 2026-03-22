@@ -50,22 +50,28 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
         composable(OnboardingRoute.SalaryAndSchedule.route) {
             SalaryAndScheduleScreen(
                 initialIncome = state.netIncomePerPayday,
-                initialFixedCosts = state.monthlyFixedCosts,
                 initialFrequency = state.payFrequency,
                 initialMonthlyPayday = state.monthlyPayday,
                 initialNextBiweeklyPaydayText = state.nextBiweeklyPaydayText,
-                initialPreset = state.preset,
                 onBack = { navController.popBackStack() },
-                onNext = { income, fixedCosts, frequency, monthlyPayday, biweeklyPayday, preset ->
+                onNext = { income, frequency, monthlyPayday, biweeklyPayday ->
                     viewModel.setSalaryDetails(
                         incomePerPayday = income,
-                        monthlyFixedCosts = fixedCosts,
                         payFrequency = frequency,
                         monthlyPayday = monthlyPayday,
-                        nextBiweeklyPaydayText = biweeklyPayday,
-                        preset = preset
+                        nextBiweeklyPaydayText = biweeklyPayday
                     )
-                    if (viewModel.buildPreview()) {
+                    navController.navigate(OnboardingRoute.FixedCosts.route)
+                }
+            )
+        }
+        composable(OnboardingRoute.FixedCosts.route) {
+            FixedCostsScreen(
+                initialFixedCosts = state.monthlyFixedCosts,
+                initialPreset = state.preset,
+                onBack = { navController.popBackStack() },
+                onNext = { fixedCosts, preset ->
+                    if (viewModel.setFixedCostsAndBuild(fixedCosts, preset)) {
                         navController.navigate(OnboardingRoute.PlanPreview.route)
                     }
                 }

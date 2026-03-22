@@ -28,30 +28,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import pt.ms.myshare.domain.model.AllocationPreset
 import pt.ms.myshare.domain.model.PayFrequency
 import java.math.BigDecimal
 
 @Composable
 fun SalaryAndScheduleScreen(
     initialIncome: BigDecimal?,
-    initialFixedCosts: BigDecimal?,
-    initialFrequency: PayFrequency,
     initialMonthlyPayday: Int,
     initialNextBiweeklyPaydayText: String,
-    initialPreset: AllocationPreset,
     onBack: () -> Unit,
-    onNext: (BigDecimal, BigDecimal, PayFrequency, Int, String, AllocationPreset) -> Unit
+    onNext: (BigDecimal, PayFrequency, Int, String) -> Unit
 ) {
     var incomeText by remember { mutableStateOf(initialIncome?.toPlainString() ?: "") }
-    var fixedCostsText by remember { mutableStateOf(initialFixedCosts?.toPlainString() ?: "") }
     var payFrequency by remember { mutableStateOf(initialFrequency) }
     var monthlyPaydayText by remember { mutableStateOf(initialMonthlyPayday.toString()) }
     var nextBiweeklyPaydayText by remember { mutableStateOf(initialNextBiweeklyPaydayText) }
-    var preset by remember { mutableStateOf(initialPreset) }
 
     val income = incomeText.toBigDecimalOrNull()
-    val fixedCosts = fixedCostsText.toBigDecimalOrNull()
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(
@@ -69,14 +62,6 @@ fun SalaryAndScheduleScreen(
                 onValueChange = { incomeText = it.replace(',', '.') },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Net income per payday") },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
-            )
-            OutlinedTextField(
-                value = fixedCostsText,
-                onValueChange = { fixedCostsText = it.replace(',', '.') },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Monthly fixed costs") },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )
@@ -114,29 +99,21 @@ fun SalaryAndScheduleScreen(
                 )
             }
 
-            Text("Plan style", style = MaterialTheme.typography.titleMedium)
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                PresetChip("Conservative", preset == AllocationPreset.CONSERVATIVE) { preset = AllocationPreset.CONSERVATIVE }
-                PresetChip("Balanced", preset == AllocationPreset.BALANCED) { preset = AllocationPreset.BALANCED }
-                PresetChip("Growth", preset == AllocationPreset.GROWTH) { preset = AllocationPreset.GROWTH }
-            }
-
             Spacer(Modifier.weight(1f))
             Button(
                 onClick = {
                     onNext(
                         income ?: BigDecimal.ZERO,
-                        fixedCosts ?: BigDecimal.ZERO,
                         payFrequency,
                         monthlyPaydayText.toIntOrNull() ?: 1,
-                        nextBiweeklyPaydayText,
-                        preset
+                        nextBiweeklyPaydayText
                     )
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = income != null && income > BigDecimal.ZERO && fixedCosts != null && fixedCosts >= BigDecimal.ZERO
+                enabled = income != null && income > BigDecimal.ZERO,
+                shape = RoundedCornerShape(12.dp)
             ) {
-                Text("See my plan")
+                Text("Continue")
             }
         }
     }
@@ -146,10 +123,10 @@ fun SalaryAndScheduleScreen(
 private fun ChoiceCard(text: String, selected: Boolean, onClick: () -> Unit) {
     Card(
         modifier = Modifier.clickable(onClick = onClick),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         border = BorderStroke(
             width = if (selected) 2.dp else 1.dp,
-            color = if (selected) MaterialTheme.colorScheme.primary else Color(0xFFD5DDE2)
+            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
         ),
         colors = CardDefaults.cardColors(
             containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
@@ -157,9 +134,4 @@ private fun ChoiceCard(text: String, selected: Boolean, onClick: () -> Unit) {
     ) {
         Text(text, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp))
     }
-}
-
-@Composable
-private fun PresetChip(text: String, selected: Boolean, onClick: () -> Unit) {
-    ChoiceCard(text = text, selected = selected, onClick = onClick)
 }

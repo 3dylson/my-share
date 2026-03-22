@@ -77,23 +77,30 @@ class OnboardingViewModel @Inject constructor(
 
     fun setSalaryDetails(
         incomePerPayday: BigDecimal,
-        monthlyFixedCosts: BigDecimal,
         payFrequency: PayFrequency,
         monthlyPayday: Int,
-        nextBiweeklyPaydayText: String,
-        preset: AllocationPreset
+        nextBiweeklyPaydayText: String
     ) {
         state.update {
             it.copy(
                 netIncomePerPayday = incomePerPayday,
-                monthlyFixedCosts = monthlyFixedCosts,
                 payFrequency = payFrequency,
                 monthlyPayday = monthlyPayday,
                 nextBiweeklyPaydayText = nextBiweeklyPaydayText,
+                error = null
+            )
+        }
+    }
+
+    fun setFixedCostsAndBuild(monthlyFixedCosts: BigDecimal, preset: AllocationPreset): Boolean {
+        state.update {
+            it.copy(
+                monthlyFixedCosts = monthlyFixedCosts,
                 preset = preset,
                 error = null
             )
         }
+        return buildPreview()
     }
 
     fun buildPreview(): Boolean {

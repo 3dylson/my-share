@@ -15,3 +15,6 @@
 .cxx
 local.properties
 /gradle/gradle-daemon-jvm.properties
+/.agent
+/.agents
+skills-lock.json

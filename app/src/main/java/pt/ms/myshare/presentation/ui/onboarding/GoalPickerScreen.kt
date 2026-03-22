@@ -107,7 +107,8 @@ fun GoalPickerScreen(
             Button(
                 onClick = { onNext(selectedFocus, goalName.ifBlank { "Emergency fund" }, goalAmount ?: BigDecimal.ZERO) },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = goalAmount != null && goalAmount > BigDecimal.ZERO
+                enabled = goalAmount != null && goalAmount > BigDecimal.ZERO,
+                shape = RoundedCornerShape(12.dp)
             ) {
                 Text("Continue")
             }
@@ -124,10 +125,10 @@ private fun FocusCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(12.dp),
         border = BorderStroke(
             width = if (selected) 2.dp else 1.dp,
-            color = if (selected) MaterialTheme.colorScheme.primary else Color(0xFFD5DDE2)
+            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
         ),
         colors = CardDefaults.cardColors(
             containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
