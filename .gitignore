@@ -18,3 +18,5 @@ local.properties
 /.agent
 /.agents
 skills-lock.json
+/.gstack
+/.kotlin

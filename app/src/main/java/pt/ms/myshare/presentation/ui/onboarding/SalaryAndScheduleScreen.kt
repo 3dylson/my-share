@@ -34,6 +34,7 @@ import java.math.BigDecimal
 @Composable
 fun SalaryAndScheduleScreen(
     initialIncome: BigDecimal?,
+    initialFrequency: PayFrequency,
     initialMonthlyPayday: Int,
     initialNextBiweeklyPaydayText: String,
     onBack: () -> Unit,
