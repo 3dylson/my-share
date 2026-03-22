@@ -130,4 +130,7 @@ dependencies {
 
     // WorkManager (Payday Autopilot reminders)
     implementation "androidx.work:work-runtime-ktx:2.10.0"
+
+    // Google Play Billing
+    implementation "com.android.billingclient:billing-ktx:8.3.0"
 }

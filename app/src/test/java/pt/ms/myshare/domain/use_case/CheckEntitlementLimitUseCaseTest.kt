@@ -1,0 +1,105 @@
+package pt.ms.myshare.domain.use_case
+
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+import pt.ms.myshare.domain.model.AllocationPreset
+import pt.ms.myshare.domain.model.StoreProduct
+import pt.ms.myshare.domain.repository.EntitlementRepository
+
+class CheckEntitlementLimitUseCaseTest {
+
+    private lateinit var useCase: CheckEntitlementLimitUseCase
+    private lateinit var fakeRepository: FakeEntitlementRepository
+
+    @Before
+    fun setup() {
+        fakeRepository = FakeEntitlementRepository()
+        useCase = CheckEntitlementLimitUseCase(fakeRepository)
+    }
+
+    @Test
+    fun `canUsePreset allows BALANCED for free users`() = runTest {
+        fakeRepository.setProState(false)
+        assertTrue(useCase.canUsePreset(AllocationPreset.BALANCED))
+    }
+
+    @Test
+    fun `canUsePreset denies CONSERVATIVE and GROWTH for free users`() = runTest {
+        fakeRepository.setProState(false)
+        assertFalse(useCase.canUsePreset(AllocationPreset.CONSERVATIVE))
+        assertFalse(useCase.canUsePreset(AllocationPreset.GROWTH))
+    }
+
+    @Test
+    fun `canUsePreset allows any preset for PRO users`() = runTest {
+        fakeRepository.setProState(true)
+        assertTrue(useCase.canUsePreset(AllocationPreset.CONSERVATIVE))
+        assertTrue(useCase.canUsePreset(AllocationPreset.GROWTH))
+        assertTrue(useCase.canUsePreset(AllocationPreset.BALANCED))
+    }
+
+    @Test
+    fun `canAddMultipleGoals allows first goal for free users`() = runTest {
+        fakeRepository.setProState(false)
+        assertTrue(useCase.canAddMultipleGoals(0))
+    }
+
+    @Test
+    fun `canAddMultipleGoals denies second goal for free users`() = runTest {
+        fakeRepository.setProState(false)
+        assertFalse(useCase.canAddMultipleGoals(1))
+    }
+
+    @Test
+    fun `canAddMultipleGoals allows unlimited goals for PRO users`() = runTest {
+        fakeRepository.setProState(true)
+        assertTrue(useCase.canAddMultipleGoals(0))
+        assertTrue(useCase.canAddMultipleGoals(1))
+        assertTrue(useCase.canAddMultipleGoals(50))
+    }
+
+    @Test
+    fun `canViewReviewHistoryDepth limits free users to 3`() = runTest {
+        fakeRepository.setProState(false)
+        assertTrue(useCase.canViewReviewHistoryDepth(0))
+        assertTrue(useCase.canViewReviewHistoryDepth(2))
+        assertFalse(useCase.canViewReviewHistoryDepth(3))
+        assertFalse(useCase.canViewReviewHistoryDepth(10))
+    }
+
+    @Test
+    fun `canViewReviewHistoryDepth allows infinite depth for PRO users`() = runTest {
+        fakeRepository.setProState(true)
+        assertTrue(useCase.canViewReviewHistoryDepth(0))
+        assertTrue(useCase.canViewReviewHistoryDepth(3))
+        assertTrue(useCase.canViewReviewHistoryDepth(12))
+        assertTrue(useCase.canViewReviewHistoryDepth(100))
+    }
+}
+
+class FakeEntitlementRepository : EntitlementRepository {
+    private val _isPro = MutableStateFlow(false)
+    override val isPro = _isPro.asStateFlow()
+
+    private val _availableProducts = MutableStateFlow<List<StoreProduct>>(emptyList())
+    override val availableProducts = _availableProducts.asStateFlow()
+
+    suspend fun setProState(value: Boolean) {
+        _isPro.emit(value)
+    }
+
+    override suspend fun checkActiveEntitlement() {}
+
+    override suspend fun purchasePlan(activity: android.app.Activity, product: StoreProduct) {}
+
+    override suspend fun setPro(value: Boolean) {
+        _isPro.emit(value)
+    }
+
+    override suspend fun restorePurchases() {}
+}
