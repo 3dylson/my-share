@@ -189,4 +189,35 @@ class OnboardingViewModelTest {
         assertTrue(state.bankSyncHandled)
         coVerify { plannerRepository.setOnboardingCompleted(true) }
     }
+
+    @Test
+    fun `purchasePremium uses real StoreProduct from availableProducts`() = runTest {
+        val monthlyProduct = pt.ms.myshare.domain.model.StoreProduct(
+            productId = "myshare_monthly",
+            name = "Monthly",
+            description = "Monthly premium",
+            price = "€4.99/mo",
+            basePlanId = "monthly-base",
+            offerToken = "token-monthly-123"
+        )
+        every { entitlementRepository.availableProducts } returns MutableStateFlow(listOf(monthlyProduct))
+        viewModel.setSelectedBillingPlan(BillingPlan.MONTHLY)
+        val activity = mockk<android.app.Activity>(relaxed = true)
+        viewModel.purchasePremium(activity)
+        advanceUntilIdle()
+        coVerify { entitlementRepository.purchasePlan(activity, monthlyProduct) }
+    }
+
+    @Test
+    fun `purchasePremium shows error when product not yet loaded`() = runTest {
+        every { entitlementRepository.availableProducts } returns MutableStateFlow(emptyList())
+        val activity = mockk<android.app.Activity>(relaxed = true)
+        viewModel.purchasePremium(activity)
+        advanceUntilIdle()
+        assertEquals(
+            "Product not available. Please check your connection and try again.",
+            viewModel.uiState.value.error
+        )
+        coVerify(exactly = 0) { entitlementRepository.purchasePlan(any(), any()) }
+    }
 }

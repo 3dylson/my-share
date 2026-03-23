@@ -96,8 +96,12 @@ class BillingClientWrapper(context: Context) : PurchasesUpdatedListener {
     override fun onPurchasesUpdated(billingResult: BillingResult, purchases: MutableList<Purchase>?) {
         if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
             val validPurchases = purchases.filter { it.purchaseState == Purchase.PurchaseState.PURCHASED }
-            _purchases.value = _purchases.value + validPurchases
-            // Note: In production, we'd acknowledge here after backend verification
+            val existing = _purchases.value.map { it.purchaseToken }.toSet()
+            val newOnes = validPurchases.filter { it.purchaseToken !in existing }
+            if (newOnes.isNotEmpty()) {
+                _purchases.value = _purchases.value + newOnes
+            }
+            // Note: verify-and-acknowledge is triggered reactively by the collect loop in PlayBillingEntitlementRepository
         } else if (billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
             Timber.i("User cancelled purchase flow.")
         } else {

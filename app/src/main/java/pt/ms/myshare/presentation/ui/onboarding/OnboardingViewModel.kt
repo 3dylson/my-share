@@ -153,9 +153,13 @@ class OnboardingViewModel @Inject constructor(
 
     fun purchasePremium(activity: android.app.Activity) {
         val storeProductId = if (state.value.selectedBillingPlan == BillingPlan.ANNUAL) "myshare_annual" else "myshare_monthly"
-        val product = pt.ms.myshare.domain.model.StoreProduct(storeProductId, "Premium", "Unlock premium features", "$0.00", "subs", null)
-        
         viewModelScope.launch {
+            val products = entitlementRepository.availableProducts.first()
+            val product = products.find { it.productId == storeProductId }
+            if (product == null) {
+                state.update { it.copy(error = "Product not available. Please check your connection and try again.") }
+                return@launch
+            }
             FirebaseUtils.logEvent("purchase_started", Bundle().apply {
                 putString("billing_plan", state.value.selectedBillingPlan.name.lowercase(Locale.US))
                 putString("price_cluster", state.value.pricingStrategy?.marketCluster)

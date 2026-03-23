@@ -4,7 +4,6 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
-import com.google.android.gms.ads.MobileAds
 import dagger.hilt.android.HiltAndroidApp
 import pt.ms.myshare.utils.logs.FirebaseUtils
 import timber.log.Timber
