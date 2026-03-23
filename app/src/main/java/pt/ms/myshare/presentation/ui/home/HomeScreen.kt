@@ -52,7 +52,7 @@ fun HomeScreen(
     onBillingPlanSelected: (BillingPlan) -> Unit,
     onUnlockPremium: (android.app.Activity) -> Unit
 ) {
-    val activity = androidx.compose.ui.platform.LocalContext.current as? android.app.Activity
+    val activity = androidx.activity.compose.LocalActivity.current
     Scaffold(
         modifier = modifier,
         topBar = {

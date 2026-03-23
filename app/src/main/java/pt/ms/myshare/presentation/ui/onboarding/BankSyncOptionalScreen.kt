@@ -5,7 +5,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-
+import androidx.compose.ui.res.stringResource
+import pt.ms.myshare.R
 @Composable
 fun BankSyncOptionalScreen(
     onSync: () -> Unit,
@@ -18,14 +19,14 @@ fun BankSyncOptionalScreen(
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text("Bank sync (Optional)", style = MaterialTheme.typography.headlineMedium)
-            Text("My Share works perfectly as a manual planner. If you prefer, securely link your bank to track income automatically.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.onboarding_banksync_title), style = MaterialTheme.typography.headlineMedium)
+            Text(stringResource(R.string.onboarding_banksync_subtitle), color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.weight(1f))
             Button(onClick = onSync, modifier = Modifier.fillMaxWidth()) {
-                Text("Link Bank Account")
+                Text(stringResource(R.string.onboarding_banksync_link))
             }
             TextButton(onClick = onSkip, modifier = Modifier.fillMaxWidth()) {
-                Text("Not now")
+                Text(stringResource(R.string.onboarding_banksync_skip))
             }
         }
     }

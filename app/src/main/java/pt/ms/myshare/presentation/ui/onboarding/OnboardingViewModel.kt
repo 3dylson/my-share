@@ -190,9 +190,13 @@ class OnboardingViewModel @Inject constructor(
 
     fun completeOnboarding() {
         viewModelScope.launch {
-            plannerRepository.setOnboardingCompleted(true)
-            state.update { it.copy(onboardingCompleted = true) }
-            FirebaseUtils.logEvent("onboarding_completed")
+            if (plannerRepository.loadPlan() != null) {
+                plannerRepository.setOnboardingCompleted(true)
+                state.update { it.copy(onboardingCompleted = true) }
+                FirebaseUtils.logEvent("onboarding_completed")
+            } else {
+                state.update { it.copy(error = "Cannot complete onboarding without a valid plan.") }
+            }
         }
     }
 

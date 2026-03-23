@@ -14,6 +14,8 @@ import androidx.credentials.GetCredentialRequest
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.launch
+import androidx.compose.ui.res.stringResource
+import pt.ms.myshare.R
 import timber.log.Timber
 
 @Composable
@@ -31,8 +33,8 @@ fun SignupScreen(
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text("Save your plan", style = MaterialTheme.typography.headlineMedium)
-            Text("Create an account to keep your plan safe and accessible across devices. Or continue locally.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.onboarding_signup_title), style = MaterialTheme.typography.headlineMedium)
+            Text(stringResource(R.string.onboarding_signup_subtitle), color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.weight(1f))
             Button(
                 onClick = {
@@ -66,10 +68,10 @@ fun SignupScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Sign up with Google")
+                Text(stringResource(R.string.onboarding_signup_google))
             }
             TextButton(onClick = onSkip, modifier = Modifier.fillMaxWidth()) {
-                Text("Continue locally")
+                Text(stringResource(R.string.onboarding_signup_skip))
             }
         }
     }

@@ -88,7 +88,7 @@ fun PaywallScreen(
     onRestore: () -> Unit,
     onPurchaseSelected: (android.app.Activity) -> Unit
 ) {
-    val activity = LocalContext.current as? android.app.Activity
+    val activity = androidx.activity.compose.LocalActivity.current
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(
             modifier = Modifier

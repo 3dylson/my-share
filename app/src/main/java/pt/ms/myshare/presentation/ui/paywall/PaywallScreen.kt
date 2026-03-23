@@ -25,7 +25,7 @@ fun PaywallScreen(
     val isPro by viewModel.isPro.collectAsState(initial = false)
     val availableProducts by viewModel.availableProducts.collectAsState(initial = emptyList())
     val isLoading by viewModel.isLoading.collectAsState()
-    val context = LocalContext.current as Activity
+    val activity = androidx.activity.compose.LocalActivity.current
 
     LaunchedEffect(isPro) {
         if (isPro) {
@@ -64,7 +64,7 @@ fun PaywallScreen(
             } else {
                 availableProducts.firstOrNull()?.let { product ->
                     Button(
-                        onClick = { viewModel.purchasePlan(context, product) },
+                        onClick = { activity?.let { viewModel.purchasePlan(it, product) } },
                         modifier = Modifier.fillMaxWidth().height(56.dp),
                         shape = RoundedCornerShape(12.dp)
                     ) {

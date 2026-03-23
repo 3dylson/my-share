@@ -62,8 +62,12 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideEntitlementRepository(billingClientWrapper: BillingClientWrapper): EntitlementRepository = 
-        PlayBillingEntitlementRepository(billingClientWrapper)
+    fun provideEntitlementRepository(
+        billingClientWrapper: BillingClientWrapper,
+        firebaseAuth: FirebaseAuth,
+        firestore: FirebaseFirestore
+    ): EntitlementRepository = 
+        PlayBillingEntitlementRepository(billingClientWrapper, firebaseAuth, firestore)
 
     @Provides
     @Singleton

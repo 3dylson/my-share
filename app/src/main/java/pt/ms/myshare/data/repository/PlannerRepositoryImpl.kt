@@ -126,6 +126,23 @@ class PlannerRepositoryImpl @Inject constructor(
             .putLong(KEY_REVIEW_CREATED_AT_EPOCH, review.createdAt.toEpochDay())
             .apply()
         reviewState.value = review
+        syncReviewToFirestore(review)
+    }
+
+    private fun syncReviewToFirestore(review: ManualReview) {
+        val user = firebaseAuth.currentUser ?: return
+        coroutineScope.launch {
+            val data = hashMapOf(
+                "actualFlexibleSpend" to review.actualFlexibleSpend.toPlainString(),
+                "actualGoalContribution" to review.actualGoalContribution.toPlainString(),
+                "createdAtDate" to review.createdAt.toString()
+            )
+            try {
+                firestore.collection("users").document(user.uid).collection("reviews").document("latest").set(data)
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e, "Failed to sync review to Firestore")
+            }
+        }
     }
 
     override fun observeReminderConfiguration(): Flow<ReminderConfiguration> = reminderState.asStateFlow()
@@ -147,6 +164,24 @@ class PlannerRepositoryImpl @Inject constructor(
             .putString(KEY_REMINDER_CADENCE, configuration.cadence.name)
             .apply()
         reminderState.value = configuration
+        syncReminderToFirestore(configuration)
+    }
+
+    private fun syncReminderToFirestore(config: ReminderConfiguration) {
+        val user = firebaseAuth.currentUser ?: return
+        coroutineScope.launch {
+            val data = hashMapOf(
+                "enabled" to config.enabled,
+                "hourOfDay" to config.hourOfDay,
+                "minute" to config.minute,
+                "cadence" to config.cadence.name
+            )
+            try {
+                firestore.collection("users").document(user.uid).collection("settings").document("reminders").set(data)
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e, "Failed to sync reminder to Firestore")
+            }
+        }
     }
 
     override fun isOnboardingCompleted(): Boolean = prefs.getBoolean(KEY_ONBOARDING_COMPLETED, false)
@@ -154,6 +189,19 @@ class PlannerRepositoryImpl @Inject constructor(
     override suspend fun setOnboardingCompleted(completed: Boolean) {
         Timber.tag(TAG).d("setOnboardingCompleted completed=%s", completed)
         prefs.edit().putBoolean(KEY_ONBOARDING_COMPLETED, completed).apply()
+        syncOnboardingStateToFirestore(completed)
+    }
+
+    private fun syncOnboardingStateToFirestore(completed: Boolean) {
+        val user = firebaseAuth.currentUser ?: return
+        coroutineScope.launch {
+            val data = hashMapOf("onboardingCompleted" to completed)
+            try {
+                firestore.collection("users").document(user.uid).set(data, com.google.firebase.firestore.SetOptions.merge())
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e, "Failed to sync onboarding state to Firestore")
+            }
+        }
     }
 
     private fun readPlan(): SalaryPlan? {

@@ -46,6 +46,11 @@ android {
             resValue "string", "admob_banner_ad_unit_id", '"ca-app-pub-3940256099942544/6300978111"' // TODO: Replace with real production Ad Unit ID
         }
     }
+    
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
     compileOptions {
         coreLibraryDesugaringEnabled true
 
@@ -90,6 +95,7 @@ dependencies {
     implementation 'com.google.android.ump:user-messaging-platform:3.1.0'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
+    testImplementation 'io.mockk:mockk:1.13.8'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
 
