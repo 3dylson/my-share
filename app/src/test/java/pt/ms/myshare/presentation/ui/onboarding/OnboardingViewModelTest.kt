@@ -123,23 +123,40 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun `completeOnboarding sets error if no plan exists`() = runTest {
-        // Given no plan exists in repository
-        every { plannerRepository.loadPlan() } returns null
-
-        // When completeOnboarding called
+    fun `completeOnboarding fails if guards not met`() = runTest {
+        // Initially guards are false
         viewModel.completeOnboarding()
         advanceUntilIdle()
-
-        // Then onboardingCompleted is false and error string is emitted
+        
         val state = viewModel.uiState.value
         assertFalse(state.onboardingCompleted)
-        assertEquals("Cannot complete onboarding without a valid plan.", state.error)
+        assertEquals("Please build your plan first.", state.error)
     }
 
     @Test
-    fun `completeOnboarding succeeds if plan exists`() = runTest {
-        // Given a plan exists in repository
+    fun `completeOnboarding succeeds only if all guards met`() = runTest {
+        // Set up valid preview to satisfy planSaved
+        viewModel.setSalaryDetails(BigDecimal("1000"), PayFrequency.MONTHLY, 1, "")
+        every { calculatePlanPreviewUseCase.execute(any()) } returns mockk(relaxed = true)
+        viewModel.setFixedCostsAndBuild(BigDecimal("400"), AllocationPreset.BALANCED)
+        advanceUntilIdle()
+        
+        // Reminder not yet handled
+        viewModel.completeOnboarding()
+        assertEquals("Please handle the reminder step.", viewModel.uiState.value.error)
+        
+        // Handle reminder
+        viewModel.skipReminderConfiguration()
+        advanceUntilIdle()
+        
+        // Bank sync not handled
+        viewModel.completeOnboarding()
+        assertEquals("Please complete or skip the bank sync step.", viewModel.uiState.value.error)
+        
+        // Handle bank sync
+        viewModel.setBankSyncHandled()
+        
+        // Now it should succeed if plan exists in repo
         val plan = SalaryPlan(
             focus = PlanningFocus.SAVE_WITHOUT_STRESS,
             netIncomePerPayday = BigDecimal("1000"),
@@ -151,13 +168,25 @@ class OnboardingViewModelTest {
         )
         every { plannerRepository.loadPlan() } returns plan
 
-        // When completeOnboarding called
         viewModel.completeOnboarding()
         advanceUntilIdle()
 
-        // Then onboardingCompleted is true
+        assertTrue(viewModel.uiState.value.onboardingCompleted)
+    }
+
+    @Test
+    fun `skipToHomeWithDefaultPlan sets defaults and completes`() = runTest {
+        every { calculatePlanPreviewUseCase.execute(any()) } returns mockk(relaxed = true)
+        
+        viewModel.skipToHomeWithDefaultPlan()
+        advanceUntilIdle()
+        
         val state = viewModel.uiState.value
         assertTrue(state.onboardingCompleted)
+        assertEquals(BigDecimal("1500"), state.netIncomePerPayday)
+        assertTrue(state.planSaved)
+        assertTrue(state.reminderSkipped)
+        assertTrue(state.bankSyncHandled)
         coVerify { plannerRepository.setOnboardingCompleted(true) }
     }
 }

@@ -9,6 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.functions.FirebaseFunctions
 import pt.ms.myshare.data.billing.BillingClientWrapper
 import pt.ms.myshare.data.billing.PlayBillingEntitlementRepository
 import pt.ms.myshare.data.repository.AuthRepositoryImpl
@@ -43,6 +44,10 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideFirebaseFunctions(): FirebaseFunctions = FirebaseFunctions.getInstance()
+
+    @Provides
+    @Singleton
     fun provideAuthRepository(firebaseAuth: FirebaseAuth): AuthRepository = AuthRepositoryImpl(firebaseAuth)
 
     @Provides
@@ -65,9 +70,10 @@ object AppModule {
     fun provideEntitlementRepository(
         billingClientWrapper: BillingClientWrapper,
         firebaseAuth: FirebaseAuth,
-        firestore: FirebaseFirestore
+        firestore: FirebaseFirestore,
+        firebaseFunctions: FirebaseFunctions
     ): EntitlementRepository = 
-        PlayBillingEntitlementRepository(billingClientWrapper, firebaseAuth, firestore)
+        PlayBillingEntitlementRepository(billingClientWrapper, firebaseAuth, firestore, firebaseFunctions)
 
     @Provides
     @Singleton

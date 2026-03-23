@@ -128,7 +128,7 @@ class OnboardingViewModel @Inject constructor(
         val fixedCosts = current.monthlyFixedCosts ?: return false
         val plan = buildPlan(current, income, fixedCosts) ?: return false
         val preview = calculatePlanPreviewUseCase.execute(plan)
-        state.update { it.copy(planPreview = preview, error = null) }
+        state.update { it.copy(planPreview = preview, error = null, planSaved = true) }
         viewModelScope.launch {
             plannerRepository.savePlan(plan)
             FirebaseUtils.logEvent("create_plan_completed", Bundle().apply {
@@ -137,6 +137,14 @@ class OnboardingViewModel @Inject constructor(
             })
         }
         return true
+    }
+
+    fun setReminderSaved() {
+        state.update { it.copy(reminderSaved = true) }
+    }
+
+    fun setBankSyncHandled() {
+        state.update { it.copy(bankSyncHandled = true) }
     }
 
     fun setSelectedBillingPlan(plan: BillingPlan) {
@@ -179,6 +187,27 @@ class OnboardingViewModel @Inject constructor(
         onComplete()
     }
 
+    fun skipToHomeWithDefaultPlan() {
+        viewModelScope.launch {
+            val pricing = state.value.pricingStrategy
+            state.update { 
+                it.copy(
+                    netIncomePerPayday = BigDecimal("1500"),
+                    monthlyFixedCosts = BigDecimal("600"),
+                    selectedFocus = PlanningFocus.SAVE_WITHOUT_STRESS,
+                    preset = AllocationPreset.BALANCED,
+                    planSaved = true,
+                    reminderSkipped = true,
+                    bankSyncHandled = true
+                )
+            }
+            buildPreview()
+            plannerRepository.setOnboardingCompleted(true)
+            state.update { it.copy(onboardingCompleted = true) }
+            FirebaseUtils.logEvent("onboarding_skipped_with_defaults")
+        }
+    }
+
     fun restorePurchases(onRestored: (Boolean) -> Unit) {
         viewModelScope.launch {
             entitlementRepository.restorePurchases()
@@ -189,6 +218,20 @@ class OnboardingViewModel @Inject constructor(
     }
 
     fun completeOnboarding() {
+        val current = state.value
+        if (!current.planSaved) {
+            state.update { it.copy(error = "Please build your plan first.") }
+            return
+        }
+        if (!current.reminderSaved && !current.reminderSkipped) {
+            state.update { it.copy(error = "Please handle the reminder step.") }
+            return
+        }
+        if (!current.bankSyncHandled) {
+            state.update { it.copy(error = "Please complete or skip the bank sync step.") }
+            return
+        }
+
         viewModelScope.launch {
             if (plannerRepository.loadPlan() != null) {
                 plannerRepository.setOnboardingCompleted(true)
@@ -211,6 +254,7 @@ class OnboardingViewModel @Inject constructor(
                 )
             )
             scheduleReminderWork()
+            state.update { it.copy(reminderSaved = true, reminderSkipped = false) }
             FirebaseUtils.logEvent("reminder_enabled")
         }
     }
@@ -218,6 +262,7 @@ class OnboardingViewModel @Inject constructor(
     fun skipReminderConfiguration() {
         viewModelScope.launch {
             plannerRepository.saveReminderConfiguration(ReminderConfiguration(enabled = false))
+            state.update { it.copy(reminderSaved = false, reminderSkipped = true) }
             FirebaseUtils.logEvent("reminder_skipped")
         }
     }

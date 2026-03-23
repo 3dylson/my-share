@@ -59,6 +59,7 @@ class PlannerRepositoryImpl @Inject constructor(
             .putString(KEY_INVESTING, plan.investing?.toPlainString() ?: "")
             .putString(KEY_CRYPTO, plan.crypto?.toPlainString() ?: "")
             .putLong(KEY_PLAN_CREATED_AT_EPOCH, plan.createdAt.toEpochDay())
+            .putString(KEY_PRESET, plan.preset.name)
             .apply()
         planState.value = plan
         

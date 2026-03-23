@@ -11,15 +11,28 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.functions.FirebaseFunctions
+import com.android.billingclient.api.Purchase
+import timber.log.Timber
 
 class PlayBillingEntitlementRepository(
     private val billingClientWrapper: BillingClientWrapper,
     private val firebaseAuth: FirebaseAuth,
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val firebaseFunctions: FirebaseFunctions
 ) : EntitlementRepository {
 
     init {
         billingClientWrapper.startBillingConnection()
+        CoroutineScope(Dispatchers.IO).launch {
+            billingClientWrapper.purchases.collect { purchases ->
+                purchases.forEach { purchase ->
+                    if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED && !purchase.isAcknowledged) {
+                        verifyAndAcknowledge(purchase)
+                    }
+                }
+            }
+        }
         CoroutineScope(Dispatchers.IO).launch {
             isPro.collect { proStatus ->
                 val user = firebaseAuth.currentUser ?: return@collect
@@ -36,6 +49,29 @@ class PlayBillingEntitlementRepository(
             }
         }
     }
+
+    private fun verifyAndAcknowledge(purchase: Purchase) {
+        val productId = purchase.products.firstOrNull() ?: return
+        val data = hashMapOf(
+            "purchaseToken" to purchase.purchaseToken,
+            "subscriptionId" to productId
+        )
+
+        firebaseFunctions
+            .getHttpsCallable("verifySubscription")
+            .call(data)
+            .addOnSuccessListener { result ->
+                val resultMap = result.data as? Map<*, *>
+                val isValid = resultMap?.get("isValid") as? Boolean ?: false
+                if (isValid) {
+                    billingClientWrapper.acknowledgePurchase(purchase.purchaseToken)
+                }
+            }
+            .addOnFailureListener { e ->
+                Timber.tag("BillingRepo").e(e, "Verification failed")
+            }
+    }
+
 
     override val isPro: Flow<Boolean> = billingClientWrapper.purchases.map { purchases ->
         purchases.any { purchase -> 

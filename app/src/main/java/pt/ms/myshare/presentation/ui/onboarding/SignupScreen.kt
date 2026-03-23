@@ -43,7 +43,7 @@ fun SignupScreen(
                             val credentialManager = CredentialManager.create(context)
                             val googleIdOption = GetGoogleIdOption.Builder()
                                 .setFilterByAuthorizedAccounts(false)
-                                .setServerClientId("YOUR_WEB_CLIENT_ID") // TODO: Replace with real client ID
+                                .setServerClientId("564550726509-g94sj76hhfhjdpufiqp1feqei5f1gbuh.apps.googleusercontent.com")
                                 .build()
                             
                             val request = GetCredentialRequest.Builder()

@@ -31,7 +31,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
         composable(OnboardingRoute.Welcome.route) {
             WelcomeScreen(
                 onContinue = { navController.navigate(OnboardingRoute.GoalPicker.route) },
-                onSkip = { viewModel.completeOnboarding() }
+                onSkip = { viewModel.skipToHomeWithDefaultPlan() }
             )
         }
         composable(OnboardingRoute.GoalPicker.route) {
@@ -132,6 +132,8 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
         composable(OnboardingRoute.Trajectory.route) {
             LaunchedEffect(Unit) { viewModel.logTrajectoryViewed() }
             TrajectoryScreen(
+                preview = state.planPreview,
+                goalName = state.goalName,
                 onNext = {
                     viewModel.logPaywallViewed()
                     navController.navigate(OnboardingRoute.Paywall.route)
@@ -180,9 +182,13 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
         composable(OnboardingRoute.BankSyncOptional.route) {
             LaunchedEffect(Unit) { viewModel.logBankSyncPromptShown() }
             BankSyncOptionalScreen(
-                onSync = { viewModel.completeOnboarding() },
+                onSync = { 
+                    viewModel.setBankSyncHandled()
+                    viewModel.completeOnboarding() 
+                },
                 onSkip = { 
                     viewModel.logBankSyncSkipped()
+                    viewModel.setBankSyncHandled()
                     viewModel.completeOnboarding() 
                 }
             )

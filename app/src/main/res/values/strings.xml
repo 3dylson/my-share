@@ -54,4 +54,35 @@
     <string name="onboarding_banksync_subtitle">My Share works perfectly as a manual planner. If you prefer, securely link your bank to track income automatically.</string>
     <string name="onboarding_banksync_link">Link Bank Account</string>
     <string name="onboarding_banksync_skip">Not now</string>
+
+    <!-- Plan Preview -->
+    <string name="onboarding_plan_preview_title">Here’s your payday plan</string>
+    <string name="onboarding_plan_preview_fixed_costs">Fixed costs</string>
+    <string name="onboarding_plan_preview_flexible_spend">Flexible spend</string>
+    <string name="onboarding_plan_preview_savings">Savings</string>
+    <string name="onboarding_plan_preview_investing_crypto">Investing + crypto</string>
+    <string name="onboarding_plan_preview_weekly_guide">Weekly spend guide</string>
+    <string name="onboarding_plan_preview_autopilot">See premium automation</string>
+    <string name="onboarding_plan_preview_free">Use the free plan first</string>
+
+    <!-- Paywall -->
+    <string name="onboarding_paywall_close">Close</string>
+    <string name="onboarding_paywall_restore">Restore</string>
+    <string name="onboarding_paywall_premium_perks">Premium gives you</string>
+    <string name="onboarding_paywall_premium_perks_body">Recurring payday rules, salary-day reminders, weekly reviews, and more than one goal.</string>
+    <string name="onboarding_paywall_trust">Trust first</string>
+    <string name="onboarding_paywall_trust_body">No ads in sensitive financial screens. Cancel in Google Play. Free stays useful with one plan and one goal.</string>
+    <string name="onboarding_paywall_trial_cancel">Free trial: %1$d days. Cancel during the trial and you won’t be charged.</string>
+    <string name="onboarding_paywall_trial_start">Start %1$d-day trial</string>
+    <string name="onboarding_paywall_best_entry">Best entry point</string>
+
+    <!-- Welcome -->
+    <string name="onboarding_welcome_title">Create your salary plan in about a minute</string>
+    <string name="onboarding_welcome_subtitle">No bank sync. No heavy setup. Start with simple numbers and get a clear next-payday plan.</string>
+    <string name="onboarding_welcome_perks_title">What you get before any paywall</string>
+    <string name="onboarding_welcome_perks_body">• A concrete payday split\n• A target date for your first goal\n• An option to turn on reminders later</string>
+    <string name="onboarding_welcome_start">Start</string>
+    <string name="onboarding_welcome_skip">Skip for now</string>
+    <string name="onboarding_welcome_skip_note1">You can still explore the app, but the repeat loop works best once the first plan is created.</string>
+    <string name="onboarding_welcome_skip_note2">Tap skip only if you want to come back later.</string>
 </resources>

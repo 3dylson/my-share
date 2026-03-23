@@ -218,29 +218,27 @@ private fun MoreTab(
         }
         Switch(checked = moreCard.reminderEnabled, onCheckedChange = onToggleReminder)
     }
-    moreCard.pricingStrategy?.let { pricing ->
-        HelperCard(title = pricing.paywallHeadline, body = pricing.paywallSubhead)
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-            FilterChip(
-                selected = moreCard.selectedBillingPlan == BillingPlan.MONTHLY,
-                onClick = { onBillingPlanSelected(BillingPlan.MONTHLY) },
-                label = { Text(pricing.monthlyLabel) }
-            )
-            FilterChip(
-                selected = moreCard.selectedBillingPlan == BillingPlan.ANNUAL,
-                onClick = { onBillingPlanSelected(BillingPlan.ANNUAL) },
-                label = { Text(pricing.annualLabel) }
-            )
-        }
-        if (!moreCard.isPremium) {
-            Button(onClick = onUnlockPremium, modifier = Modifier.fillMaxWidth()) {
-                Text("Unlock recurring rules")
+    if (!moreCard.isPremium) {
+        moreCard.pricingStrategy?.let { pricing ->
+            HelperCard(title = pricing.paywallHeadline, body = pricing.paywallSubhead)
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                FilterChip(
+                    selected = moreCard.selectedBillingPlan == BillingPlan.MONTHLY,
+                    onClick = { onBillingPlanSelected(BillingPlan.MONTHLY) },
+                    label = { Text(pricing.monthlyLabel) }
+                )
+                FilterChip(
+                    selected = moreCard.selectedBillingPlan == BillingPlan.ANNUAL,
+                    onClick = { onBillingPlanSelected(BillingPlan.ANNUAL) },
+                    label = { Text(pricing.annualLabel) }
+                )
             }
-            Spacer(Modifier.height(16.dp))
-            pt.ms.myshare.presentation.ui.ads.SafeAdBanner(isPremium = false)
-        } else {
-            MetricCard(title = "Premium active", value = "Recurring rules, reminders, and deeper review are unlocked.")
+            Button(onClick = onUnlockPremium, modifier = Modifier.fillMaxWidth()) {
+                Text("Unlock Premium")
+            }
         }
+    } else {
+        MetricCard(title = "Premium active", value = "Recurring rules, reminders, and deeper review are unlocked.")
     }
 }
 

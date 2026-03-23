@@ -22,7 +22,8 @@ class BillingClientWrapper(context: Context) : PurchasesUpdatedListener {
     val purchases = _purchases.asStateFlow()
 
     // We only have one premium subscription product id currently
-    private val PREMIUM_SUB_ID = "myshare_premium"
+    private val MONTHLY_ID = "myshare_monthly"
+    private val ANNUAL_ID = "myshare_annual"
 
     fun startBillingConnection() {
         billingClient.startConnection(object : BillingClientStateListener {
@@ -46,7 +47,11 @@ class BillingClientWrapper(context: Context) : PurchasesUpdatedListener {
             .setProductList(
                 listOf(
                     QueryProductDetailsParams.Product.newBuilder()
-                        .setProductId(PREMIUM_SUB_ID)
+                        .setProductId(MONTHLY_ID)
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build(),
+                    QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(ANNUAL_ID)
                         .setProductType(BillingClient.ProductType.SUBS)
                         .build()
                 )
@@ -124,6 +129,19 @@ class BillingClientWrapper(context: Context) : PurchasesUpdatedListener {
                     )
                     .build()
                 billingClient.launchBillingFlow(activity, billingFlowParams)
+            }
+        }
+    }
+
+    fun acknowledgePurchase(purchaseToken: String) {
+        val params = AcknowledgePurchaseParams.newBuilder()
+            .setPurchaseToken(purchaseToken)
+            .build()
+        billingClient.acknowledgePurchase(params) { billingResult ->
+            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                Timber.d("Purchase acknowledged successfully")
+            } else {
+                Timber.e("Error acknowledging purchase: \${billingResult.debugMessage}")
             }
         }
     }

@@ -16,10 +16,7 @@ class MyShareApp : Application() {
         super.onCreate()
         FirebaseUtils.init(this)
         
-        // Initialize AdMob
-        MobileAds.initialize(this) { status ->
-            Timber.tag(TAG).d("AdMob Initialized: $status")
-        }
+
 
         createNotificationChannel()
         Timber.tag(TAG).d("Application created")
