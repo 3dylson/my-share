@@ -21,3 +21,5 @@ skills-lock.json
 /.gstack
 /.kotlin
 /docs
+/firebase/tests/node_modules/
+/firebase/functions/node_modules/

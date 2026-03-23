@@ -1,0 +1,31 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // A user can only read/write their own document
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // Entitlement snapshot — written by the server (Cloud Function) and
+      // readable by the owning user only
+      match /entitlements/{doc} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        // Write is server-only (Cloud Function uses Admin SDK which bypasses rules)
+        allow write: if false;
+      }
+
+      // Salary plans and reminder configs — owned by the user
+      match /plans/{doc} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      match /reminders/{doc} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      match /reviews/{doc} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+  }
+}
