@@ -18,16 +18,17 @@ class CalculatePlanPreviewUseCase @Inject constructor() {
         val remainingAfterFixed = plan.netIncomePerPayday.subtract(fixedCostsPerPayday).max(BigDecimal.ZERO)
 
         val weights = adjustedWeights(plan.focus, plan.preset)
-        val flexibleSpend = percentageOf(remainingAfterFixed, weights.flexibleSpend)
-        val savings = percentageOf(remainingAfterFixed, weights.savings)
-        val investing = percentageOf(remainingAfterFixed, weights.investing)
-        val crypto = percentageOf(remainingAfterFixed, weights.crypto)
+        val flexibleSpend = plan.flexibleSpend ?: percentageOf(remainingAfterFixed, weights.flexibleSpend)
+        val savings = plan.savings ?: percentageOf(remainingAfterFixed, weights.savings)
+        val investing = plan.investing ?: percentageOf(remainingAfterFixed, weights.investing)
+        val crypto = plan.crypto ?: percentageOf(remainingAfterFixed, weights.crypto)
         val debt = remainingAfterFixed
             .subtract(flexibleSpend)
             .subtract(savings)
             .subtract(investing)
             .subtract(crypto)
             .setScale(2, RoundingMode.HALF_UP)
+            .max(BigDecimal.ZERO)
 
         val monthlyGoalContribution = normalizeToMonthly(savings.add(investing).add(crypto).add(debt), plan.payFrequency)
         val weeklySpend = normalizeToMonthly(flexibleSpend, plan.payFrequency)

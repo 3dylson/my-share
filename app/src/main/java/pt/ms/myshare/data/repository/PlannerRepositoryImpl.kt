@@ -6,6 +6,11 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import pt.ms.myshare.domain.model.AllocationPreset
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.PayFrequency
@@ -22,10 +27,13 @@ import javax.inject.Singleton
 
 @Singleton
 class PlannerRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val firebaseAuth: FirebaseAuth,
+    private val firestore: FirebaseFirestore
 ) : PlannerRepository {
 
     private val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     private val planState = MutableStateFlow(readPlan())
     private val reviewState = MutableStateFlow(readLatestReview())
@@ -44,12 +52,46 @@ class PlannerRepositoryImpl @Inject constructor(
             .putString(KEY_PAY_FREQUENCY, plan.payFrequency.name)
             .putInt(KEY_MONTHLY_PAYDAY, plan.monthlyPayday ?: 1)
             .putLong(KEY_BIWEEKLY_PAYDAY_EPOCH, plan.nextBiweeklyPayday?.toEpochDay() ?: NO_EPOCH)
-            .putString(KEY_PRESET, plan.preset.name)
             .putString(KEY_GOAL_NAME, plan.goalName)
             .putString(KEY_GOAL_AMOUNT, plan.goalAmount.toPlainString())
+            .putString(KEY_FLEXIBLE_SPEND, plan.flexibleSpend?.toPlainString() ?: "")
+            .putString(KEY_SAVINGS, plan.savings?.toPlainString() ?: "")
+            .putString(KEY_INVESTING, plan.investing?.toPlainString() ?: "")
+            .putString(KEY_CRYPTO, plan.crypto?.toPlainString() ?: "")
             .putLong(KEY_PLAN_CREATED_AT_EPOCH, plan.createdAt.toEpochDay())
             .apply()
         planState.value = plan
+        
+        syncPlanToFirestore(plan)
+    }
+
+    private fun syncPlanToFirestore(plan: SalaryPlan) {
+        val user = firebaseAuth.currentUser ?: return
+        coroutineScope.launch {
+            val data = hashMapOf(
+                "focus" to plan.focus.name,
+                "netIncomePerPayday" to plan.netIncomePerPayday.toPlainString(),
+                "monthlyFixedCosts" to plan.monthlyFixedCosts.toPlainString(),
+                "payFrequency" to plan.payFrequency.name,
+                "monthlyPayday" to (plan.monthlyPayday ?: 1),
+                "nextBiweeklyPaydayText" to (plan.nextBiweeklyPayday?.toString() ?: ""),
+                "preset" to plan.preset.name,
+                "goalName" to plan.goalName,
+                "goalAmount" to plan.goalAmount.toPlainString(),
+                "flexibleSpend" to (plan.flexibleSpend?.toPlainString() ?: ""),
+                "savings" to (plan.savings?.toPlainString() ?: ""),
+                "investing" to (plan.investing?.toPlainString() ?: ""),
+                "crypto" to (plan.crypto?.toPlainString() ?: ""),
+                "createdAtDate" to plan.createdAt.toString()
+            )
+            try {
+                firestore.collection("users").document(user.uid).collection("plans").document("current")
+                    .set(data)
+                Timber.tag(TAG).d("Plan synced to Firestore successfully")
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e, "Failed to sync plan to Firestore")
+            }
+        }
     }
 
     override suspend fun clearPlan() {
@@ -60,10 +102,13 @@ class PlannerRepositoryImpl @Inject constructor(
             .remove(KEY_MONTHLY_FIXED_COSTS)
             .remove(KEY_PAY_FREQUENCY)
             .remove(KEY_MONTHLY_PAYDAY)
-            .remove(KEY_BIWEEKLY_PAYDAY_EPOCH)
             .remove(KEY_PRESET)
             .remove(KEY_GOAL_NAME)
             .remove(KEY_GOAL_AMOUNT)
+            .remove(KEY_FLEXIBLE_SPEND)
+            .remove(KEY_SAVINGS)
+            .remove(KEY_INVESTING)
+            .remove(KEY_CRYPTO)
             .remove(KEY_PLAN_CREATED_AT_EPOCH)
             .apply()
         planState.value = null
@@ -122,6 +167,11 @@ class PlannerRepositoryImpl @Inject constructor(
         val createdAtEpoch = prefs.getLong(KEY_PLAN_CREATED_AT_EPOCH, LocalDate.now().toEpochDay())
         val monthlyPayday = prefs.getInt(KEY_MONTHLY_PAYDAY, 1).coerceIn(1, 31)
         val biweeklyEpoch = prefs.getLong(KEY_BIWEEKLY_PAYDAY_EPOCH, NO_EPOCH)
+        val flexibleSpend = prefs.getString(KEY_FLEXIBLE_SPEND, null)?.takeIf { it.isNotBlank() }?.toBigDecimalOrNull()
+        val savings = prefs.getString(KEY_SAVINGS, null)?.takeIf { it.isNotBlank() }?.toBigDecimalOrNull()
+        val investing = prefs.getString(KEY_INVESTING, null)?.takeIf { it.isNotBlank() }?.toBigDecimalOrNull()
+        val crypto = prefs.getString(KEY_CRYPTO, null)?.takeIf { it.isNotBlank() }?.toBigDecimalOrNull()
+
         return SalaryPlan(
             focus = focus,
             netIncomePerPayday = income,
@@ -132,6 +182,10 @@ class PlannerRepositoryImpl @Inject constructor(
             preset = preset,
             goalName = goalName,
             goalAmount = goalAmount,
+            flexibleSpend = flexibleSpend,
+            savings = savings,
+            investing = investing,
+            crypto = crypto,
             createdAt = LocalDate.ofEpochDay(createdAtEpoch)
         )
     }
@@ -172,6 +226,10 @@ class PlannerRepositoryImpl @Inject constructor(
         const val KEY_PRESET = "planner_preset"
         const val KEY_GOAL_NAME = "planner_goal_name"
         const val KEY_GOAL_AMOUNT = "planner_goal_amount"
+        const val KEY_FLEXIBLE_SPEND = "planner_flexible_spend"
+        const val KEY_SAVINGS = "planner_savings"
+        const val KEY_INVESTING = "planner_investing"
+        const val KEY_CRYPTO = "planner_crypto"
         const val KEY_PLAN_CREATED_AT_EPOCH = "planner_plan_created_at_epoch"
         const val KEY_REVIEW_FLEXIBLE_SPEND = "planner_review_flexible_spend"
         const val KEY_REVIEW_GOAL_CONTRIBUTION = "planner_review_goal_contribution"

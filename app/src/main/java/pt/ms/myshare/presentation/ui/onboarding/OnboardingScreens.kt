@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -85,8 +86,9 @@ fun PaywallScreen(
     onPlanSelected: (BillingPlan) -> Unit,
     onClose: () -> Unit,
     onRestore: () -> Unit,
-    onPurchaseSelected: () -> Unit
+    onPurchaseSelected: (android.app.Activity) -> Unit
 ) {
+    val activity = LocalContext.current as? android.app.Activity
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(
             modifier = Modifier
@@ -122,7 +124,10 @@ fun PaywallScreen(
             }
             Text("Free trial: ${pricingStrategy.trialDays} days. Cancel during the trial and you won’t be charged.", color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.weight(1f))
-            Button(onClick = onPurchaseSelected, modifier = Modifier.fillMaxWidth()) {
+            Button(
+                onClick = { activity?.let(onPurchaseSelected) }, 
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Text("Start ${pricingStrategy.trialDays}-day trial")
             }
         }

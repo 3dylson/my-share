@@ -5,8 +5,12 @@ sealed class OnboardingRoute(val route: String) {
     object GoalPicker : OnboardingRoute("goal_picker")
     object SalaryAndSchedule : OnboardingRoute("salary_and_schedule")
     object FixedCosts : OnboardingRoute("fixed_costs")
+    object AllocationPriorities : OnboardingRoute("allocation_priorities")
     object PlanPreview : OnboardingRoute("plan_preview")
+    object Signup : OnboardingRoute("signup")
+    object Trajectory : OnboardingRoute("trajectory")
     object Paywall : OnboardingRoute("paywall")
     object ReminderSetup : OnboardingRoute("reminder_setup")
+    object BankSyncOptional : OnboardingRoute("bank_sync_optional")
 }
 

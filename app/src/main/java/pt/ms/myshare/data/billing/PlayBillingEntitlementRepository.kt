@@ -17,7 +17,8 @@ class PlayBillingEntitlementRepository(
 
     override val isPro: Flow<Boolean> = billingClientWrapper.purchases.map { purchases ->
         purchases.any { purchase -> 
-            purchase.products.contains("myshare_premium") && purchase.purchaseState == com.android.billingclient.api.Purchase.PurchaseState.PURCHASED
+            (purchase.products.contains("myshare_annual") || purchase.products.contains("myshare_monthly")) && 
+            purchase.purchaseState == com.android.billingclient.api.Purchase.PurchaseState.PURCHASED
         }
     }
 

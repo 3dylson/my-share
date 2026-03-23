@@ -50,8 +50,9 @@ fun HomeScreen(
     onSaveReview: () -> Unit,
     onToggleReminder: (Boolean) -> Unit,
     onBillingPlanSelected: (BillingPlan) -> Unit,
-    onUnlockPremium: () -> Unit
+    onUnlockPremium: (android.app.Activity) -> Unit
 ) {
+    val activity = androidx.compose.ui.platform.LocalContext.current as? android.app.Activity
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -132,7 +133,7 @@ fun HomeScreen(
                         moreCard = state.moreCard,
                         onToggleReminder = onToggleReminder,
                         onBillingPlanSelected = onBillingPlanSelected,
-                        onUnlockPremium = onUnlockPremium
+                        onUnlockPremium = { activity?.let(onUnlockPremium) }
                     )
                 }
             }

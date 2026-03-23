@@ -49,7 +49,7 @@ class HomeViewModelTest {
             plannerRepository = fakePlannerRepository,
             entitlementRepository = fakeEntitlementRepository,
             calculatePlanPreviewUseCase = CalculatePlanPreviewUseCase(),
-            createReviewInsightUseCase = CreateReviewInsightUseCase(),
+            createReviewInsightUseCase = CreateReviewInsightUseCase(CalculatePlanPreviewUseCase()),
             resolvePricingStrategyUseCase = ResolvePricingStrategyUseCase()
         )
     }
@@ -63,7 +63,7 @@ class HomeViewModelTest {
     fun `saveReview successfully saves review and updates state`() = runTest {
         // Given a plan exists
         val currentPlan = SalaryPlan(
-            focus = PlanningFocus.BALANCED,
+            focus = PlanningFocus.SAVE_WITHOUT_STRESS,
             netIncomePerPayday = BigDecimal("1000"),
             monthlyFixedCosts = BigDecimal("400"),
             payFrequency = PayFrequency.MONTHLY,
@@ -95,7 +95,7 @@ class HomeViewModelTest {
     @Test
     fun `saveReview with empty fields sets error state`() = runTest {
         val currentPlan = SalaryPlan(
-            focus = PlanningFocus.BALANCED,
+            focus = PlanningFocus.SAVE_WITHOUT_STRESS,
             netIncomePerPayday = BigDecimal("1000"),
             monthlyFixedCosts = BigDecimal("400"),
             payFrequency = PayFrequency.MONTHLY,
@@ -123,7 +123,7 @@ class HomeViewModelTest {
 class FakePlannerRepository : PlannerRepository {
     private val planFlow = MutableStateFlow<SalaryPlan?>(null)
     private val reviewFlow = MutableStateFlow<ManualReview?>(null)
-    private val reminderFlow = MutableStateFlow(ReminderConfiguration(false, 9, 0, ReminderCadence.PAYDAYS))
+    private val reminderFlow = MutableStateFlow(ReminderConfiguration(false, 9, 0, ReminderCadence.PAYDAY))
     private var isOnboardingCompletedState = false
 
     override fun observePlan(): MutableStateFlow<SalaryPlan?> = planFlow
@@ -131,19 +131,16 @@ class FakePlannerRepository : PlannerRepository {
     
     override fun observeLatestReview(): MutableStateFlow<ManualReview?> = reviewFlow
     override suspend fun saveReview(review: ManualReview) { reviewFlow.emit(review) }
-    override suspend fun getReviewHistory(limit: Int): List<ManualReview> = listOfNotNull(reviewFlow.value)
+    override fun loadLatestReview(): ManualReview? = reviewFlow.value
     
     override fun observeReminderConfiguration(): MutableStateFlow<ReminderConfiguration> = reminderFlow
     override suspend fun saveReminderConfiguration(config: ReminderConfiguration) { reminderFlow.emit(config) }
-    override suspend fun loadReminderConfiguration(): ReminderConfiguration = reminderFlow.value
+    override fun loadReminderConfiguration(): ReminderConfiguration = reminderFlow.value
     
     override fun isOnboardingCompleted(): Boolean = isOnboardingCompletedState
     override suspend fun setOnboardingCompleted(completed: Boolean) { isOnboardingCompletedState = completed }
-    override suspend fun clearAllData() {
-        planFlow.emit(null)
-        reviewFlow.emit(null)
-        isOnboardingCompletedState = false
-    }
+    override fun loadPlan(): pt.ms.myshare.domain.model.SalaryPlan? = planFlow.value
+    override suspend fun clearPlan() { planFlow.emit(null) }
 }
 
 class TestFakeEntitlementRepository : EntitlementRepository {

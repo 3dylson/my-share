@@ -25,6 +25,10 @@ data class SalaryPlan(
     val preset: AllocationPreset,
     val goalName: String,
     val goalAmount: BigDecimal,
+    val flexibleSpend: BigDecimal? = null,
+    val savings: BigDecimal? = null,
+    val investing: BigDecimal? = null,
+    val crypto: BigDecimal? = null,
     val createdAt: LocalDate = LocalDate.now()
 )
 

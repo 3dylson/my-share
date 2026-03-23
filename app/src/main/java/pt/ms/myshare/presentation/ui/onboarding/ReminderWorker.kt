@@ -23,7 +23,11 @@ class ReminderWorker(
     params: WorkerParameters
 ) : Worker(context, params) {
 
-    private val plannerRepository = PlannerRepositoryImpl(context)
+    private val plannerRepository = PlannerRepositoryImpl(
+        context,
+        com.google.firebase.auth.FirebaseAuth.getInstance(),
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+    )
     private val calculatePlanPreviewUseCase = CalculatePlanPreviewUseCase()
     private val buildPaydayNotificationMessageUseCase = BuildPaydayNotificationMessageUseCase(calculatePlanPreviewUseCase)
 

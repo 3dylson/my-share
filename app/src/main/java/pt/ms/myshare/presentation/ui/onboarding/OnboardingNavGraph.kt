@@ -31,7 +31,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
         composable(OnboardingRoute.Welcome.route) {
             WelcomeScreen(
                 onContinue = { navController.navigate(OnboardingRoute.GoalPicker.route) },
-                onSkip = { viewModel.completeOnboardingWithoutPremium() }
+                onSkip = { viewModel.completeOnboarding() }
             )
         }
         composable(OnboardingRoute.GoalPicker.route) {
@@ -73,10 +73,32 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                 onBack = { navController.popBackStack() },
                 onNext = { fixedCosts, preset ->
                     if (viewModel.setFixedCostsAndBuild(fixedCosts, preset)) {
-                        navController.navigate(OnboardingRoute.PlanPreview.route)
+                        navController.navigate(OnboardingRoute.AllocationPriorities.route)
                     }
                 }
             )
+        }
+        composable(OnboardingRoute.AllocationPriorities.route) {
+            val preview = state.planPreview
+            if (preview != null) {
+                val totalAvailable = preview.incomePerPayday - preview.fixedCostsPerPayday - preview.debtPerPayday
+                AllocationPrioritiesScreen(
+                    initialFlexibleSpend = preview.flexibleSpendPerPayday,
+                    initialSavings = preview.savingsPerPayday,
+                    initialInvesting = preview.investingPerPayday,
+                    initialCrypto = preview.cryptoPerPayday,
+                    totalAvailable = totalAvailable,
+                    onBack = { navController.popBackStack() },
+                    onNext = { flex, sav, inv, cry ->
+                        if (viewModel.setAllocationsAndBuild(flex, sav, inv, cry)) {
+                            navController.navigate(OnboardingRoute.PlanPreview.route)
+                        }
+                    }
+                )
+            } else {
+                // Should not happen organically in the sequence as FixedCosts guarantees preview
+                navController.popBackStack()
+            }
         }
         composable(OnboardingRoute.PlanPreview.route) {
             val preview = state.planPreview
@@ -86,21 +108,52 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                     goalName = state.goalName,
                     goalAmount = state.goalAmount,
                     onAutopilot = {
-                        viewModel.logPaywallViewed()
-                        navController.navigate(OnboardingRoute.Paywall.route)
+                        navController.navigate(OnboardingRoute.Signup.route)
                     },
-                    onNotNow = { navController.navigate(OnboardingRoute.ReminderSetup.route) }
+                    onNotNow = { navController.navigate(OnboardingRoute.Signup.route) }
                 )
             }
         }
+        composable(OnboardingRoute.Signup.route) {
+            LaunchedEffect(Unit) { viewModel.logSignupStarted() }
+            SignupScreen(
+                onSignup = { idToken ->
+                    viewModel.signInWithGoogle(idToken) {
+                        navController.navigate(OnboardingRoute.Trajectory.route)
+                    }
+                },
+                onSkip = {
+                    viewModel.skipSignIn {
+                        navController.navigate(OnboardingRoute.Trajectory.route)
+                    }
+                }
+            )
+        }
+        composable(OnboardingRoute.Trajectory.route) {
+            LaunchedEffect(Unit) { viewModel.logTrajectoryViewed() }
+            TrajectoryScreen(
+                onNext = {
+                    viewModel.logPaywallViewed()
+                    navController.navigate(OnboardingRoute.Paywall.route)
+                }
+            )
+        }
         composable(OnboardingRoute.Paywall.route) {
             val pricing = state.pricingStrategy
+            val isPremium = state.isPremium
+            
+            LaunchedEffect(isPremium) {
+                if (isPremium) {
+                    navController.navigate(OnboardingRoute.ReminderSetup.route)
+                }
+            }
+
             if (pricing != null) {
                 PaywallScreen(
                     pricingStrategy = pricing,
                     selectedPlan = state.selectedBillingPlan,
                     onPlanSelected = viewModel::setSelectedBillingPlan,
-                    onClose = { navController.popBackStack() },
+                    onClose = { navController.navigate(OnboardingRoute.ReminderSetup.route) },
                     onRestore = {
                         viewModel.restorePurchases { restored ->
                             if (restored) {
@@ -108,14 +161,30 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                             }
                         }
                     },
-                    onPurchaseSelected = { viewModel.unlockPremium { navController.navigate(OnboardingRoute.ReminderSetup.route) } }
+                    onPurchaseSelected = { activity -> viewModel.purchasePremium(activity) }
                 )
             }
         }
         composable(OnboardingRoute.ReminderSetup.route) {
             ReminderSetupScreen(
-                onConfirm = { time, cadence -> viewModel.saveReminderConfiguration(time, cadence) },
-                onSkip = { viewModel.skipReminderConfiguration() }
+                onConfirm = { time, cadence ->
+                    viewModel.saveReminderConfiguration(time, cadence)
+                    navController.navigate(OnboardingRoute.BankSyncOptional.route)
+                },
+                onSkip = {
+                    viewModel.skipReminderConfiguration()
+                    navController.navigate(OnboardingRoute.BankSyncOptional.route)
+                }
+            )
+        }
+        composable(OnboardingRoute.BankSyncOptional.route) {
+            LaunchedEffect(Unit) { viewModel.logBankSyncPromptShown() }
+            BankSyncOptionalScreen(
+                onSync = { viewModel.completeOnboarding() },
+                onSkip = { 
+                    viewModel.logBankSyncSkipped()
+                    viewModel.completeOnboarding() 
+                }
             )
         }
     }

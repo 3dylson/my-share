@@ -20,6 +20,7 @@ import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.domain.model.ReminderConfiguration
 import pt.ms.myshare.domain.model.SalaryPlan
+import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
@@ -37,6 +38,7 @@ import javax.inject.Inject
 class OnboardingViewModel @Inject constructor(
     private val plannerRepository: PlannerRepository,
     private val entitlementRepository: EntitlementRepository,
+    private val authRepository: AuthRepository,
     private val calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase,
     private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase,
     private val workManager: WorkManager
@@ -103,6 +105,23 @@ class OnboardingViewModel @Inject constructor(
         return buildPreview()
     }
 
+    fun setAllocationsAndBuild(
+        flexibleSpend: BigDecimal,
+        savings: BigDecimal,
+        investing: BigDecimal,
+        crypto: BigDecimal
+    ): Boolean {
+        state.update {
+            it.copy(
+                allocatedFlexibleSpend = flexibleSpend,
+                allocatedSavings = savings,
+                allocatedInvesting = investing,
+                allocatedCrypto = crypto
+            )
+        }
+        return buildPreview()
+    }
+
     fun buildPreview(): Boolean {
         val current = state.value
         val income = current.netIncomePerPayday ?: return false
@@ -124,18 +143,41 @@ class OnboardingViewModel @Inject constructor(
         state.update { it.copy(selectedBillingPlan = plan) }
     }
 
-    fun unlockPremium(onUnlocked: () -> Unit) {
+    fun purchasePremium(activity: android.app.Activity) {
+        val storeProductId = if (state.value.selectedBillingPlan == BillingPlan.ANNUAL) "myshare_annual" else "myshare_monthly"
+        val product = pt.ms.myshare.domain.model.StoreProduct(storeProductId, "Premium", "Unlock premium features", "$0.00", "subs", null)
+        
         viewModelScope.launch {
-            entitlementRepository.setPro(true)
-            state.update { it.copy(isPremium = true) }
-            FirebaseUtils.logEvent("trial_started", Bundle().apply {
+            FirebaseUtils.logEvent("purchase_started", Bundle().apply {
                 putString("billing_plan", state.value.selectedBillingPlan.name.lowercase(Locale.US))
                 putString("price_cluster", state.value.pricingStrategy?.marketCluster)
             })
-            onUnlocked()
+            entitlementRepository.purchasePlan(activity, product)
         }
     }
 
+
+    fun signInWithGoogle(idToken: String, onComplete: () -> Unit) {
+        viewModelScope.launch {
+            authRepository.signInWithGoogle(idToken)
+                .onSuccess {
+                    FirebaseUtils.logEvent("signup_completed")
+                    plannerRepository.loadPlan()?.let { plan ->
+                        plannerRepository.savePlan(plan)
+                    }
+                    onComplete()
+                }
+                .onFailure { error ->
+                    Timber.tag(TAG).e(error, "Sign in failed")
+                    state.update { it.copy(error = "Sign in failed. Please try again or continue locally.") }
+                }
+        }
+    }
+
+    fun skipSignIn(onComplete: () -> Unit) {
+        FirebaseUtils.logEvent("signup_skipped")
+        onComplete()
+    }
 
     fun restorePurchases(onRestored: (Boolean) -> Unit) {
         viewModelScope.launch {
@@ -146,10 +188,11 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    fun completeOnboardingWithoutPremium() {
+    fun completeOnboarding() {
         viewModelScope.launch {
             plannerRepository.setOnboardingCompleted(true)
             state.update { it.copy(onboardingCompleted = true) }
+            FirebaseUtils.logEvent("onboarding_completed")
         }
     }
 
@@ -164,8 +207,6 @@ class OnboardingViewModel @Inject constructor(
                 )
             )
             scheduleReminderWork()
-            plannerRepository.setOnboardingCompleted(true)
-            state.update { it.copy(onboardingCompleted = true) }
             FirebaseUtils.logEvent("reminder_enabled")
         }
     }
@@ -173,8 +214,7 @@ class OnboardingViewModel @Inject constructor(
     fun skipReminderConfiguration() {
         viewModelScope.launch {
             plannerRepository.saveReminderConfiguration(ReminderConfiguration(enabled = false))
-            plannerRepository.setOnboardingCompleted(true)
-            state.update { it.copy(onboardingCompleted = true) }
+            FirebaseUtils.logEvent("reminder_skipped")
         }
     }
 
@@ -183,6 +223,22 @@ class OnboardingViewModel @Inject constructor(
             putString("price_cluster", state.value.pricingStrategy?.marketCluster)
             putString("billing_plan", state.value.selectedBillingPlan.name.lowercase(Locale.US))
         })
+    }
+
+    fun logSignupStarted() {
+        FirebaseUtils.logEvent("signup_started")
+    }
+
+    fun logTrajectoryViewed() {
+        FirebaseUtils.logEvent("trajectory_viewed")
+    }
+
+    fun logBankSyncPromptShown() {
+        FirebaseUtils.logEvent("bank_sync_prompt_shown")
+    }
+
+    fun logBankSyncSkipped() {
+        FirebaseUtils.logEvent("bank_sync_skipped")
     }
 
     private fun buildPlan(current: OnboardingState, income: BigDecimal, fixedCosts: BigDecimal): SalaryPlan? {
@@ -203,7 +259,11 @@ class OnboardingViewModel @Inject constructor(
             nextBiweeklyPayday = nextBiweeklyPayday,
             preset = current.preset,
             goalName = current.goalName,
-            goalAmount = current.goalAmount
+            goalAmount = current.goalAmount,
+            flexibleSpend = current.allocatedFlexibleSpend,
+            savings = current.allocatedSavings,
+            investing = current.allocatedInvesting,
+            crypto = current.allocatedCrypto
         )
     }
 

@@ -9,6 +9,7 @@ import pt.ms.myshare.domain.model.PaySchedule
 import pt.ms.myshare.domain.model.PlanInput
 import java.math.BigDecimal
 import java.time.LocalDate
+import androidx.core.content.edit
 
 /**
  * Lightweight SharedPreferences storage for onboarding + autopilot reminder inputs.
@@ -36,29 +37,30 @@ object OnboardingPrefs {
     }
 
     fun setOnboardingCompleted(context: Context, completed: Boolean) {
-        prefs(context).edit().putBoolean(KEY_ONBOARDING_COMPLETED, completed).apply()
+        prefs(context).edit { putBoolean(KEY_ONBOARDING_COMPLETED, completed) }
     }
 
     fun savePlanInput(context: Context, input: PlanInput) {
-        val editor = prefs(context).edit()
-        editor.putString(KEY_GOAL_TYPE, input.goal.type.name)
-        editor.putString(KEY_GOAL_AMOUNT, input.goal.amount.toPlainString())
-        editor.putString(KEY_GOAL_LABEL, input.goal.label ?: "")
-        editor.putString(KEY_NET_SALARY, input.netSalary.toPlainString())
-        editor.putString(KEY_PRESET, input.preset.name)
-        when (val schedule = input.schedule) {
-            is PaySchedule.Monthly -> {
-                editor.putString(KEY_SCHEDULE_TYPE, SCHEDULE_MONTHLY)
-                editor.putInt(KEY_SCHEDULE_DAY_OF_MONTH, schedule.dayOfMonth)
-                editor.remove(KEY_SCHEDULE_NEXT_PAYDAY_EPOCH)
-            }
-            is PaySchedule.BiWeekly -> {
-                editor.putString(KEY_SCHEDULE_TYPE, SCHEDULE_BIWEEKLY)
-                editor.putLong(KEY_SCHEDULE_NEXT_PAYDAY_EPOCH, schedule.nextPayday.toEpochDay())
-                editor.remove(KEY_SCHEDULE_DAY_OF_MONTH)
+        prefs(context).edit {
+            putString(KEY_GOAL_TYPE, input.goal.type.name)
+            putString(KEY_GOAL_AMOUNT, input.goal.amount.toPlainString())
+            putString(KEY_GOAL_LABEL, input.goal.label ?: "")
+            putString(KEY_NET_SALARY, input.netSalary.toPlainString())
+            putString(KEY_PRESET, input.preset.name)
+            when (val schedule = input.schedule) {
+                is PaySchedule.Monthly -> {
+                    putString(KEY_SCHEDULE_TYPE, SCHEDULE_MONTHLY)
+                    putInt(KEY_SCHEDULE_DAY_OF_MONTH, schedule.dayOfMonth)
+                    remove(KEY_SCHEDULE_NEXT_PAYDAY_EPOCH)
+                }
+
+                is PaySchedule.BiWeekly -> {
+                    putString(KEY_SCHEDULE_TYPE, SCHEDULE_BIWEEKLY)
+                    putLong(KEY_SCHEDULE_NEXT_PAYDAY_EPOCH, schedule.nextPayday.toEpochDay())
+                    remove(KEY_SCHEDULE_DAY_OF_MONTH)
+                }
             }
         }
-        editor.apply()
     }
 
     fun loadPlanInput(context: Context): PlanInput? {
@@ -100,9 +102,10 @@ object OnboardingPrefs {
         * For bi-weekly scheduling, the Worker advances the next payday after firing.
         */
     fun updateNextBiWeeklyPayday(context: Context, nextPayday: LocalDate) {
-        prefs(context).edit().putString(KEY_SCHEDULE_TYPE, SCHEDULE_BIWEEKLY)
-            .putLong(KEY_SCHEDULE_NEXT_PAYDAY_EPOCH, nextPayday.toEpochDay())
-            .apply()
+        prefs(context).edit {
+            putString(KEY_SCHEDULE_TYPE, SCHEDULE_BIWEEKLY)
+                .putLong(KEY_SCHEDULE_NEXT_PAYDAY_EPOCH, nextPayday.toEpochDay())
+        }
     }
 
     private fun prefs(context: Context) = PreferenceManager.getDefaultSharedPreferences(context)

@@ -180,10 +180,13 @@ class HomeViewModel @Inject constructor(
         uiState.update { it.copy(moreCard = it.moreCard.copy(selectedBillingPlan = plan)) }
     }
 
-    fun unlockPremium() {
+    fun unlockPremium(activity: android.app.Activity) {
+        val storeProductId = if (uiState.value.moreCard.selectedBillingPlan == BillingPlan.ANNUAL) "myshare_annual" else "myshare_monthly"
+        val product = pt.ms.myshare.domain.model.StoreProduct(storeProductId, "Premium", "Unlock premium features", "$0.00", "subs", null)
+
         viewModelScope.launch {
-            entitlementRepository.setPro(true)
-            FirebaseUtils.logEvent("purchase_completed")
+            entitlementRepository.purchasePlan(activity, product)
+            FirebaseUtils.logEvent("purchase_started")
         }
     }
 
