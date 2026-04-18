@@ -68,7 +68,7 @@ fun PlanPreviewScreen(
                     PremiumMetricCard(
                         label = "Initial Balance",
                         value = currency.format(preview.incomePerPayday),
-                        description = preview.summary
+                        subtitle = preview.summary
                     )
                 }
 
@@ -83,7 +83,7 @@ fun PlanPreviewScreen(
                             label = "Flexible", 
                             value = currency.format(preview.flexibleSpendPerPayday), 
                             modifier = Modifier.weight(1f),
-                            description = "${currency.format(preview.weeklyFlexibleSpend)} / week"
+                            subtitle = "${currency.format(preview.weeklyFlexibleSpend)} / week"
                         )
                     }
                 }
@@ -243,6 +243,7 @@ fun PaywallScreen(
                 PremiumPaywallCard(
                     title = "Monthly",
                     price = pricingStrategy.monthlyLabel,
+                    period = "month",
                     description = "Flexible commitment",
                     isSelected = selectedPlan == BillingPlan.MONTHLY,
                     onClick = { onPlanSelected(BillingPlan.MONTHLY) }
@@ -250,9 +251,9 @@ fun PaywallScreen(
                 PremiumPaywallCard(
                     title = "Annual",
                     price = pricingStrategy.annualLabel,
+                    period = "year",
                     description = "Best value for long-term growth",
                     isSelected = selectedPlan == BillingPlan.ANNUAL,
-                    isTrialEligible = true,
                     onClick = { onPlanSelected(BillingPlan.ANNUAL) }
                 )
             }

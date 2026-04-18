@@ -69,7 +69,7 @@ fun FixedCostsScreen(
                 label = "Monthly Fixed Costs",
                 placeholder = "0.00",
                 prefix = { Text("€ ") },
-                error = if (fixedCostsText.isNotEmpty() && fixedCosts == null) "Invalid amount" else null
+                isError = fixedCostsText.isNotEmpty() && fixedCosts == null
             )
 
             if (fixedCostsText.isNotEmpty() && fixedCosts == null) {

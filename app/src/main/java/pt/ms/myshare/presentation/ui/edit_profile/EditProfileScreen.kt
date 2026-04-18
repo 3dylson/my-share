@@ -4,33 +4,14 @@ import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,11 +24,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import pt.ms.myshare.R
-import pt.ms.myshare.presentation.ui.theme.MyShareTheme
+import pt.ms.myshare.presentation.ui.components.PremiumButton
+import pt.ms.myshare.presentation.ui.components.PremiumSectionHeader
+import pt.ms.myshare.presentation.ui.components.PremiumTextField
+import pt.ms.myshare.presentation.ui.theme.*
 
 @Composable
 fun EditProfileRoute(
@@ -104,16 +89,26 @@ fun EditProfileScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(id = R.string.edit_profile_label)) },
+            CenterAlignedTopAppBar(
+                title = { 
+                    Text(
+                        stringResource(id = R.string.edit_profile_label),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Black
+                    ) 
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null // stringResource(id = R.string.cd_back_button)
+                            contentDescription = "Back",
+                            tint = MySharePrimary
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
@@ -123,149 +118,103 @@ fun EditProfileScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(16.dp)
+                    .padding(horizontal = 24.dp)
                     .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
+                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                OutlinedTextField(
+                Spacer(Modifier.height(8.dp))
+                
+                PremiumSectionHeader(title = "Salary Details")
+                
+                PremiumTextField(
                     value = uiState.netSalary,
                     onValueChange = onNetSalaryChange,
-                    label = { Text(stringResource(id = R.string.your_net_salary_label, "")) },
-                    visualTransformation = CurrencyVisualTransformation(locale),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = !uiState.isLoading
+                    label = stringResource(id = R.string.your_net_salary_label, ""),
+                    placeholder = "0.00"
+                    // visualTransformation = CurrencyVisualTransformation(locale), // Keep transformation if possible
                 )
-                Spacer(modifier = Modifier.height(16.dp))
-                OutlinedTextField(
+
+                PremiumSectionHeader(title = "Allocations")
+                
+                PremiumTextField(
                     value = uiState.netSalaryPercentage,
                     onValueChange = onNetSalaryPercentageChange,
-                    label = { Text(stringResource(id = R.string.investments_savings_percentage_label)) },
-                    visualTransformation = PercentageVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth(),
-                    isError = uiState.netSalaryPercentageError != null,
-                    supportingText = { uiState.netSalaryPercentageError?.let { Text(it) } },
-                    enabled = !uiState.isLoading
+                    label = stringResource(id = R.string.investments_savings_percentage_label),
+                    placeholder = "0%",
+                    isError = uiState.netSalaryPercentageError != null
                 )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                val stockLabel = stringResource(id = R.string.percentage_stocks_label)
-                val stockAnnotatedString = buildAnnotatedString {
-                    val parts = stockLabel.split("<b>", "</b>")
-                    append(parts[0])
-                    if (parts.size > 1) {
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(parts[1])
-                        }
-                        if (parts.size > 2) {
-                            append(parts[2])
-                        }
-                    }
+                uiState.netSalaryPercentageError?.let { 
+                    Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) 
                 }
-                OutlinedTextField(
+
+                PremiumTextField(
                     value = uiState.stockPercentage,
                     onValueChange = onStockPercentageChange,
-                    label = { Text(stockAnnotatedString) },
-                    visualTransformation = PercentageVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth(),
-                    isError = uiState.stockPercentageError != null,
-                    supportingText = { uiState.stockPercentageError?.let { Text(it) } },
-                    enabled = !uiState.isLoading
+                    label = "Stocks Allocation",
+                    placeholder = "0%",
+                    isError = uiState.stockPercentageError != null
                 )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                val cryptoLabel = stringResource(id = R.string.percentage_crypto_label)
-                val cryptoAnnotatedString = buildAnnotatedString {
-                    val parts = cryptoLabel.split("<b>", "</b>")
-                    append(parts[0])
-                    if (parts.size > 1) {
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(parts[1])
-                        }
-                        if (parts.size > 2) {
-                            append(parts[2])
-                        }
-                    }
+                uiState.stockPercentageError?.let { 
+                    Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) 
                 }
-                OutlinedTextField(
+
+                PremiumTextField(
                     value = uiState.cryptoPercentage,
                     onValueChange = onCryptoPercentageChange,
-                    label = { Text(cryptoAnnotatedString) },
-                    visualTransformation = PercentageVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth(),
-                    isError = uiState.cryptoPercentageError != null,
-                    supportingText = { uiState.cryptoPercentageError?.let { Text(it) } },
-                    enabled = !uiState.isLoading
+                    label = "Crypto Allocation",
+                    placeholder = "0%",
+                    isError = uiState.cryptoPercentageError != null
                 )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                val savingsLabel = stringResource(id = R.string.percentage_savings_label)
-                val savingsAnnotatedString = buildAnnotatedString {
-                    val parts = savingsLabel.split("<b>", "</b>")
-                    append(parts[0])
-                    if (parts.size > 1) {
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(parts[1])
-                        }
-                        if (parts.size > 2) {
-                            append(parts[2])
-                        }
-                    }
+                uiState.cryptoPercentageError?.let { 
+                    Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) 
                 }
-                OutlinedTextField(
+
+                PremiumTextField(
                     value = uiState.savingsPercentage,
                     onValueChange = onSavingsPercentageChange,
-                    label = { Text(savingsAnnotatedString) },
-                    visualTransformation = PercentageVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth(),
-                    isError = uiState.savingsPercentageError != null,
-                    supportingText = { uiState.savingsPercentageError?.let { Text(it) } },
-                    enabled = !uiState.isLoading
+                    label = "Savings Allocation",
+                    placeholder = "0%",
+                    isError = uiState.savingsPercentageError != null
                 )
+                uiState.savingsPercentageError?.let { 
+                    Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) 
+                }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                Box(contentAlignment = Alignment.Center) {
-                    Button(
-                        onClick = onSave,
-                        enabled = !uiState.isLoading,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                    ) {
-                        Text(text = stringResource(id = R.string.btn_ep_confirm_text))
-                    }
-                }
+                PremiumButton(
+                    text = stringResource(id = R.string.btn_ep_confirm_text),
+                    onClick = onSave,
+                    isLoading = uiState.isLoading
+                )
+                
+                Spacer(modifier = Modifier.height(32.dp))
             }
+            
             if (uiState.isLoading) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.5f))
+                        .background(Color.Black.copy(alpha = 0.3f))
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null
                         ) {},
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(color = MySharePrimary)
                 }
             }
         }
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 fun EditProfileScreenPreview() {
     MyShareTheme {
         EditProfileScreen(
-            uiState = EditProfileState(isLoading = true),
+            uiState = EditProfileState(isLoading = false),
             onNetSalaryChange = {},
             onNetSalaryPercentageChange = {},
             onStockPercentageChange = {},

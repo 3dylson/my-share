@@ -60,7 +60,7 @@ fun TrajectoryScreen(
                         label = "Payday Allocation",
                         value = it.summary,
                         icon = Icons.Default.Savings,
-                        description = "This is what stays with you after all obligations are met."
+                        subtitle = "This is what stays with you after all obligations are met."
                     )
                     
                     it.goalTargetDate?.let { date ->
@@ -69,7 +69,7 @@ fun TrajectoryScreen(
                             label = "Goal Achievement",
                             value = dateString,
                             icon = Icons.Default.Event,
-                            description = "Estimated date to reach your € ${goalName} target."
+                            subtitle = "Estimated date to reach your € ${goalName} target."
                         )
                     }
                 }

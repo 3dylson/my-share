@@ -18,6 +18,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.components.PremiumPaywallCard
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import pt.ms.myshare.presentation.ui.theme.*
 
 @Composable
@@ -42,152 +45,150 @@ fun PaywallScreen(
 
     LaunchedEffect(availableProducts) {
         if (selectedProduct == null && availableProducts.isNotEmpty()) {
-            selectedProduct = availableProducts.first()
+            selectedProduct = availableProducts.find { it.name.contains("Year", ignoreCase = true) } ?: availableProducts.first()
         }
     }
 
-    Surface(
-        color = MaterialTheme.colorScheme.background,
-        modifier = Modifier.fillMaxSize()
-    ) {
+    Scaffold(
+        containerColor = MyShareBackground,
+        topBar = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(onClick = onBack) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close",
+                        tint = MyShareSecondary
+                    )
+                }
+            }
+        }
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(padding)
                 .padding(horizontal = 24.dp)
                 .verticalScroll(scrollState)
         ) {
-            Spacer(Modifier.height(16.dp))
-            
-            IconButton(
-                onClick = onBack,
-                modifier = Modifier.align(Alignment.End)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Close, 
-                    contentDescription = "Close",
-                    tint = MyShareSecondary
-                )
-            }
-            
-            Spacer(Modifier.height(8.dp))
-            
             Text(
-                "Unlock Unlimited Potential", 
+                "Master Your Share",
                 style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.ExtraBold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
-                lineHeight = 40.sp,
-                color = MyShareOnSurface
+                fontWeight = FontWeight.Black,
+                color = MyShareOnSurface,
+                letterSpacing = (-1).sp
             )
             
             Text(
-                "Experience the full power of My Share and master your finances with precision.", 
-                color = MyShareSecondary,
+                "Unlock the full system and automate your path to financial freedom.",
                 style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                lineHeight = 24.sp
+                color = MyShareSecondary,
+                modifier = Modifier.padding(top = 8.dp, bottom = 32.dp),
+                lineHeight = 26.sp
             )
 
-            Spacer(Modifier.height(40.dp))
-            
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                FeatureRow("Unlimited Intentional Goals")
-                FeatureRow("Advanced Rule Presets & Logic")
-                FeatureRow("Full 12-Month Trajectory History")
-                FeatureRow("Ad-Free, Focused Experience")
-                FeatureRow("Priority Cloud Sync")
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                FeatureRow("Unlimited Intentional Goals", "Build savings for everything that matters.")
+                FeatureRow("Live Rule Automation", "Get notified exactly what to do on payday.")
+                FeatureRow("Advanced Analytics", "Track your wealth trajectory over 12 months.")
+                FeatureRow("Priority Support", "Direct access to our financial design team.")
             }
 
             Spacer(Modifier.height(48.dp))
 
             if (isLoading) {
-                Box(modifier = Modifier.fillMaxWidth().height(150.dp), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier.fillMaxWidth().height(200.dp),
+                    contentAlignment = Alignment.Center
+                ) {
                     CircularProgressIndicator(color = MySharePrimary)
                 }
             } else {
-                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    availableProducts.forEach { product ->
-                        PremiumPaywallCard(
-                            title = product.name,
-                            price = product.price,
-                            description = if (product.name.contains("Year", ignoreCase = true)) "Best value for long-term growth" else "Flexible monthly commitment",
-                            isSelected = selectedProduct?.id == product.id,
-                            isTrialEligible = product.id.contains("trial", ignoreCase = true),
-                            onClick = { selectedProduct = product }
-                        )
-                    }
-                }
-
-                if (availableProducts.isEmpty()) {
-                    Text(
-                        "Updating premium plans...",
-                        color = MyShareSecondary,
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
-                        textAlign = TextAlign.Center
+                availableProducts.forEach { product ->
+                    val isAnnual = product.name.contains("Year", ignoreCase = true)
+                    val period = if (isAnnual) "year" else "month"
+                    
+                    PremiumPaywallCard(
+                        title = product.name,
+                        price = product.price,
+                        period = period,
+                        description = if (isAnnual) "Focus on long-term wealth" else "Start small, expand later",
+                        badge = if (isAnnual) "BEST VALUE" else null,
+                        isSelected = selectedProduct?.productId == product.productId,
+                        onClick = { selectedProduct = product },
+                        modifier = Modifier.padding(bottom = 16.dp)
                     )
                 }
             }
 
-            Spacer(Modifier.weight(1f))
-            Spacer(Modifier.height(40.dp))
+            Spacer(Modifier.height(24.dp))
 
             selectedProduct?.let { product ->
                 PremiumButton(
-                    text = "Unlock Premium Now",
+                    text = "Upgrade Now",
                     onClick = { activity?.let { viewModel.purchasePlan(it, product) } }
                 )
-            } ?: PremiumButton(
-                text = "Loading Plans...",
-                onClick = {},
-                enabled = false
-            )
+            }
 
             TextButton(
                 onClick = { viewModel.restorePurchases() },
-                modifier = Modifier.fillMaxWidth().height(48.dp)
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
             ) {
                 Text(
-                    "Restore Purchases", 
+                    "Restore Purchases",
                     style = MaterialTheme.typography.labelLarge,
                     color = MyShareSecondary
                 )
             }
-            
-            Spacer(Modifier.height(24.dp))
-            
+
             Text(
                 "Recurring billing. Cancel anytime in Store settings.",
                 style = MaterialTheme.typography.labelSmall,
-                color = MyShareSecondary.copy(alpha = 0.6f),
+                color = MyShareSecondary.copy(alpha = 0.5f),
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp)
             )
-            
-            Spacer(Modifier.height(32.dp))
         }
     }
 }
 
 @Composable
-private fun FeatureRow(text: String) {
+private fun FeatureRow(title: String, subtitle: String) {
     Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
+        verticalAlignment = Alignment.Top,
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Icon(
-            imageVector = Icons.Default.CheckCircle, 
-            contentDescription = null,
-            tint = MySharePrimary,
-            modifier = Modifier.size(24.dp)
-        )
+        Box(
+            modifier = Modifier
+                .size(24.dp)
+                .clip(RoundedCornerShape(6.dp))
+                .background(MySharePrimary.copy(alpha = 0.1f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.CheckCircle,
+                contentDescription = null,
+                tint = MySharePrimary,
+                modifier = Modifier.size(16.dp)
+            )
+        }
         Spacer(Modifier.width(16.dp))
-        Text(
-            text = text, 
-            style = MaterialTheme.typography.bodyLarge,
-            color = MyShareOnSurface,
-            fontWeight = FontWeight.Medium
-        )
+        Column {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MyShareOnSurface,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = MyShareSecondary
+            )
+        }
     }
 }

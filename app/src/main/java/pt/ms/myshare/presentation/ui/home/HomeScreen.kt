@@ -3,6 +3,10 @@ package pt.ms.myshare.presentation.ui.home
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoGraph
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.outlined.AutoGraph
 import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.Flag
@@ -11,6 +15,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -18,7 +23,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import pt.ms.myshare.domain.model.BillingPlan
-import pt.ms.myshare.presentation.ui.theme.MyShareTheme
+import androidx.compose.material.icons.filled.*
+import pt.ms.myshare.presentation.ui.components.*
+import pt.ms.myshare.presentation.ui.theme.*
 
 @Composable
 fun HomeRoute(
@@ -55,35 +62,47 @@ fun HomeScreen(
     val activity = androidx.activity.compose.LocalActivity.current
     Scaffold(
         modifier = modifier,
+        containerColor = MyShareBackground,
         topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text("My Share")
-                        Text(
-                            "When money comes in, know what to do next.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            )
+            Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 20.dp)) {
+                PremiumAppHeader(
+                    title = "My Share",
+                    subtitle = "Financial clarity, simplified."
+                )
+            }
         },
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.surface,
+                tonalElevation = 8.dp
+            ) {
                 HomeDestination.entries.forEach { destination ->
+                    val isSelected = state.selectedDestination == destination
                     NavigationBarItem(
-                        selected = state.selectedDestination == destination,
+                        selected = isSelected,
                         onClick = { onDestinationSelected(destination) },
                         icon = {
-                            when (destination) {
-                                HomeDestination.PLAN -> Icon(Icons.Outlined.CalendarToday, contentDescription = null)
-                                HomeDestination.GOALS -> Icon(Icons.Outlined.Flag, contentDescription = null)
-                                HomeDestination.REVIEW -> Icon(Icons.Outlined.AutoGraph, contentDescription = null)
-                                HomeDestination.MORE -> Icon(Icons.Outlined.MoreHoriz, contentDescription = null)
+                            val icon = when (destination) {
+                                HomeDestination.PLAN -> if (isSelected) Icons.Filled.CalendarToday else Icons.Outlined.CalendarToday
+                                HomeDestination.GOALS -> if (isSelected) Icons.Filled.Flag else Icons.Outlined.Flag
+                                HomeDestination.REVIEW -> if (isSelected) Icons.Filled.AutoGraph else Icons.Outlined.AutoGraph
+                                HomeDestination.MORE -> if (isSelected) Icons.Filled.MoreHoriz else Icons.Outlined.MoreHoriz
                             }
+                            Icon(icon, contentDescription = null)
                         },
-                        label = { Text(destination.name.lowercase().replaceFirstChar(Char::titlecase)) }
+                        label = { 
+                            Text(
+                                destination.name.lowercase().replaceFirstChar(Char::titlecase),
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                            ) 
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MySharePrimary,
+                            selectedTextColor = MySharePrimary,
+                            unselectedIconColor = MyShareSecondary,
+                            unselectedTextColor = MyShareSecondary,
+                            indicatorColor = MySharePrimaryContainer.copy(alpha = 0.5f)
+                        )
                     )
                 }
             }
@@ -91,193 +110,177 @@ fun HomeScreen(
     ) { innerPadding ->
         if (state.isLoading) {
             Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = MySharePrimary)
             }
             return@Scaffold
         }
 
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(innerPadding),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            item {
-                state.emptyMessage?.let {
-                    HelperCard(title = "Build your first repeat loop", body = it)
-                }
-            }
             when (state.selectedDestination) {
-                HomeDestination.PLAN -> item {
+                HomeDestination.PLAN -> {
                     state.planCard?.let { planCard ->
-                        PlanTab(
-                            planCard = planCard,
-                            emptyMessage = state.emptyMessage
+                        item {
+                            PremiumPlanSummary(
+                                headline = planCard.nextPaydayLabel,
+                                body = planCard.summary
+                            )
+                        }
+                        item {
+                            PremiumSectionHeader(title = "Core Metrics")
+                            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                                PremiumMetricCard(
+                                    label = "Income per payday", 
+                                    value = planCard.incomeLabel,
+                                    icon = Icons.Default.Payments
+                                )
+                                PremiumMetricCard(
+                                    label = "Weekly Guide", 
+                                    value = planCard.weeklySpendLabel,
+                                    subtitle = "Safe to spend every week",
+                                    icon = Icons.Default.AccountBalanceWallet
+                                )
+                            }
+                        }
+                        item {
+                            PremiumSectionHeader(title = "Allocation Preview")
+                            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                                PremiumMetricCard(
+                                    label = "Fixed", 
+                                    value = planCard.fixedCostsLabel, 
+                                    modifier = Modifier.weight(1f),
+                                    color = MyShareSecondary
+                                )
+                                PremiumMetricCard(
+                                    label = "Flexible", 
+                                    value = planCard.flexibleSpendLabel, 
+                                    modifier = Modifier.weight(1f),
+                                    color = MyShareSecondary
+                                )
+                            }
+                        }
+                    }
+                }
+                HomeDestination.GOALS -> {
+                    state.goalCard?.let { goalCard ->
+                        item {
+                            PremiumSectionHeader(title = "Primary Objective")
+                            PremiumMetricCard(
+                                label = goalCard.goalName, 
+                                value = goalCard.goalAmountLabel, 
+                                subtitle = goalCard.targetDateLabel,
+                                icon = Icons.Default.Flag
+                            )
+                        }
+                        item {
+                            PremiumInfoCard(
+                                title = "Design Logic", 
+                                body = goalCard.progressNote,
+                                icon = Icons.Default.TipsAndUpdates,
+                                backgroundColor = MySharePrimary.copy(alpha = 0.05f)
+                            )
+                        }
+                        if (!state.moreCard.isPremium) {
+                            item {
+                                PremiumPaywallCard(
+                                    title = "Unlock Advanced Goals",
+                                    price = "Premium",
+                                    period = "feature",
+                                    description = "Track multiple goals simultaneously and get trajectory predictions.",
+                                    isSelected = false,
+                                    onClick = { onDestinationSelected(HomeDestination.MORE) }
+                                )
+                            }
+                        }
+                    }
+                }
+                HomeDestination.REVIEW -> {
+                    item {
+                        PremiumSectionHeader(title = "The Habit Loop")
+                        PremiumInfoCard(
+                            title = "Manual Check-in", 
+                            body = "Log actual spend vs. blueprint. This feedback loop is the key to financial awareness.",
+                            icon = Icons.Default.HistoryEdu
                         )
                     }
-                }
-                HomeDestination.GOALS -> item {
-                    state.goalCard?.let { goalCard ->
-                        GoalsTab(goalCard = goalCard, isPremium = state.moreCard.isPremium)
+                    item {
+                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                            PremiumTextField(
+                                value = state.reviewCard.actualFlexibleSpend,
+                                onValueChange = onFlexibleSpendChanged,
+                                label = "Actual Flexible Spend",
+                                prefix = { Text("$ ", color = MyShareSecondary) }
+                            )
+                            PremiumTextField(
+                                value = state.reviewCard.actualGoalContribution,
+                                onValueChange = onGoalContributionChanged,
+                                label = "Actual Goal Contribution",
+                                prefix = { Text("$ ", color = MyShareSecondary) }
+                            )
+                            
+                            PremiumButton(
+                                text = "Submit Review",
+                                onClick = onSaveReview,
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
+                        }
                     }
                 }
-                HomeDestination.REVIEW -> item {
-                    ReviewTab(
-                        reviewCard = state.reviewCard,
-                        onFlexibleSpendChanged = onFlexibleSpendChanged,
-                        onGoalContributionChanged = onGoalContributionChanged,
-                        onSaveReview = onSaveReview
-                    )
+                HomeDestination.MORE -> {
+                    item {
+                        PremiumSectionHeader(title = "Global Settings")
+                        PremiumChoiceCard(
+                            title = "Smart Notifications",
+                            description = state.moreCard.reminderLabel,
+                            isSelected = state.moreCard.reminderEnabled,
+                            onClick = { onToggleReminder(!state.moreCard.reminderEnabled) },
+                            icon = Icons.Default.Notifications
+                        )
+                    }
+                    if (!state.moreCard.isPremium) {
+                        item {
+                            PremiumPaywallCard(
+                                title = "Annual Membership",
+                                price = "$49.99",
+                                period = "year",
+                                description = "Unlock automation, multiple goals, and detailed sync.",
+                                badge = "60% OFF",
+                                isSelected = state.moreCard.selectedBillingPlan == BillingPlan.ANNUAL,
+                                onClick = { onBillingPlanSelected(BillingPlan.ANNUAL) }
+                            )
+                        }
+                        item {
+                            PremiumPaywallCard(
+                                title = "Monthly Membership",
+                                price = "$5.99",
+                                period = "month",
+                                description = "Flexible access to all premium features.",
+                                isSelected = state.moreCard.selectedBillingPlan == BillingPlan.MONTHLY,
+                                onClick = { onBillingPlanSelected(BillingPlan.MONTHLY) }
+                            )
+                        }
+                        item {
+                            PremiumButton(
+                                text = "Go Unlimited",
+                                onClick = { activity?.let(onUnlockPremium) },
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
+                        }
+                    } else {
+                        item {
+                            PremiumMetricCard(
+                                label = "Account Level",
+                                value = "Unlimited Access",
+                                subtitle = "Lifetime system mastery active",
+                                icon = Icons.Default.VerifiedUser
+                            )
+                        }
+                    }
                 }
-                HomeDestination.MORE -> item {
-                    MoreTab(
-                        moreCard = state.moreCard,
-                        onToggleReminder = onToggleReminder,
-                        onBillingPlanSelected = onBillingPlanSelected,
-                        onUnlockPremium = { activity?.let(onUnlockPremium) }
-                    )
-                }
             }
-        }
-    }
-}
-
-@Composable
-private fun PlanTab(planCard: HomePlanCardState, emptyMessage: String?) {
-    HelperCard(title = planCard.nextPaydayLabel, body = planCard.summary)
-    MetricCard(title = "Income per payday", value = planCard.incomeLabel)
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-        MetricCard(title = "Fixed costs", value = planCard.fixedCostsLabel, modifier = Modifier.weight(1f))
-        MetricCard(title = "Flexible spend", value = planCard.flexibleSpendLabel, modifier = Modifier.weight(1f))
-    }
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-        MetricCard(title = "Savings", value = planCard.savingsLabel, modifier = Modifier.weight(1f))
-        MetricCard(title = "Investing", value = planCard.investingLabel, modifier = Modifier.weight(1f))
-    }
-    MetricCard(title = "Weekly spend guide", value = planCard.weeklySpendLabel)
-    if (emptyMessage != null) {
-        HelperCard(title = "Why this matters", body = "The research pointed to payday planning, reminders, and manual review as the clearest repeat loop for My Share.")
-    }
-}
-
-@Composable
-private fun GoalsTab(goalCard: GoalCardState, isPremium: Boolean) {
-    MetricCard(title = goalCard.goalName, value = goalCard.goalAmountLabel, supporting = goalCard.targetDateLabel)
-    HelperCard(title = "Free tier", body = goalCard.progressNote)
-    if (!isPremium) {
-        HelperCard(title = "Premium unlocks", body = "Multiple goals, recurring payday rules, and deeper plan-vs-actual history.")
-    }
-}
-
-@Composable
-private fun ReviewTab(
-    reviewCard: ReviewCardState,
-    onFlexibleSpendChanged: (String) -> Unit,
-    onGoalContributionChanged: (String) -> Unit,
-    onSaveReview: () -> Unit
-) {
-    HelperCard(title = "Manual weekly check-in", body = "Log what actually happened. This is the habit loop that the analytics addendum says the current app is missing.")
-    OutlinedTextField(
-        value = reviewCard.actualFlexibleSpend,
-        onValueChange = onFlexibleSpendChanged,
-        modifier = Modifier.fillMaxWidth(),
-        label = { Text("Actual flexible spend") },
-        singleLine = true
-    )
-    OutlinedTextField(
-        value = reviewCard.actualGoalContribution,
-        onValueChange = onGoalContributionChanged,
-        modifier = Modifier.fillMaxWidth(),
-        label = { Text("Actual goal contribution") },
-        singleLine = true
-    )
-    reviewCard.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-    Button(
-        onClick = onSaveReview,
-        modifier = Modifier.fillMaxWidth().height(56.dp),
-        shape = MaterialTheme.shapes.medium
-    ) {
-        Text("Save review", fontSize = 16.sp, fontWeight = FontWeight.Medium)
-    }
-    reviewCard.savedReviewDate?.let { Text("Last saved $it", style = MaterialTheme.typography.bodyMedium) }
-    reviewCard.insight?.let { insight ->
-        MetricCard(title = insight.headline, value = insight.supportingText)
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-            MetricCard(title = "Spend delta", value = insight.flexibleSpendDelta.toPlainString(), modifier = Modifier.weight(1f))
-            MetricCard(title = "Goal delta", value = insight.goalContributionDelta.toPlainString(), modifier = Modifier.weight(1f))
-        }
-    }
-}
-
-@Composable
-private fun MoreTab(
-    moreCard: MoreCardState,
-    onToggleReminder: (Boolean) -> Unit,
-    onBillingPlanSelected: (BillingPlan) -> Unit,
-    onUnlockPremium: () -> Unit
-) {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text("Payday reminders", style = MaterialTheme.typography.titleMedium)
-            Text(moreCard.reminderLabel, style = MaterialTheme.typography.bodyMedium)
-        }
-        Switch(checked = moreCard.reminderEnabled, onCheckedChange = onToggleReminder)
-    }
-    if (!moreCard.isPremium) {
-        moreCard.pricingStrategy?.let { pricing ->
-            HelperCard(title = pricing.paywallHeadline, body = pricing.paywallSubhead)
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                FilterChip(
-                    selected = moreCard.selectedBillingPlan == BillingPlan.MONTHLY,
-                    onClick = { onBillingPlanSelected(BillingPlan.MONTHLY) },
-                    label = { Text(pricing.monthlyLabel) }
-                )
-                FilterChip(
-                    selected = moreCard.selectedBillingPlan == BillingPlan.ANNUAL,
-                    onClick = { onBillingPlanSelected(BillingPlan.ANNUAL) },
-                    label = { Text(pricing.annualLabel) }
-                )
-            }
-            Button(
-                onClick = onUnlockPremium,
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Text("Unlock Premium", fontSize = 16.sp, fontWeight = FontWeight.Medium)
-            }
-        }
-    } else {
-        MetricCard(title = "Premium active", value = "Recurring rules, reminders, and deeper review are unlocked.")
-    }
-}
-
-@Composable
-private fun MetricCard(title: String, value: String, modifier: Modifier = Modifier, supporting: String? = null) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(8.dp))
-            Text(value, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-            supporting?.let {
-                Spacer(Modifier.height(8.dp))
-                Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-        }
-    }
-}
-
-@Composable
-private fun HelperCard(title: String, body: String) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(6.dp))
-            Text(body, style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
@@ -291,7 +294,7 @@ private fun HomeScreenPreview() {
                 isLoading = false,
                 selectedDestination = HomeDestination.PLAN,
                 planCard = HomePlanCardState(
-                    nextPaydayLabel = "Next payday 2 Apr",
+                    nextPaydayLabel = "Payday: 2 April",
                     incomeLabel = "€1,500.00",
                     fixedCostsLabel = "€620.00",
                     flexibleSpendLabel = "€380.00",
@@ -301,10 +304,10 @@ private fun HomeScreenPreview() {
                     summary = "A calm split that protects essentials and builds savings."
                 ),
                 goalCard = GoalCardState(
-                    goalName = "Emergency fund",
+                    goalName = "Emergency Fund",
                     goalAmountLabel = "€3,000.00",
                     targetDateLabel = "On pace for November 2026",
-                    progressNote = "One goal is free."
+                    progressNote = "Consistency is your greatest asset."
                 )
             ),
             onDestinationSelected = { _ -> },
