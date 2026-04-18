@@ -11,10 +11,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import pt.ms.myshare.domain.model.BillingPlan
@@ -191,8 +191,12 @@ private fun ReviewTab(
         singleLine = true
     )
     reviewCard.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-    Button(onClick = onSaveReview, modifier = Modifier.fillMaxWidth()) {
-        Text("Save review")
+    Button(
+        onClick = onSaveReview,
+        modifier = Modifier.fillMaxWidth().height(56.dp),
+        shape = MaterialTheme.shapes.medium
+    ) {
+        Text("Save review", fontSize = 16.sp, fontWeight = FontWeight.Medium)
     }
     reviewCard.savedReviewDate?.let { Text("Last saved $it", style = MaterialTheme.typography.bodyMedium) }
     reviewCard.insight?.let { insight ->
@@ -233,8 +237,12 @@ private fun MoreTab(
                     label = { Text(pricing.annualLabel) }
                 )
             }
-            Button(onClick = onUnlockPremium, modifier = Modifier.fillMaxWidth()) {
-                Text("Unlock Premium")
+            Button(
+                onClick = onUnlockPremium,
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Text("Unlock Premium", fontSize = 16.sp, fontWeight = FontWeight.Medium)
             }
         }
     } else {
@@ -263,7 +271,7 @@ private fun MetricCard(title: String, value: String, modifier: Modifier = Modifi
 @Composable
 private fun HelperCard(title: String, body: String) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFEAF5F8)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {

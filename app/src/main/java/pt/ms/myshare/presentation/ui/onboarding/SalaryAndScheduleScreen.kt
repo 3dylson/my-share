@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -112,11 +115,11 @@ fun SalaryAndScheduleScreen(
                         nextBiweeklyPaydayText
                     )
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().height(56.dp),
                 enabled = income != null && income > BigDecimal.ZERO,
-                shape = RoundedCornerShape(12.dp)
+                shape = MaterialTheme.shapes.medium
             ) {
-                Text("Continue")
+                Text("Continue", fontSize = 16.sp, fontWeight = FontWeight.Medium)
             }
         }
     }

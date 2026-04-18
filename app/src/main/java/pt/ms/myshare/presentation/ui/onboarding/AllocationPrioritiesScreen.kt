@@ -6,7 +6,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.Locale
@@ -45,6 +47,7 @@ fun AllocationPrioritiesScreen(
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            TextButton(onClick = onBack) { Text("Back") }
             Spacer(Modifier.height(8.dp))
             Text("Let's give every dollar a job", style = MaterialTheme.typography.headlineMedium)
             Text(
@@ -90,14 +93,17 @@ fun AllocationPrioritiesScreen(
             )
 
             Spacer(Modifier.weight(1f))
-            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                TextButton(onClick = onBack) { Text("Back") }
-                Button(
-                    onClick = { onNext(parsedFlex, parsedSav, parsedInv, parsedCry) },
-                    enabled = isValid
-                ) {
-                    Text(if (isValid) "Build my plan" else "Balance to 0")
-                }
+            Button(
+                onClick = { onNext(parsedFlex, parsedSav, parsedInv, parsedCry) },
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                enabled = isValid,
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Text(
+                    text = if (isValid) "Build my plan" else "Balance to 0",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
+                )
             }
         }
     }

@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 import pt.ms.myshare.domain.model.PlanPreview
 import java.text.NumberFormat
@@ -63,8 +65,12 @@ fun TrajectoryScreen(
             )
 
             Spacer(Modifier.weight(1f))
-            Button(onClick = onNext, modifier = Modifier.fillMaxWidth()) {
-                Text("Continue")
+            Button(
+                onClick = onNext,
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Text("Continue", fontSize = 16.sp, fontWeight = FontWeight.Medium)
             }
         }
     }

@@ -60,11 +60,19 @@ fun WelcomeScreen(
             
             Spacer(Modifier.weight(1f))
             
-            Button(onClick = onContinue, modifier = Modifier.fillMaxWidth()) {
-                Text("Start")
+            Button(
+                onClick = onContinue, 
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Text("Start", fontSize = 16.sp, fontWeight = FontWeight.Medium)
             }
-            TextButton(onClick = onSkip, modifier = Modifier.fillMaxWidth()) {
-                Text("Skip for now")
+            TextButton(
+                onClick = onSkip, 
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Text("Skip for now", fontSize = 16.sp)
             }
             Text(
                 "You can explore the app first, but the magic happens when you build your plan.",

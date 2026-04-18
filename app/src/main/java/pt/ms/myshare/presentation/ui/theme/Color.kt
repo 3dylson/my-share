@@ -2,19 +2,27 @@ package pt.ms.myshare.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val MySharePrimary = Color(0xFF005A70)
+// Sharp & Professional - Light Mode Defaults
+val MySharePrimary = Color(0xFF0D253F) // Deep Navy
 val MyShareOnPrimary = Color(0xFFFFFFFF)
-val MySharePrimaryContainer = Color(0xFFB6EAFF)
-val MyShareOnPrimaryContainer = Color(0xFF001F28)
-val MyShareSecondary = Color(0xFF5E6B75)
+val MySharePrimaryContainer = Color(0xFFE5F1FC) // Very subtle cool grey/blue
+val MyShareOnPrimaryContainer = Color(0xFF031124) // Darker variant
+
+val MyShareSecondary = Color(0xFF6B7280) // Refined grey
 val MyShareOnSecondary = Color(0xFFFFFFFF)
-val MyShareBackground = Color(0xFFF6F8FA)
-val MyShareOnBackground = Color(0xFF111B21)
-val MyShareSurface = Color(0xFFFFFFFF)
-val MyShareOnSurface = Color(0xFF111B21)
-val MyShareSurfaceVariant = Color(0xFFDCE4E9)
-val MyShareOnSurfaceVariant = Color(0xFF40484D)
-val MyShareOutline = Color(0xFF70787D)
-val MySharePositive = Color(0xFF2E7D32)
-val MyShareWarning = Color(0xFFA66300)
-val MyShareError = Color(0xFFB3261E)
+
+val MyShareBackground = Color(0xFFFAFAFA) // Crisp white with a hint of grey
+val MyShareOnBackground = Color(0xFF111827)
+
+val MyShareSurface = Color(0xFFFFFFFF) // Pure white cards
+val MyShareOnSurface = Color(0xFF111827)
+
+val MyShareSurfaceVariant = Color(0xFFF3F4F6)
+val MyShareOnSurfaceVariant = Color(0xFF4B5563)
+
+val MyShareOutline = Color(0xFFD1D5DB)
+
+// Semantic colors - muted for premium feel
+val MySharePositive = Color(0xFF059669) // Emerald
+val MyShareWarning = Color(0xFFD97706)
+val MyShareError = Color(0xFFDC2626)

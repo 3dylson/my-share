@@ -34,15 +34,15 @@ private val DarkColorScheme = darkColorScheme(
     onPrimary = MyShareOnPrimaryContainer,
     secondary = MyShareSecondary,
     onSecondary = MyShareOnSecondary,
-    background = androidx.compose.ui.graphics.Color(0xFF0E1418),
-    onBackground = androidx.compose.ui.graphics.Color(0xFFE8F1F5),
-    surface = androidx.compose.ui.graphics.Color(0xFF121A1F),
-    onSurface = androidx.compose.ui.graphics.Color(0xFFE8F1F5),
-    surfaceVariant = androidx.compose.ui.graphics.Color(0xFF243239),
-    onSurfaceVariant = androidx.compose.ui.graphics.Color(0xFFC1CAD0),
-    outline = androidx.compose.ui.graphics.Color(0xFF8A9398),
-    error = androidx.compose.ui.graphics.Color(0xFFF2B8B5),
-    onError = androidx.compose.ui.graphics.Color(0xFF601410)
+    background = androidx.compose.ui.graphics.Color(0xFF030712), // Deepest Navy/Black
+    onBackground = androidx.compose.ui.graphics.Color(0xFFF9FAFB),
+    surface = androidx.compose.ui.graphics.Color(0xFF111827), // Elevated Navy/Grey
+    onSurface = androidx.compose.ui.graphics.Color(0xFFF9FAFB),
+    surfaceVariant = androidx.compose.ui.graphics.Color(0xFF374151),
+    onSurfaceVariant = androidx.compose.ui.graphics.Color(0xFFE5E7EB),
+    outline = androidx.compose.ui.graphics.Color(0xFF6B7280),
+    error = androidx.compose.ui.graphics.Color(0xFFFCA5A5),
+    onError = androidx.compose.ui.graphics.Color(0xFF7F1D1D)
 )
 
 @Composable
@@ -63,6 +63,7 @@ fun MyShareTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
+        shapes = Shapes,
         content = content
     )
 }

@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import pt.ms.myshare.domain.model.PlanningFocus
 import java.math.BigDecimal
 
@@ -108,11 +109,11 @@ fun GoalPickerScreen(
             Spacer(Modifier.weight(1f))
             Button(
                 onClick = { onNext(selectedFocus, goalName.ifBlank { "Emergency fund" }, goalAmount ?: BigDecimal.ZERO) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().height(56.dp),
                 enabled = goalAmount != null && goalAmount > BigDecimal.ZERO,
-                shape = RoundedCornerShape(12.dp)
+                shape = MaterialTheme.shapes.medium
             ) {
-                Text("Continue")
+                Text("Continue", fontSize = 16.sp, fontWeight = FontWeight.Medium)
             }
         }
     }

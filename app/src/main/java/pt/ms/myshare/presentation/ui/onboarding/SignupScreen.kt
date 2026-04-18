@@ -7,7 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
@@ -66,12 +68,17 @@ fun SignupScreen(
                         }
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = MaterialTheme.shapes.medium
             ) {
-                Text(stringResource(R.string.onboarding_signup_google))
+                Text(stringResource(R.string.onboarding_signup_google), fontSize = 16.sp, fontWeight = FontWeight.Medium)
             }
-            TextButton(onClick = onSkip, modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.onboarding_signup_skip))
+            TextButton(
+                onClick = onSkip,
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Text(stringResource(R.string.onboarding_signup_skip), fontSize = 16.sp)
             }
         }
     }

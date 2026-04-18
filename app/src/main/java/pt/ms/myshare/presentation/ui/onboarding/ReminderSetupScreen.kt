@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -24,7 +25,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import pt.ms.myshare.domain.model.ReminderCadence
 import java.time.LocalTime
@@ -83,11 +86,19 @@ fun ReminderSetupScreen(
             }
             message?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             Spacer(Modifier.weight(1f))
-            Button(onClick = { requestPermissionIfNeeded() }, modifier = Modifier.fillMaxWidth()) {
-                Text("Enable reminders")
+            Button(
+                onClick = { requestPermissionIfNeeded() },
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Text("Enable reminders", fontSize = 16.sp, fontWeight = FontWeight.Medium)
             }
-            TextButton(onClick = onSkip, modifier = Modifier.fillMaxWidth()) {
-                Text("I’ll do this later")
+            TextButton(
+                onClick = onSkip,
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Text("I’ll do this later", fontSize = 16.sp)
             }
         }
     }

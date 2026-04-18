@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.PlanPreview
 import java.math.BigDecimal
@@ -69,11 +70,19 @@ fun PlanPreviewScreen(
                     ?: "Add more goal contribution later to bring the date forward"
             )
             Spacer(Modifier.weight(1f))
-            Button(onClick = onAutopilot, modifier = Modifier.fillMaxWidth()) {
-                Text("See premium automation")
+            Button(
+                onClick = onAutopilot, 
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Text("See premium automation", fontSize = 16.sp, fontWeight = FontWeight.Medium)
             }
-            TextButton(onClick = onNotNow, modifier = Modifier.fillMaxWidth()) {
-                Text("Use the free plan first")
+            TextButton(
+                onClick = onNotNow, 
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Text("Use the free plan first", fontSize = 16.sp, fontWeight = FontWeight.Medium)
             }
         }
     }
@@ -126,9 +135,10 @@ fun PaywallScreen(
             Spacer(Modifier.weight(1f))
             Button(
                 onClick = { activity?.let(onPurchaseSelected) }, 
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = MaterialTheme.shapes.medium
             ) {
-                Text("Start ${pricingStrategy.trialDays}-day trial")
+                Text("Start ${pricingStrategy.trialDays}-day trial", fontSize = 16.sp, fontWeight = FontWeight.Medium)
             }
         }
     }

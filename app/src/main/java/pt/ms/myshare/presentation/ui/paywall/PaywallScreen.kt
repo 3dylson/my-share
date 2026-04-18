@@ -2,7 +2,6 @@ package pt.ms.myshare.presentation.ui.paywall
 
 import android.app.Activity
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -66,7 +65,7 @@ fun PaywallScreen(
                     Button(
                         onClick = { activity?.let { viewModel.purchasePlan(it, product) } },
                         modifier = Modifier.fillMaxWidth().height(56.dp),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = MaterialTheme.shapes.medium
                     ) {
                         Text(
                             text = "Subscribe for ${product.price} / mo",
