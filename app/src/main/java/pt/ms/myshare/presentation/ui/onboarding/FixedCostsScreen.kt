@@ -51,8 +51,10 @@ fun FixedCostsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             TextButton(onClick = onBack) { Text("Back") }
-            Text("Let's capture your fixed obligations", style = MaterialTheme.typography.headlineMedium)
-            Text("Rent, utilities, subscriptions. What must be paid no matter what?", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.height(8.dp))
+            Text("How much must leave your account every month?", style = MaterialTheme.typography.headlineMedium)
+            Text("Rent, utilities, and other absolute essentials.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = fixedCostsText,
@@ -98,7 +100,7 @@ fun FixedCostsScreen(
                 enabled = fixedCosts != null && fixedCosts >= BigDecimal.ZERO,
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("See my plan")
+                Text("Continue")
             }
         }
     }

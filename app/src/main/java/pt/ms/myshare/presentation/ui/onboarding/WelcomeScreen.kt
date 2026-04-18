@@ -8,15 +8,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun WelcomeScreen(
@@ -30,20 +32,34 @@ fun WelcomeScreen(
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Spacer(Modifier.height(24.dp))
-            Text("Create your salary plan in about a minute", style = MaterialTheme.typography.headlineLarge)
+            Spacer(Modifier.height(48.dp))
+            
             Text(
-                "No bank sync. No heavy setup. Start with simple numbers and get a clear next-payday plan.",
+                "Get your salary plan in exactly 60 seconds.",
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold
+            )
+            
+            Spacer(Modifier.height(8.dp))
+            
+            Text(
+                "No bank sync. No heavy setup. Start with simple numbers and get a clear plan for your next payday.",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("What you get before any paywall", style = MaterialTheme.typography.titleMedium)
-                    Text("• A concrete payday split\n• A target date for your first goal\n• An option to turn on reminders later")
-                }
-            }
+            
+            Spacer(Modifier.height(32.dp))
+            
+            Text(
+                "\"Built with intention to give every dollar a job.\"",
+                fontFamily = FontFamily.Cursive,
+                fontStyle = FontStyle.Italic,
+                fontSize = 24.sp,
+                color = MaterialTheme.colorScheme.primary
+            )
+            
             Spacer(Modifier.weight(1f))
+            
             Button(onClick = onContinue, modifier = Modifier.fillMaxWidth()) {
                 Text("Start")
             }
@@ -51,12 +67,7 @@ fun WelcomeScreen(
                 Text("Skip for now")
             }
             Text(
-                "You can still explore the app, but the repeat loop works best once the first plan is created.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                "Tap skip only if you want to come back later.",
+                "You can explore the app first, but the magic happens when you build your plan.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

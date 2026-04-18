@@ -31,6 +31,8 @@ android {
         minSdk 23
         targetSdk 36
         testInstrumentationRunner "com.google.dagger.hilt.android.testing.HiltTestRunner"
+        manifestPlaceholders = [admobAppId: "ca-app-pub-3940256099942544~3347511713"]
+        resValue "string", "admob_banner_ad_unit_id", '"ca-app-pub-3940256099942544/6300978111"'
     }
 
     buildTypes {
@@ -39,6 +41,9 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+            manifestPlaceholders = [admobAppId: "ca-app-pub-3940256099942544~3347511713"] // TODO: Replace with real production AdMob App ID
+            resValue "string", "admob_banner_ad_unit_id", '"ca-app-pub-3940256099942544/6300978111"' // TODO: Replace with real production Ad Unit ID
+
         }
     }
     

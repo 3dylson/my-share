@@ -50,8 +50,8 @@ fun PlanPreviewScreen(
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text("Here’s your payday plan", style = MaterialTheme.typography.headlineMedium)
-            Text(preview.summary, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("Your personalized plan is ready", style = MaterialTheme.typography.headlineMedium)
+            Text(preview.summary, color = MaterialTheme.colorScheme.primary)
             MetricCard(title = "Next payday ${preview.nextPayday.format(dateFormatter)}", value = currency.format(preview.incomePerPayday))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
                 MetricCard(title = "Fixed costs", value = currency.format(preview.fixedCostsPerPayday), modifier = Modifier.weight(1f))

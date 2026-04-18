@@ -59,8 +59,10 @@ fun GoalPickerScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             TextButton(onClick = onBack) { Text("Back") }
-            Text("What do you want to solve first?", style = MaterialTheme.typography.headlineMedium)
-            Text("This personalizes the plan and the premium story without adding heavy setup.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.height(8.dp))
+            Text("Let's personalize your plan", style = MaterialTheme.typography.headlineMedium)
+            Text("What brings you to My Share today?", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.height(8.dp))
 
             FocusCard(
                 title = "Save without stress",

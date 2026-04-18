@@ -45,11 +45,13 @@ fun AllocationPrioritiesScreen(
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text("Set your allocations", style = MaterialTheme.typography.headlineMedium)
+            Spacer(Modifier.height(8.dp))
+            Text("Let's give every dollar a job", style = MaterialTheme.typography.headlineMedium)
             Text(
-                "You have ${currency.format(totalAvailable)} to allocate after fixed costs.",
+                "After fixed costs, you have ${currency.format(totalAvailable)} to allocate.",
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+            Spacer(Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = flex,
@@ -94,7 +96,7 @@ fun AllocationPrioritiesScreen(
                     onClick = { onNext(parsedFlex, parsedSav, parsedInv, parsedCry) },
                     enabled = isValid
                 ) {
-                    Text(if (isValid) "See Plan" else "Balance to 0")
+                    Text(if (isValid) "Build my plan" else "Balance to 0")
                 }
             }
         }

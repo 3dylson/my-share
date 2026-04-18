@@ -23,3 +23,5 @@ skills-lock.json
 /docs
 /firebase/tests/node_modules/
 /firebase/functions/node_modules/
+/.venv/
+.env

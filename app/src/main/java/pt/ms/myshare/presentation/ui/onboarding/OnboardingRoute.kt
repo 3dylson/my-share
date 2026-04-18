@@ -6,6 +6,7 @@ sealed class OnboardingRoute(val route: String) {
     object SalaryAndSchedule : OnboardingRoute("salary_and_schedule")
     object FixedCosts : OnboardingRoute("fixed_costs")
     object AllocationPriorities : OnboardingRoute("allocation_priorities")
+    object BuildingPlan : OnboardingRoute("building_plan")
     object PlanPreview : OnboardingRoute("plan_preview")
     object Signup : OnboardingRoute("signup")
     object Trajectory : OnboardingRoute("trajectory")

@@ -91,7 +91,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                     onBack = { navController.popBackStack() },
                     onNext = { flex, sav, inv, cry ->
                         if (viewModel.setAllocationsAndBuild(flex, sav, inv, cry)) {
-                            navController.navigate(OnboardingRoute.PlanPreview.route)
+                            navController.navigate(OnboardingRoute.BuildingPlan.route)
                         }
                     }
                 )
@@ -99,6 +99,15 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                 // Should not happen organically in the sequence as FixedCosts guarantees preview
                 navController.popBackStack()
             }
+        }
+        composable(OnboardingRoute.BuildingPlan.route) {
+            BuildingPlanScreen(
+                onBuilt = {
+                    navController.navigate(OnboardingRoute.PlanPreview.route) {
+                        popUpTo(OnboardingRoute.AllocationPriorities.route) { inclusive = true }
+                    }
+                }
+            )
         }
         composable(OnboardingRoute.PlanPreview.route) {
             val preview = state.planPreview

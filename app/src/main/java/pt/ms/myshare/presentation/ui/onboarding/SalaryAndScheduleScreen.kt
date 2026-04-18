@@ -55,8 +55,10 @@ fun SalaryAndScheduleScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             TextButton(onClick = onBack) { Text("Back") }
-            Text("Tell My Share about your payday", style = MaterialTheme.typography.headlineMedium)
-            Text("Keep it light. These are the only numbers needed to create a first useful plan.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.height(8.dp))
+            Text("When does your cycle start?", style = MaterialTheme.typography.headlineMedium)
+            Text("We need this to align your plan with your real life.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = incomeText,

@@ -1,0 +1,1907 @@
+
+
+
+==== docs/Monetização e onboarding orientados à conversão para My Share.pdf ====
+
+
+Monetização e onboarding orientados à
+conversão para My Share
+O que as pessoas pagam nesta categoria
+Exemplos de referência usados neste estudo (apps e plataformas monetizadas por subscrição / IAP):
+RevenueCat, Adapty , Superwall, Qonversion, YNAB , Rocket Money, PocketGuard
+, Spendee , BudgetBakers, Monarch , Quicken , EveryDollar, Empower , Google
+Play , Android Developers.
+Coisas pelas quais os utilizadores pagam claramente hoje
+Automação  que  elimina  trabalho  manual  (sincronização  bancária,  importação  automática,
+categorização e regras). Isto aparece, repetidamente, como o “núcleo premium” em apps de finanças
+pessoais:
+-  “Wallet”  (BudgetBakers)  posiciona  Premium  como  forma  de  eliminar  a  entrada  manual  ao  gerar
+registos automaticamente via ligação bancária segura, e destaca contas bancárias ilimitadas e partilha
+de grupos. 
+- PocketGuard vende “best-in-class connectivity”, regras de transações e categorização avançada, com
+teste grátis e assinatura. 
+- Spendee destaca sincronização com bancos e categorização automática como funcionalidades-chave
+(em vários planos). 
+- Monarch posiciona “conectar contas + categorizar automaticamente” como parte central da proposta
+(“Monarch will do the heavy lifting to categorize your finances”). 
+Conclusão (Prática comprovada | Evidência: Alta): Em finanças pessoais “mobile-first”, o que sustenta
+preço  recorrente,  de  forma  mais  universal,  é  automatizar  a  recolha  e  organização  do  dinheiro
+(menos fricção, menos “sheets”, mais confiança de “está actualizado”). 
+Um plano com “resultado prometido” (poupança, controlo, roteiro) e não só tracking.
+- YNAB vende uma promessa de resultado (p. ex., “Save $600 in one month, $6,000 in one year” como
+claim de marketing) e justifica o pagamento com “não vender dados” e foco no utilizador . 
+- EveryDollar Premium inclui “paycheck planning”, “financial roadmap” e “budget insights”, além de
+conectividade bancária—ou seja, vende “plano e orientação” como valor recorrente. 
+Conclusão (Padrão promissor | Evidência: Média): Subscrições em finanças tendem a ganhar poder
+de  preço  quando  o  produto  promete  uma  trajectória (“vou  chegar  a  X  até  Y”)  e  não  apenas
+visibilidade. (A evidência é indirecta via packaging e posicionamento oficial/analítico de concorrentes,
+não via A/B público por segmento.)
+Colaboração/“household” quando o dinheiro é partilhado.
+-  Monarch  realça  colaboração  com  parceiro/profissional  “at  no  extra  cost”  e  tem  uma  secção  “For
+Couples”. 
+- Spendee vende “shared wallets”, e a partilha é um benefício explícito de planos pagos. 
+- Wallet Premium inclui “Group Sharing”. 
+1 2 3 4 5 6
+7 8 9 10 11 12 13
+14 15
+16
+17
+18
+19
+20
+21
+22
+19
+18
+16
+1
+Conclusão (Padrão promissor | Evidência: Média): “Casais/família” aumenta retenção potencial (mais
+utilizadores por conta, mais rotinas), mas aumenta risco de configuração e suporte; é forte quando o
+produto entrega valor imediato sem obrigar ambos a sincronizar bancos logo no minuto 1. (Inferência
+apoiada por packaging.)
+Privacidade e ausência de anúncios como motivo explícito para pagar.
+-  PocketGuard  abre  a  página  de  preços  com  “No  ads.  We  don't  sell  data.”  e  reforça  “You’re  the
+customer … not advertisers.” 
+- Wallet Premium inclui “No Advertisements!”. 
+- Monarch promete “No ads”. 
+- YNAB dedica FAQ a “não vender dados” e a lógica de “se não pagas, és o produto” (posicionamento).
+Conclusão  (Prática  comprovada  |  Evidência:  Alta): Em  apps  financeiras,  “pago  para  não  ser  o
+produto” é  uma  peça  de  confiança  que  ajuda  a  justificar  preço,  especialmente  quando  há  dados
+sensíveis e sincronização bancária. 
+“Pagar para poupar dinheiro” via serviços/ações concretas (cancelamentos, negociação).
+- Rocket Money Premium desbloqueia automação e inclui “subscription cancellations”, e cobra por “bill
+negotiation” como fee de performance (35–60% da poupança do primeiro ano). 
+Conclusão  (Padrão  promissor  |  Evidência:  Média): Serviços  com  “pay-for-performance”  (ex.:
+negociação  de  contas)  reduzem  fricção  (“só  pago  se  poupar”)  e  podem  aumentar  confiança  na
+monetização—mas são operacionais e difíceis de escalar fora de certos mercados. 
+Coisas que os utilizadores pagam às vezes
+Insights  e  alertas  “inteligentes”  (incluindo  IA),  desde  que  ligados  a  dados  reais  e  a  decisões
+repetidas. PocketGuard inclui “AI chat” como parte do pacote Premium, mas ancorado em transações/
+regras/insights. 
+Modelos  “lifetime”/one-time  purchase aparecem  em  finanças  pessoais  (não  é  raro),  mas  como
+alternativa/segmento—não como único motor em todos os casos.
+- Wallet descreve “Lifetime” como pagamento único com as mesmas funcionalidades de Premium. 
+- PocketGuard diz que alguns utilizadores podem encontrar uma oferta “lifetime” dentro da app. 
+- Spendee tem planos e também refere “Lifetime Premium” no help center (modelo “pay once”). 
+Conclusão  (Padrão  promissor  |  Evidência:  Média): “Lifetime”  funciona  como  escape  hatch para
+utilizadores avessos a subscrição (baixa confiança/baixa tolerância a recorrência) — pode aumentar
+receita total, mas complica LTV e roadmap (porque entregas futuro “de graça”). 
+Coisas que soam atractivas mas tendem a ser negócios fracos de subscrição
+Ferramentas “calculator-like” ou planeadores sem automação e sem loop semanal. (Ex.: apenas
+escolher  percentagens  para  categorias,  sem  execução  recorrente,  sem  verificação  e  sem  impacto
+operacional.)
+- A própria benchmark macro da RevenueCat indica que o mercado está a ficar mais “front-loaded” e
+competitivo;  logo,  propostas  com  pouco  “valor  contínuo”  perdem  rapidamente  para  apps  com
+automatização e hábito. 
+17
+16
+19
+21
+23
+24
+24
+17
+16
+17
+25
+26
+27
+2
+Dashboards  “net  worth”  podem  ser  difíceis  como  subscrição  isolada  quando  existem  opções
+gratuitas fortes. O Empower posiciona-se explicitamente como app gratuita para ver net worth, contas
+e objetivos. 
+Conclusão (Hipótese | Evidência: Baixa): “Net worth tracking” sozinho tende a precisar de outro motor
+(ex.: aconselhamento/monetização alternativa) para sustentar preço premium—porque o utilizador não
+sente “perda” semanal se cancelar . (Inferência apoiada por existência de oferta gratuita relevante.) 
+Conceitos de monetização para My Share
+Scorecard das direções candidatas
+Como ler as pontuações (1–5): 1 = fraco; 5 = forte.
+Para “Risco de confiança/privacidade” e “Risco de churn”, 5 = baixo risco (bom), 1 = alto risco (mau).
+Nota de evidência: este scorecard mistura evidência e julgamento. Onde existam benchmarks/case
+studies  públicos,  uso-os;  onde  não  existam,  marco  como  inferência/hipótese  (pedido  explícito  do
+briefing).
+Direção Disposição
+a pagar
+Valor
+demonstrável
+na 1ª sessão
+Velocidade
+do “aha”
+Valor
+contínuo
+p/
+subscrição
+Confiança/
+privacidade
+Complexidade
+(mais fácil=5)
+Potencial
+retenção
+Risco
+churn
+(baixo=5)
+Fit
+Android
+(IAP)
+Fit modelo (1–5) +
+melhor modelo
+Guided money-
+allocation
+planning
+4 5 5 3 5 4 3 3 4
+4 — hard
+paywall+trial/reverse
+trial
+Personalized
+savings/investing
+targets
+4 4 4 4 4 3 4 3 4 4 — trial → anual
+Recurring
+paycheck
+allocation rules
+5 5 5 5 4 3 5 4 5
+5 — hard
+paywall+trial (com
+“trial toggle” Android)
+Goal-based
+financial planning 4 4 4 4 4 3 4 3 4 4 — trial (7–14d) +
+anual
+Smart alerts +
+adherence
+nudges
+3 3 3 4 3 3 4 3 4
+3 —
+freemium→upgrade /
+trial
+Bank/account
+sync 5 2 2 5 2 2 5 3 4 4 — trial com “skip
+sync”
+Automatic
+transaction
+categorization
+5 3 3 5 2 2 5 3 4 4 — bundled com
+sync
+Shared
+household/
+partner planning
+4 3 3 5 3 2 5 4 4 4 — plano “family”
+anual
+28
+29
+3
+Direção Disposição
+a pagar
+Valor
+demonstrável
+na 1ª sessão
+Velocidade
+do “aha”
+Valor
+contínuo
+p/
+subscrição
+Confiança/
+privacidade
+Complexidade
+(mais fácil=5)
+Potencial
+retenção
+Risco
+churn
+(baixo=5)
+Fit
+Android
+(IAP)
+Fit modelo (1–5) +
+melhor modelo
+Net worth/
+portfolio tracking 3 2 2 3 3 3 3 3 3 2 — freemium +
+upsell / híbrido
+Premium
+insights/
+recommendations
+3 3 3 4 2 3 4 2 4 3 — trial curto / add-
+on
+AI-powered
+financial
+suggestions
+3 3 3 3 2 3 3 2 4 3 — trial; cuidado
+com confiança
+One-time
+purchase utility
+model
+2 4 4 1 5 5 2 4 3 3 — one-time (com
+upsell opcional)
+Conclusão (Padrão promissor | Evidência: Média): Se o objectivo é maximizar subscrições “durante
+ou imediatamente após onboarding”, as direções com melhor perfil são as que entregam  um plano
+personalizado  em  minutos e  que  criam  rotina  semanal/mensal (regras  por  salário  +  metas  +
+nudges). Isto é consistente com o facto de (i) a janela de conversão estar cada vez mais concentrada no
+Day 0 e (ii) hard paywalls baterem freemium em conversão de forma muito significativa na mediana.
+Top 5 direções de valor para My Share
+Abaixo estão as 5 direções recomendadas (ordenadas para  conversão no onboarding +  retenção e
+confiança). Em cada uma, indico força de evidência e tradeoffs.
+Primeira direção: Regras por salário com piloto automático de alocação
+Promessa paga: “Cada vez que recebes, o My Share diz-te exactamente quanto mover para despesas
+fixas, despesas variáveis, poupança e investimentos—e mantém-te no caminho com regras, lembranças
+e alertas.”
+Utilizador-alvo: pessoas  com  rendimento  estável  (mensal/quinzenal),  sensação  de  “o  dinheiro
+desaparece”, e intenção real de melhorar .
+Porque pagaria: reduz esforço e erro (o valor é “dá-me o plano e mantém-me consistente”). “Paycheck
+planning” já é vendido como premium em apps de budgeting (ex.: EveryDollar). 
+Demonstração no onboarding: muito fácil: basta 3–5 inputs (salário líquido, periodicidade, 2–3 metas,
+despesas fixas) para gerar um plano com números, calendário e 1ª regra.
+Fit subscrição vs one-time: forte para subscrição (valor recorrente: cada salário + revisão semanal).
+One-time só faria sentido como “template offline” limitado.
+Evidência:Média (há evidência forte de que o “momento Day 0” é crítico e que paywalls/onboarding
+bem desenhados movem métricas; a prova directa por app financeira específica é menos pública). A
+RevenueCat resume que o “battle is won or lost in the first session” e que 55% dos cancelamentos de
+trials curtos acontecem no Day 0. 
+Tradeoffs: risco de parecer “mais uma app de orçamento” se a promessa não for única; necessidade de
+garantir que o plano não é “aconselhamento financeiro” (copys + disclaimers); e necessidade de criar
+um loop que não dependa de bank sync no minuto 1.
+27
+30
+27
+4
+Segunda direção: Roteiro de metas com datas e trajectória (goal-based roadmap)
+Promessa paga: “Diz-nos para onde queres ir (fundo de emergência, objectivo, dívida) e recebe um
+roteiro com datas e milestones, ajustado quando o teu rendimento ou gastos mudam.”
+Utilizador-alvo: quem precisa de “um caminho” (p. ex., “quero 10k de emergência”, “quero investir X/
+mês”).
+Porque  pagaria: reduz  incerteza  e  ansiedade  (clareza  +  acompanhamento).  EveryDollar  Premium
+posiciona “financial roadmap” e “personalized plans” como features premium. 
+Demonstração no onboarding: boa: “dá-me a data estimada” + “quanto por salário” é um aha rápido.
+Subscrição vs one-time: subscrição ganha porque o roadmap precisa de revisões e acompanhamento
+(ou perde credibilidade).
+Evidência:Média (forte via packaging e percepção de valor; menos via A/B público).
+Tradeoffs: se não houver dados reais (ou disciplina de uso), pode virar “planeador bonito” com churn.
+Terceira direção: Bank sync + categorização + dashboards (o package de automação)
+Promessa paga: “Liga as contas e tens visão total (transações, cashflow, net worth) com categorização
+e regras—sem trabalho manual.”
+Utilizador-alvo: quem paga muito por cartão e quer “um centro de controlo”.
+Porque pagaria: é o pacote mais “comprovado” de valor recorrente (automatiza). Wallet Premium e
+PocketGuard vendem explicitamente a eliminação de entrada manual e melhorias de conectividade.
+Demonstração no onboarding: mais difícil—depende de ligação bancária bem sucedida (fricção +
+confiança).
+Subscrição vs one-time: subscrição faz sentido (manutenção + conectividade + alertas).
+Evidência:Alta para  a  tese  “automação  paga”;  Baixa–Média para  “converte  melhor  no
+onboarding” (porque a fricção pode atrasar aha).
+Tradeoffs: risco de confiança/privacidade e risco de suporte (instituições que falham), além de maior
+superfície de compliance.
+Quarta direção: Planeamento partilhado (casal/household) com regras e visibilidade
+Promessa paga: “Um plano partilhado por salários: cada pessoa vê o que tem de fazer , e o casal vê o
+progresso e as regras.”
+Utilizador-alvo: casais/roommates com fricção sobre dinheiro, objetivos comuns e contas partilhadas.
+Porque pagaria: valor por conta sobe (duas pessoas a resolver um problema), e colaboração é uma
+promessa central do Monarch, enquanto Spendee e Wallet vendem partilha como feature clara. 
+Demonstração no onboarding: média (precisa de “valor para 1 pessoa” antes de convidar a outra).
+Subscrição vs one-time: subscrição (sincronização + alertas + regras) é natural; pode haver plano anual
+“family”.
+Evidência:Média (via packaging/posicionamento).
+Tradeoffs: mais complexidade (permissões, conflitos, suporte) e maior risco de confiança (dados entre
+pessoas).
+Quinta direção: “Savings ops” — alertas accionáveis + detectar recorrências + reduzir despesas
+Promessa paga: “Encontra despesas recorrentes e dá-te um plano para reduzir , cancelar e não voltar a
+falhar pagamentos.”
+Utilizador-alvo: quem sente que tem “subscrições fantasma” e contas recorrentes.
+Porque pagaria: ROI percebido (poupo mais do que pago). Rocket Money monetiza via Premium e via
+fee de negociação (35–60% da poupança do 1º ano). 
+Demonstração no onboarding: boa se houver bank sync; média sem sync (pode ser por questionário).
+Subscrição vs one-time: pode funcionar em subscrição; “pay-for-performance” reduz ansiedade, mas é
+operacional.
+30
+31
+32
+24
+5
+Evidência:Média (pricing e positioning são claros; A/B específico é menos público).
+Tradeoffs: dependência de mercado/parceiros e risco de “promessa agressiva” se não entregar .
+Conclusão (Prática comprovada | Evidência: Alta): Independentemente da direção, a probabilidade
+de converter está cada vez mais concentrada no primeiro contacto: a RevenueCat mostra que 55% dos
+cancelamentos de trials de 3 dias acontecem no Day 0 e que o “battle for the subscriber” se decide na
+primeira sessão. 
+Conclusão (Promissory pattern | Evidência: Média): Para My Share, a direção com melhor equilíbrio
+“converter cedo + reter + confiança” é  regras por salário + plano + nudges, com bank sync como
+acelerador opcional (não obrigatório no 1.º minuto).
+Estratégia de produto focada no onboarding
+Recomendar uma única direção
+Recomendação  principal:Recorrência  por  salário  (paycheck  rules)  como  “core  product”,  com
+plano guiado e nudges de execução.
+O que My Share deve tornar-se: não um “alocador de percentagens” mas um  Motor de Plano por
+Salário:
+1) cria um plano com números + calendário em minutos;
+2) transforma-o em regras repetidas (cada salário);
+3) mantém adesão com alertas, check-ins e uma revisão simples semanal;
+4) (opcional) integra bank sync para prova automática e para reduzir fricção do tracking.
+Porque esta direção maximiza conversão no onboarding:
+- O “aha” pode acontecer sem dados sensíveis. O utilizador recebe um plano concreto com números
+após inputs mínimos—sem bloquear o valor com “liga o banco”. Isto responde ao facto de que, em
+subscrições, a maior parte dos trials começa cedo (muitos dentro das primeiras 24h) e a batalha é
+imediatamente decidida. 
+- Há prova de que paywalls/onboarding são o principal terreno de optimização. A RevenueCat cita
+explicitamente  que  o  ideal  é  levar  o  utilizador  ao  “aha”  em  ~60  segundos  e  seguir  com  “paywall
+moment” após onboarding mostrar valor . 
+- Dá continuidade clara para subscrição. Cada salário é um “evento” recorrente que justifica pagar (e
+reduz  churn  por  falta  de  uso).  Isto  também  alinha  com  “paycheck  planning”  ser  um  componente
+premium em apps de budgeting. 
+Conclusão (Padrão promissor | Evidência: Média): O caminho de monetização mais forte para My
+Share  é  “da  1.ª  sessão  para  um  plano  por  salário”,  e  não  “da  1.ª  sessão  para  um  dashboard”.
+(Inferência: reduz fricção de confiança, aumenta velocidade do aha.)
+O que deve permanecer gratuito
+Para preservar confiança e retenção (e evitar que o paywall pareça “pedir dinheiro por nada”), o free
+precisa de ser um produto mínimo com utilidade real, mas sem o loop de automatização.
+Free recomendado (mínimo viável):
+- Criar 1 “Plano por Salário” (1 rendimento principal, 1 periodicidade).
+- 1 meta simples (ex.: “fundo de emergência” com alvo e data).
+-  Visualização  de  alocação  por  categorias  (poupança,  stocks,  cripto,  despesas  fixas/variáveis),  com
+27
+33
+34
+30
+6
+sliders e “safety rails” (limites).
+- Um “check-in” manual semanal (1 pergunta: “cumpriste?”) e um relatório curto.
+-  Export  (p.  ex.,  PDF  simples  do  plano)  como  “valor  tangível”  na  1.ª  sessão  (incentiva  partilha  e
+confiança).
+Conclusão  (Hipótese  |  Evidência:  Baixa): Um  free  que  entrega  “um  plano  imprimível”  reduz  a
+sensação de “paywall agressivo”, sem destruir conversão, se o premium for claramente “autopilot +
+acompanhamento”.
+O que deve ser premium
+Premium recomendado (o que realmente justifica recorrência):
+- Regras recorrentes por salário (vários rendimentos, regras condicionais, calendário).
+- Metas múltiplas + cenários (“se investir X vs Y, quando chego lá?”).
+- Nudges/alertas inteligentes de adesão (incluindo push + “in-app check”).
+- (Opcional, mas forte) bank sync para validar execução e automatizar “plan vs actual”.
+- Insights accionáveis (p. ex., detecção de recorrências, desvios ao plano).
+- Household: partilha/convite + visão conjunta (plano “family”).
+Maiores riscos e como mitigá-los
+Risco: perda de confiança por pedir permissões/dados cedo demais.
+Mitigação: alinhar com as expectativas de transparência do ecossistema Android/Google Play (Data
+Safety, User Data policy). A Google Play exige transparência sobre recolha/uso/partilha e práticas de
+segurança, e a Data Safety section é uma peça explícita de confiança para o utilizador . 
+Risco:  “conselhos  de  investimento”  (stocks/cripto)  serem  percebidos  como  recomendação
+financeira.
+Mitigação: framing de “alocação e disciplina” (planeamento) e não “recomendação de ativos”; optar por
+linguagem de “regras e metas” e incluir disclaimers claros.
+Risco: diferenciação fraca (“mais uma app de budgets”).
+Mitigação:  promessa  singular  de  “plano  por  salário”  +  execução;  e  packaging  agressivo  de
+“autopilot” (regras + nudges) em vez de “mais dashboards”.
+Fluxo ideal de onboarding e paywall
+Princípios de design que guiam o fluxo
+Janela de decisão é curta (Day 0).
+- RevenueCat (2026) aponta que 55% dos cancelamentos de trials de 3 dias acontecem no Day 0 e que o
+“battle” se decide na primeira sessão. 
+- RevenueCat (2024) mostra que a maioria dos trial starts acontece nas primeiras 24h. 
+- Além disso, há diferença entre plataformas: a RevenueCat reporta trials na App Store a converterem
+mais do que na Play Store (39,0% vs 28,5% em média) — logo, em Android,  o valor precisa de ser
+ainda mais óbvio e rápido.
+Paywall deve contar história e reduzir ansiedade. Multi-page paywalls tendem a funcionar bem por
+“prime” e por reduzir ansiedade de trial. 
+35
+27
+34
+34
+36
+7
+Android permite “trial toggle” como alavanca de ARPU (com cuidado). Um artigo de case studies da
+RevenueCat descreve várias melhorias com trial toggle (ex.: +17,02% ARPU num paywall; e nota que a
+Apple começou a rejeitar trial toggles em fevereiro de 2026, mas em Android “go right ahead and add
+that toggle”). 
+Onboarding screen-by-screen (desenhado para converter cedo sem perder
+confiança)
+Abaixo vai um fluxo completo, mas desenhado para time-to-value < 2 minutos e paywall logo após o
+1.º valor.
+Ecrã 1 — Promessa (antes de qualquer signup)
+Título: “Cria o teu plano por salário em 60 segundos.”
+Subtexto: “Sem ligar contas. Começa com números simples e melhora mais tarde.”
+CTA: “Começar”.
+Ecrã 2 — Escolha de intenção (segmentação do valor e do paywall)
+Pergunta única: “O que queres resolver primeiro?”
+Opções (1 escolha): “Poupar sem esforço”, “Investir com disciplina”, “Sair do ciclo ‘onde foi o dinheiro?’”,
+“Plano a dois”.
+Isto alimenta: copy do plano, benefícios premium, e triggers de nudges.
+Ecrã 3 — Rendimento e ritmo
+Inputs mínimos: salário líquido (range e/ou valor), frequência (mensal/quinzenal/semanal), dia “típico”
+de pagamento.
+Ecrã 4 — Obrigações fixas (apenas o essencial)
+Pergunta: “Quanto é que tem de sair por mês?” (renda/crédito, contas, transportes, etc.)
+Forma: 3 campos rápidos + “não sei” (com slider aproximado).
+Objectivo: construir espaço “livre para alocar”.
+Ecrã 5 — Prioridades de alocação (o “My Share moment”)
+UI  de  alocação:  “Fixo”,  “Gastos  variáveis”,  “Poupança”,  “Investimentos  (stocks)”,  “Cripto”,  “Amortizar
+dívida” (mostrar/ocultar conforme segmento).
+Mostrar imediatamente: “Isto dá-te €X/semana para gastar” ou “€Y por salário para a meta”.
+Ecrã 6 — Aha imediato: preview do plano (ainda free)
+Mostrar um cartão:
+- “No próximo salário (€A), faz: €B para despesas fixas, €C para gastar , €D para poupança, €E para
+investimentos.”
+- “Se mantiveres isto, chegas a [meta] em [data].”
+Indicador: “Plano criado em 45s.”
+Ecrã 7 — Signup só agora (para “guardar + lembretes”)
+Mensagem: “Guarda o teu plano, activa lembretes e vê a trajectória completa.”
+Opções: Google Sign-In / email.
+Nota: Evitar pedir permissões aqui; apenas autenticação.
+Ecrã 8 — Trajectória completa (primeiro valor ‘profundo’)
+Mostrar:
+37
+8
+- linha do tempo da meta (mês a mês)
+- “regra por salário” (texto simples)
+- 1 nudge sugerido: “Lembrete no dia do salário”.
+Ecrã 9 — Paywall (multi-page, com prova e controlo)
+Timing: imediatamente após o utilizador ver o plano completo (primeiro valor real). Isto alinha com a
+recomendação de “aha → paywall moment” e com a concentração de conversão no Day 0. 
+Página 1 (benefício + outcome):
+“Piloto automático do teu plano por salário”
+3 bullets, todos orientados a outcome:
+- “Regras por salário (sem pensar)”
+- “Metas múltiplas com datas”
+- “Alertas quando sais do plano”
+Página 2 (prova + confiança):
+- “Sem anúncios. Não vendemos dados.” (se for verdade; isto é decisivo em finanças, como se vê em
+concorrentes) 
+- “Cancelas no Google Play em 2 toques; manténs acesso até ao fim do período.” (reduz ansiedade; é
+consistente com o help do Google Play sobre cancelamento.) 
+Página 3 (oferta/pricing):
+- Mostrar anual como “melhor valor” + mensal como alternativa. (Isto é padrão em concorrentes: YNAB,
+Monarch, PocketGuard, Spendee, EveryDollar—todos têm anual e mensal com desconto anual.) 
+- Trial (7–14 dias) com linguagem explícita para reduzir medo:
+- “Cancela durante o trial e não pagas.” (Android Developers documenta que, se o utilizador cancelar
+durante o trial, a subscrição fica activa até ao fim do trial e não há cobrança.) 
+-  Opcional (Android-only): toggle “Testar grátis” vs “Pagar já com desconto”. Isto tem histórico de
+aumentar ARPU em casos públicos, mas deve ser testado com guardrails de confiança. 
+Ecrã 10 — Pedido de notificações (após o valor e contexto)
+Só pedir permission  depois do utilizador escolher “Lembretes no dia do salário” / “alertas”. A própria
+documentação Android recomenda pedir permissão no contexto correcto, explicando o uso. 
+Ecrã 11 — Bank sync (apenas após confiança, e sempre opcional)
+Mensagem:  “Liga  contas  para:  (1)  validar  execução  do  plano  automaticamente,  (2)  detectar
+recorrências, (3) alertas de desvio.”
+Botões: “Ligar agora” / “Mais tarde”.
+Explicar Data Safety/privacidade em linguagem humana (e link para política). A Google Play enfatiza
+transparência e divulgação de práticas de dados via Data Safety e User Data policy. 
+Conclusão  (Prática  comprovada  |  Evidência:  Alta): O  melhor  timing  de  paywall,  em  termos  de
+probabilidade de conversão, é imediatamente após a primeira evidência de valor, porque a janela
+Day 0 é dominante e os trials/pagamentos concentram-se cedo. 
+Conclusão (Padrão promissor | Evidência: Média): Em apps financeiras, a forma mais segura de
+manter confiança com um paywall cedo é: (1) gerar algo com números reais antes da cobrança, (2)
+ser  radicalmente  transparente  sobre  cancelamento/renovação,  (3)  adiar  dados  sensíveis  até
+haver “razão” clara.
+33
+23
+38
+39
+40
+37
+41
+42
+33
+43
+9
+Estratégia de subscrição e preços
+Fronteira free vs paid
+Free (ganha confiança e hábito): criação do 1.º plano por salário + 1 meta + check-in manual.
+Paid  (vende  recorrência): regras  recorrentes  (multi-salários),  metas  múltiplas,  cenários,  nudges
+automáticos, e (opcional) bank sync + automação de “plan vs actual”.
+Conclusão (Padrão promissor | Evidência: Média): A fronteira deve separar  “planeamento único”
+(free) de “execução recorrente + automação” (paid). Isso preserva confiança e reduz churn por “não
+uso” (porque o paid tem triggers recorrentes).
+Mensal vs anual (e como apresentar)
+A maioria dos concorrentes relevantes empurra anual como “melhor valor” e mantém mensal como
+alternativa:
+- YNAB: $14.99/mês vs $109/ano (âncora anual). 
+- Monarch: $99.99/ano (~$8.33/mês) e trial de 7 dias. 
+- PocketGuard: $12.99/mês vs $74.99/ano, com trial de 7 dias. 
+- Spendee: $5.99/mês vs $35.99/ano, com trial de 7 dias. 
+- EveryDollar: $17.99/mês vs $79.99/ano, trial 14 dias. 
+Recomendação: apresentar anual como default (seleccionado), com mensal como “flexibilidade”.
+Cuidado Android: a própria RevenueCat reporta que a conversão de trial para paid é inferior na Play
+Store vs App Store (média 28.5% vs 39.0%), o que sugere que em Android precisa de (i) valor mais claro
+e (ii) talvez mais opções de entrada (ex.: monthly + anual com desconto real). 
+Trial: duração e modelo (standard vs reverse trial)
+O que os benchmarks dizem:
+- RevenueCat (2024) reporta trials curtos (≤4 dias) com conversão ~31.2% e trials mais longos até
+~44.9%. 
+- RevenueCat (2026) também indica que trials mais longos tendem a converter melhor (medianas mais
+altas em buckets maiores) e que trial starts são esmagadoramente no Day 0 em muitas categorias. 
+O  que  os  concorrentes  fazem  nesta  categoria  (observável): 7  dias  é  extremamente  comum
+(PocketGuard, Monarch, Rocket Money, Spendee), e 14 dias aparece (EveryDollar). 
+Recomendação prática para My Share (Android-first):
+-  Trial  standard  de  7  dias como  baseline  (porque  é  “padrão  mental”  e  reduz  fricção),  mas testar
+também 14 dias para ver impacto em trial→paid e churn.
+- Deixar explícito no paywall que: “Se cancelares durante o trial, ficas activo até ao fim do trial e não és
+cobrado”—isto está documentado em Android Developers. 
+-  Trial toggle (Android-only) como teste controlado: há cases públicos onde toggles aumentaram
+ARPU e reduziram abuso do trial, mas deve ser avaliado com guardrails de refund e reclamações. 
+Reverse trial (sem cartão) — avaliação:
+-  Hipótese (Evidência: Baixa): um reverse trial “sem compromisso” antes do paywall pode aumentar
+confiança em finanças, mas no ecossistema Google Play o “trial verdadeiro” normalmente é um produto
+de  subscrição,  e  o  objectivo  do  briefing  é  converter  para  subscritor  durante/imediatamente  após
+21
+19
+17
+18
+44
+34
+34
+27
+45
+40
+37
+10
+onboarding. Portanto, reverse trial só faz sentido se for curto (ex.: 24h de premium “in-app”), seguido
+de paywall standard.
+One-time purchase ou híbrido: quando pode ganhar
+Há sinais claros de que “lifetime” em finanças pessoais existe e é vendido activamente por alguns
+players (Wallet, PocketGuard, Spendee). 
+E a RevenueCat (2026) mostra que, no agregado, existe uma fatia relevante de apps com “Subscriptions
++ Lifetime” (23.2% no total). 
+Recomendação:modelo  híbrido (subscrição  como  principal  +  “lifetime”  como  oferta  segmentada)
+pode superar subscrição pura em Android, especialmente para utilizadores desconfiados de recorrência.
+- Mostrar “lifetime” apenas a: (i) quem rejeitou trial/subscrição, (ii) quem tem uso “planner-only” (sem
+sync), ou (iii) mercados com baixa propensão a subscrição. 
+Conclusão (Padrão promissor | Evidência: Média): “Lifetime” não deve ser o core (mata a lógica de
+valor contínuo), mas pode ser um  salvador de conversão para segmentos avessos a subscrição—se
+não canibalizar o plano anual.
+Erros de pricing/packaging a evitar (anti‑patterns)
+Cobrar antes do utilizador ver um resultado com números. A própria RevenueCat nota que paywall
+sem contexto “feels jarring” e que onboarding precisa de criar momentum antes do ask. 
+Ser  ambíguo  sobre  cancelamento,  renovação  e  trial. Em  Android,  existe  documentação  clara:
+cancelar durante trial mantém activo até ao fim e não cobra; cancelar subscrição mantém acesso até ao
+fim do período pago. Se isto não estiver explicado, aumenta churn “por medo”. 
+Over-claim em “IA financeira”. A RevenueCat (2026) nota que “AI apps” vendem mas retêm pior (maior
+churn), sugerindo risco de atrair curiosidade e não hábito.  (Inferência: aplicar este padrão a “IA em
+finanças” exige cautela e disclaimers.)
+Métricas e diagnóstico
+Funil e métricas essenciais (primeira sessão, primeiro dia, primeira semana)
+Onboarding (primeiros minutos)
+- onboarding_start_rate = % installs que iniciam onboarding
+- onboarding_complete_rate = % que terminam onboarding (até gerar plano)
+- time_to_first_plan (p50/p75) = tempo até “Plano por Salário gerado” (evento de ativação)
+-  first_plan_quality_proxy (proxy)  =  %  que  chegam  a  um  plano  com  ≥1  meta  +  ≥1  regra
+(mesmo que free)
+Paywall e compra
+- paywall_view_rate (D0) = % que vê paywall no Day 0
+- paywall_to_trial_start = % paywall viewers que inicia trial
+- paywall_to_paid (no‑trial) = % que paga sem trial (se existir)
+- trial_start_rate (D0/D1) e trial_start_time_distribution (minutos até trial)
+-  trial_cancel_D0_rate =  %  trials  cancelados  no  Day  0  (importante  porque  cancelamentos
+26
+27
+27
+46
+27
+11
+concentram-se cedo em trials curtos). 
+- trial_to_paid_conversion (por coorte de start) — comparar 7 vs 14 dias
+Retenção e valor (D1/D7/D30)
+- D1_retention e D7_retention para free, trial e paid
+- plan_checkin_completion (≥1 check-in por semana)
+- rule_adoption = % paid que cria ≥2 regras por salário
+- goal_progress_view_rate = % que consulta trajectória (sinal de “valor percebido”)
+- notification_opt_in_rate (só pedir em contexto, depois do utilizador escolher lembretes). 
+Cancelamento e refund
+- cancel_rate_by_day (D0–D7 é crítico)
+- refund_rate (por produto, por paywall variante)
+- complaint_rate (support tickets por 1k trials)
+- bank_sync_connect_success_rate e bank_sync_churn_correlation (se bank sync existir)
+Como diagnosticar a causa de underperformance
+Se time_to_first_plan é alto e onboarding_complete_rate é baixo:
+- Provável: onboarding pesado, demasiadas perguntas, ou valor não aparece rápido.
+- Acção: remover inputs não essenciais e mover para pós-paywall/pós-setup.
+Se paywall_view_rate é alto mas paywall_to_trial_start é baixo:
+- Provável: promessa fraca ou paywall com ansiedade (preço, renovação, falta de confiança).
+-  Acção:  multi-page  com  prova  e  transparência  (Superwall  reporta  multi-page  como  tendência  que
+funciona). 
+Se trial_start_rate é bom mas trial_to_paid é fraco:
+- Provável: trial “fácil de cancelar” por falta de valor contínuo; ou usuários “savvier” a desligar auto-
+renew rapidamente (comportamento reconhecido em comentários do report 2024). 
+- Acção: reforçar ativação (regras criadas, lembretes activos) nas primeiras 24–48h.
+Se D7_retention é fraco apesar de boa compra:
+- Provável: produto vendido no paywall não é vivido na semana 1 (mismatch).
+- Acção: “premium moments” obrigatórios (ex.: configurar 1 regra + 1 lembrete + 1 meta) e nudges de
+hábito.
+Se a fricção é bank sync:
+- Ver connect_success_rate, tempo médio e dropout por etapa.
+- Se está a matar o Day 0, mover sync para depois do plano e tornar “skip” claro.
+Conclusão  (Prática  comprovada  |  Evidência:  Alta): “Aha  rápido”  e  ativação  cedo  são  os  maiores
+determinantes  do  funil  (a  RevenueCat  recomenda  explicitamente  chegar  ao  aha  em  ~60s  e  ligar
+onboarding ao paywall). 
+Roadmap de experiências
+Abaixo  está  um  plano  de  8–12  semanas  com  experiências  priorizadas  para  encontrar  o  melhor
+“onboarding-first business”.
+27
+41
+36
+34
+33
+12
+Experiências (prioridade alta → média)
+Experiência 1 — Promessa de onboarding (3 variantes de positioning)
+-  Hipótese: framing  “Plano  por  salário  em  60s”  converte  melhor  do  que  framing  “orçamento”  ou
+“investimentos”, por reduzir fricção e aumentar aha.
+- Porque importa: a primeira sessão decide conversão; o objetivo é acelerar aha. 
+- Métrica principal:trial_start_rate_D0 e paywall_to_trial_start.
+- Guardrails:onboarding_complete_rate, D1_retention, complaint_rate.
+- Esforço: baixo (copy + layout).
+- Confiança: média.
+- Valida: +10–20% em trial starts D0 sem queda em D1.
+- Mata: ganho em trial mas queda forte em D1/complaints (sinal de “over-promise”).
+Experiência 2 — Redução radical de inputs (mínimo vs padrão)
+-  Hipótese: reduzir perguntas aumenta completion e não reduz conversão, desde que o plano final
+mostre números suficientes.
+- Métrica principal:onboarding_complete_rate e time_to_first_plan.
+- Guardrails:paywall_to_trial_start, D7_retention.
+- Esforço: médio (re-ordenação + lógica).
+- Confiança: média.
+- Valida: p50 time-to-plan < 90s e +X% completion.
+- Mata: completion sobe mas conversão cai (plano menos convincente).
+Experiência 3 — Timing do paywall (antes do plano vs depois do plano)
+- Hipótese: paywall depois do “plano completo” aumenta conversão líquida em finanças por confiança;
+paywall cedo pode aumentar trial starts mas piorar retenção.
+- Métrica principal:install_to_trial_start e trial_to_paid.
+- Guardrails:D1/D7, refund_rate.
+- Esforço: baixo–médio.
+-  Confiança: alta  (padrão  amplamente  testado  em  subscrições;  RevenueCat  enfatiza  paywall  após
+momentum). 
+- Valida: melhor LTV proxy (trial_to_paid + D7).
+- Mata: conversão pior sem ganho de retenção.
+Experiência 4 — Paywall multi-page vs single-page
+- Hipótese: multi-page melhora conversão ao reduzir ansiedade de trial e explicar valor .
+- Evidência: Superwall relata multi-page como tendência que continua a funcionar bem. 
+- Métrica principal:paywall_to_trial_start.
+- Guardrails:paywall_bounce_rate, D1.
+- Esforço: médio.
+- Confiança: média.
+Experiência 5 — Inserir “trust proof” e transparência (Data Safety + cancelamento)
+-  Hipótese: em  finanças,  clarificar  privacidade  +  cancelamento  aumenta  trial  starts  e  reduz
+cancelamentos D0.
+-  Evidência: Google  Play  exige  transparência  (User  Data  /  Data  Safety)  e  Android  docs  clarificam
+comportamento de trial/cancelamento; usar isso como copy reduz medo. 
+- Métrica principal:paywall_to_trial_start, trial_cancel_D0_rate.
+- Guardrails:complaint_rate, refund_rate.
+47
+47
+36
+48
+13
+- Esforço: baixo.
+- Confiança: alta.
+Experiência 6 — Trial length (7 vs 14 dias)
+-  Hipótese: 14  dias  aumenta  trial_to_paid vs  7  dias;  mas  pode  aumentar  cancelamentos
+antecipados se o valor não for vivido cedo.
+- Evidência: RevenueCat reporta conversões maiores com trials mais longos em média. 
+- Métrica principal:trial_to_paid_conversion (por coorte).
+- Guardrails:D7/D30, refund_rate.
+- Esforço: baixo (config + paywall).
+- Confiança: média.
+Experiência 7 — Trial toggle Android-only (trial vs pagar já com desconto anual)
+- Hipótese: toggle aumenta ARPU e reduz abuso do trial; mas pode ferir confiança se parecer “trick”.
+-  Evidência: case studies públicos indicam ganhos de ARPU e nota explícita de que em Android é
+permitido. 
+- Métrica principal:ARPU_D7 e paywall_revenue_per_view.
+- Guardrails:refund_rate, complaint_rate.
+- Esforço: médio.
+- Confiança: média.
+Experiência 8 — Bank sync timing (logo vs pós-paywall vs opt-in no momento certo)
+- Hipótese: adiar bank sync até depois do plano aumenta conversão por confiança; pedir cedo aumenta
+drop-off.
+-  Métrica  principal: onboarding_complete_rate,  trial_start_rate_D0, 
+bank_sync_connect_success_rate.
+- Guardrails:D7_retention, support_tickets.
+- Esforço: médio–alto.
+- Confiança: média.
+Experiência 9 — Opt-in de notificações com pre-permission contextual
+-  Hipótese: pedir notificações só quando o utilizador ativa “lembretes por salário” aumenta opt-in e
+retenção.
+- Evidência: Android recomenda pedir no contexto correcto; e existem guias específicos para Android
+13+ sobre timing. 
+- Métrica principal:notification_opt_in_rate, D7_retention.
+- Guardrails:uninstall_rate_D1.
+- Esforço: baixo–médio.
+- Confiança: alta.
+Experiência 10 — Oferta híbrida: “lifetime” apenas para rejeitadores (segmentado)
+- Hipótese: uma oferta one-time segmentada recupera receita sem canibalizar subscrição.
+-  Evidência: Wallet/PocketGuard/Spendee oferecem lifetime; e RevenueCat mostra peso material de
+“subs + lifetime” no mercado. 
+- Métrica principal:recovered_purchase_rate (quem rejeitou subscrição mas compra lifetime).
+- Guardrails: queda em annual_take_rate, LTV_proxy por coorte.
+- Esforço: médio.
+- Confiança: média.
+33
+37
+41
+49
+14
+Operator summary
+Melhor direção de monetização para My Share:Regras por salário + plano + nudges de adesão (o
+produto torna-se “piloto automático do plano por salário”).
+-  Conclusão (Padrão promissor | Evidência: Média): maximiza “aha rápido”, cria loop recorrente e
+evita depender de bank sync para entregar valor na 1.ª sessão.
+Melhor padrão de onboarding para essa direção:Gerar um plano completo com números antes do
+paywall, com inputs mínimos e prova de trajectória (meta + data). Isto alinha com a recomendação de
+“aha em ~60s” e com a concentração de conversão no Day 0. 
+Melhor modelo de paywall/subscrição:Hard paywall com trial (7 dias baseline), multi-page, com
+transparência total de cancelamento/renovação e “trial toggle” testado em Android.
+-  Hard  paywalls  têm  mediana  de  conversão  Day-35  muito  superior  a  freemium  (10.7%  vs  2.1%)  e
+retenção  anual  semelhante  na  comparação  agregada,  sugerindo  que  o  modelo  é  viável  quando  o
+produto é forte e o onboarding cria contexto. 
+5 ações de maior confiança para testar primeiro (ordem sugerida):
+1) Reframing do onboarding para “Plano por salário em 60s” + segmentação por intenção (E1). 
+2) Reduzir inputs e garantir time_to_first_plan < 90s (E2).
+3) Paywall após plano completo (E3) + multi-page com prova e redução de ansiedade (E4). 
+4)  Trust copy: Data Safety/privacidade + cancelamento/trial explicado com comportamento Android
+(E5). 
+5) Trial 7 vs 14 dias (E6), medindo trial→paid e cancelamentos D0 (porque D0 é decisivo). 
+Track, budget, plan, and do more with your money | Monarch
+https://www.monarch.com/
+User Data - Play Console Help
+https://support.google.com/googleplay/android-developer/answer/10144311?hl=en&utm_source=chatgpt.com
+Provide information for Google Play's Data safety section
+https://support.google.com/googleplay/android-developer/answer/10787469?hl=en&utm_source=chatgpt.com
+State of Subscription Apps 2026 – RevenueCat
+https://www.revenuecat.com/state-of-subscription-apps/
+About subscriptions | Play Billing - Android Developers
+https://developer .android.com/google/play/billing/subscriptions?utm_source=chatgpt.com
+Everything about Premium – Wallet Help Center
+https://support.budgetbakers.com/hc/en-us/articles/7151349344018-Everything-about-Premium
+Superwall Ships! 2025 Year in Review — Superwall - Superwall
+https://superwall.com/blog/superwall-ships-recap/
+How much does Rocket Money cost? | Rocket Money Help Center
+https://help.rocketmoney.com/en/articles/2217739-how-much-does-rocket-money-cost
+Budgeting App Pricing Plans | PocketGuard
+https://pocketguard.com/pricing/
+Pricing - Start any Plan with a 7 day Free Trial | Spendee
+https://www.spendee.com/pricing
+33
+27
+33
+50
+51
+33
+1 19 32
+2 11 35 48
+3 13 42 51
+4 27 47
+5 7 40 43 46
+6 8 15 16 20 26 31 49
+9 10 12 36 50
+14 24
+17 23 45
+18
+15
+Pricing | YNAB
+https://www.ynab.com/pricing
+EveryDollar App Review 2026: Is this Budgeting App a Good Fit For You? - NerdWallet
+https://www.nerdwallet.com/finance/learn/everydollar-app-review
+What is Lifetime Premium?
+https://help.spendee.com/article/205-what-is-lifetime-premium?utm_source=chatgpt.com
+Empower Personal Dashboard™ - Apps on Google Play
+https://play.google.com/store/apps/details?id=com.personalcapital.pcapandroid&utm_source=chatgpt.com
+Empower Personal Dashboard Budget App Review
+https://www.nerdwallet.com/finance/learn/empower-personal-dashboard-budget-app-review?utm_source=chatgpt.com
+State of Subscription Apps 2024 – RevenueCat
+https://www.revenuecat.com/state-of-subscription-apps-2024/
+How four paywall redesigns boosted conversions and revenue
+https://www.revenuecat.com/blog/growth/paywall-redesigns-case-studies/
+Cancel, pause, or change a subscription on Google Play - Android - Google Play Help
+https://support.google.com/googleplay/answer/7018481?co=GENIE.Platform%3DAndroid&hl=en
+Notification runtime permission | Views - Android Developers
+https://developer .android.com/develop/ui/views/notifications/notification-permission?utm_source=chatgpt.com
+EveryDollar Premium Subscription Cost – EveryDollar
+https://everydollar .help.ramseysolutions.com/hc/en-us/articles/21544207900685-EveryDollar-Premium-Subscription-Cost
+21 39
+22 30
+25
+28
+29
+33 34
+37
+38
+41
+44
+16
+
+
+
+==== docs/Anúncios no My Share_ decisão estratégica orientada à confiança, LTV e compliance.pdf ====
+
+
+Anúncios no My Share: decisão estratégica
+orientada à confiança, LTV e compliance
+Este  relatório  avalia  se  uma  app  de  finanças  pessoais  e  planeamento  salarial,  com  modelo
+subscription-led e  free  tier (“My  Share”),  deve  usar  anúncios  —  e,  caso  use,  como  fazê-lo  sem
+degradar confiança, crescimento de subscrição e conformidade em iOS e Android.
+A análise prioriza fontes oficiais e políticas de plataforma, e separa  evidência (o que as políticas/
+documentação exigem) de inferência (juízos de produto/UX onde a evidência direta é limitada).
+Contexto chave (do produto): app  Android-first, adulta, com audiência hoje ponderada para Nigéria
+, Paquistão , Índia  e Brasil ; sessões ainda pouco profundas; a confiança é missão-crítica
+(finanças); foco em LTV de longo prazo, não em receita de anúncios de curto prazo.
+Recomendações executivas
+A. Executive recommendation
+Conclusão direta: para o My Share, a opção mais defensável (trust/LTV/compliance) é evitar anúncios
+de rede (third‑party ads) no produto principal e, se houver publicidade, fazê-lo  apenas de forma
+muito limitada e isolada em superfícies de baixa sensibilidade (conteúdo educativo/explicadores/
+empty states),  exclusivamente no free tier, com  defaults de privacidade conservadores e  regras
+duras de categorias e frequência.
+Em termos do teu menu de opções, a recomendação fica assim:
+Primário (recomendado): “evitar anúncios inteiramente” (pelo menos até haver prova, via
+experimentação, de que anúncios não prejudicam retenção, conversão e sinais de confiança). 
+Se a organização precisar mesmo de testar monetização adicional no free tier: “usar
+anúncios muito limitados em colocações selecionadas” (conteúdo/educação/empty states),
+nunca em superfícies financeiras sensíveis e nunca para subscritores/trials.
+Razões (evidência + inferência):
+1) Carga de compliance e privacidade aumenta de forma material com SDKs de anúncios.
+- No App Store, a publicidade tem requisitos específicos: anúncios têm de ser apropriados para a
+classificação etária, intersticiais não podem manipular/trucar cliques e têm de ter botões de fechar/
+ignorar bem visíveis; apps com anúncios têm de permitir  reportar anúncios inapropriados; e, se
+houver targeting, o utilizador deve conseguir ver  toda a informação usada para o direcionamento
+sem sair da app. 
+- Em privacidade, a Apple exige permissão explícita via App Tracking Transparency para “tracking” e
+proíbe exigir tracking para aceder a funcionalidades. 
+- Em Google Play, as políticas de anúncios proíbem experiências que forcem cliques, interfiram com
+uso normal ou usem botões falsos de “dismiss”; anúncios têm de ser facilmente dispensáveis. 
+- O Google Mobile Ads SDK (stack típica de anúncios) recolhe por defeito dados como IP , interações,
+diagnósticos e identificadores do dispositivo/conta (incluindo Ad ID) — o que impacta Data Safety/
+declarações e obriga a governação de dados mais rigorosa. 
+1 2 3 4
+• 
+• 
+5
+6
+7
+8
+9
+10
+1
+2)  O espaço “seguro” para anúncios é pequeno num utilitário financeiro trust‑sensitive (inferência
+suportada por políticas de “não interferir”, “não enganar” e de evitar experiências abusivas).
+-  As  políticas  insistem  que  anúncios  não  podem  bloquear  o  core  UX,  não  podem  surpreender  o
+utilizador em tarefas ativas, e devem evitar cliques acidentais (por ex., recomendações fortes contra
+intersticiais recorrentes e contra proximidade de banners a elementos clicáveis). 
+-  Quando  o  vosso  core  UX  envolve  “momentos  de  dinheiro”  (dashboards,  saldos,  transações,
+orçamentos),  qualquer  componente  publicitário  constante  tende  a  ser  percebido  como  “ruído”  ou
+“monetização à custa do utilizador” (inferência). O risco de reviews negativas/erosão de credibilidade é
+real para finanças porque o utilizador já está em modo de “risco” (inferência), e as plataformas tratam
+finanças como domínio sensível/altamente escrutinado. 
+3)  O  vosso  norte  é  LTV  e  hábito;  anúncios  tendem  a  competir  com  hábito (inferência),
+especialmente  em  produto  com  sessões  ainda  pouco  profundas  (facto  do  contexto).  Além  disso,
+formatos que maximizam receita (intersticiais/app open) são os mesmos que as próprias guidelines
+associam a risco de disrupção e rejeição/limitações (por experiência e políticas). 
+Implicaçāo prática: se introduzires anúncios demasiado cedo, corres o risco de “pagar” com confiança
+e  crescimento  de  subscrição por  um  upside  de  receita  que  (i)  pode  ser  baixo  no  início  (pouca
+profundidade de sessão), e (ii) vem com custo de privacidade/compliance contínuo. A recomendação é
+que anúncios só sejam justificados se, e apenas se, passarem um conjunto de testes com kill criteria
+agressivos (ver secções de experimentação e métricas).
+J. Final recommendation
+Estratégia final preferida:subscription-led, free tier limpo (sem anúncios de rede); monetização
+incremental via pricing/offers e melhoria do “value communication” do paywall, antes de anúncios. Isto
+alinha com o foco da Apple em confiança/privacidade e com a exigência do Google Play de evitar
+purchase flows e experiências manipulativas/deceptivas. 
+Versão mais segura para lançar (se quiseres experimentar ads):
+“No ads por defeito” + um experimento pequeno (≤5–10% do tráfego free) com 1 único placement
+native em  superfícies  de  conteúdo  educativo (ou  empty  states),  sem  personalização (ou  com
+consentimento  explícito  onde  exigível),  sem  recolher  Ad  ID  onde  possível no  Android,  e  com
+frequência rígida (ver regras). 
+Versão de maior receita ainda defensável (limite superior):
+Free tier com  native + banner muito discreto apenas em áreas de baixa sensibilidade (conteúdo/
+educação/empty states), mantendo:
+- zero ads para subscritores e trial,
+- zero ads em ecrãs financeiros sensíveis,
+- zero intersticiais/app open,
+- bloqueio de categorias “alto risco financeiro” e “jogo/apostas”, e
+- consentimento e disclosures rigorosos. 
+Condições sob as quais a resposta mudaria:
+Só faria sentido subir agressividade se houver evidência causal em coortes comparáveis de que (a) LTV
+a 30 dias e retenção não caem, (b) conversão e qualidade de subscrição não sofrem, (c) queixas/reviews
+se  mantêm,  e  (d)  a  carga  de  compliance  é  sustentável.  Como  as  políticas  são  estáveis  mas  a
+performance é específica do produto, esta decisão deve ser “data‑driven” com kill criteria (ver secções
+G/H). 
+11
+12
+13
+14
+15
+16
+17
+2
+Checklist “uma página” (produto/design/engenharia/analytics/compliance):
+Produto 
+Definir por escrito: “superfícies sensíveis” vs “baixa sensibilidade” e proibição absoluta de
+anúncios nas sensíveis. 
+Garantir que “ad-free” (se usado) é benefício verdadeiro e verificável, sem ambiguidades. 
+Design 
+Todos os anúncios claramente identificados como anúncios; evitar qualquer semelhança com UI
+de conteúdo. 
+Botões/ações críticos nunca perto de banners; evitar layouts que gerem cliques acidentais (risco
+de “Confirmed Click”/invalid activity). 
+Engenharia 
+iOS: só usar ATT se houver tracking; nunca condicionar funcionalidade ao tracking. 
+Android: implementar consentimento antes de inicializar SDK de anúncios quando aplicável;
+atenção a pré‑carregamento no initialize. 
+Implementar “report ad” in‑app para cumprir requisito da Apple. 
+Analytics 
+Instrumentar: “ad exposure state”, “impression depth”, “time‑to‑first‑value”, “paywall conversion”,
+“D7/D30 retention”, “complaint rate”, “store rating delta”. 
+Definir kill criteria antes de lançar o teste. 
+Compliance/Privacidade 
+Atualizar App Privacy Details e Play Data Safety com dados de terceiros/SDKs; manter respostas
+atualizadas. 
+EEE/UK/CH: CMP certificada e consentimento válido para personalização; registos e revogação. 
+EUA (estados relevantes): opt‑out de “sharing” (cross‑context ads) quando aplicável; respeitar
+sinais/requests. 
+Framework de monetização trust-first
+B. Trust-first monetization framework
+Abaixo está um ranking do melhor para o pior para este tipo de app (finanças pessoais trust‑sensitive,
+subscription-led), incluindo tradeoffs.
+Ranking resumido: 1) Subscription only (free tier limpo)
+2) Subscription + “native sponsorship” muito limitado e isolado (conteúdo/educação)
+3) Subscription + anúncios free‑tier muito limitados (native, não personalizados por defeito)
+4) Subscription + banners
+5) Subscription + intersticiais / app open
+6) Outros modelos agressivos (p.ex. “ad wall” em fluxos críticos)
+Subscription only (melhor)
+Confiança: maximizada (inferência coerente com a ênfase de plataformas em confiança/
+privacidade e com ausência de terceiros publicitários). 
+Upside de receita: mais lento no curto prazo, mas consistente com objetivo de LTV (inferência). 
+Conversão para subscrição: geralmente mais clara (menos alternativas “baratas” dentro do
+produto) (inferência), reduz risco de fricção por anúncios e de policy issues de “disruptive ads”. 
+Risco de review/store: menor (menos superfícies para violações). 
+• 
+• 
+18
+• 19
+• 
+• 
+20
+• 
+21
+• 
+• 7
+• 
+22
+• 6
+• 
+• 
+23
+• 
+• 
+• 
+24
+• 
+25
+• 
+26
+• 
+27
+• 
+• 
+9
+• 
+3
+Complexidade de privacidade: menor (menos SDKs e menos dados recolhidos por terceiros). 
+Subscription + native sponsorship-style placements (muito bom, se for “limpo”)
+Confiança: pode manter-se alta se for claramente rotulado (“Patrocinado”) e isolado em
+conteúdo educativo, sem aparência de manipulação. Requisitos de rotulagem em native são
+explícitos nas políticas (Ad/Advertisement/Sponsored + AdChoices). 
+Upside: moderado; mais controlável do que rede aberta (inferência). 
+Risco de conversão: menor do que banners/intersticiais se não competir com o core flow
+(inferência + suporte de políticas anti‑interferência). 
+Policy risk: médio (ainda existe “ad UX compliance”), mas menor do que formatos full‑screen. 
+Complexidade: exige processos comerciais/curadoria + revisão de claims (inferência). 
+Subscription + anúncios muito limitados no free tier (aceitável com limites)
+Confiança: risco médio; tens de compensar com transparência e regras duras. Em iOS, além de
+rotulagem e UX, tens também o requisito de “report inappropriate ads” e (se houver targeting)
+“ver informações de targeting”. 
+Upside: existe, mas com teto (poucos placements “seguros”). 
+Privacidade/compliance: aumenta (ATT potencial, CMP/consent, Data Safety, disclosures). 
+Subscription + banners (pior para este app)
+Confiança: banners são persistentes e frequentemente aparecem perto de navegação; as
+próprias guidelines do AdMob destacam risco de cliques acidentais quando próximos de
+elementos interativos. 
+Retenção/hábito: risco de irritação constante em app utilitária (inferência). 
+Policy risk: aumenta (invalid activity, Confirmed Click, “disruptive” se interferir). 
+Subscription + intersticiais / app open (muito mau para este app)
+Confiança: formatos full‑screen são os mais “agressivos”; as políticas do AdMob proíbem
+intersticiais em app load/exit e alertam contra repetição e surpresa em tarefas ativas. 
+Habit formation: app open ads são recomendados sobretudo para apps com aberturas
+frequentes (mais de uma vez a cada 4 horas) — o que pode não ser o padrão na fase atual do My
+Share. 
+Google Play: risco de “disruptive ads” se o UX ficar intrusivo. 
+Outras alternativas não‑ads (relevantes para o My Share)
+Melhor packaging do free tier + paywall mais claro: as políticas de subscrição do Google Play
+e da Apple valorizam clareza e proíbem manipulação; investir aqui reduz risco e pode aumentar
+conversão sem ads. 
+Localização de pricing/offers: a Apple permite pricing por storefront e tem tooling de ofertas;
+isto pode ser mais consistente com subscription-led do que ad monetization. 
+Referral revenue com salvaguardas (apenas parceiros curados): tratar como “patrocínio” e
+exigir disclosure claro; evitar produtos financeiros de risco reputacional (inferência + ver secção
+de regras de categorias, suportada por capacidade de bloqueio/curadoria e pelo escrutínio da
+Apple em áreas financeiras). 
+• 28
+• 
+29
+• 
+• 
+30
+• 31
+• 
+• 
+6
+• 
+• 32
+• 
+21
+• 
+• 33
+• 
+34
+• 
+35
+• 9
+• 
+19
+• 
+36
+• 
+37
+4
+Anúncios no percurso do utilizador
+C. Placement analysis by user journey
+A tabela abaixo marca cada momento/superfície como  recomendado,  aceitável com restrições ou
+evitar, considerando: (i) confiança, (ii) impacto em ativação/hábito/subscrição (inferência), e (iii) risco de
+políticas (evidência).
+Legenda de superfícies:
+- “Sensível” = dashboards e ecrãs diretamente ligados a dinheiro/decisões financeiras (como definido no
+teu briefing).
+- “Baixa sensibilidade” = educação, explicadores, empty states, settings/account.
+Momento /
+superfície Tipo Veredito Porquê (evidência + inferência)
+Onboarding Sensível lato Evitar
+Construção de confiança e “first
+value” são críticos; adicionar ads cedo
+aumenta risco de perceção spammy
+(inferência) e cria risco de UX
+“disruptivo” se interferir; políticas de
+plataformas são rigorosas com ads
+que interferem com uso normal. 
+Antes do paywall
+(pré‑paywall) Sensível Evitar
+Pré-paywall é zona de decisão e de
+clareza de valor . Misturar anúncios
+aqui aumenta confusão/click‑risk
+(inferência) e eleva risco de “acidental
+click”. 
+No paywall Sensível /
+compra Evitar
+Paywall é compra/renovação; Google
+Play proíbe experiências de compra
+manipulativas e stressa clareza em
+ecrãs de seleção e promo. Ads no
+paywall aumentam risco de “dark UX”
+e distração (inferência). 
+Imediatamente
+após dismiss do
+paywall
+Sensível Evitar
+“Punir” o utilizador com ads após
+dizer “não” tende a ser interpretado
+como manipulação (inferência) e
+aumenta risco de disrupção. Políticas
+punem layouts que levam a cliques
+acidentais e surpresa em tarefas. 
+Primeira sessão
+após onboardingSensível Evitar
+Prioridade é criar hábito/valor . App
+open e intersticiais têm guidelines
+que sugerem não mostrar demasiado
+cedo (“after your users have used
+your app a few times”) e evitar
+surpresa. 
+38
+21
+39
+40
+41
+5
+Momento /
+superfície Tipo Veredito Porquê (evidência + inferência)
+Sessões 2–3 após
+onboarding Sensível
+Aceitável com
+restrições (só em
+baixa
+sensibilidade)
+Se (e só se) quiseres testar , faz em
+conteúdo/educação/empty states,
+nunca em screens monetárias. “App
+open” é explícito em best practice:
+mostrar o primeiro só após algumas
+utilizações e idealmente durante
+loading. 
+Home/dashboardSensível Evitar
+A Apple exige cuidados com ads e
+intersticiais; e banners perto de
+navegação geram cliques acidentais.
+No dashboard o utilizador está em
+“modo dinheiro”. (Inferência +
+suporte de políticas anti‑interferência
+e anti‑acidental clicks.) 
+Ecrãs “habit loop”
+recorrentes (voltar
+diariamente)
+Sensível Evitar
+Habit formation é chave; formatos
+persistentes ou full‑screen
+introduzem fricção; políticas de
+“disruptive ads” e de “don’t surprise
+users” tornam isto mais arriscado. 
+Deep analytics Sensível Evitar
+São ecrãs com dados financeiros/
+decisões; presença de ads pode
+degradar confiança (inferência) e
+aumenta risco de proximidade com
+controlos. 
+Saldos /
+transações /
+orçamentos /
+carteira/
+investimentos
+Altamente
+sensível Evitar (red line)
+Mesmo que não haja proibição
+explícita “finance screens”, as
+políticas exigem ads não
+enganadores e não intrusivos; e a
+Apple coloca finanças em domínio
+regulado/alto escrutínio (licenças/
+entidade legal). A escolha trust-first é
+proibir . 
+Settings / conta Baixa
+sensibilidade
+Aceitável com
+restrições
+Pode ser zona “tolerável” se não
+interferir com ações de conta/
+cancelamento e se estiver bem
+rotulada; Google Play exige caminho
+fácil para gerir/cancelar subscrição —
+não deve ser degradado por ads. 
+Empty states (p.ex.
+“ainda não tens
+transações”)
+Baixa
+sensibilidade
+Recomendado (se
+houver ads)
+Superfície menos crítica; bom para
+“sponsored tip”/native, desde que
+rotulado e com frequência baixa.
+Native exige rotulagem (Ad/
+Sponsored) e AdChoices. 
+42
+43
+30
+21
+44
+45
+29
+6
+Momento /
+superfície Tipo Veredito Porquê (evidência + inferência)
+Educação /
+explicadores /
+módulos de
+aprendizagem
+Baixa
+sensibilidade
+Recomendado (se
+houver ads)
+Melhor encaixe com “conteúdo”;
+permite native/sponsorship com
+disclosure claro. Ainda assim, no EEE/
+UK/CH personalização exige CMP e
+consentimento válido. 
+Síntese: se existir publicidade no My Share, o “corredor seguro” é conteúdo educativo + empty states
++  (eventualmente)  settings,  com  native/sponsorship;  e  um  “red  line”  absoluto  em  todas  as
+superfícies financeiras sensíveis.
+Recomendação por formato de anúncio
+D. Format-by-format recommendation
+Abaixo segue uma avaliação de cada formato comum, especificamente para uma app de finanças
+pessoais trust‑sensitive e subscription-led.
+Tabela comparativa de alto nível
+Formato Impacto na
+confiança
+Potencial de
+receita
+Risco de
+canibalizar
+subscrição
+Risco
+policy/store
+Complexidade
+implementação
+Veredito para
+My Share
+Banner
+Médio‑alto
+risco
+(persistente;
+cliques
+acidentais) 
+Médio
+Médio
+(irritação /
+“parece
+freeware”)
+(inferência)
+Médio‑alto Baixa‑média
+Evitar (exceto
+talvez em
+conteúdo/
+educação e
+muito
+limitado)
+Native
+Mais
+controlável
+se bem
+rotulado 
+Baixo‑médio
+Baixo‑médio
+(depende do
+copy/
+posicionamento)
+(inferência)
+Médio
+(exige
+rotulagem
+e
+compliance)
+Média
+Melhor opção
+se houver ads
+(conteúdo/
+empty states)
+Interstitial
+Alto risco
+(full‑screen,
+disrupção) Alto Alto (inferência)Alto Média Evitar
+46
+21
+47
+29
+48
+34
+40
+7
+Formato Impacto na
+confiança
+Potencial de
+receita
+Risco de
+canibalizar
+subscrição
+Risco
+policy/store
+Complexidade
+implementação
+Veredito para
+My Share
+App open
+Alto risco
+em finanças
+(primeira
+impressão;
+“spam”)
+(inferência +
+guidance) 
+Médio‑alto Alto (inferência)
+Alto
+(execução
+sensível) Média Evitar
+Rewarded
+Médio risco
+(opt‑in
+ajuda) 
+Médio
+Médio (pode
+virar substituto
+de subscrição)
+(inferência)
+Médio
+(regras
+estritas) Média‑alta
+Geralmente
+evitar; só se
+houver
+recompensa
+ética e não
+financeira
+Rewarded
+interstitial
+Alto risco
+(automático
+em
+transições) 
+Médio‑alto Alto Alto Média‑alta Evitar
+No ads Melhor para
+confiança —
+Melhor para
+subscrição
+(inferência)
+Menor Menor Recomendado
+Banner
+Melhores use cases (se e só se): páginas de conteúdo educativo, com muito espaço e separação
+de controlos (nunca junto a botões “seguinte”, tab bars, elementos de input). 
+Piores use cases: qualquer ecrã com muitas interações (listas de transações, inputs de valores,
+sliders de orçamento), e zonas onde o utilizador toca repetidamente. As guidelines avisam que
+proximidade gera cliques acidentais e pode levar a invalid activity e até desativação de ad
+serving. 
+Impacto provável: 
+Confiança: negativo se aparecer “em todo o lado” (inferência). 
+Conversão subscrição: pode aumentar “ad‑free value” mas também diminuir perceção premium
+se a app parecer “cheia de ads” (inferência). 
+Retenção: risco de irritação persistente, especialmente em utilitário (inferência). 
+Policy/compliance: respeitar políticas de UX não intrusivo e evitar botões falsos/ads que
+interferem; em Google Play, ads devem ser dispensáveis e não forçar cliques. 
+Veredito: não recomendado para My Share, exceto um teste muito limitado em conteúdos
+educativos (e mesmo aí, preferir native).
+Native
+Melhores use cases: “sponsored tip” em módulo de aprendizagem; “parceria” num artigo;
+recomendações de recursos educativos (sempre rotulado). Native permite encaixar visualmente,
+42
+49
+50
+51
+52
+• 
+53
+• 
+21
+• 
+• 
+• 
+• 
+• 
+47
+• 
+• 
+8
+mas tem de ser claramente identificado: texto “Ad/Advertisement/Sponsored” (localizado) +
+AdChoices visível. 
+Piores use cases: “imitar conteúdo” ou parecer uma recomendação editorial sem disclosure; isso
+colide diretamente com exigência de diferenciação. 
+Impacto provável: 
+Confiança: melhor dos formatos publicitários se rotulado e em superfícies não sensíveis
+(inferência + requisito de rotulagem reduz risco de engano). 
+Conversão para subscrição: risco menor do que banner/interstitial se colocado fora do core task;
+pode reforçar “ad‑free” como benefício sem “punir” o utilizador (inferência). 
+Policy/compliance: atenção especial a rotulagem e ao AdChoices, e a não criar “espaço em
+branco clicável”/layouts maus (ver guidelines). 
+Veredito: formato preferido se houver ads.
+Interstitial
+Melhores use cases (teóricos): “breaks naturais” entre páginas de conteúdo, não em tarefas de
+input; mas numa app financeira há poucos breaks naturais que não pareçam intrusivos
+(inferência). 
+Piores use cases: app load/exit (explicitamente desaconselhado/proibido como implementação),
+repetição frequente, surpresa durante tarefa (formulários, leitura, etc.). 
+Impacto provável: confiança e retenção sofrem em utilitário financeiro (inferência); risco elevado
+de reviews negativas e de “disruptive ads” no Play. 
+Veredito: evitar.
+App open
+Evidência crítica: 
+AdMob diz que app open ads devem aparecer apenas quando o utilizador abre/volta à app, e
+recomenda considerar outros formatos se a app não tem aberturas frequentes (mais de 1 vez a
+cada 4 horas). 
+A doc técnica alerta para evitar “surpreender” o utilizador com um anúncio fora de contexto após
+o conteúdo já estar visível; e recomenda que o primeiro app open seja mostrado só depois de o
+utilizador ter usado a app “algumas vezes”. 
+Para My Share: como a app ainda procura formar hábito e é trust‑sensitive, isto é uma escolha
+com risco alto (inferência fortemente suportada por guidance). 
+Veredito: evitar.
+Rewarded
+Evidência: rewarded deve ser opt‑in inequívoco (o utilizador escolhe explicitamente) e não pode
+impedir uso normal se o utilizador recusar . Além disso, não deve usar copy para “empurrar” a
+escolha (“watch this ad to support our business”). 
+Problema para finanças: é difícil desenhar uma “recompensa” ética que não seja manipulativa
+(“ver anúncio para melhorar o teu orçamento”) e que não distorça o valor da subscrição
+(inferência). 
+Caso de uso aceitável (muito específico): desbloquear conteúdo puramente educativo (ex.: um
+módulo/worksheet) por tempo limitado, desde que isto não substitua o core premium e não crie
+“pay‑to‑learn” enganador (inferência). 
+Veredito: geralmente evitar; se for usar , só em educação e com grande cuidado de “value
+boundaries”.
+29
+• 
+48
+• 
+• 
+54
+• 
+• 
+55
+• 
+• 
+• 
+40
+• 
+9
+• 
+• 
+• 
+56
+• 
+57
+• 
+• 
+• 
+58
+• 
+• 
+• 
+9
+Rewarded interstitial
+Evidência: rewarded interstitial tem regras de opt‑out e screen introdutório “don’t accept”, e é
+colocado automaticamente em transições; para o My Share, isto tende a ser dissonante com
+finanças e aumenta risco de disrupção. 
+Veredito: evitar.
+No ads
+É a escolha que minimiza risco de privacy/compliance e preserva “trust posture”, alinhada com a
+ênfase da Apple em confiança e com a carga real de disclosures quando se integram terceiros
+(ad/analytics SDKs). 
+Regras de interação com subscrição
+E. Subscription interaction rules
+Esta secção define “como ads e subscrição convivem” sem dark patterns nem degradação de compra/
+gestão de subscrição.
+Princípios  base  (evidência): -  Google  Play  proíbe  experiências  de  compra  deceptivas  ou
+manipulativas; exige clareza em promoções/splash e ecrãs de seleção. 
+- Apple exige clareza e proíbe “scam practices”/tricks em subscrições e, separadamente, exige que
+intersticiais sejam claramente anúncios e não manipulem cliques. 
+Regras recomendadas (inferência orientada pela evidência):
+1) Ads totalmente suprimidos durante onboarding.
+- Justificação: reduzir risco de disrupção e maximizar probabilidade de “time to first value”. (Inferência;
+coerente com guidelines anti‑interferência.) 
+2) Ads suprimidos nas primeiras sessões pós‑onboarding.
+-  Regra  concreta:  “no  ads”  até  o  utilizador  completar  2–3  loops  de  valor  (ex.:  criar  salário/plano  +
+primeiro orçamento + first goal).
+- Evidência de suporte: app open ads têm best practice explícita de só mostrar após o utilizador ter
+usado a app algumas vezes (mesmo fora de app open, isto é um sinal de “não monetizar o primeiro
+contacto”). 
+3) Quem viu paywall (e recusou) não deve ser “punido” com pico de ads.
+- Regra: se o utilizador fechou paywall, aplicar um cooldown (ex.: 24h) sem novos placements, e manter
+densidade baixa nos 3 dias seguintes.
+- Justificação: reduzir perceção de coerção (inferência) e reduzir risco de incidentes de “disruptive ads”.
+4) Trial users: ad‑free durante todo o trial.
+- Justificação: trial é demonstração do valor premium; misturar ads reduz clareza do benefício e pode
+ser interpretado como manipulação (inferência, alinhada com exigência de transparência). 
+5) Subscritores ativos: sempre ad‑free.
+- Justificação: promessa simples; reduz risco reputacional; e evita “double monetization” que pode ser
+• 
+52
+• 
+• 
+59
+60
+61
+62
+57
+9
+19
+10
+percecionada  como  injusta  (inferência).  Em  políticas,  tens  de  ser  verdadeiro  sobre  benefícios  de
+subscrição e não os misrepresentar . 
+6) Churned → voltou ao free: regressa a regras do free, mas com “boas maneiras”.
+- Regra: 7 dias ad‑free ou “low ad mode” para reativar confiança/hábito; depois aplicar as mesmas
+regras do free tier .
+-  Justificação:  churned  é  segmento  sensível  a  perceção  de  degradação;  e  o  objetivo  é  win‑back
+(inferência). 
+7) “Ad‑free” como benefício de subscrição: permitido, mas sem dark patterns.
+- Boa prática: “Sem anúncios” pode estar na lista de benefícios, mas sem copy de culpa (“apoia-nos”),
+sem esconder alternativas, e sem colocar botões/flows que levem a cliques acidentais.
+- Evidência: políticas de rewarded ads até proíbem texto que empurre escolha por “apoio ao negócio”
+em contextos de opt‑in; e Google Play dá exemplos de flows não‑compliant por “acidental subscribe” e
+manipulação. 
+Privacidade, consentimento e compliance
+F. Privacy, consent, and compliance review
+Esta secção separa hard requirements (o que tens mesmo de fazer) de best practices (o que deves
+fazer para proteger confiança e reduzir risco), segmentando por plataforma e regime regional.
+Hard requirements
+iOS (Apple)
+1) Cumprir regras específicas de ads em apps
+- Intersticiais/ads que interrompem: têm de ser claramente identificados como anúncios, não podem
+manipular/trucar cliques, e têm de ter close/skip bem visível; apps com ads têm de permitir reportar
+anúncios inapropriados; e ads devem ser apropriados à classificação etária. 
+2) Tracking → requer ATT; não podes forçar tracking para usar a app
+- A Apple define tracking (incluindo linking com dados de terceiros para targeted ads/measurement ou
+partilha com data brokers) e exige permissão antes de tracking; além disso, se o utilizador escolher “Ask
+App Not to Track”, não podes aceder ao IDFA nem “contornar” usando outros identificadores como
+email. 
+3)  Disclosures  de  privacidade  (App  Privacy  Details  /  “Privacy  Nutrition  Labels”)  devem  incluir
+terceiros
+- Tens de declarar dados recolhidos por ti e por “third‑party partners” (incluindo ad networks/SDKs) e
+manter informação atualizada. 
+4) Finance/regulated: escrutínio aumentado
+- Guidelines referem que apps em áreas reguladas (incluindo serviços financeiros) e que requerem
+informação  sensível  devem  ser  submetidas  por  entidade  legal  que  presta  os  serviços;  e  apps  de
+trading/investing/money  management  devem  ter  licenças/permissões.  Mesmo  que  My  Share  seja
+“manual-first”, isto é um sinal de que features futuras (bank sync, aconselhamento de investimento,
+referrals de crédito) elevam o nível de exigência. 
+19
+63
+6
+64
+65
+66
+11
+Android / Google Play
+1) Política de Ads (Google Play) — não interferir, não enganar, não forçar cliques
+- Proibição de forçar cliques/submissão de dados para publicidade antes do uso completo; nada de
+overlays que interferem; ads disruptivos têm de ser dispensáveis sem penalização; proibição de botões
+falsos e “ads onde o utilizador costuma tocar”. 
+2) Políticas de subscrição (Google Play) — transparência e anti‑manipulação
+- Não misleading; proibição explícita de experiências de compra manipulativas; termos devem ser claros
+(preço, renovação, necessidade de subscrição, etc.). 
+3) User Data / Developer Program Policy — consentimento e disclosure quando necessário
+- Requisitos detalhados de “Prominent Disclosure & Consent”: disclosure in‑app, linguagem clara, ação
+afirmativa, não iniciar recolha antes de consentimento, não usar mensagens auto‑dismiss/expiring para
+obter consent. 
+4) Dados financeiros sensíveis: não divulgar publicamente
+- A política indica que apps que lidam com info financeira/pagamentos não podem expor publicamente
+dados pessoais/sensíveis relacionados. 
+AdMob / Google Mobile Ads + Consent (EEE/UK/CH)
+1) EEE/UK/CH: CMP certificada (TCF) para ads personalizados
+- Para servir  personalized ads no Espaço Económico Europeu (EEE) e Reino Unido, é exigida
+CMP certificada integrada com TCF desde 16 jan 2024; para Suíça, desde 31 jul 2024. 
+2) EU User Consent Policy (Google): consentimento e revogação
+- Exige consentimento válido para cookies/local storage quando necessário e para recolha/partilha/uso
+de  dados  pessoais  para  personalização;  exige  identificar  todas  as  partes  e  fornecer  instruções  de
+revogação, além de manter registos de consentimento. 
+3) Implementar UMP/privacy messages corretamente
+-  A  documentação  de  UMP  recomenda  atualizar  informação  de  consentimento  em  cada  launch  e
+mostrar formulários quando necessário. 
+4) Ordem de inicialização importa (consent antes de SDK init)
+-  A  doc  de  AdMob  (via  Firebase)  avisa  que  ads  podem  ser  preloaded  ao  chamar
+MobileAds.initialize() e que ações como “obter consentimento no EEE” devem ocorrer antes de
+inicializar o SDK. 
+Best practices (trust-first) por região
+EEE / UK / Suíça
+Default: non‑personalized até consentimento explícito granular . (Inferência conservadora,
+alinhada com requisitos de consentimento e com o custo de CMP .) 
+Revogação fácil: UI de “Privacy choices”/“Rever consentimento” acessível e sem fricção
+(coerente com requisitos de revogação). 
+Evitar “consent walls” na app se a recusa impedir o core da app financeira (inferência; alinhado
+com a ideia de consentimento “freely given”). 
+9
+60
+67
+68
+69 70
+71 72
+73
+74
+75
+• 
+76
+• 
+77
+• 
+78
+12
+EUA (estados com relevância de privacidade)
+O enquadramento varia por estado; o caso mais influente é Califórnia: há direito de opt‑out
+de “sale/sharing”, e “sharing” é explicitamente ligado a cross‑context behavioral advertising. 
+A California Privacy Protection Agency promove e regula “opt‑out preference signals”; e a
+regulação descreve como sinais devem ser tratados como requests válidos. 
+Best practice: se houver qualquer adtech que conte como “sharing” (no sentido CPRA/CCPA),
+implementar opt‑out robusto e governança de parceiros (inferência com base no texto sobre
+“sharing” e nos mecanismos de opt‑out). 
+Resto do mundo
+Mesmo onde a lei é menos exigente, a tua proposta de valor é confiança. Portanto, aplicar
+defaults conservadores (pouca recolha, sem personalização por defeito, disclosure claro) é
+estratégia de marca (inferência). A própria Apple coloca “trust” no centro e responsabiliza o
+developer por SDKs de terceiros. 
+Implicações específicas para “personalized vs non‑personalized”
+Personalized ads: exige consentimento robusto no EEE/UK/CH + CMP certificada (hard
+requirement) e aumenta probabilidade de entrar em “ATT territory” no iOS se houver tracking. 
+Non‑personalized/contextual: reduz risco, mas não elimina recolha por SDK (IP/device
+identifiers etc.) e mantém obrigações de disclosure/data safety. 
+Considerações específicas de “finance apps” (se o produto evoluir)
+A Apple menciona explicitamente finanças como área regulada e com requisitos de entidade/
+licenças em certos tipos de apps (money management/investing/trading) e impõe requisitos
+rígidos a apps de empréstimos (divulgação de termos, APR máximo, etc.). Isto sugere que
+qualquer “cross‑sell” financeiro ou ads de lending/crypto podem aumentar risco de escrutínio e
+devem ser tratados com cautela. 
+Plano de experimentação e métricas
+G. Experimentation plan
+A  decisão  “ads  vs  no  ads”  deve  ser  tratada  como  experimento  de  risco  elevado com  kill  criteria
+rigorosos. Abaixo está um roadmap de testes pensado para My Share (manual-first, low session depth,
+LTV‑first).
+Princípios de desenho experimental
+Segmentar por: plataforma (iOS/Android), região (EEE/UK/CH; EUA estados relevantes; RoW),
+estado do utilizador (nunca subscrito; trial; subscritor; churned→free) e tipo de superfície
+(sensível vs baixa sensibilidade). 
+Garantir compliance antes de expor ads: consent/UMP (quando aplicável) antes de init do SDK;
+evitar que o SDK recolha/mande dados antes de escolhas do utilizador . 
+• 79
+80
+• 81
+82
+83
+• 
+84
+• 
+85
+• 
+86
+• 
+87
+• 
+• 
+88
+13
+Testes recomendados (com hipótese, implementação, métricas e kill criteria)
+Teste 1: no ads vs native muito limitado no free tier (conteúdo/empty state) - Hipótese: native em
+superfícies de baixa sensibilidade aumenta ARPDAU do free sem afetar retenção e conversão para trial/
+sub.
+- Implementação: 90% controlo sem ads; 10% tratamento com 1 placement native em conteúdo/empty
+states; frequency cap forte (ver abaixo); non‑personalized por defeito. 
+- Métricas primárias: blended D30 LTV; paywall conversion; trial starts; D7 e D30 retention.
+- Guardrails: complaint/support ticket rate “ads/privacidade”; store rating delta; “disruptive ads” flags; ad
+invalid activity (Confirmed Click). 
+- Kill criteria (exemplo):
+- D7 retention ↓ >0,5 pp OU D30 retention ↓ >0,3 pp
+- paywall conversion ↓ >0,3 pp
+-  store  rating  (média)  ↓ >0,15  estrelas  ou  aumento  significativo  de  reviews  negativas  com  “ads/
+spam” (limiar a definir internamente)
+- aumento significativo de tickets “privacidade/ads”
+- qualquer sinal de policy enforcement (Google ad serving disabled / Apple review issues)
+Teste 2: “ad‑free primeiras sessões” vs ads imediatos após paywall dismiss - Hipótese: suprimir ads
+nas primeiras sessões reduz risco de dano em habit formation.
+-  Implementação:  ambos  com  o  mesmo  placement;  apenas  muda  a  janela  temporal  (primeiras  3
+sessões vs imediato).
+- Evidência guia: “show first app open ad after users have used app a few times” é um princípio útil
+mesmo fora de app open. 
+- Métricas: second‑session rate; time‑to‑first‑value; D7 retention; paywall conversion.
+- Kill criteria: qualquer queda relevante em second‑session rate e D1/D7.
+Teste  3:  dashboard  native  (apenas  widget  discreto)  vs  content-only  placement -  Hipótese:
+dashboard aumenta impressões mas pode degradar confiança.
+- Implementação: tratamento A coloca native no dashboard (se insistires em testar); tratamento B só
+conteúdo.
+- Expectativa: forte probabilidade de dano na perceção trust‑sensitive (inferência).
+- Kill criteria: se dashboard placement reduzir D7 retention ou aumentar queixas/“spam” — matar .
+- Nota: política/UX torna este teste de alto risco; preferível não o fazer .
+Teste 4: personalized vs non‑personalized (apenas onde legal e com consentimento) - Hipótese:
+personalized aumenta eCPM/ad ARPDAU sem afetar confiança.
+-  Implementação:  só  fora  do  EEE/UK/CH  sem  consentimento;  no  EEE/UK/CH  apenas  com  CMP
+certificada + consent válido; no iOS apenas com ATT quando tracking ocorrer . 
+- Guardrails: opt‑out rate; consent refusal; trust signals; store rating.
+- Kill criteria: se a camada de consentimento afetar onboarding completion/time‑to‑value ou aumentar
+queixas, reverter para non‑personalized.
+Teste 5: “ad‑free” como benefício no paywall vs não enfatizar - Hipótese: “ad‑free” pode aumentar
+conversão sem parecer dark pattern.
+- Implementação: variar copy e ordem de benefícios; nunca usar linguagem coerciva; manter info de
+preço/renovação/termos clara (política). 
+-  Kill  criteria:  aumento  de  chargebacks/refunds  ou  reviews  com  “enganaram‑me”,  “subscrição
+escondida”.
+89
+90
+57
+91
+19
+14
+Teste  6:  inventário  bloqueado  “finance‑safe”  vs  inventário  mais  amplo -  Hipótese:  bloquear
+categorias (jogo/apostas, cripto especulativo, empréstimos predatórios etc.) reduz receita mas aumenta
+confiança e reduz queixas.
+- Implementação: usar controles de blocking por categoria + ad review center + bloqueio por URL/app
+install ads. 
+- Kill criteria: se inventário amplo aumentar queixas/reviews negativas, manter bloqueios mesmo com
+perda de receita.
+Regras de frequência/cooldowns (recomendadas para finanças)
+Como as políticas não dão um “cap universal” para finanças, isto é inferência prudente com base em:
+evitar  disrupção,  evitar  cliques  acidentais  e  evitar  “overwhelm  users”,  que  o  AdMob  chama
+explicitamente em interstitial guidance. 
+Regras concretas sugeridas: - Native (conteúdo/empty states): 1 impressão por sessão, máximo 1–2
+sessões/dia com ads; cooldown de 12h após interação negativa (“hide ad”, “report ad”, “not interested”).
+- Banner (se usado): apenas em conteúdo; refresh lento; 0 banners em ecrãs com inputs/scroll intenso;
+buffer obrigatório face a controlos. 
+- Interstitial/app open/rewarded interstitial:0 (proibidos) para este app.
+H. Metrics framework
+Para comparar “ads vs subscription-led”, precisas de um framework que capture receita incremental e
+custo de confiança.
+Métricas de aquisição/ativação - onboarding completion
+- time to first value (p.ex. primeiro plano salarial completo / primeiro orçamento criado)
+- second‑session rate (proxy de hábito inicial)
+Métricas de subscrição - paywall view rate
+- paywall conversion (trial start e paid start)
+- subscriber conversion rate (free→paid)
+- churn e win‑back rate
+-  taxa  de  cancelamento  e  pedidos  de  suporte  relacionados  com  billing  (coerente  com  foco  de
+plataformas em transparência/cancelamento). 
+Retenção - D1 / D7 / D30 retention
+- frequência de sessões e profundidade (nº ações “finance core” por sessão)
+Ads - ad ARPDAU, eCPM, fill rate
+- impression depth
+- CTR (com cautela; CTR alto por cliques acidentais é mau) — “Confirmed Click” é sinal de problema. 
+- invalid activity / policy warnings (AdMob/Play)
+Confiança / qualidade - store rating impact e % de reviews que mencionam “ads”, “scam”, “spam”,
+“privacidade”
+- complaint/support‑ticket rate (ads e privacidade)
+- “report ad” usage (iOS requirement e também sinal de qualidade do inventário). 
+92
+93
+21
+94
+95
+6
+15
+Blended LTV - LTV por coorte (free e paid) com janela mínima D30 (idealmente D90 quando possível).
+- Decisão deve ser por “blended LTV” e não por ad ARPDAU isolado (inferência alinhada com teu north
+star).
+Anti-padrões
+I. Anti-patterns
+Abaixo está uma lista concreta de “não fazer” para o My Share, por risco de confiança, conversão e/ou
+políticas.
+Ads no onboarding e nos primeiros momentos de valor . (Risco de disrupção e má primeira
+impressão.) 
+Ads antes do paywall, no paywall, ou imediatamente após dismiss do paywall. (Risco de
+perceção manipulativa; e purchase-flow policies exigem clareza e proíbem manipulação.) 
+Qualquer anúncio em superfícies sensíveis: dashboard financeiro, saldos, transações,
+orçamentos, alocações de salário, objetivos monetários, portefólio/investimentos. (Red line
+trust-first; alto risco reputacional.) 
+Interstitials em app load/exit; interstitials recorrentes e inesperados; interstitials que
+impactam navegação. 
+App open ads cedo demais (primeiras utilizações) ou depois do conteúdo estar visível. 
+Banners colados a botões, tabs, “next”, inputs, sliders — qualquer layout que favoreça cliques
+acidentais. 
+Native que parece conteúdo (sem badge “Ad/Sponsored” ou sem AdChoices visível). 
+Rewarded com copy coercivo (“apoia-nos”) ou sem opt‑out real; rewarded que impede o uso
+normal quando recusado. 
+Misturar targeting/personalização com “dados financeiros” do utilizador (mesmo que não
+seja explicitamente proibido como “health data”, é materialmente danoso para confiança e
+aumenta risco de scrutiny). (Inferência trust-first; suportada por exigências de transparência e
+limites de tracking/consent.) 
+Consent flows com fricção ou que não sejam “freely given”/revogáveis, especialmente no
+EEE/UK/CH. 
+Anti‑padrões de categorias de anunciante (deves bloquear/evitar): - Jogo/apostas (e “social casino”)
+- “Get rich quick”, esquemas, promessas irreais
+- Empréstimos predatórios / payday / “debt relief” agressivo
+- Cripto altamente especulativo / derivados / forex/binary options
+- Apps de “loan” de baixa qualidade
+Justificação: proteção de confiança e redução de risco reputacional; além disso, a Apple tem regras
+rígidas sobre apps de empréstimos e limitações em derivados/binary options, sinalizando sensibilidade
+do ecossistema. 
+Ferramenta: AdMob permite bloquear por categorias sensíveis e gerais, por URLs e por app‑install ads,
+e oferece ad review center . 
+Resumo final em uma frase: o My Share, por ser uma app financeira trust‑sensitive e subscription-led,
+deve  ser  ad‑free  por  defeito;  se  testar  anúncios,  que  seja  apenas  no  free  tier,  em  conteúdo/
+educação/empty  states,  com  native  claramente  rotulado,  não‑personalizado  por  defeito,
+frequência baixa, categorias bloqueadas e kill criteria duros. 
+• 
+62
+• 
+39
+• 
+96
+• 
+40
+• 42
+• 
+21
+• 29
+• 
+51
+• 
+97
+• 
+98
+87
+92
+99
+16
+https://support.google.com/googleplay/android-developer/answer/9900533?
+hl=en
+https://support.google.com/googleplay/android-developer/answer/9900533?hl=en
+https://support.google.com/admob/answer/10094971?hl=en
+https://support.google.com/admob/answer/10094971?hl=en
+https://developer .apple.com/app-store/
+review/guidelines/
+https://developer .apple.com/app-store/review/guidelines/
+https://support.google.com/admob/answer/9341964?hl=en
+https://support.google.com/admob/answer/9341964?hl=en
+https://support.google.com/admob/answer/6239795?hl=en
+https://support.google.com/admob/answer/6239795?hl=en
+https://support.google.com/googleplay/android-developer/answer/
+9857753?hl=en
+https://support.google.com/googleplay/android-developer/answer/9857753?hl=en
+https://developers.google.com/admob/android/privacy/play-data-disclosure
+https://developers.google.com/admob/android/privacy/play-data-disclosure
+https://developer .apple.com/app-store/user-privacy-and-data-use/
+https://developer .apple.com/app-store/user-privacy-and-data-use/
+https://support.google.com/admob/answer/6201362?hl=en
+https://support.google.com/admob/answer/6201362?hl=en
+https://support.google.com/admob/answer/6128877?hl=en
+https://support.google.com/admob/answer/6128877?hl=en
+https://firebase.google.com/docs/admob/android/quick-start
+https://firebase.google.com/docs/admob/android/quick-start
+https://developer .apple.com/app-store/app-privacy-details/
+https://developer .apple.com/app-store/app-privacy-details/
+https://support.google.com/admob/answer/13554116?hl=en
+https://support.google.com/admob/answer/13554116?hl=en
+https://oag.ca.gov/privacy/ccpa
+https://oag.ca.gov/privacy/ccpa
+https://developer .apple.com/app-store/subscriptions/
+https://developer .apple.com/app-store/subscriptions/
+https://developers.google.com/admob/android/app-open
+https://developers.google.com/admob/android/app-open
+https://support.google.com/admanager/answer/7031536?hl=en
+https://support.google.com/admanager/answer/7031536?hl=en
+https://support.google.com/admob/answer/7372450?hl=en
+https://support.google.com/admob/answer/7372450?hl=en
+https://support.google.com/admob/answer/7313578?hl=en
+https://support.google.com/admob/answer/7313578?hl=en
+1 19 39 45 60 70 94
+2 90 95
+3 6 7 12 16 20 31 32 37 43 44 61 66 87 96 97 99
+4 35 49 56
+5 15 29 46 89
+8 9 11 13 17 30 33 38 47 62
+10 23 86
+14 27 59 69 84
+18 34 40 81 93
+21 53
+22 75 79 88
+24 28 65
+25 72 85 91
+26 80 83
+36
+41 42 57
+48 54 55
+50
+51 52 58 63
+17
+https://support.apple.com/en-us/102420
+https://support.apple.com/en-us/102420
+https://support.google.com/googleplay/android-developer/answer/16944162?hl=en
+https://support.google.com/googleplay/android-developer/answer/16944162?hl=en
+https://support.google.com/googleplay/android-developer/answer/10144311?hl=en
+https://support.google.com/googleplay/android-developer/answer/10144311?hl=en
+https://developers.google.com/admob/android/privacy
+https://developers.google.com/admob/android/privacy
+https://www.google.com/about/company/user-consent-policy/
+https://www.google.com/about/company/user-consent-policy/
+https://www.edpb.europa.eu/sites/default/files/files/file1/
+edpb_guidelines_202005_consent_en.pdf
+https://www.edpb.europa.eu/sites/default/files/files/file1/edpb_guidelines_202005_consent_en.pdf
+https://cppa.ca.gov/pdf/oops.pdf
+https://cppa.ca.gov/pdf/oops.pdf
+https://support.google.com/admob/answer/3150235?hl=en
+https://support.google.com/admob/answer/3150235?hl=en
+64
+67
+68
+71 74
+73 76 77
+78 98
+82
+92
+18
