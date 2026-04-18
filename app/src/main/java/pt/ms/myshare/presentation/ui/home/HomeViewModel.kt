@@ -43,6 +43,13 @@ class HomeViewModel @Inject constructor(
     private val dateFormatter = DateTimeFormatter.ofPattern("d MMM", locale)
     private val pricingStrategy = resolvePricingStrategyUseCase.execute(locale)
 
+    fun onToggleAutomation(enabled: Boolean) {
+        viewModelScope.launch {
+            plannerRepository.saveAutomationEnabled(enabled)
+            FirebaseUtils.logEvent(if (enabled) "automation_enabled" else "automation_disabled")
+        }
+    }
+
     init {
         observePlannerData()
         FirebaseUtils.logScreen("home")
@@ -54,8 +61,9 @@ class HomeViewModel @Inject constructor(
                 plannerRepository.observePlan(),
                 plannerRepository.observeLatestReview(),
                 plannerRepository.observeReminderConfiguration(),
+                plannerRepository.observeAutomationEnabled(),
                 entitlementRepository.isPro
-            ) { plan, review, reminder, isPremium ->
+            ) { plan, review, reminder, automation, isPremium ->
                 val emptyMessage = if (plan == null) "Build a salary plan first to unlock the repeat loop." else null
                 val planCard = plan?.let { buildPlanCard(it) }
                 val goalCard = plan?.let { buildGoalCard(it) }
@@ -69,7 +77,8 @@ class HomeViewModel @Inject constructor(
                     },
                     pricingStrategy = pricingStrategy,
                     selectedBillingPlan = pricingStrategy.heroPlan,
-                    isPremium = isPremium
+                    isPremium = isPremium,
+                    automationEnabled = automation
                 )
                 HomeState(
                     selectedDestination = uiState.value.selectedDestination,

@@ -38,6 +38,7 @@ class PlannerRepositoryImpl @Inject constructor(
     private val planState = MutableStateFlow(readPlan())
     private val reviewState = MutableStateFlow(readLatestReview())
     private val reminderState = MutableStateFlow(readReminderConfiguration())
+    private val automationState = MutableStateFlow(readAutomationEnabled())
 
     override fun observePlan(): Flow<SalaryPlan?> = planState.asStateFlow()
 
@@ -185,6 +186,27 @@ class PlannerRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun observeAutomationEnabled(): Flow<Boolean> = automationState.asStateFlow()
+
+    override suspend fun saveAutomationEnabled(enabled: Boolean) {
+        Timber.tag(TAG).d("saveAutomationEnabled enabled=%s", enabled)
+        prefs.edit().putBoolean(KEY_AUTOMATION_ENABLED, enabled).apply()
+        automationState.value = enabled
+        syncAutomationToFirestore(enabled)
+    }
+
+    private fun syncAutomationToFirestore(enabled: Boolean) {
+        val user = firebaseAuth.currentUser ?: return
+        coroutineScope.launch {
+            val data = hashMapOf("automationEnabled" to enabled)
+            try {
+                firestore.collection("users").document(user.uid).collection("settings").document("automation").set(data)
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e, "Failed to sync automation to Firestore")
+            }
+        }
+    }
+
     override fun isOnboardingCompleted(): Boolean = prefs.getBoolean(KEY_ONBOARDING_COMPLETED, false)
 
     override suspend fun setOnboardingCompleted(completed: Boolean) {
@@ -262,6 +284,10 @@ class PlannerRepositoryImpl @Inject constructor(
         )
     }
 
+    private fun readAutomationEnabled(): Boolean {
+        return prefs.getBoolean(KEY_AUTOMATION_ENABLED, false)
+    }
+
     private companion object {
         const val TAG = "PlannerRepository"
         const val NO_EPOCH = Long.MIN_VALUE
@@ -287,5 +313,6 @@ class PlannerRepositoryImpl @Inject constructor(
         const val KEY_REMINDER_HOUR = "planner_reminder_hour"
         const val KEY_REMINDER_MINUTE = "planner_reminder_minute"
         const val KEY_REMINDER_CADENCE = "planner_reminder_cadence"
+        const val KEY_AUTOMATION_ENABLED = "planner_automation_enabled"
     }
 }

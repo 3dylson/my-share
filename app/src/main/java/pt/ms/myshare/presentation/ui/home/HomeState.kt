@@ -44,6 +44,7 @@ data class ReviewCardState(
 data class MoreCardState(
     val reminderEnabled: Boolean = false,
     val reminderLabel: String = "",
+    val automationEnabled: Boolean = false,
     val pricingStrategy: PricingStrategy? = null,
     val selectedBillingPlan: BillingPlan = BillingPlan.MONTHLY,
     val isPremium: Boolean = false

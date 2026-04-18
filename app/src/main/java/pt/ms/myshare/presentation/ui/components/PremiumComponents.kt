@@ -26,6 +26,15 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import pt.ms.myshare.presentation.ui.theme.*
+import androidx.compose.ui.viewinterop.AndroidView
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
+import androidx.compose.ui.res.stringResource
+import pt.ms.myshare.R
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.animation.core.*
 
 @Composable
 fun PremiumChoiceCard(
@@ -194,7 +203,10 @@ fun PremiumButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     isLoading: Boolean = false,
-    contentPadding: PaddingValues = PaddingValues(16.dp)
+    contentPadding: PaddingValues = PaddingValues(16.dp),
+    icon: ImageVector? = null,
+    containerColor: Color = MySharePrimary,
+    contentColor: Color = MyShareOnPrimary
 ) {
     Button(
         onClick = onClick,
@@ -204,29 +216,42 @@ fun PremiumButton(
         enabled = enabled && !isLoading,
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = MySharePrimary,
-            contentColor = MyShareOnPrimary,
-            disabledContainerColor = MyShareOutline,
-            disabledContentColor = MyShareOnSecondary
+            containerColor = containerColor,
+            contentColor = contentColor,
+            disabledContainerColor = containerColor.copy(alpha = 0.5f)
         ),
         elevation = ButtonDefaults.buttonElevation(
             defaultElevation = 4.dp,
-            pressedElevation = 2.dp
+            pressedElevation = 8.dp
         ),
         contentPadding = contentPadding
     ) {
         if (isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.size(24.dp),
-                color = MyShareOnPrimary,
+                color = contentColor,
                 strokeWidth = 2.dp
             )
         } else {
-            Text(
-                text = text,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                if (icon != null) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(Modifier.width(10.dp))
+                }
+                Text(
+                    text = text.uppercase(),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp
+                )
+            }
         }
     }
 }
@@ -530,5 +555,91 @@ fun PremiumAppHeader(
                 .clip(RoundedCornerShape(2.dp))
                 .background(MySharePrimary)
         )
+    }
+}
+
+@Composable
+fun PremiumAdBanner(
+    modifier: Modifier = Modifier,
+    adUnitId: String = stringResource(R.string.admob_banner_ad_unit_id)
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(60.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+        contentAlignment = Alignment.Center
+    ) {
+        AndroidView(
+            modifier = Modifier.fillMaxWidth(),
+            factory = { context ->
+                AdView(context).apply {
+                    setAdSize(AdSize.BANNER)
+                    setAdUnitId(adUnitId)
+                    loadAd(AdRequest.Builder().build())
+                }
+            }
+        )
+        
+        // Overlay for debugging/identifying ad space if ads don't load in emulator
+        Text(
+            text = "ADVERTISEMENT",
+            style = MaterialTheme.typography.labelSmall,
+            color = MyShareSecondary.copy(alpha = 0.5f),
+            modifier = Modifier.align(Alignment.TopStart).padding(4.dp)
+        )
+    }
+}
+
+@Composable
+fun PremiumBenefitCard(
+    title: String,
+    description: String,
+    icon: ImageVector = Icons.Default.AutoAwesome,
+    onClick: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        shape = RoundedCornerShape(20.dp),
+        color = MySharePrimary.copy(alpha = 0.03f),
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.1f))
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MySharePrimary.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MySharePrimary,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MyShareOnSurface
+                )
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MyShareSecondary
+                )
+            }
+        }
     }
 }

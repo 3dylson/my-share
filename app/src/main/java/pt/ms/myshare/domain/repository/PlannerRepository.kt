@@ -19,6 +19,9 @@ interface PlannerRepository {
     fun loadReminderConfiguration(): ReminderConfiguration
     suspend fun saveReminderConfiguration(configuration: ReminderConfiguration)
 
+    fun observeAutomationEnabled(): Flow<Boolean>
+    suspend fun saveAutomationEnabled(enabled: Boolean)
+
     fun isOnboardingCompleted(): Boolean
     suspend fun setOnboardingCompleted(completed: Boolean)
 }

@@ -41,6 +41,7 @@ fun HomeRoute(
         onGoalContributionChanged = viewModel::onGoalContributionChanged,
         onSaveReview = viewModel::saveReview,
         onToggleReminder = viewModel::toggleReminder,
+        onToggleAutomation = viewModel::onToggleAutomation,
         onBillingPlanSelected = viewModel::chooseBillingPlan,
         onUnlockPremium = viewModel::unlockPremium
     )
@@ -56,6 +57,7 @@ fun HomeScreen(
     onGoalContributionChanged: (String) -> Unit,
     onSaveReview: () -> Unit,
     onToggleReminder: (Boolean) -> Unit,
+    onToggleAutomation: (Boolean) -> Unit,
     onBillingPlanSelected: (BillingPlan) -> Unit,
     onUnlockPremium: (android.app.Activity) -> Unit
 ) {
@@ -162,6 +164,16 @@ fun HomeScreen(
                                 )
                             }
                         }
+                        if (!state.moreCard.isPremium) {
+                            item {
+                                PremiumBenefitCard(
+                                    title = "Smart Adjustments",
+                                    description = "Enable Automation to automatically adjust your weekly guide based on last month's review.",
+                                    icon = Icons.Default.PrecisionManufacturing,
+                                    onClick = { onDestinationSelected(HomeDestination.MORE) }
+                                )
+                            }
+                        }
                     }
                 }
                 HomeDestination.GOALS -> {
@@ -185,6 +197,14 @@ fun HomeScreen(
                         }
                         if (!state.moreCard.isPremium) {
                             item {
+                                PremiumBenefitCard(
+                                    title = "Multiple Goals",
+                                    description = "Don't stop at one. Track home deposists, travel funds, and more simultaneously.",
+                                    icon = Icons.Default.AddBusiness,
+                                    onClick = { onDestinationSelected(HomeDestination.MORE) }
+                                )
+                            }
+                            item {
                                 PremiumPaywallCard(
                                     title = "Unlock Advanced Goals",
                                     price = "Premium",
@@ -192,6 +212,16 @@ fun HomeScreen(
                                     description = "Track multiple goals simultaneously and get trajectory predictions.",
                                     isSelected = false,
                                     onClick = { onDestinationSelected(HomeDestination.MORE) }
+                                )
+                            }
+                        } else {
+                            item {
+                                PremiumButton(
+                                    text = "Add New Goal",
+                                    onClick = { /* Implement multi-goal logic or placeholder Toast */ },
+                                    icon = Icons.Default.Add,
+                                    containerColor = MySharePrimaryContainer,
+                                    contentColor = MySharePrimary
                                 )
                             }
                         }
@@ -232,13 +262,30 @@ fun HomeScreen(
                 HomeDestination.MORE -> {
                     item {
                         PremiumSectionHeader(title = "Global Settings")
-                        PremiumChoiceCard(
-                            title = "Smart Notifications",
-                            description = state.moreCard.reminderLabel,
-                            isSelected = state.moreCard.reminderEnabled,
-                            onClick = { onToggleReminder(!state.moreCard.reminderEnabled) },
-                            icon = Icons.Default.Notifications
-                        )
+                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                            PremiumChoiceCard(
+                                title = "Smart Notifications",
+                                description = state.moreCard.reminderLabel,
+                                isSelected = state.moreCard.reminderEnabled,
+                                onClick = { onToggleReminder(!state.moreCard.reminderEnabled) },
+                                icon = Icons.Default.Notifications
+                            )
+                            
+                            PremiumChoiceCard(
+                                title = "Smart Automation",
+                                description = if (state.moreCard.automationEnabled) "System automatically adjusting buffers" else "Disabled",
+                                isSelected = state.moreCard.automationEnabled,
+                                onClick = { 
+                                    if (state.moreCard.isPremium) {
+                                        onToggleAutomation(!state.moreCard.automationEnabled)
+                                    } else {
+                                        // Show paywall or stay as is
+                                    }
+                                },
+                                icon = Icons.Default.PrecisionManufacturing,
+                                badge = if (!state.moreCard.isPremium) "PREMIUM" else null
+                            )
+                        }
                     }
                     if (!state.moreCard.isPremium) {
                         item {
@@ -281,6 +328,13 @@ fun HomeScreen(
                     }
                 }
             }
+            
+            if (!state.moreCard.isPremium) {
+                item {
+                    Spacer(modifier = Modifier.height(20.dp))
+                    PremiumAdBanner()
+                }
+            }
         }
     }
 }
@@ -315,6 +369,7 @@ private fun HomeScreenPreview() {
             onGoalContributionChanged = { _ -> },
             onSaveReview = {},
             onToggleReminder = { _ -> },
+            onToggleAutomation = { _ -> },
             onBillingPlanSelected = { _ -> },
             onUnlockPremium = {}
         )

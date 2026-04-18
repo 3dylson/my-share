@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.components.PremiumPaywallCard
+import pt.ms.myshare.presentation.ui.components.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
@@ -75,30 +76,23 @@ fun PaywallScreen(
                 .padding(horizontal = 24.dp)
                 .verticalScroll(scrollState)
         ) {
-            Text(
-                "Master Your Share",
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Black,
-                color = MyShareOnSurface,
-                letterSpacing = (-1).sp
+            PremiumAppHeader(
+                title = "Master Your Share",
+                subtitle = "Unlock the full system and automate your path to financial freedom."
             )
             
-            Text(
-                "Unlock the full system and automate your path to financial freedom.",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MyShareSecondary,
-                modifier = Modifier.padding(top = 8.dp, bottom = 32.dp),
-                lineHeight = 26.sp
-            )
+            Spacer(Modifier.height(32.dp))
 
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 FeatureRow("Unlimited Intentional Goals", "Build savings for everything that matters.")
-                FeatureRow("Live Rule Automation", "Get notified exactly what to do on payday.")
-                FeatureRow("Advanced Analytics", "Track your wealth trajectory over 12 months.")
-                FeatureRow("Priority Support", "Direct access to our financial design team.")
+                FeatureRow("Smart Budget Automation", "Automatically adjust guides based on past performance.")
+                FeatureRow("Advanced Trajectory Analytics", "Visual forecast of your wealth over 12 months.")
+                FeatureRow("Direct Concierge Support", "Priority access to our financial design team.")
             }
 
             Spacer(Modifier.height(48.dp))
+
+            PremiumSectionHeader(title = "Choose Your Membership")
 
             if (isLoading) {
                 Box(
@@ -117,7 +111,7 @@ fun PaywallScreen(
                         price = product.price,
                         period = period,
                         description = if (isAnnual) "Focus on long-term wealth" else "Start small, expand later",
-                        badge = if (isAnnual) "BEST VALUE" else null,
+                        badge = if (isAnnual) "60% OFF" else null,
                         isSelected = selectedProduct?.productId == product.productId,
                         onClick = { selectedProduct = product },
                         modifier = Modifier.padding(bottom = 16.dp)
@@ -129,7 +123,7 @@ fun PaywallScreen(
 
             selectedProduct?.let { product ->
                 PremiumButton(
-                    text = "Upgrade Now",
+                    text = "Upgrade to Unlimited",
                     onClick = { activity?.let { viewModel.purchasePlan(it, product) } }
                 )
             }
@@ -141,7 +135,8 @@ fun PaywallScreen(
                 Text(
                     "Restore Purchases",
                     style = MaterialTheme.typography.labelLarge,
-                    color = MyShareSecondary
+                    color = MyShareSecondary,
+                    fontWeight = FontWeight.Medium
                 )
             }
 
@@ -150,7 +145,7 @@ fun PaywallScreen(
                 style = MaterialTheme.typography.labelSmall,
                 color = MyShareSecondary.copy(alpha = 0.5f),
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp)
+                modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp)
             )
         }
     }
@@ -159,13 +154,17 @@ fun PaywallScreen(
 @Composable
 private fun FeatureRow(title: String, subtitle: String) {
     Row(
-        verticalAlignment = Alignment.Top,
-        modifier = Modifier.fillMaxWidth()
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(16.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(24.dp)
-                .clip(RoundedCornerShape(6.dp))
+                .size(40.dp)
+                .clip(RoundedCornerShape(12.dp))
                 .background(MySharePrimary.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
         ) {
@@ -173,7 +172,7 @@ private fun FeatureRow(title: String, subtitle: String) {
                 imageVector = Icons.Default.CheckCircle,
                 contentDescription = null,
                 tint = MySharePrimary,
-                modifier = Modifier.size(16.dp)
+                modifier = Modifier.size(20.dp)
             )
         }
         Spacer(Modifier.width(16.dp))
