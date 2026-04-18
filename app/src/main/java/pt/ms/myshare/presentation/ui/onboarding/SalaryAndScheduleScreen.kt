@@ -54,44 +54,66 @@ fun SalaryAndScheduleScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(24.dp)
         ) {
-            TextButton(onClick = onBack) { Text("Back") }
-            Spacer(Modifier.height(8.dp))
-            Text("When does your cycle start?", style = MaterialTheme.typography.headlineMedium)
-            Text("We need this to align your plan with your real life.", color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Spacer(Modifier.height(8.dp))
+            TextButton(onClick = onBack, modifier = Modifier.padding(bottom = 8.dp)) { 
+                Text("Back", color = MaterialTheme.colorScheme.onSurfaceVariant) 
+            }
+            
+            Text(
+                "Your Cash Flow", 
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold
+            )
+            
+            Text(
+                "We need to know when your money arrives to build a plan that actually works.", 
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyLarge
+            )
+            
+            Spacer(Modifier.height(32.dp))
 
+            // Income Section
             OutlinedTextField(
                 value = incomeText,
                 onValueChange = { incomeText = it.replace(',', '.') },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Net income per payday") },
+                label = { Text("Next payday amount (Net)") },
+                placeholder = { Text("e.g. 2500.00") },
                 singleLine = true,
+                prefix = { Text("€ ") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )
 
-            Text("Pay frequency", style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(32.dp))
+
+            Text("Pay frequency", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            Spacer(Modifier.height(12.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 ChoiceCard(
                     text = "Monthly",
                     selected = payFrequency == PayFrequency.MONTHLY,
+                    modifier = Modifier.weight(1f),
                     onClick = { payFrequency = PayFrequency.MONTHLY }
                 )
                 ChoiceCard(
                     text = "Every 2 weeks",
                     selected = payFrequency == PayFrequency.BIWEEKLY,
+                    modifier = Modifier.weight(1f),
                     onClick = { payFrequency = PayFrequency.BIWEEKLY }
                 )
             }
+
+            Spacer(Modifier.height(24.dp))
 
             if (payFrequency == PayFrequency.MONTHLY) {
                 OutlinedTextField(
                     value = monthlyPaydayText,
                     onValueChange = { monthlyPaydayText = it.filter(Char::isDigit) },
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Typical payday day of month") },
+                    label = { Text("Typical payday (Day of month)") },
+                    placeholder = { Text("e.g. 25") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
@@ -100,7 +122,8 @@ fun SalaryAndScheduleScreen(
                     value = nextBiweeklyPaydayText,
                     onValueChange = { nextBiweeklyPaydayText = it },
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Next payday (YYYY-MM-DD)") },
+                    label = { Text("Next payday date (YYYY-MM-DD)") },
+                    placeholder = { Text("2024-05-15") },
                     singleLine = true
                 )
             }
@@ -119,25 +142,34 @@ fun SalaryAndScheduleScreen(
                 enabled = income != null && income > BigDecimal.ZERO,
                 shape = MaterialTheme.shapes.medium
             ) {
-                Text("Continue", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                Text("Continue", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
         }
     }
 }
 
 @Composable
-private fun ChoiceCard(text: String, selected: Boolean, onClick: () -> Unit) {
+private fun ChoiceCard(text: String, selected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Card(
-        modifier = Modifier.clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
+        modifier = modifier.clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
         border = BorderStroke(
             width = if (selected) 2.dp else 1.dp,
             color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
         ),
         colors = CardDefaults.cardColors(
-            containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
+            containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f) else MaterialTheme.colorScheme.surface
         )
     ) {
-        Text(text, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp))
+        androidx.compose.foundation.layout.Box(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            contentAlignment = androidx.compose.ui.Alignment.Center
+        ) {
+            Text(
+                text, 
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                color = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+            )
+        }
     }
 }

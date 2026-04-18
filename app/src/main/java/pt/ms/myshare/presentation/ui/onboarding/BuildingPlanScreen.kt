@@ -65,11 +65,18 @@ fun BuildingPlanScreen(onBuilt: () -> Unit) {
             Spacer(modifier = Modifier.height(32.dp))
             
             Text(
-                "Building your personalized salary plan...",
-                style = MaterialTheme.typography.headlineMedium
+                "Building your plan",
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.ExtraBold
             )
             
-            Spacer(modifier = Modifier.height(32.dp))
+            Text(
+                "Personalizing your logic and safety nets.",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            
+            Spacer(modifier = Modifier.height(48.dp))
             
             AnimatedVisibility(
                 visible = step1Visible,

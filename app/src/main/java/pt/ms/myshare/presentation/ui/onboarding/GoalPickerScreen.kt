@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -56,64 +57,91 @@ fun GoalPickerScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(24.dp)
         ) {
-            TextButton(onClick = onBack) { Text("Back") }
-            Spacer(Modifier.height(8.dp))
-            Text("Let's personalize your plan", style = MaterialTheme.typography.headlineMedium)
-            Text("What brings you to My Share today?", color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Spacer(Modifier.height(8.dp))
+            TextButton(onClick = onBack, modifier = Modifier.padding(bottom = 8.dp)) { 
+                Text("Back", color = MaterialTheme.colorScheme.onSurfaceVariant) 
+            }
+            
+            Text(
+                "Select your focus", 
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold
+            )
+            
+            Text(
+                "We'll tailor your experience based on your current financial priority.", 
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyLarge
+            )
+            
+            Spacer(Modifier.height(24.dp))
 
-            FocusCard(
-                title = "Save without stress",
-                subtitle = "More calm, fewer money surprises.",
-                selected = selectedFocus == PlanningFocus.SAVE_WITHOUT_STRESS,
-                onClick = { setDefaultsForFocus(PlanningFocus.SAVE_WITHOUT_STRESS) }
-            )
-            FocusCard(
-                title = "Invest with discipline",
-                subtitle = "Keep contributions consistent every payday.",
-                selected = selectedFocus == PlanningFocus.INVEST_WITH_DISCIPLINE,
-                onClick = { setDefaultsForFocus(PlanningFocus.INVEST_WITH_DISCIPLINE) }
-            )
-            FocusCard(
-                title = "Stop the money leak",
-                subtitle = "Protect future money before flexible spending grows.",
-                selected = selectedFocus == PlanningFocus.STOP_OVERSPENDING,
-                onClick = { setDefaultsForFocus(PlanningFocus.STOP_OVERSPENDING) }
-            )
-            FocusCard(
-                title = "Plan together",
-                subtitle = "A clearer split for shared life and shared bills.",
-                selected = selectedFocus == PlanningFocus.PLAN_TOGETHER,
-                onClick = { setDefaultsForFocus(PlanningFocus.PLAN_TOGETHER) }
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                FocusCard(
+                    title = "Save without stress",
+                    subtitle = "Build a safety net without overthinking.",
+                    selected = selectedFocus == PlanningFocus.SAVE_WITHOUT_STRESS,
+                    onClick = { setDefaultsForFocus(PlanningFocus.SAVE_WITHOUT_STRESS) }
+                )
+                FocusCard(
+                    title = "Invest with discipline",
+                    subtitle = "Market consistency starts with a plan.",
+                    selected = selectedFocus == PlanningFocus.INVEST_WITH_DISCIPLINE,
+                    onClick = { setDefaultsForFocus(PlanningFocus.INVEST_WITH_DISCIPLINE) }
+                )
+                FocusCard(
+                    title = "Stop overspending",
+                    subtitle = "Identify and plug the money leaks.",
+                    selected = selectedFocus == PlanningFocus.STOP_OVERSPENDING,
+                    onClick = { setDefaultsForFocus(PlanningFocus.STOP_OVERSPENDING) }
+                )
+            }
 
-            OutlinedTextField(
-                value = goalName,
-                onValueChange = { goalName = it },
+            Spacer(Modifier.height(32.dp))
+
+            // Goal Section in a Card
+            Card(
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Goal name") },
-                singleLine = true
-            )
-            OutlinedTextField(
-                value = goalAmountText,
-                onValueChange = { goalAmountText = it.replace(',', '.') },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Goal amount") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                singleLine = true
-            )
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Target Goal", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                    
+                    OutlinedTextField(
+                        value = goalName,
+                        onValueChange = { goalName = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("What are you saving for?") },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                        )
+                    )
+                    OutlinedTextField(
+                        value = goalAmountText,
+                        onValueChange = { goalAmountText = it.replace(',', '.') },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Target Amount") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                        )
+                    )
+                }
+            }
 
             Spacer(Modifier.weight(1f))
+            
             Button(
                 onClick = { onNext(selectedFocus, goalName.ifBlank { "Emergency fund" }, goalAmount ?: BigDecimal.ZERO) },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 enabled = goalAmount != null && goalAmount > BigDecimal.ZERO,
                 shape = MaterialTheme.shapes.medium
             ) {
-                Text("Continue", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                Text("Continue", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
         }
     }

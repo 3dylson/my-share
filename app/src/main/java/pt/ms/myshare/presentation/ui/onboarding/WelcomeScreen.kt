@@ -29,34 +29,53 @@ fun WelcomeScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(24.dp)
         ) {
-            Spacer(Modifier.height(48.dp))
+            Spacer(Modifier.height(64.dp))
             
             Text(
-                "Get your salary plan in exactly 60 seconds.",
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold
+                "Build your payday plan in exactly 60 seconds.",
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.ExtraBold,
+                lineHeight = 44.sp
             )
             
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(16.dp))
             
             Text(
-                "No bank sync. No heavy setup. Start with simple numbers and get a clear plan for your next payday.",
+                "No bank sync. No heavy setup. Start with simple numbers and get a clear split for your next salary.",
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                lineHeight = 24.sp
             )
             
-            Spacer(Modifier.height(32.dp))
-            
-            Text(
-                "\"Built with intention to give every dollar a job.\"",
-                fontFamily = FontFamily.Cursive,
-                fontStyle = FontStyle.Italic,
-                fontSize = 24.sp,
-                color = MaterialTheme.colorScheme.primary
-            )
+            Spacer(Modifier.height(48.dp))
+
+            // Premium Visual Anchor
+            androidx.compose.foundation.background(
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+            ).let { 
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .then(it)
+                        .padding(20.dp)
+                ) {
+                    Text(
+                        "Designed for Intention",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        "Give every dollar a job before you even spend it.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
             
             Spacer(Modifier.weight(1f))
             
@@ -65,20 +84,20 @@ fun WelcomeScreen(
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape = MaterialTheme.shapes.medium
             ) {
-                Text("Start", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                Text("Get Started", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
+            
+            Spacer(Modifier.height(8.dp))
+
             TextButton(
                 onClick = onSkip, 
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape = MaterialTheme.shapes.medium
             ) {
-                Text("Skip for now", fontSize = 16.sp)
+                Text("Explore the app first", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            Text(
-                "You can explore the app first, but the magic happens when you build your plan.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            
+            Spacer(Modifier.height(16.dp))
         }
     }
 }

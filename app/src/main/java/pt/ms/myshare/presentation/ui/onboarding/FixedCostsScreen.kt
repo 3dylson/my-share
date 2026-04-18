@@ -50,14 +50,25 @@ fun FixedCostsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(24.dp)
         ) {
-            TextButton(onClick = onBack) { Text("Back") }
-            Spacer(Modifier.height(8.dp))
-            Text("How much must leave your account every month?", style = MaterialTheme.typography.headlineMedium)
-            Text("Rent, utilities, and other absolute essentials.", color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Spacer(Modifier.height(8.dp))
+            TextButton(onClick = onBack, modifier = Modifier.padding(bottom = 8.dp)) { 
+                Text("Back", color = MaterialTheme.colorScheme.onSurfaceVariant) 
+            }
+            
+            Text(
+                "Essentials & Bills", 
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold
+            )
+            
+            Text(
+                "What must leave your account every month for rent, utilities, and absolute essentials?", 
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyLarge
+            )
+            
+            Spacer(Modifier.height(32.dp))
 
             OutlinedTextField(
                 value = fixedCostsText,
@@ -66,6 +77,7 @@ fun FixedCostsScreen(
                 label = { Text("Monthly fixed costs") },
                 placeholder = { Text("e.g. 1200.00") },
                 singleLine = true,
+                prefix = { Text("€ ") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 isError = fixedCostsText.isNotEmpty() && fixedCosts == null
             )
@@ -74,15 +86,19 @@ fun FixedCostsScreen(
                 Text(
                     text = "Please enter a valid number for costs.",
                     color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = 4.dp)
                 )
             }
 
-            Text("Plan style", style = MaterialTheme.typography.titleMedium)
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                PresetChip("Conservative", preset == AllocationPreset.CONSERVATIVE) { preset = AllocationPreset.CONSERVATIVE }
-                PresetChip("Balanced", preset == AllocationPreset.BALANCED) { preset = AllocationPreset.BALANCED }
-                PresetChip("Growth", preset == AllocationPreset.GROWTH) { preset = AllocationPreset.GROWTH }
+            Spacer(Modifier.height(32.dp))
+
+            Text("Allocation style", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            Spacer(Modifier.height(12.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                PresetChip("Conservative", preset == AllocationPreset.CONSERVATIVE, Modifier.weight(1f)) { preset = AllocationPreset.CONSERVATIVE }
+                PresetChip("Balanced", preset == AllocationPreset.BALANCED, Modifier.weight(1f)) { preset = AllocationPreset.BALANCED }
+                PresetChip("Growth", preset == AllocationPreset.GROWTH, Modifier.weight(1f)) { preset = AllocationPreset.GROWTH }
             }
 
             if (error != null) {
@@ -90,7 +106,7 @@ fun FixedCostsScreen(
                     text = error,
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(top = 8.dp)
+                    modifier = Modifier.padding(top = 16.dp)
                 )
             }
 
@@ -103,30 +119,41 @@ fun FixedCostsScreen(
                 enabled = fixedCosts != null && fixedCosts >= BigDecimal.ZERO,
                 shape = MaterialTheme.shapes.medium
             ) {
-                Text("Continue", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                Text("Continue", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
         }
     }
 }
 
 @Composable
-private fun ChoiceCard(text: String, selected: Boolean, onClick: () -> Unit) {
+private fun ChoiceCard(text: String, selected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Card(
-        modifier = Modifier.clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
+        modifier = modifier.clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
         border = BorderStroke(
             width = if (selected) 2.dp else 1.dp,
             color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
         ),
         colors = CardDefaults.cardColors(
-            containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
+            containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f) else MaterialTheme.colorScheme.surface
         )
     ) {
-        Text(text, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp))
+        androidx.compose.foundation.layout.Box(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp, horizontal = 8.dp),
+            contentAlignment = androidx.compose.ui.Alignment.Center
+        ) {
+            Text(
+                text, 
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                color = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
+                maxLines = 1
+            )
+        }
     }
 }
 
 @Composable
-private fun PresetChip(text: String, selected: Boolean, onClick: () -> Unit) {
-    ChoiceCard(text = text, selected = selected, onClick = onClick)
+private fun PresetChip(text: String, selected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    ChoiceCard(text = text, selected = selected, modifier = modifier, onClick = onClick)
 }

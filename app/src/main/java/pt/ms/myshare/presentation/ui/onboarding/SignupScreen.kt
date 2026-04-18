@@ -2,6 +2,10 @@ package pt.ms.myshare.presentation.ui.onboarding
 
 import android.content.Context
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -32,12 +36,47 @@ fun SignupScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(24.dp)
         ) {
-            Text(stringResource(R.string.onboarding_signup_title), style = MaterialTheme.typography.headlineMedium)
-            Text(stringResource(R.string.onboarding_signup_subtitle), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.height(32.dp))
+            
+            Text(
+                stringResource(R.string.onboarding_signup_title), 
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.ExtraBold
+            )
+            
+            Spacer(Modifier.height(8.dp))
+            
+            Text(
+                stringResource(R.string.onboarding_signup_subtitle), 
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyLarge
+            )
+            
+            Spacer(Modifier.height(48.dp))
+
+            // Trust / Feature Section
+            Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
+                SecurityFeature(
+                    title = "Your Private Vault",
+                    description = "We don't store your bank credentials. Ever.",
+                    icon = androidx.compose.material.icons.Icons.Default.Lock
+                )
+                SecurityFeature(
+                    title = "Cloud Sync",
+                    description = "Access your plan across all your devices.",
+                    icon = androidx.compose.material.icons.Icons.Default.Cloud
+                )
+                SecurityFeature(
+                    title = "Safe & Secure",
+                    description = "Biometric protection for your sensitive data.",
+                    icon = androidx.compose.material.icons.Icons.Default.Fingerprint
+                )
+            }
+            
             Spacer(Modifier.weight(1f))
+            
             Button(
                 onClick = {
                     coroutineScope.launch {
@@ -64,22 +103,46 @@ fun SignupScreen(
                             }
                         } catch (e: Exception) {
                             Timber.e(e, "Google Sign-In failed")
-                            // Fallback or error handling here
                         }
                     }
                 },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape = MaterialTheme.shapes.medium
             ) {
-                Text(stringResource(R.string.onboarding_signup_google), fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                Text(stringResource(R.string.onboarding_signup_google), fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
+            
+            Spacer(Modifier.height(8.dp))
+
             TextButton(
                 onClick = onSkip,
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape = MaterialTheme.shapes.medium
             ) {
-                Text(stringResource(R.string.onboarding_signup_skip), fontSize = 16.sp)
+                Text(stringResource(R.string.onboarding_signup_skip), fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
+            
+            Spacer(Modifier.height(16.dp))
         }
     }
+}
+
+@Composable
+private fun SecurityFeature(title: String, description: String, icon: androidx.compose.ui.graphics.vector.ImageVector) {
+    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+        androidx.compose.foundation.background(
+            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+            shape = androidx.compose.foundation.shape.CircleShape
+        ).let { 
+            Box(modifier = Modifier.size(48.dp).then(it), contentAlignment = androidx.compose.ui.Alignment.Center) {
+                Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+            }
+        }
+        Spacer(Modifier.width(20.dp))
+        Column {
+            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
 }

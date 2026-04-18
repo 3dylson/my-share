@@ -71,21 +71,96 @@ fun ReminderSetupScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
         ) {
-            Text("Set up the repeat loop", style = MaterialTheme.typography.headlineMedium)
-            Text("Ask for notifications only after the plan exists and only in the context of reminders.", color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Button(onClick = { cadence = ReminderCadence.PAYDAY }) { Text("Payday") }
-                Button(onClick = { cadence = ReminderCadence.WEEKLY_REVIEW }) { Text("Weekly review") }
+            Spacer(Modifier.height(48.dp))
+            
+            Text(
+                "Stay on track",
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+            
+            Spacer(Modifier.height(12.dp))
+            
+            Text(
+                "Consistent check-ins are the key to building wealth. We'll send a gentle nudge to help you follow your plan.",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+            
+            Spacer(Modifier.height(48.dp))
+
+            // Cadence Selection
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                androidx.compose.material3.FilterChip(
+                    selected = cadence == ReminderCadence.PAYDAY,
+                    onClick = { cadence = ReminderCadence.PAYDAY },
+                    label = { Text("Every Payday") },
+                    modifier = Modifier.padding(4.dp)
+                )
+                androidx.compose.material3.FilterChip(
+                    selected = cadence == ReminderCadence.WEEKLY_REVIEW,
+                    onClick = { cadence = ReminderCadence.WEEKLY_REVIEW },
+                    label = { Text("Weekly Review") },
+                    modifier = Modifier.padding(4.dp)
+                )
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Button(onClick = { time = time.minusHours(1) }) { Text("-1h") }
-                Text("${time.hour.toString().padStart(2, '0')}:${time.minute.toString().padStart(2, '0')}")
-                Button(onClick = { time = time.plusHours(1) }) { Text("+1h") }
+
+            Spacer(Modifier.height(32.dp))
+
+            // Time Selector
+            Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+                Text(
+                    "Reminder Time",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(Modifier.height(16.dp))
+                Row(
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(24.dp)
+                ) {
+                    androidx.compose.material3.IconButton(
+                        onClick = { time = time.minusHours(1) },
+                        modifier = androidx.compose.foundation.background(
+                            MaterialTheme.colorScheme.surfaceVariant,
+                            androidx.compose.foundation.shape.CircleShape
+                        )
+                    ) {
+                        Text("-", fontSize = 24.sp)
+                    }
+
+                    Text(
+                        "${time.hour.toString().padStart(2, '0')}:${time.minute.toString().padStart(2, '0')}",
+                        style = MaterialTheme.typography.displayMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+
+                    androidx.compose.material3.IconButton(
+                        onClick = { time = time.plusHours(1) },
+                        modifier = androidx.compose.foundation.background(
+                            MaterialTheme.colorScheme.surfaceVariant,
+                            androidx.compose.foundation.shape.CircleShape
+                        )
+                    ) {
+                        Text("+", fontSize = 24.sp)
+                    }
+                }
             }
-            message?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+
+            message?.let { 
+                Spacer(Modifier.height(16.dp))
+                Text(it, color = MaterialTheme.colorScheme.error, textAlign = androidx.compose.ui.text.style.TextAlign.Center) 
+            }
+
             Spacer(Modifier.weight(1f))
+
             Button(
                 onClick = { requestPermissionIfNeeded() },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
@@ -93,13 +168,18 @@ fun ReminderSetupScreen(
             ) {
                 Text("Enable reminders", fontSize = 16.sp, fontWeight = FontWeight.Medium)
             }
+            
+            Spacer(Modifier.height(8.dp))
+
             TextButton(
                 onClick = onSkip,
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape = MaterialTheme.shapes.medium
             ) {
-                Text("I’ll do this later", fontSize = 16.sp)
+                Text("I’ll do this later", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
+            
+            Spacer(Modifier.height(16.dp))
         }
     }
 }
