@@ -3,16 +3,17 @@ package pt.ms.myshare.presentation.ui.onboarding
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import pt.ms.myshare.presentation.ui.theme.*
 
 @Composable
 fun BuildingPlanScreen(onBuilt: () -> Unit) {
@@ -39,7 +40,7 @@ fun BuildingPlanScreen(onBuilt: () -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(32.dp),
+                .padding(horizontal = 32.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start
         ) {
@@ -47,31 +48,32 @@ fun BuildingPlanScreen(onBuilt: () -> Unit) {
                 progress = progress,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(8.dp),
-                color = MaterialTheme.colorScheme.primary,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                    .height(12.dp),
+                color = MySharePrimary,
+                trackColor = MySharePrimaryContainer,
                 strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
             )
             
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(56.dp))
             
             Text(
-                "Building your blueprint",
-                style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Black
+                "Finalizing Blueprint",
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Black,
+                color = MyShareOnSurface
             )
             
-            Spacer(modifier = Modifier.height(8.dp))
-
             Text(
-                "Personalizing your logic and safety nets based on your inputs.",
+                "Personalizing your logic and safety nets based on your journey.",
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MyShareSecondary,
+                lineHeight = 24.sp,
+                modifier = Modifier.padding(top = 8.dp)
             )
             
             Spacer(modifier = Modifier.height(48.dp))
             
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
                 AnimatedStep(visible = step1Visible, text = "Aligning with your goals")
                 AnimatedStep(visible = step2Visible, text = "Structuring fixed costs")
                 AnimatedStep(visible = step3Visible, text = "Calculating weekly safe-to-spend")
@@ -84,7 +86,7 @@ fun BuildingPlanScreen(onBuilt: () -> Unit) {
 private fun AnimatedStep(visible: Boolean, text: String) {
     AnimatedVisibility(
         visible = visible,
-        enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { 40 }
+        enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { 20 }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -93,15 +95,15 @@ private fun AnimatedStep(visible: Boolean, text: String) {
             Icon(
                 imageVector = Icons.Default.CheckCircle,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = MySharePrimary,
                 modifier = Modifier.size(28.dp)
             )
-            Spacer(Modifier.width(16.dp))
+            Spacer(Modifier.width(20.dp))
             Text(
                 text = text,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MyShareOnSurface
             )
         }
     }

@@ -1,17 +1,22 @@
 package pt.ms.myshare.presentation.ui.onboarding
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.EventRepeat
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.ms.myshare.domain.model.PayFrequency
+import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.components.PremiumChoiceCard
+import pt.ms.myshare.presentation.ui.components.PremiumTextField
+import pt.ms.myshare.presentation.ui.theme.*
 import java.math.BigDecimal
 
 @Composable
@@ -30,58 +35,72 @@ fun SalaryAndScheduleScreen(
 
     val income = incomeText.toBigDecimalOrNull()
     val payday = paydayText.toIntOrNull() ?: 1
+    val scrollState = rememberScrollState()
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(horizontal = 24.dp)
+                .verticalScroll(scrollState)
         ) {
-            TextButton(onClick = onBack, modifier = Modifier.padding(bottom = 8.dp)) { 
-                Text("Back", color = MaterialTheme.colorScheme.onSurfaceVariant) 
+            Spacer(Modifier.height(16.dp))
+            TextButton(
+                onClick = onBack, 
+                contentPadding = PaddingValues(0.dp)
+            ) { 
+                Text("Back", color = MyShareSecondary) 
             }
+            
+            Spacer(Modifier.height(8.dp))
             
             Text(
                 "Your Cash Flow", 
-                style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Black
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.ExtraBold,
+                color = MyShareOnSurface
             )
             
             Text(
                 "We need to know when your money arrives to build a plan that actually works.", 
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyLarge
+                color = MyShareSecondary,
+                style = MaterialTheme.typography.bodyLarge,
+                lineHeight = 24.sp
             )
             
             Spacer(Modifier.height(32.dp))
 
-            OutlinedTextField(
+            PremiumTextField(
                 value = incomeText,
                 onValueChange = { incomeText = it.replace(',', '.') },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Next payday amount (Net)") },
-                placeholder = { Text("e.g. 2500.00") },
-                singleLine = true,
-                prefix = { Text("€ ") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                shape = RoundedCornerShape(16.dp)
+                label = "Next Net Payday Amount",
+                placeholder = "0.00",
+                prefix = { Text("€ ") }
             )
 
             Spacer(Modifier.height(32.dp))
 
-            Text("Pay frequency", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-            Spacer(Modifier.height(12.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+            Text(
+                "Pay Frequency", 
+                style = MaterialTheme.typography.titleMedium, 
+                fontWeight = FontWeight.Bold,
+                color = MyShareOnSurface
+            )
+            Spacer(Modifier.height(16.dp))
+            
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 PremiumChoiceCard(
-                    text = "Monthly",
-                    selected = frequency == PayFrequency.MONTHLY,
-                    modifier = Modifier.weight(1f),
+                    title = "Monthly",
+                    description = "I get paid once a month.",
+                    isSelected = frequency == PayFrequency.MONTHLY,
+                    icon = Icons.Default.CalendarMonth,
                     onClick = { frequency = PayFrequency.MONTHLY }
                 )
                 PremiumChoiceCard(
-                    text = "Every 2 weeks",
-                    selected = frequency == PayFrequency.BIWEEKLY,
-                    modifier = Modifier.weight(1f),
+                    title = "Every 2 weeks",
+                    description = "I get paid bi-weekly.",
+                    isSelected = frequency == PayFrequency.BIWEEKLY,
+                    icon = Icons.Default.EventRepeat,
                     onClick = { frequency = PayFrequency.BIWEEKLY }
                 )
             }
@@ -89,39 +108,33 @@ fun SalaryAndScheduleScreen(
             Spacer(Modifier.height(32.dp))
 
             if (frequency == PayFrequency.MONTHLY) {
-                OutlinedTextField(
+                PremiumTextField(
                     value = paydayText,
                     onValueChange = { if (it.length <= 2) paydayText = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Typical payday (Day of month)") },
-                    placeholder = { Text("e.g. 28") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    shape = RoundedCornerShape(16.dp)
+                    label = "Typical Payday (Day of month)",
+                    placeholder = "e.g. 28"
                 )
             } else {
-                OutlinedTextField(
+                PremiumTextField(
                     value = biweeklyPaydayText,
                     onValueChange = { biweeklyPaydayText = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Next payday date") },
-                    placeholder = { Text("e.g. Apr 25") },
-                    singleLine = true,
-                    shape = RoundedCornerShape(16.dp)
+                    label = "Next Payday Date",
+                    placeholder = "e.g. Apr 25"
                 )
             }
 
-            Spacer(Modifier.weight(1f))
-            Button(
+            Spacer(Modifier.height(40.dp))
+            
+            PremiumButton(
+                text = "Continue",
                 onClick = {
                     onNext(income ?: BigDecimal.ZERO, frequency, payday, biweeklyPaydayText)
                 },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                enabled = income != null && income > BigDecimal.ZERO,
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Text("Continue", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            }
+                enabled = income != null && income > BigDecimal.ZERO
+            )
+            
+            Spacer(Modifier.height(32.dp))
         }
     }
 }
+

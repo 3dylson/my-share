@@ -1,8 +1,11 @@
 package pt.ms.myshare.presentation.ui.onboarding
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -11,7 +14,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.ms.myshare.domain.model.PlanningFocus
+import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.components.PremiumChoiceCard
+import pt.ms.myshare.presentation.ui.components.PremiumTextField
+import pt.ms.myshare.presentation.ui.theme.*
 import java.math.BigDecimal
 
 @Composable
@@ -27,6 +33,7 @@ fun GoalPickerScreen(
     var goalAmountText by remember { mutableStateOf(initialGoalAmount.toPlainString()) }
 
     val goalAmount = goalAmountText.toBigDecimalOrNull()
+    val scrollState = rememberScrollState()
 
     fun setDefaultsForFocus(focus: PlanningFocus) {
         selectedFocus = focus
@@ -54,86 +61,88 @@ fun GoalPickerScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(horizontal = 24.dp)
+                .verticalScroll(scrollState)
         ) {
-            TextButton(onClick = onBack, modifier = Modifier.padding(bottom = 8.dp)) { 
-                Text("Back", color = MaterialTheme.colorScheme.onSurfaceVariant) 
+            Spacer(Modifier.height(16.dp))
+            TextButton(
+                onClick = onBack, 
+                contentPadding = PaddingValues(0.dp)
+            ) { 
+                Text("Back", color = MyShareSecondary) 
             }
+            
+            Spacer(Modifier.height(8.dp))
             
             Text(
                 "Pick your priority", 
                 style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.ExtraBold,
+                color = MyShareOnSurface
             )
             
             Text(
                 "We'll tailor your experience based on your current financial focus.", 
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyLarge
+                color = MyShareSecondary,
+                style = MaterialTheme.typography.bodyLarge,
+                lineHeight = 24.sp
             )
             
             Spacer(Modifier.height(32.dp))
 
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 PlanningFocus.values().forEach { focus ->
-                    val (title, subtitle) = when (focus) {
-                        PlanningFocus.SAVE_WITHOUT_STRESS -> "Save without stress" to "Build a safety net without overthinking."
-                        PlanningFocus.INVEST_WITH_DISCIPLINE -> "Invest with discipline" to "Market consistency starts with a plan."
-                        PlanningFocus.STOP_OVERSPENDING -> "Stop overspending" to "Identify and plug the money leaks."
-                        PlanningFocus.PLAN_TOGETHER -> "Plan together" to "Coordinate finances with your partner."
+                    val (title, subtitle, icon) = when (focus) {
+                        PlanningFocus.SAVE_WITHOUT_STRESS -> Triple("Save without stress", "Build a safety net without overthinking.", Icons.Default.Savings)
+                        PlanningFocus.INVEST_WITH_DISCIPLINE -> Triple("Invest with discipline", "Market consistency starts with a plan.", Icons.Default.TrendingUp)
+                        PlanningFocus.STOP_OVERSPENDING -> Triple("Stop overspending", "Identify and plug the money leaks.", Icons.Default.Warning)
+                        PlanningFocus.PLAN_TOGETHER -> Triple("Plan together", "Coordinate finances with your partner.", Icons.Default.People)
                     }
                     PremiumChoiceCard(
-                        text = title,
-                        supportingText = subtitle,
-                        selected = selectedFocus == focus,
+                        title = title,
+                        description = subtitle,
+                        isSelected = selectedFocus == focus,
+                        icon = icon,
                         onClick = { setDefaultsForFocus(focus) }
                     )
                 }
             }
 
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(40.dp))
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                ),
-                shape = RoundedCornerShape(20.dp)
-            ) {
-                Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("Your specific goal", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-                    
-                    OutlinedTextField(
-                        value = goalName,
-                        onValueChange = { goalName = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text("What are you saving for?") },
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                    OutlinedTextField(
-                        value = goalAmountText,
-                        onValueChange = { goalAmountText = it.replace(',', '.') },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text("Target Amount") },
-                        prefix = { Text("€ ") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                }
-            }
-
-            Spacer(Modifier.weight(1f))
+            Text(
+                "Customize Goal", 
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MyShareOnSurface
+            )
+            Spacer(Modifier.height(16.dp))
             
-            Button(
+            PremiumTextField(
+                value = goalName,
+                onValueChange = { goalName = it },
+                label = "What are you saving for?",
+                placeholder = "e.g. Travel, House, Wedding"
+            )
+            Spacer(Modifier.height(16.dp))
+            PremiumTextField(
+                value = goalAmountText,
+                onValueChange = { goalAmountText = it.replace(',', '.') },
+                label = "Target Amount",
+                prefix = { Text("€ ") },
+                placeholder = "0.00"
+            )
+
+            Spacer(Modifier.height(40.dp))
+            
+            PremiumButton(
+                text = "Continue",
                 onClick = { onNext(selectedFocus, goalName.ifBlank { "Emergency fund" }, goalAmount ?: BigDecimal.ZERO) },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                enabled = goalAmount != null && goalAmount > BigDecimal.ZERO,
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Text("Continue", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            }
+                enabled = goalAmount != null && goalAmount > BigDecimal.ZERO
+            )
+            
+            Spacer(Modifier.height(32.dp))
         }
     }
 }
+

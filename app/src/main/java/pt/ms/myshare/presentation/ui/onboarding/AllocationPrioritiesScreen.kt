@@ -1,18 +1,19 @@
 package pt.ms.myshare.presentation.ui.onboarding
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import pt.ms.myshare.presentation.ui.components.PremiumButton
+import pt.ms.myshare.presentation.ui.components.PremiumTextField
+import pt.ms.myshare.presentation.ui.theme.*
 import java.math.BigDecimal
 import java.text.NumberFormat
-import java.util.Locale
+import java.util.*
 
 @Composable
 fun AllocationPrioritiesScreen(
@@ -40,30 +41,39 @@ fun AllocationPrioritiesScreen(
 
     val locale = Locale.getDefault()
     val currency = NumberFormat.getCurrencyInstance(locale)
+    val symbol = currency.currency?.symbol ?: "€"
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(horizontal = 24.dp)
         ) {
-            TextButton(onClick = onBack, modifier = Modifier.padding(bottom = 8.dp)) { 
-                Text("Back", color = MaterialTheme.colorScheme.onSurfaceVariant) 
+            Spacer(Modifier.height(16.dp))
+            TextButton(
+                onClick = onBack, 
+                contentPadding = PaddingValues(0.dp)
+            ) { 
+                Text("Back", color = MyShareSecondary) 
             }
+            
+            Spacer(Modifier.height(8.dp))
             
             Text(
                 "Money Allocation", 
-                style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Black
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.ExtraBold,
+                color = MyShareOnSurface
             )
             
             Text(
-                "Give every dollar a job. You have ${currency.format(totalAvailable)} to distribute.", 
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyLarge
+                "Give every cent a job. Distribute ${currency.format(totalAvailable)} to build your plan.", 
+                color = MyShareSecondary,
+                style = MaterialTheme.typography.bodyLarge,
+                lineHeight = 24.sp
             )
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(32.dp))
 
             // Progress Section
             val progress = if (totalAvailable > BigDecimal.ZERO) {
@@ -73,112 +83,85 @@ fun AllocationPrioritiesScreen(
             Column {
                 LinearProgressIndicator(
                     progress = progress.coerceAtMost(1f),
-                    modifier = Modifier.fillMaxWidth().height(8.dp),
-                    color = if (remaining < BigDecimal.ZERO) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                    modifier = Modifier.fillMaxWidth().height(12.dp),
+                    color = if (remaining < BigDecimal.ZERO) MaterialTheme.colorScheme.error else MySharePrimary,
+                    trackColor = MySharePrimaryContainer,
                     strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
                 )
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(12.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(
                         "Allocated: ${currency.format(allocated)}", 
-                        style = MaterialTheme.typography.labelMedium,
-                        color = if (remaining < BigDecimal.ZERO) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
+                        style = MaterialTheme.typography.labelLarge,
+                        color = if (remaining < BigDecimal.ZERO) MaterialTheme.colorScheme.error else MyShareSecondary
                     )
                     Text(
-                        if (remaining >= BigDecimal.ZERO) "Left: ${currency.format(remaining)}" else "Over: ${currency.format(remaining.abs())}", 
-                        style = MaterialTheme.typography.labelMedium,
+                        if (remaining >= BigDecimal.ZERO) "Remaining: ${currency.format(remaining)}" else "Over: ${currency.format(remaining.abs())}", 
+                        style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
-                        color = if (remaining < BigDecimal.ZERO) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                        color = if (remaining < BigDecimal.ZERO) MaterialTheme.colorScheme.error else MySharePrimary
                     )
                 }
             }
 
             Spacer(Modifier.height(32.dp))
 
-            androidx.compose.foundation.lazy.LazyColumn(
+            LazyColumn(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                contentPadding = PaddingValues(bottom = 24.dp)
             ) {
                 item {
-                    AllocationInput(
-                        title = "Flexible Spending",
-                        description = "Groceries, dining, hobbies, and day-to-day life.",
+                    PremiumTextField(
                         value = flex,
                         onValueChange = { flex = it.replace(',', '.') },
-                        currency = currency.currency?.symbol ?: "€"
+                        label = "Flexible Spending",
+                        prefix = { Text("$symbol ") },
+                        placeholder = "0.00",
+                        description = "Groceries, dining, hobbies, and day-to-day life."
                     )
                 }
                 item {
-                    AllocationInput(
-                        title = "Savings",
-                        description = "Cushion for emergencies and short-term goals.",
+                    PremiumTextField(
                         value = sav,
                         onValueChange = { sav = it.replace(',', '.') },
-                        currency = currency.currency?.symbol ?: "€"
+                        label = "Savings",
+                        prefix = { Text("$symbol ") },
+                        placeholder = "0.00",
+                        description = "Cushion for emergencies and short-term goals."
                     )
                 }
                 item {
-                    AllocationInput(
-                        title = "Investing",
-                        description = "Long-term growth and market exposure.",
+                    PremiumTextField(
                         value = inv,
                         onValueChange = { inv = it.replace(',', '.') },
-                        currency = currency.currency?.symbol ?: "€"
+                        label = "Investing",
+                        prefix = { Text("$symbol ") },
+                        placeholder = "0.00",
+                        description = "Long-term growth and market exposure."
                     )
                 }
                 item {
-                    AllocationInput(
-                        title = "Speculative / Crypto",
-                        description = "High-risk, high-reward allocations.",
+                    PremiumTextField(
                         value = cry,
                         onValueChange = { cry = it.replace(',', '.') },
-                        currency = currency.currency?.symbol ?: "€"
+                        label = "Speculative / Crypto",
+                        prefix = { Text("$symbol ") },
+                        placeholder = "0.00",
+                        description = "High-risk allocations (optional)."
                     )
                 }
             }
 
             Spacer(Modifier.height(16.dp))
 
-            Button(
+            PremiumButton(
+                text = if (isValid) "Build My Blueprint" else "Balance your allocation",
                 onClick = { onNext(parsedFlex, parsedSav, parsedInv, parsedCry) },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                enabled = isValid,
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Text(
-                    text = if (isValid) "Build My Plan" else "Remaining: ${currency.format(remaining)}",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun AllocationInput(
-    title: String,
-    description: String,
-    value: String,
-    onValueChange: (String) -> Unit,
-    currency: String
-) {
-    Column {
-        Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(Modifier.height(8.dp))
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            modifier = Modifier.fillMaxWidth(),
-            prefix = { Text("$currency ") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-            singleLine = true,
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                enabled = isValid
             )
-        )
+            
+            Spacer(Modifier.height(32.dp))
+        }
     }
 }

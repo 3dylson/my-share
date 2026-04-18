@@ -1,10 +1,9 @@
 package pt.ms.myshare.presentation.ui.onboarding
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.AutoGraph
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -13,6 +12,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import pt.ms.myshare.presentation.ui.components.PremiumButton
+import pt.ms.myshare.presentation.ui.theme.*
 
 @Composable
 fun WelcomeScreen(
@@ -27,92 +28,75 @@ fun WelcomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Premium Visual Anchor
+            Spacer(Modifier.height(80.dp))
+
+            // Premium Visual Anchor - Glow effect
             Surface(
-                modifier = Modifier.size(80.dp),
-                shape = RoundedCornerShape(24.dp),
-                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                modifier = Modifier.size(100.dp),
+                shape = RoundedCornerShape(32.dp),
+                color = MySharePrimaryContainer,
+                shadowElevation = 8.dp
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
-                        imageVector = Icons.Default.CheckCircle,
+                        imageVector = Icons.Default.AutoGraph,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(40.dp)
+                        tint = MySharePrimary,
+                        modifier = Modifier.size(48.dp)
                     )
                 }
             }
             
-            Spacer(Modifier.height(40.dp))
+            Spacer(Modifier.height(48.dp))
 
             Text(
-                "Welcome to My Share", 
-                style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Black,
+                "Your Money,\nBuilt for Intention", 
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.ExtraBold,
                 textAlign = TextAlign.Center,
-                lineHeight = 44.sp
+                lineHeight = 42.sp,
+                color = MyShareOnSurface
             )
             
             Spacer(Modifier.height(16.dp))
             
             Text(
-                "The intentional way to manage your income, bills, and goals.",
+                "Stop reactive spending. Start building your blueprint for financial freedom today.",
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                lineHeight = 24.sp
+                color = MyShareSecondary,
+                modifier = Modifier.padding(horizontal = 8.dp),
+                lineHeight = 26.sp
             )
-
-            Spacer(Modifier.height(48.dp))
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                ),
-                shape = RoundedCornerShape(24.dp),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-            ) {
-                Column(
-                    modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        "Designed for Intention", 
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    Text(
-                        "Stop reactive spending. Start building your blueprint for financial freedom today.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        lineHeight = 20.sp
-                    )
-                }
-            }
 
             Spacer(Modifier.weight(1f))
 
-            Button(
-                onClick = onContinue,
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = MaterialTheme.shapes.medium
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Get Started", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                PremiumButton(
+                    text = "Get Started",
+                    onClick = onContinue
+                )
+                
+                TextButton(
+                    onClick = onSkip,
+                    modifier = Modifier.height(48.dp)
+                ) {
+                    Text(
+                        "Explore the app first", 
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MyShareSecondary
+                    )
+                }
             }
             
-            TextButton(
-                onClick = onSkip,
-                modifier = Modifier.fillMaxWidth().height(56.dp)
-            ) {
-                Text("Explore the app first", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
+            Spacer(Modifier.height(16.dp))
         }
     }
 }
+

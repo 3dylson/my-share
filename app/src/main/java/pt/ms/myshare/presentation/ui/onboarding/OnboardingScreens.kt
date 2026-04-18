@@ -1,38 +1,28 @@
 package pt.ms.myshare.presentation.ui.onboarding
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.ui.Alignment
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.PlanPreview
+import pt.ms.myshare.presentation.ui.components.*
+import pt.ms.myshare.presentation.ui.theme.*
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.time.format.DateTimeFormatter
-import java.util.Locale
-
-import pt.ms.myshare.presentation.ui.components.PremiumMetricCard
-import pt.ms.myshare.presentation.ui.components.PremiumChoiceCard
+import java.util.*
 
 @Composable
 fun PlanPreviewScreen(
@@ -50,47 +40,50 @@ fun PlanPreviewScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(horizontal = 24.dp)
         ) {
+            Spacer(Modifier.height(40.dp))
+            
             Text(
-                "Your Blueprint", 
-                style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Black
+                "Final Blueprint", 
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.ExtraBold,
+                color = MyShareOnSurface
             )
             Text(
                 "Created for your payday on ${preview.nextPayday.format(dateFormatter)}",
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MyShareSecondary,
+                lineHeight = 24.sp
             )
 
             Spacer(Modifier.height(32.dp))
 
-            androidx.compose.foundation.lazy.LazyColumn(
+            LazyColumn(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(bottom = 24.dp)
             ) {
                 item {
                     PremiumMetricCard(
-                        title = "Initial Balance",
+                        label = "Initial Balance",
                         value = currency.format(preview.incomePerPayday),
-                        supportingText = preview.summary,
-                        isPrimary = true
+                        description = preview.summary
                     )
                 }
 
                 item {
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         PremiumMetricCard(
-                            title = "Fixed Costs", 
+                            label = "Fixed Costs", 
                             value = currency.format(preview.fixedCostsPerPayday), 
-                            modifier = Modifier.weight(1f),
-                            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f)
+                            modifier = Modifier.weight(1f)
                         )
                         PremiumMetricCard(
-                            title = "Flexible", 
+                            label = "Flexible", 
                             value = currency.format(preview.flexibleSpendPerPayday), 
                             modifier = Modifier.weight(1f),
-                            supportingText = "${currency.format(preview.weeklyFlexibleSpend)} / week"
+                            description = "${currency.format(preview.weeklyFlexibleSpend)} / week"
                         )
                     }
                 }
@@ -98,36 +91,46 @@ fun PlanPreviewScreen(
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        shape = RoundedCornerShape(24.dp)
+                        colors = CardDefaults.cardColors(containerColor = MySharePrimaryContainer.copy(alpha = 0.5f)),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp)
                     ) {
-                        Column(Modifier.padding(20.dp)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text("Savings Goal", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-                                    Text(goalName, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                                }
-                                Text(currency.format(goalAmount), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                            }
+                        Column(Modifier.padding(24.dp)) {
+                            Text(
+                                "Savings Goal", 
+                                style = MaterialTheme.typography.labelMedium, 
+                                color = MySharePrimary,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                goalName, 
+                                style = MaterialTheme.typography.headlineSmall, 
+                                fontWeight = FontWeight.ExtraBold,
+                                color = MyShareOnSurface
+                            )
                             
                             Spacer(Modifier.height(16.dp))
                             
-                            Text(
-                                "Monthly contribution: ${currency.format(preview.savingsPerPayday)}",
-                                style = MaterialTheme.typography.bodyMedium
-                            )
+                            Row(verticalAlignment = Alignment.Bottom) {
+                                Text(
+                                    currency.format(goalAmount), 
+                                    style = MaterialTheme.typography.titleLarge, 
+                                    fontWeight = FontWeight.Bold,
+                                    color = MyShareOnSurface
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    "target", 
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MyShareSecondary
+                                )
+                            }
                             
                             preview.goalTargetDate?.let { date ->
-                                Spacer(Modifier.height(4.dp))
+                                Spacer(Modifier.height(8.dp))
                                 Text(
                                     "Estimated: ${date.month.name.lowercase().replaceFirstChar(Char::titlecase)} ${date.year}",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.primary,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MySharePrimary,
                                     fontWeight = FontWeight.Bold
                                 )
                             }
@@ -136,14 +139,14 @@ fun PlanPreviewScreen(
                 }
 
                 item {
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         PremiumMetricCard(
-                            title = "Investing", 
+                            label = "Investing", 
                             value = currency.format(preview.investingPerPayday), 
                             modifier = Modifier.weight(1f)
                         )
                         PremiumMetricCard(
-                            title = "Crypto", 
+                            label = "Crypto", 
                             value = currency.format(preview.cryptoPerPayday), 
                             modifier = Modifier.weight(1f)
                         )
@@ -151,21 +154,25 @@ fun PlanPreviewScreen(
                 }
             }
 
-            Spacer(Modifier.height(24.dp))
-            
-            Button(
-                onClick = onAutopilot, 
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = MaterialTheme.shapes.medium
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text("Secure my plan", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            }
-            
-            TextButton(
-                onClick = onNotNow, 
-                modifier = Modifier.fillMaxWidth().height(56.dp)
-            ) {
-                Text("Start with basic plan", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                PremiumButton(
+                    text = "Secure My Plan",
+                    onClick = onAutopilot
+                )
+                
+                TextButton(
+                    onClick = onNotNow, 
+                    modifier = Modifier.fillMaxWidth().height(48.dp)
+                ) {
+                    Text(
+                        "Start with basic plan", 
+                        style = MaterialTheme.typography.labelLarge, 
+                        color = MyShareSecondary
+                    )
+                }
             }
         }
     }
@@ -181,100 +188,113 @@ fun PaywallScreen(
     onPurchaseSelected: (android.app.Activity) -> Unit
 ) {
     val activity = androidx.activity.compose.LocalActivity.current
+    val scrollState = rememberScrollState()
+
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(horizontal = 24.dp)
+                .verticalScroll(scrollState)
         ) {
+            Spacer(Modifier.height(16.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 IconButton(onClick = onClose) {
-                    Icon(androidx.compose.material.icons.Icons.Default.Close, contentDescription = "Close")
+                    Icon(Icons.Default.Close, contentDescription = "Close", tint = MyShareSecondary)
                 }
                 TextButton(onClick = onRestore) { 
-                    Text("Restore", style = MaterialTheme.typography.labelLarge) 
+                    Text("Restore", color = MyShareSecondary, style = MaterialTheme.typography.labelLarge) 
                 }
             }
             
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(8.dp))
 
             Text(
                 pricingStrategy.paywallHeadline, 
-                style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Black
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.ExtraBold,
+                textAlign = TextAlign.Center,
+                lineHeight = 40.sp,
+                color = MyShareOnSurface,
+                modifier = Modifier.fillMaxWidth()
             )
-            Spacer(Modifier.height(8.dp))
+            
             Text(
                 pricingStrategy.paywallSubhead, 
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MyShareSecondary,
+                textAlign = TextAlign.Center,
+                lineHeight = 24.sp,
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
             )
             
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(40.dp))
 
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                FeatureRow("Automation", "Recurring rules for every payday.")
-                FeatureRow("Reminders", "Never forget to log your major spends.")
-                FeatureRow("Goals", "Track unlimited goals simultaneously.")
-                FeatureRow("Deals", "Early access to partner financial tools.")
+                FeatureRowNew("Automation", "Recurring rules for every payday.")
+                FeatureRowNew("Reminders", "Never forget to log your major spends.")
+                FeatureRowNew("Unlimited Goals", "Track all your dreams simultaneously.")
+                FeatureRowNew("Exclusive Deals", "Early access to partner financial tools.")
             }
 
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(48.dp))
 
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                PremiumChoiceCard(
-                    text = "Monthly",
-                    supportingText = pricingStrategy.monthlyLabel,
-                    selected = selectedPlan == BillingPlan.MONTHLY,
-                    modifier = Modifier.weight(1f),
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                PremiumPaywallCard(
+                    title = "Monthly",
+                    price = pricingStrategy.monthlyLabel,
+                    description = "Flexible commitment",
+                    isSelected = selectedPlan == BillingPlan.MONTHLY,
                     onClick = { onPlanSelected(BillingPlan.MONTHLY) }
                 )
-                PremiumChoiceCard(
-                    text = "Annual",
-                    supportingText = pricingStrategy.annualLabel,
-                    selected = selectedPlan == BillingPlan.ANNUAL,
-                    modifier = Modifier.weight(1f),
+                PremiumPaywallCard(
+                    title = "Annual",
+                    price = pricingStrategy.annualLabel,
+                    description = "Best value for long-term growth",
+                    isSelected = selectedPlan == BillingPlan.ANNUAL,
+                    isTrialEligible = true,
                     onClick = { onPlanSelected(BillingPlan.ANNUAL) }
                 )
             }
             
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
             
             Text(
                 "Trial for ${pricingStrategy.trialDays} days. Cancel anytime.", 
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MyShareSecondary,
                 modifier = Modifier.fillMaxWidth(),
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                textAlign = TextAlign.Center
             )
 
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.height(40.dp))
             
-            Button(
-                onClick = { activity?.let(onPurchaseSelected) }, 
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Text("Upgrade Now", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            }
+            PremiumButton(
+                text = "Upgrade Now",
+                onClick = { activity?.let(onPurchaseSelected) }
+            )
+            
+            Spacer(Modifier.height(32.dp))
         }
     }
 }
 
 @Composable
-private fun FeatureRow(title: String, body: String) {
-    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+private fun FeatureRowNew(title: String, body: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
+    ) {
         Icon(
-            androidx.compose.material.icons.Icons.Default.Check, 
+            imageVector = Icons.Default.CheckCircle, 
             contentDescription = null, 
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = androidx.compose.ui.Modifier.size(20.dp)
+            tint = MySharePrimary,
+            modifier = Modifier.size(24.dp)
         )
         Spacer(Modifier.width(16.dp))
         Column {
-            Text(title, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
-            Text(body, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MyShareOnSurface)
+            Text(body, style = MaterialTheme.typography.bodyMedium, color = MyShareSecondary)
         }
     }
 }
-

@@ -13,6 +13,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,8 +23,9 @@ import androidx.credentials.GetCredentialRequest
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.launch
-import androidx.compose.ui.res.stringResource
 import pt.ms.myshare.R
+import pt.ms.myshare.presentation.ui.components.PremiumButton
+import pt.ms.myshare.presentation.ui.theme.*
 import timber.log.Timber
 
 @Composable
@@ -38,28 +40,28 @@ fun SignupScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(horizontal = 24.dp)
         ) {
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(40.dp))
             
             Text(
                 stringResource(R.string.onboarding_signup_title), 
-                style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.ExtraBold
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.ExtraBold,
+                color = MyShareOnSurface
             )
-            
-            Spacer(Modifier.height(8.dp))
             
             Text(
                 stringResource(R.string.onboarding_signup_subtitle), 
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyLarge
+                color = MyShareSecondary,
+                style = MaterialTheme.typography.bodyLarge,
+                lineHeight = 24.sp
             )
             
             Spacer(Modifier.height(48.dp))
 
             // Trust / Feature Section
-            Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(32.dp)) {
                 SecurityFeature(
                     title = "Your Private Vault",
                     description = "We don't store your bank credentials. Ever.",
@@ -79,7 +81,8 @@ fun SignupScreen(
             
             Spacer(Modifier.weight(1f))
             
-            Button(
+            PremiumButton(
+                text = stringResource(R.string.onboarding_signup_google),
                 onClick = {
                     coroutineScope.launch {
                         try {
@@ -107,24 +110,21 @@ fun SignupScreen(
                             Timber.e(e, "Google Sign-In failed")
                         }
                     }
-                },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Text(stringResource(R.string.onboarding_signup_google), fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            }
+                }
+            )
             
-            Spacer(Modifier.height(8.dp))
-
             TextButton(
                 onClick = onSkip,
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = MaterialTheme.shapes.medium
+                modifier = Modifier.fillMaxWidth().height(56.dp)
             ) {
-                Text(stringResource(R.string.onboarding_signup_skip), fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    stringResource(R.string.onboarding_signup_skip), 
+                    style = MaterialTheme.typography.labelLarge, 
+                    color = MyShareSecondary
+                )
             }
             
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
         }
     }
 }
@@ -134,19 +134,19 @@ private fun SecurityFeature(title: String, description: String, icon: androidx.c
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(
             modifier = Modifier
-                .size(48.dp)
+                .size(56.dp)
                 .background(
-                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                    color = MySharePrimaryContainer.copy(alpha = 0.5f),
                     shape = CircleShape
                 ),
             contentAlignment = Alignment.Center
         ) {
-            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+            Icon(icon, contentDescription = null, tint = MySharePrimary, modifier = Modifier.size(28.dp))
         }
         Spacer(Modifier.width(20.dp))
         Column {
-            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-            Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MyShareOnSurface)
+            Text(description, style = MaterialTheme.typography.bodyMedium, color = MyShareSecondary)
         }
     }
 }

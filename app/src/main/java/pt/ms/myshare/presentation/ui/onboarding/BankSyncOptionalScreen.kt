@@ -3,17 +3,21 @@ package pt.ms.myshare.presentation.ui.onboarding
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lock
 import pt.ms.myshare.R
+import pt.ms.myshare.presentation.ui.components.PremiumButton
+import pt.ms.myshare.presentation.ui.theme.*
+
 @Composable
 fun BankSyncOptionalScreen(
     onSync: () -> Unit,
@@ -23,17 +27,16 @@ fun BankSyncOptionalScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
+                .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(48.dp))
+            Spacer(Modifier.height(64.dp))
             
-            // Icon or Visual element placeholder (Shield icon for trust)
             Box(
                 modifier = Modifier
-                    .size(80.dp)
+                    .size(96.dp)
                     .background(
-                        color = MaterialTheme.colorScheme.primaryContainer,
+                        color = MySharePrimaryContainer.copy(alpha = 0.5f),
                         shape = CircleShape
                     ),
                 contentAlignment = Alignment.Center
@@ -41,50 +44,49 @@ fun BankSyncOptionalScreen(
                 Icon(
                     imageVector = Icons.Default.Lock,
                     contentDescription = null,
-                    modifier = Modifier.size(40.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                    modifier = Modifier.size(48.dp),
+                    tint = MySharePrimary
                 )
             }
 
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(40.dp))
 
             Text(
                 stringResource(R.string.onboarding_banksync_title), 
                 style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                fontWeight = FontWeight.ExtraBold,
+                textAlign = TextAlign.Center,
+                color = MyShareOnSurface
             )
-            
-            Spacer(Modifier.height(12.dp))
             
             Text(
                 stringResource(R.string.onboarding_banksync_subtitle), 
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MyShareSecondary,
                 style = MaterialTheme.typography.bodyLarge,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                textAlign = TextAlign.Center,
+                lineHeight = 24.sp,
+                modifier = Modifier.padding(top = 16.dp)
             )
             
             Spacer(Modifier.weight(1f))
             
-            Button(
-                onClick = onSync,
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Text(stringResource(R.string.onboarding_banksync_link), fontSize = 16.sp, fontWeight = FontWeight.Medium)
-            }
+            PremiumButton(
+                text = stringResource(R.string.onboarding_banksync_link),
+                onClick = onSync
+            )
             
-            Spacer(Modifier.height(8.dp))
-
             TextButton(
                 onClick = onSkip,
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = MaterialTheme.shapes.medium
+                modifier = Modifier.fillMaxWidth().height(56.dp)
             ) {
-                Text(stringResource(R.string.onboarding_banksync_skip), fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    stringResource(R.string.onboarding_banksync_skip), 
+                    style = MaterialTheme.typography.labelLarge, 
+                    color = MyShareSecondary
+                )
             }
             
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
         }
     }
 }

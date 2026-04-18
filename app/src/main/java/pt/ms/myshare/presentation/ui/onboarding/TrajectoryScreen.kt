@@ -1,16 +1,24 @@
 package pt.ms.myshare.presentation.ui.onboarding
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
 import pt.ms.myshare.domain.model.PlanPreview
+import pt.ms.myshare.presentation.ui.components.PremiumButton
+import pt.ms.myshare.presentation.ui.components.PremiumMetricCard
+import pt.ms.myshare.presentation.ui.theme.*
 import java.text.NumberFormat
-import java.util.Locale
+import java.util.*
 
 @Composable
 fun TrajectoryScreen(
@@ -19,111 +27,102 @@ fun TrajectoryScreen(
     onNext: () -> Unit
 ) {
     val currencyFormat = NumberFormat.getCurrencyInstance(Locale.getDefault())
+    val scrollState = rememberScrollState()
     
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = 24.dp)
+                .verticalScroll(scrollState)
         ) {
+            Spacer(Modifier.height(40.dp))
+            
             Text(
-                "Your Projection", 
+                "Your Blueprint", 
                 style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.ExtraBold,
+                color = MyShareOnSurface
             )
             
             Text(
-                "Based on your numbers, here is how you'll grow.", 
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyLarge
+                "Based on your numbers, here is how your wealth will grow with discipline.", 
+                color = MyShareSecondary,
+                style = MaterialTheme.typography.bodyLarge,
+                lineHeight = 24.sp
             )
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(32.dp))
             
             preview?.let {
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)),
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(modifier = Modifier.padding(24.dp)) {
-                        Text(
-                            "Next Payday", 
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.secondary
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    PremiumMetricCard(
+                        label = "Payday Allocation",
+                        value = it.summary,
+                        icon = Icons.Default.Savings,
+                        description = "This is what stays with you after all obligations are met."
+                    )
+                    
+                    it.goalTargetDate?.let { date ->
+                        val dateString = "${date.month.name.lowercase().replaceFirstChar(Char::titlecase)} ${date.year}"
+                        PremiumMetricCard(
+                            label = "Goal Achievement",
+                            value = dateString,
+                            icon = Icons.Default.Event,
+                            description = "Estimated date to reach your € ${goalName} target."
                         )
-                        Spacer(Modifier.height(8.dp))
-                        Text(
-                            it.summary, 
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-                        
-                        Divider(modifier = Modifier.padding(vertical = 16.dp), thickness = 0.5.dp)
-                        
-                        Text(
-                            "Target: $goalName",
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Medium
-                        )
-                        it.goalTargetDate?.let { date ->
-                            Text(
-                                "Estimated: ${date.month.name.lowercase().replaceFirstChar(Char::titlecase)} ${date.year}",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
                     }
                 }
                 
-                Spacer(Modifier.height(32.dp))
+                Spacer(Modifier.height(40.dp))
 
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        "Payday Allocation",
+                        "Contribution Intensity",
                         style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MyShareSecondary,
+                        modifier = Modifier.padding(bottom = 8.dp)
                     )
-                    Spacer(Modifier.height(4.dp))
                     Text(
                         currencyFormat.format(it.savingsPerPayday),
                         style = MaterialTheme.typography.displayMedium,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = MaterialTheme.colorScheme.primary
+                        fontWeight = FontWeight.Black,
+                        color = MySharePrimary
                     )
                     Text(
-                        "added to your future every payday.",
+                        "invested into your future every single payday.",
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MyShareOnSurface,
+                        lineHeight = 24.sp
                     )
                 }
-            } ?: Text("Calculating your trajectory...")
+            } ?: Box(modifier = Modifier.fillMaxWidth().height(200.dp)) {
+                CircularProgressIndicator(modifier = Modifier.align(androidx.compose.ui.Alignment.Center))
+            }
 
             Spacer(Modifier.weight(1f))
 
             Text(
-                "Start free with one goal and full plan visibility.",
+                "Start free with your first goal. Unlock unlimited tracking to scale your wealth.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
+                color = MyShareSecondary,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                lineHeight = 20.sp
             )
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
 
-            Button(
-                onClick = onNext,
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Text("Continue", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            }
+            PremiumButton(
+                text = "See Full Plan",
+                onClick = onNext
+            )
+            
+            Spacer(Modifier.height(32.dp))
         }
     }
 }
+

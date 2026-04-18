@@ -19,6 +19,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import pt.ms.myshare.domain.model.ReminderCadence
+import pt.ms.myshare.presentation.ui.components.PremiumButton
+import pt.ms.myshare.presentation.ui.components.PremiumChoiceCard
+import pt.ms.myshare.presentation.ui.theme.*
 import java.time.LocalTime
 
 @Composable
@@ -59,116 +62,117 @@ fun ReminderSetupScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
+                .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(48.dp))
+            Spacer(Modifier.height(40.dp))
             
             Text(
                 "Stay on track",
                 style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
+                fontWeight = FontWeight.ExtraBold,
+                textAlign = TextAlign.Center,
+                color = MyShareOnSurface
             )
-            
-            Spacer(Modifier.height(12.dp))
             
             Text(
                 "Consistent check-ins are the key to building wealth. We'll send a gentle nudge to help you follow your plan.",
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
+                color = MyShareSecondary,
+                textAlign = TextAlign.Center,
+                lineHeight = 24.sp,
+                modifier = Modifier.padding(top = 8.dp)
             )
             
             Spacer(Modifier.height(48.dp))
 
             // Cadence Selection
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                FilterChip(
-                    selected = cadence == ReminderCadence.PAYDAY,
-                    onClick = { cadence = ReminderCadence.PAYDAY },
-                    label = { Text("Every Payday") },
-                    modifier = Modifier.padding(4.dp)
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                PremiumChoiceCard(
+                    title = "Every Payday",
+                    description = "Stay aligned with your plan at every income event.",
+                    isSelected = cadence == ReminderCadence.PAYDAY,
+                    onClick = { cadence = ReminderCadence.PAYDAY }
                 )
-                FilterChip(
-                    selected = cadence == ReminderCadence.WEEKLY_REVIEW,
-                    onClick = { cadence = ReminderCadence.WEEKLY_REVIEW },
-                    label = { Text("Weekly Review") },
-                    modifier = Modifier.padding(4.dp)
+                PremiumChoiceCard(
+                    title = "Weekly Review",
+                    description = "Reflect and adjust your progress every Sunday.",
+                    isSelected = cadence == ReminderCadence.WEEKLY_REVIEW,
+                    onClick = { cadence = ReminderCadence.WEEKLY_REVIEW }
                 )
             }
 
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(48.dp))
 
             // Time Selector
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     "Reminder Time",
                     style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MySharePrimary,
+                    fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.height(16.dp))
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(24.dp)
+                    horizontalArrangement = Arrangement.spacedBy(32.dp)
                 ) {
                     IconButton(
                         onClick = { time = time.minusHours(1) },
-                        modifier = Modifier.background(
-                            MaterialTheme.colorScheme.surfaceVariant,
-                            CircleShape
-                        )
+                        modifier = Modifier
+                            .size(56.dp)
+                            .background(MySharePrimaryContainer, CircleShape)
                     ) {
-                        Text("-", fontSize = 24.sp)
+                        Text("-", fontSize = 28.sp, color = MySharePrimary, fontWeight = FontWeight.Bold)
                     }
 
                     Text(
                         "${time.hour.toString().padStart(2, '0')}:${time.minute.toString().padStart(2, '0')}",
                         style = MaterialTheme.typography.displayMedium,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.Black,
+                        color = MyShareOnSurface
                     )
 
                     IconButton(
                         onClick = { time = time.plusHours(1) },
-                        modifier = Modifier.background(
-                            MaterialTheme.colorScheme.surfaceVariant,
-                            CircleShape
-                        )
+                        modifier = Modifier
+                            .size(56.dp)
+                            .background(MySharePrimaryContainer, CircleShape)
                     ) {
-                        Text("+", fontSize = 24.sp)
+                        Text("+", fontSize = 28.sp, color = MySharePrimary, fontWeight = FontWeight.Bold)
                     }
                 }
             }
 
             message?.let { 
                 Spacer(Modifier.height(16.dp))
-                Text(it, color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center) 
+                Text(
+                    text = it, 
+                    color = MaterialTheme.colorScheme.error, 
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodySmall
+                ) 
             }
 
             Spacer(Modifier.weight(1f))
 
-            Button(
-                onClick = { requestPermissionIfNeeded() },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Text("Enable reminders", fontSize = 16.sp, fontWeight = FontWeight.Medium)
-            }
+            PremiumButton(
+                text = "Enable Reminders",
+                onClick = { requestPermissionIfNeeded() }
+            )
             
-            Spacer(Modifier.height(8.dp))
-
             TextButton(
                 onClick = onSkip,
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = MaterialTheme.shapes.medium
+                modifier = Modifier.fillMaxWidth().height(56.dp)
             ) {
-                Text("I’ll do this later", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    "I’ll do this later", 
+                    style = MaterialTheme.typography.labelLarge, 
+                    color = MyShareSecondary
+                )
             }
             
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
         }
     }
 }
