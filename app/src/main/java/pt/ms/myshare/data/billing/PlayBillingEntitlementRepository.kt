@@ -22,6 +22,15 @@ class PlayBillingEntitlementRepository(
     private val firebaseFunctions: FirebaseFunctions
 ) : EntitlementRepository {
 
+    override val isPro: Flow<Boolean> = billingClientWrapper.purchases.map { purchases ->
+        purchases.any { purchase -> 
+            (purchase.products.contains("myshare_annual") || purchase.products.contains("myshare_monthly")) && 
+            purchase.purchaseState == com.android.billingclient.api.Purchase.PurchaseState.PURCHASED
+        }
+    }
+
+    override val availableProducts: Flow<List<StoreProduct>> = billingClientWrapper.availableProducts
+
     init {
         billingClientWrapper.startBillingConnection()
         CoroutineScope(Dispatchers.IO).launch {
@@ -72,15 +81,6 @@ class PlayBillingEntitlementRepository(
             }
     }
 
-
-    override val isPro: Flow<Boolean> = billingClientWrapper.purchases.map { purchases ->
-        purchases.any { purchase -> 
-            (purchase.products.contains("myshare_annual") || purchase.products.contains("myshare_monthly")) && 
-            purchase.purchaseState == com.android.billingclient.api.Purchase.PurchaseState.PURCHASED
-        }
-    }
-
-    override val availableProducts: Flow<List<StoreProduct>> = billingClientWrapper.availableProducts
 
     override suspend fun checkActiveEntitlement() {
         billingClientWrapper.queryActivePurchases()

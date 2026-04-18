@@ -2,6 +2,7 @@ package pt.ms.myshare.presentation.ui.onboarding
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -52,8 +53,8 @@ fun AllocationPrioritiesScreen(
             
             Text(
                 "Money Allocation", 
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.Black
             )
             
             Text(
@@ -71,7 +72,7 @@ fun AllocationPrioritiesScreen(
             
             Column {
                 LinearProgressIndicator(
-                    progress = { progress.coerceAtMost(1f) },
+                    progress = progress.coerceAtMost(1f),
                     modifier = Modifier.fillMaxWidth().height(8.dp),
                     color = if (remaining < BigDecimal.ZERO) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
                     trackColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -180,5 +181,4 @@ private fun AllocationInput(
             )
         )
     }
-}
 }

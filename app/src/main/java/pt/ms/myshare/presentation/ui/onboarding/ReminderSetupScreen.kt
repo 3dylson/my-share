@@ -5,27 +5,16 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
@@ -71,7 +60,7 @@ fun ReminderSetupScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(24.dp),
-            horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(Modifier.height(48.dp))
             
@@ -79,7 +68,7 @@ fun ReminderSetupScreen(
                 "Stay on track",
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                textAlign = TextAlign.Center
             )
             
             Spacer(Modifier.height(12.dp))
@@ -88,7 +77,7 @@ fun ReminderSetupScreen(
                 "Consistent check-ins are the key to building wealth. We'll send a gentle nudge to help you follow your plan.",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                textAlign = TextAlign.Center
             )
             
             Spacer(Modifier.height(48.dp))
@@ -98,13 +87,13 @@ fun ReminderSetupScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                androidx.compose.material3.FilterChip(
+                FilterChip(
                     selected = cadence == ReminderCadence.PAYDAY,
                     onClick = { cadence = ReminderCadence.PAYDAY },
                     label = { Text("Every Payday") },
                     modifier = Modifier.padding(4.dp)
                 )
-                androidx.compose.material3.FilterChip(
+                FilterChip(
                     selected = cadence == ReminderCadence.WEEKLY_REVIEW,
                     onClick = { cadence = ReminderCadence.WEEKLY_REVIEW },
                     label = { Text("Weekly Review") },
@@ -115,7 +104,7 @@ fun ReminderSetupScreen(
             Spacer(Modifier.height(32.dp))
 
             // Time Selector
-            Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     "Reminder Time",
                     style = MaterialTheme.typography.labelLarge,
@@ -123,14 +112,14 @@ fun ReminderSetupScreen(
                 )
                 Spacer(Modifier.height(16.dp))
                 Row(
-                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                    verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
-                    androidx.compose.material3.IconButton(
+                    IconButton(
                         onClick = { time = time.minusHours(1) },
-                        modifier = androidx.compose.foundation.background(
+                        modifier = Modifier.background(
                             MaterialTheme.colorScheme.surfaceVariant,
-                            androidx.compose.foundation.shape.CircleShape
+                            CircleShape
                         )
                     ) {
                         Text("-", fontSize = 24.sp)
@@ -142,11 +131,11 @@ fun ReminderSetupScreen(
                         fontWeight = FontWeight.SemiBold
                     )
 
-                    androidx.compose.material3.IconButton(
+                    IconButton(
                         onClick = { time = time.plusHours(1) },
-                        modifier = androidx.compose.foundation.background(
+                        modifier = Modifier.background(
                             MaterialTheme.colorScheme.surfaceVariant,
-                            androidx.compose.foundation.shape.CircleShape
+                            CircleShape
                         )
                     ) {
                         Text("+", fontSize = 24.sp)
@@ -156,7 +145,7 @@ fun ReminderSetupScreen(
 
             message?.let { 
                 Spacer(Modifier.height(16.dp))
-                Text(it, color = MaterialTheme.colorScheme.error, textAlign = androidx.compose.ui.text.style.TextAlign.Center) 
+                Text(it, color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center) 
             }
 
             Spacer(Modifier.weight(1f))

@@ -1,6 +1,7 @@
 package pt.ms.myshare.presentation.ui.onboarding
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.Alignment
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -26,6 +30,9 @@ import java.math.BigDecimal
 import java.text.NumberFormat
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+
+import pt.ms.myshare.presentation.ui.components.PremiumMetricCard
+import pt.ms.myshare.presentation.ui.components.PremiumChoiceCard
 
 @Composable
 fun PlanPreviewScreen(
@@ -47,8 +54,8 @@ fun PlanPreviewScreen(
         ) {
             Text(
                 "Your Blueprint", 
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.Black
             )
             Text(
                 "Created for your payday on ${preview.nextPayday.format(dateFormatter)}",
@@ -56,40 +63,34 @@ fun PlanPreviewScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(32.dp))
 
             androidx.compose.foundation.lazy.LazyColumn(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)),
-                        shape = RoundedCornerShape(20.dp)
-                    ) {
-                        Column(Modifier.padding(20.dp)) {
-                            Text("Initial Balance", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-                            Text(currency.format(preview.incomePerPayday), style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Bold)
-                            Spacer(Modifier.height(8.dp))
-                            Text(preview.summary, style = MaterialTheme.typography.bodyMedium)
-                        }
-                    }
+                    PremiumMetricCard(
+                        title = "Initial Balance",
+                        value = currency.format(preview.incomePerPayday),
+                        supportingText = preview.summary,
+                        isPrimary = true
+                    )
                 }
 
                 item {
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        MetricCard(
+                        PremiumMetricCard(
                             title = "Fixed Costs", 
                             value = currency.format(preview.fixedCostsPerPayday), 
                             modifier = Modifier.weight(1f),
-                            color = MaterialTheme.colorScheme.errorContainer
+                            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f)
                         )
-                        MetricCard(
+                        PremiumMetricCard(
                             title = "Flexible", 
                             value = currency.format(preview.flexibleSpendPerPayday), 
                             modifier = Modifier.weight(1f),
-                            supporting = "${currency.format(preview.weeklyFlexibleSpend)} / week"
+                            supportingText = "${currency.format(preview.weeklyFlexibleSpend)} / week"
                         )
                     }
                 }
@@ -97,9 +98,9 @@ fun PlanPreviewScreen(
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        shape = RoundedCornerShape(20.dp)
+                        shape = RoundedCornerShape(24.dp)
                     ) {
                         Column(Modifier.padding(20.dp)) {
                             Row(
@@ -136,12 +137,12 @@ fun PlanPreviewScreen(
 
                 item {
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        MetricCard(
+                        PremiumMetricCard(
                             title = "Investing", 
                             value = currency.format(preview.investingPerPayday), 
                             modifier = Modifier.weight(1f)
                         )
-                        MetricCard(
+                        PremiumMetricCard(
                             title = "Crypto", 
                             value = currency.format(preview.cryptoPerPayday), 
                             modifier = Modifier.weight(1f)
@@ -150,7 +151,7 @@ fun PlanPreviewScreen(
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
             
             Button(
                 onClick = onAutopilot, 
@@ -162,8 +163,7 @@ fun PlanPreviewScreen(
             
             TextButton(
                 onClick = onNotNow, 
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = MaterialTheme.shapes.medium
+                modifier = Modifier.fillMaxWidth().height(56.dp)
             ) {
                 Text("Start with basic plan", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
@@ -200,8 +200,8 @@ fun PaywallScreen(
 
             Text(
                 pricingStrategy.paywallHeadline, 
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.Black
             )
             Spacer(Modifier.height(8.dp))
             Text(
@@ -222,19 +222,17 @@ fun PaywallScreen(
             Spacer(Modifier.height(32.dp))
 
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                PaywallPlanCard(
-                    title = "Monthly",
-                    price = pricingStrategy.monthlyLabel,
+                PremiumChoiceCard(
+                    text = "Monthly",
+                    supportingText = pricingStrategy.monthlyLabel,
                     selected = selectedPlan == BillingPlan.MONTHLY,
-                    highlighted = pricingStrategy.heroPlan == BillingPlan.MONTHLY,
                     modifier = Modifier.weight(1f),
                     onClick = { onPlanSelected(BillingPlan.MONTHLY) }
                 )
-                PaywallPlanCard(
-                    title = "Annual",
-                    price = pricingStrategy.annualLabel,
+                PremiumChoiceCard(
+                    text = "Annual",
+                    supportingText = pricingStrategy.annualLabel,
                     selected = selectedPlan == BillingPlan.ANNUAL,
-                    highlighted = pricingStrategy.heroPlan == BillingPlan.ANNUAL,
                     modifier = Modifier.weight(1f),
                     onClick = { onPlanSelected(BillingPlan.ANNUAL) }
                 )
@@ -280,62 +278,3 @@ private fun FeatureRow(title: String, body: String) {
     }
 }
 
-@Composable
-private fun MetricCard(
-    title: String, 
-    value: String, 
-    modifier: Modifier = Modifier, 
-    color: Color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-    supporting: String? = null
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = color)
-    ) {
-        Column(Modifier.padding(16.dp)) {
-            Text(title, style = MaterialTheme.typography.labelMedium)
-            Spacer(Modifier.height(4.dp))
-            Text(value, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold)
-            supporting?.let {
-                Spacer(Modifier.height(4.dp))
-                Text(it, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
-            }
-        }
-    }
-}
-
-@Composable
-private fun PaywallPlanCard(
-    title: String,
-    price: String,
-    selected: Boolean,
-    highlighted: Boolean,
-    modifier: Modifier,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = modifier.clickable(onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(
-            width = if (selected) 2.dp else 1.dp,
-            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
-        ),
-        colors = CardDefaults.cardColors(
-            containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else MaterialTheme.colorScheme.surface
-        )
-    ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(title, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
-            Text(price, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold)
-            if (highlighted) {
-                Text(
-                    "Best Value", 
-                    style = MaterialTheme.typography.labelSmall, 
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-    }
-}

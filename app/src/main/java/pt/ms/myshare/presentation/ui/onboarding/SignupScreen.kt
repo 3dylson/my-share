@@ -1,7 +1,8 @@
 package pt.ms.myshare.presentation.ui.onboarding
 
-import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Fingerprint
@@ -9,6 +10,7 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -61,17 +63,17 @@ fun SignupScreen(
                 SecurityFeature(
                     title = "Your Private Vault",
                     description = "We don't store your bank credentials. Ever.",
-                    icon = androidx.compose.material.icons.Icons.Default.Lock
+                    icon = Icons.Default.Lock
                 )
                 SecurityFeature(
                     title = "Cloud Sync",
                     description = "Access your plan across all your devices.",
-                    icon = androidx.compose.material.icons.Icons.Default.Cloud
+                    icon = Icons.Default.Cloud
                 )
                 SecurityFeature(
                     title = "Safe & Secure",
                     description = "Biometric protection for your sensitive data.",
-                    icon = androidx.compose.material.icons.Icons.Default.Fingerprint
+                    icon = Icons.Default.Fingerprint
                 )
             }
             
@@ -129,14 +131,17 @@ fun SignupScreen(
 
 @Composable
 private fun SecurityFeature(title: String, description: String, icon: androidx.compose.ui.graphics.vector.ImageVector) {
-    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-        androidx.compose.foundation.background(
-            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
-            shape = androidx.compose.foundation.shape.CircleShape
-        ).let { 
-            Box(modifier = Modifier.size(48.dp).then(it), contentAlignment = androidx.compose.ui.Alignment.Center) {
-                Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
-            }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                    shape = CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
         }
         Spacer(Modifier.width(20.dp))
         Column {
@@ -144,5 +149,4 @@ private fun SecurityFeature(title: String, description: String, icon: androidx.c
             Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
-}
 }

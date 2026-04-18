@@ -1,34 +1,17 @@
 package pt.ms.myshare.presentation.ui.onboarding
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInVertically
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.font.FontWeight
 import kotlinx.coroutines.delay
 
 @Composable
@@ -36,14 +19,18 @@ fun BuildingPlanScreen(onBuilt: () -> Unit) {
     var step1Visible by remember { mutableStateOf(false) }
     var step2Visible by remember { mutableStateOf(false) }
     var step3Visible by remember { mutableStateOf(false) }
+    var progress by remember { mutableStateOf(0f) }
 
     LaunchedEffect(Unit) {
         delay(400)
         step1Visible = true
+        progress = 0.33f
         delay(700)
         step2Visible = true
+        progress = 0.66f
         delay(700)
         step3Visible = true
+        progress = 1.0f
         delay(1200)
         onBuilt()
     }
@@ -56,65 +43,66 @@ fun BuildingPlanScreen(onBuilt: () -> Unit) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start
         ) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(48.dp),
+            LinearProgressIndicator(
+                progress = progress,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(8.dp),
                 color = MaterialTheme.colorScheme.primary,
-                strokeWidth = 4.dp
+                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
             )
             
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(48.dp))
             
             Text(
-                "Building your plan",
+                "Building your blueprint",
                 style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.ExtraBold
+                fontWeight = FontWeight.Black
             )
             
+            Spacer(modifier = Modifier.height(8.dp))
+
             Text(
-                "Personalizing your logic and safety nets.",
+                "Personalizing your logic and safety nets based on your inputs.",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             
             Spacer(modifier = Modifier.height(48.dp))
             
-            AnimatedVisibility(
-                visible = step1Visible,
-                enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { 40 }
-            ) {
-                LoadingStep(text = "Aligning with your goals")
-            }
-            
-            AnimatedVisibility(
-                visible = step2Visible,
-                enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { 40 }
-            ) {
-                LoadingStep(text = "Structuring fixed costs")
-            }
-            
-            AnimatedVisibility(
-                visible = step3Visible,
-                enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { 40 }
-            ) {
-                LoadingStep(text = "Calculating weekly safe-to-spend")
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                AnimatedStep(visible = step1Visible, text = "Aligning with your goals")
+                AnimatedStep(visible = step2Visible, text = "Structuring fixed costs")
+                AnimatedStep(visible = step3Visible, text = "Calculating weekly safe-to-spend")
             }
         }
     }
 }
 
 @Composable
-private fun LoadingStep(text: String) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(vertical = 12.dp)
+private fun AnimatedStep(visible: Boolean, text: String) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { 40 }
     ) {
-        Icon(
-            imageVector = Icons.Default.CheckCircle,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(24.dp)
-        )
-        Spacer(Modifier.width(16.dp))
-        Text(text, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                imageVector = Icons.Default.CheckCircle,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(28.dp)
+            )
+            Spacer(Modifier.width(16.dp))
+            Text(
+                text = text,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
     }
 }
