@@ -25,6 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import pt.ms.myshare.domain.model.BillingPlan
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.SettingsSuggest
 import androidx.compose.material.icons.automirrored.filled.Logout
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.theme.*
@@ -54,7 +55,10 @@ fun HomeRoute(
                 }
             }
         },
-        onAddNewGoal = { navController.navigate("add_goal") }
+        onAddNewGoal = { navController.navigate("add_goal") },
+        onEditGoal = { id -> navController.navigate("add_goal?goalId=$id") },
+        onAddNewRule = { navController.navigate("add_rule") },
+        onEditRule = { id -> navController.navigate("add_rule?ruleId=$id") }
     )
 }
 
@@ -72,7 +76,10 @@ fun HomeScreen(
     onBillingPlanSelected: (BillingPlan) -> Unit,
     onUnlockPremium: (android.app.Activity) -> Unit,
     onLogout: () -> Unit,
-    onAddNewGoal: () -> Unit
+    onAddNewGoal: () -> Unit,
+    onEditGoal: (String) -> Unit,
+    onAddNewRule: () -> Unit,
+    onEditRule: (String) -> Unit
 ) {
     val activity = androidx.activity.compose.LocalActivity.current
     Scaffold(
@@ -102,6 +109,7 @@ fun HomeScreen(
                         icon = {
                             val icon = when (destination) {
                                 HomeDestination.PLAN -> if (isSelected) Icons.Filled.CalendarToday else Icons.Outlined.CalendarToday
+                                HomeDestination.RULES -> if (isSelected) Icons.Filled.SettingsSuggest else Icons.Outlined.SettingsSuggest
                                 HomeDestination.GOALS -> if (isSelected) Icons.Filled.Flag else Icons.Outlined.Flag
                                 HomeDestination.REVIEW -> if (isSelected) Icons.Filled.AutoGraph else Icons.Outlined.AutoGraph
                                 HomeDestination.MORE -> if (isSelected) Icons.Filled.MoreHoriz else Icons.Outlined.MoreHoriz
@@ -192,55 +200,120 @@ fun HomeScreen(
                         }
                     }
                 }
-                HomeDestination.GOALS -> {
-                    state.goalCard?.let { goalCard ->
+                HomeDestination.RULES -> {
+                    if (state.rules.isEmpty()) {
                         item {
-                            PremiumSectionHeader(title = "Primary Objective")
-                            PremiumMetricCard(
-                                label = goalCard.goalName, 
-                                value = goalCard.goalAmountLabel, 
-                                subtitle = goalCard.targetDateLabel,
+                            PremiumSectionHeader(title = "No Custom Logic")
+                            PremiumInfoCard(
+                                title = "Your Rules, Your Money",
+                                body = "Add payday rules to automate how your surplus is distributed between savings, debt, and other categories.",
+                                icon = Icons.Default.Rule
+                            )
+                        }
+                    } else {
+                        item {
+                            PremiumSectionHeader(title = "Payday Rules")
+                        }
+                        state.rules.forEach { ruleCard ->
+                            item {
+                                PremiumMetricCard(
+                                    label = ruleCard.name,
+                                    value = ruleCard.amountLabel,
+                                    subtitle = ruleCard.typeLabel,
+                                    icon = if (ruleCard.isPercentage) Icons.Default.Percent else Icons.Default.Savings,
+                                    onClick = { onEditRule(ruleCard.id) }
+                                )
+                                Spacer(Modifier.height(12.dp))
+                            }
+                        }
+                    }
+
+                    if (!state.moreCard.isPremium && state.rules.size >= 3) {
+                        item {
+                            PremiumBenefitCard(
+                                title = "Deep Automation",
+                                description = "Free tier supports up to 3 active rules. Upgrade for unlimited complex logic and nested allocations.",
+                                icon = Icons.Default.Lock,
+                                onClick = { onDestinationSelected(HomeDestination.MORE) }
+                            )
+                        }
+                    } else {
+                        item {
+                            PremiumButton(
+                                text = "Add New Rule",
+                                onClick = onAddNewRule,
+                                icon = Icons.Default.Add,
+                                containerColor = MySharePrimaryContainer,
+                                contentColor = MySharePrimary
+                            )
+                        }
+                    }
+
+                    item {
+                        PremiumInfoCard(
+                            title = "Logic Flow",
+                            body = "Rules are applied in order. Percentage rules take from the *remaining* balance after fixed costs and previous fixed rules.",
+                            icon = Icons.Default.Lightbulb,
+                            backgroundColor = MySharePrimary.copy(alpha = 0.05f)
+                        )
+                    }
+                }
+                HomeDestination.GOALS -> {
+                    if (state.goals.isEmpty()) {
+                        item {
+                            PremiumSectionHeader(title = "No Active Goals")
+                            PremiumInfoCard(
+                                title = "Define your vision",
+                                body = "Add your first financial milestone to start tracking your trajectory.",
                                 icon = Icons.Default.Flag
                             )
                         }
+                    } else {
                         item {
-                            PremiumInfoCard(
-                                title = "Design Logic", 
-                                body = goalCard.progressNote,
-                                icon = Icons.Default.TipsAndUpdates,
-                                backgroundColor = MySharePrimary.copy(alpha = 0.05f)
+                            PremiumSectionHeader(title = "Financial Milestones")
+                        }
+                        state.goals.forEach { goalCard ->
+                            item {
+                                PremiumMetricCard(
+                                    label = goalCard.goalName,
+                                    value = goalCard.goalAmountLabel,
+                                    subtitle = goalCard.targetDateLabel,
+                                    icon = Icons.Default.Flag,
+                                    onClick = { onEditGoal(goalCard.id) }
+                                )
+                                Spacer(Modifier.height(12.dp))
+                            }
+                        }
+                    }
+
+                    if (!state.moreCard.isPremium && state.goals.size >= 1) {
+                        item {
+                            PremiumBenefitCard(
+                                title = "Unlock Multi-Goal Support",
+                                description = "Free tier is limited to one active goal. Upgrade to track travel, home, and emergency funds simultaneously.",
+                                icon = Icons.Default.Lock,
+                                onClick = { onDestinationSelected(HomeDestination.MORE) }
                             )
                         }
-                        if (!state.moreCard.isPremium) {
-                            item {
-                                PremiumBenefitCard(
-                                    title = "Multiple Goals",
-                                    description = "Don't stop at one. Track home deposists, travel funds, and more simultaneously.",
-                                    icon = Icons.Default.AddBusiness,
-                                    onClick = { onDestinationSelected(HomeDestination.MORE) }
-                                )
-                            }
-                            item {
-                                PremiumPaywallCard(
-                                    title = "Unlock Advanced Goals",
-                                    price = "Premium",
-                                    period = "feature",
-                                    description = "Track multiple goals simultaneously and get trajectory predictions.",
-                                    isSelected = false,
-                                    onClick = { onDestinationSelected(HomeDestination.MORE) }
-                                )
-                            }
-                        } else {
-                            item {
-                                PremiumButton(
-                                    text = "Add New Goal",
-                                    onClick = onAddNewGoal,
-                                    icon = Icons.Default.Add,
-                                    containerColor = MySharePrimaryContainer,
-                                    contentColor = MySharePrimary
-                                )
-                            }
+                    } else {
+                        item {
+                            PremiumButton(
+                                text = "Add New Goal",
+                                onClick = onAddNewGoal,
+                                icon = Icons.Default.Add,
+                                containerColor = MySharePrimaryContainer,
+                                contentColor = MySharePrimary
+                            )
                         }
+                    }
+
+                    item {
+                        PremiumInfoCard(
+                            title = "Strategy Note",
+                            body = "Focus is your superpower. While we support multiple goals, keeping your 'Primary Objective' in mind helps maintain momentum.",
+                            icon = Icons.Default.TipsAndUpdates,
+                            backgroundColor = MySharePrimary.copy(alpha = 0.05f)
+                        )
                     }
                 }
                 HomeDestination.REVIEW -> {
@@ -275,7 +348,6 @@ fun HomeScreen(
                         }
                     }
                     
-                    // History / Experiment Area (Ads Zone)
                     if (!state.moreCard.isPremium) {
                         item {
                             PremiumSectionHeader(title = "Previous Sessions")
@@ -309,7 +381,7 @@ fun HomeScreen(
                                     if (state.moreCard.isPremium) {
                                         onToggleAutomation(!state.moreCard.automationEnabled)
                                     } else {
-                                        // Show paywall or stay as is
+                                        // Show paywall
                                     }
                                 },
                                 icon = Icons.Default.PrecisionManufacturing,
@@ -369,25 +441,25 @@ fun HomeScreen(
                                 Spacer(modifier = Modifier.height(16.dp))
                             }
 
-                                val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
-                                PremiumSectionHeader(title = "Legal & Privacy")
-                                Column {
-                                    PremiumMetricCard(
-                                        label = "Terms of Service",
-                                        value = "View",
-                                        subtitle = "User Agreement & Logic License",
-                                        icon = Icons.Default.Info,
-                                        onClick = { uriHandler.openUri("https://myshare.pt/terms") }
-                                    )
-                                    Spacer(modifier = Modifier.height(12.dp))
-                                    PremiumMetricCard(
-                                        label = "Privacy Policy",
-                                        value = "View",
-                                        subtitle = "Data Handling & Ad Consent",
-                                        icon = Icons.Default.Info,
-                                        onClick = { uriHandler.openUri("https://myshare.pt/privacy") }
-                                    )
-                                }
+                            val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
+                            PremiumSectionHeader(title = "Legal & Privacy")
+                            Column {
+                                PremiumMetricCard(
+                                    label = "Terms of Service",
+                                    value = "View",
+                                    subtitle = "User Agreement & Logic License",
+                                    icon = Icons.Default.Info,
+                                    onClick = { uriHandler.openUri("https://myshare.pt/terms") }
+                                )
+                                Spacer(modifier = Modifier.height(12.dp))
+                                PremiumMetricCard(
+                                    label = "Privacy Policy",
+                                    value = "View",
+                                    subtitle = "Data Handling & Ad Consent",
+                                    icon = Icons.Default.Info,
+                                    onClick = { uriHandler.openUri("https://my-share-finance.web.app/") }
+                                )
+                            }
                             
                             Spacer(modifier = Modifier.height(24.dp))
                             PremiumButton(
@@ -401,7 +473,6 @@ fun HomeScreen(
                     }
                 }
             }
-            
         }
     }
 }
@@ -424,11 +495,14 @@ private fun HomeScreenPreview() {
                     weeklySpendLabel = "€87.00",
                     summary = "A calm split that protects essentials and builds savings."
                 ),
-                goalCard = GoalCardState(
-                    goalName = "Emergency Fund",
-                    goalAmountLabel = "€3,000.00",
-                    targetDateLabel = "On pace for November 2026",
-                    progressNote = "Consistency is your greatest asset."
+                goals = listOf(
+                    GoalCardState(
+                        id = "1",
+                        goalName = "Emergency Fund",
+                        goalAmountLabel = "€3,000.00",
+                        targetDateLabel = "On pace for November 2026",
+                        progressNote = "Consistency is your greatest asset."
+                    )
                 )
             ),
             onDestinationSelected = { _ -> },
@@ -440,7 +514,10 @@ private fun HomeScreenPreview() {
             onBillingPlanSelected = { _ -> },
             onUnlockPremium = {},
             onLogout = {},
-            onAddNewGoal = {}
+            onAddNewGoal = {},
+            onEditGoal = {},
+            onAddNewRule = {},
+            onEditRule = {}
         )
     }
 }

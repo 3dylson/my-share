@@ -15,6 +15,23 @@ enum class PayFrequency {
     BIWEEKLY
 }
 
+enum class PaydayRuleType {
+    SAVINGS,
+    INVESTING,
+    CRYPTO,
+    DEBT,
+    OTHER
+}
+
+data class PaydayRule(
+    val id: String = java.util.UUID.randomUUID().toString(),
+    val name: String,
+    val amount: BigDecimal,
+    val isPercentage: Boolean = true,
+    val type: PaydayRuleType = PaydayRuleType.OTHER,
+    val createdAt: LocalDate = LocalDate.now()
+)
+
 data class SalaryPlan(
     val focus: PlanningFocus,
     val netIncomePerPayday: BigDecimal,
@@ -23,10 +40,7 @@ data class SalaryPlan(
     val monthlyPayday: Int? = null,
     val nextBiweeklyPayday: LocalDate? = null,
     val preset: AllocationPreset,
-    val flexibleSpend: BigDecimal? = null,
-    val savings: BigDecimal? = null,
-    val investing: BigDecimal? = null,
-    val crypto: BigDecimal? = null,
+    val rules: List<PaydayRule> = emptyList(),
     val createdAt: LocalDate = LocalDate.now()
 )
 

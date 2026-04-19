@@ -10,6 +10,7 @@ import java.time.YearMonth
 
 enum class HomeDestination {
     PLAN,
+    RULES,
     GOALS,
     REVIEW,
     MORE
@@ -42,6 +43,14 @@ data class ReviewCardState(
     val error: String? = null
 )
 
+data class RuleCardState(
+    val id: String,
+    val name: String,
+    val amountLabel: String,
+    val typeLabel: String,
+    val isPercentage: Boolean
+)
+
 data class MoreCardState(
     val reminderEnabled: Boolean = false,
     val reminderLabel: String = "",
@@ -57,6 +66,7 @@ data class HomeState(
     val selectedDestination: HomeDestination = HomeDestination.PLAN,
     val plan: SalaryPlan? = null,
     val planCard: HomePlanCardState? = null,
+    val rules: List<RuleCardState> = emptyList(),
     val goals: List<GoalCardState> = emptyList(),
     val reviewCard: ReviewCardState = ReviewCardState(),
     val moreCard: MoreCardState = MoreCardState(),

@@ -22,6 +22,8 @@ import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.domain.model.ReminderConfiguration
 import pt.ms.myshare.domain.model.SalaryPlan
+import pt.ms.myshare.domain.model.PaydayRule
+import pt.ms.myshare.domain.model.PaydayRuleType
 import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
@@ -292,6 +294,18 @@ class OnboardingViewModel @Inject constructor(
         } else {
             null
         }
+
+        val rules = mutableListOf<PaydayRule>()
+        current.allocatedSavings?.let { 
+            if (it > BigDecimal.ZERO) rules.add(PaydayRule(name = "Savings", amount = it, type = PaydayRuleType.SAVINGS, isPercentage = true)) 
+        }
+        current.allocatedInvesting?.let { 
+            if (it > BigDecimal.ZERO) rules.add(PaydayRule(name = "Investing", amount = it, type = PaydayRuleType.INVESTING, isPercentage = true)) 
+        }
+        current.allocatedCrypto?.let { 
+            if (it > BigDecimal.ZERO) rules.add(PaydayRule(name = "Crypto", amount = it, type = PaydayRuleType.CRYPTO, isPercentage = true)) 
+        }
+
         return SalaryPlan(
             focus = current.selectedFocus,
             netIncomePerPayday = income,
@@ -300,10 +314,7 @@ class OnboardingViewModel @Inject constructor(
             monthlyPayday = current.monthlyPayday.coerceIn(1, 28),
             nextBiweeklyPayday = nextBiweeklyPayday,
             preset = current.preset,
-            flexibleSpend = current.allocatedFlexibleSpend,
-            savings = current.allocatedSavings,
-            investing = current.allocatedInvesting,
-            crypto = current.allocatedCrypto
+            rules = rules
         )
     }
 

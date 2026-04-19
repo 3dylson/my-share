@@ -99,6 +99,7 @@ class HomeViewModel @Inject constructor(
                 val primaryGoal = goals.firstOrNull()
                 val planCard = plan?.let { buildPlanCard(it, primaryGoal?.targetAmount ?: BigDecimal.ZERO) }
                 val goalCards = goals.map { buildGoalCard(it) }
+                val ruleCards = (plan?.rules ?: emptyList()).map { buildRuleCard(it) }
                 val reviewCard = buildReviewCard(plan, reviews.maxByOrNull { it.createdAt })
                 val moreCard = MoreCardState(
                     reminderEnabled = reminder.enabled,
@@ -118,6 +119,7 @@ class HomeViewModel @Inject constructor(
                     plan = plan,
                     planCard = planCard,
                     goals = goalCards,
+                    rules = ruleCards,
                     reviewCard = reviewCard,
                     moreCard = moreCard,
                     isLoading = false,
@@ -166,6 +168,17 @@ class HomeViewModel @Inject constructor(
             goalAmountLabel = currencyFormat.format(goal.targetAmount),
             targetDateLabel = targetDateLabel,
             progressNote = "One goal is free. Extra goals, recurring rules, and deeper reviews stay premium."
+        )
+    }
+
+    private fun buildRuleCard(rule: pt.ms.myshare.domain.model.PaydayRule): RuleCardState {
+        val amountLabel = if (rule.isPercentage) "${rule.amount.stripTrailingZeros().toPlainString()}%" else currencyFormat.format(rule.amount)
+        return RuleCardState(
+            id = rule.id,
+            name = rule.name,
+            amountLabel = amountLabel,
+            typeLabel = rule.type.name.lowercase().replaceFirstChar { it.titlecase() },
+            isPercentage = rule.isPercentage
         )
     }
 

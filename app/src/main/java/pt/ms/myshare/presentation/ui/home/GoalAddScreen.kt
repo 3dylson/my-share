@@ -3,6 +3,7 @@ package pt.ms.myshare.presentation.ui.home
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -35,6 +36,7 @@ fun GoalAddRoute(
         onNameChanged = viewModel::onNameChanged,
         onAmountChanged = viewModel::onAmountChanged,
         onSave = viewModel::saveGoal,
+        onDelete = viewModel::deleteGoal,
         onBack = { navController.popBackStack() }
     )
 }
@@ -46,16 +48,59 @@ fun GoalAddScreen(
     onNameChanged: (String) -> Unit,
     onAmountChanged: (String) -> Unit,
     onSave: () -> Unit,
+    onDelete: () -> Unit,
     onBack: () -> Unit
 ) {
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete Goal") },
+            text = { Text("Are you sure you want to remove this financial milestone? This action cannot be undone.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        onDelete()
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     Scaffold(
         containerColor = MyShareBackground,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Add New Goal", style = MaterialTheme.typography.titleLarge) },
+                title = { 
+                    Text(
+                        text = if (state.goalId != null) "Edit Goal" else "Add New Goal", 
+                        style = MaterialTheme.typography.titleLarge
+                    ) 
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    if (state.goalId != null) {
+                        IconButton(onClick = { showDeleteDialog = true }) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete Goal",
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -73,8 +118,8 @@ fun GoalAddScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             PremiumAppHeader(
-                title = "Vision Expansion",
-                subtitle = "Define your next financial milestone."
+                title = if (state.goalId != null) "Refine Milestone" else "Vision Expansion",
+                subtitle = if (state.goalId != null) "Adjust your target and keep pushing." else "Define your next financial milestone."
             )
 
             PremiumInfoCard(
@@ -109,7 +154,7 @@ fun GoalAddScreen(
             Spacer(modifier = Modifier.weight(1f))
 
             PremiumButton(
-                text = if (state.isLoading) "Saving..." else "Save Goal",
+                text = if (state.isLoading) "Processing..." else if (state.goalId != null) "Update Goal" else "Save Goal",
                 onClick = onSave,
                 enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()

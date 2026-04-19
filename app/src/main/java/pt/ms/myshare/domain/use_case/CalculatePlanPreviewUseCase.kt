@@ -2,6 +2,8 @@ package pt.ms.myshare.domain.use_case
 
 import pt.ms.myshare.domain.model.AllocationPreset
 import pt.ms.myshare.domain.model.PayFrequency
+import pt.ms.myshare.domain.model.PaydayRule
+import pt.ms.myshare.domain.model.PaydayRuleType
 import pt.ms.myshare.domain.model.PlanPreview
 import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.domain.model.SalaryPlan
@@ -17,20 +19,37 @@ class CalculatePlanPreviewUseCase @Inject constructor() {
         val fixedCostsPerPayday = fixedCostsPerPayday(plan.monthlyFixedCosts, plan.payFrequency)
         val remainingAfterFixed = plan.netIncomePerPayday.subtract(fixedCostsPerPayday).max(BigDecimal.ZERO)
 
-        val weights = adjustedWeights(plan.focus, plan.preset)
-        val flexibleSpend = plan.flexibleSpend ?: percentageOf(remainingAfterFixed, weights.flexibleSpend)
-        val savings = plan.savings ?: percentageOf(remainingAfterFixed, weights.savings)
-        val investing = plan.investing ?: percentageOf(remainingAfterFixed, weights.investing)
-        val crypto = plan.crypto ?: percentageOf(remainingAfterFixed, weights.crypto)
-        val debt = remainingAfterFixed
-            .subtract(flexibleSpend)
-            .subtract(savings)
-            .subtract(investing)
-            .subtract(crypto)
-            .setScale(2, RoundingMode.HALF_UP)
-            .max(BigDecimal.ZERO)
+        val rules = if (plan.rules.isEmpty()) {
+            generateRulesFromPreset(plan)
+        } else {
+            plan.rules
+        }
 
-        val monthlyGoalContribution = normalizeToMonthly(savings.add(investing).add(crypto).add(debt), plan.payFrequency)
+        var savings = BigDecimal.ZERO
+        var investing = BigDecimal.ZERO
+        var crypto = BigDecimal.ZERO
+        var debt = BigDecimal.ZERO
+
+        rules.forEach { rule ->
+            val amount = if (rule.isPercentage) {
+                percentageOf(remainingAfterFixed, rule.amount.divide(BigDecimal("100"), SCALE, RoundingMode.HALF_UP))
+            } else {
+                rule.amount
+            }
+
+            when (rule.type) {
+                PaydayRuleType.SAVINGS -> savings = savings.add(amount)
+                PaydayRuleType.INVESTING -> investing = investing.add(amount)
+                PaydayRuleType.CRYPTO -> crypto = crypto.add(amount)
+                PaydayRuleType.DEBT -> debt = debt.add(amount)
+                PaydayRuleType.OTHER -> { /* Counted towards total contribution, but not specific category */ }
+            }
+        }
+
+        val totalRuleContribution = savings.add(investing).add(crypto).add(debt)
+        val flexibleSpend = remainingAfterFixed.subtract(totalRuleContribution).setScale(2, RoundingMode.HALF_UP).max(BigDecimal.ZERO)
+
+        val monthlyGoalContribution = normalizeToMonthly(totalRuleContribution, plan.payFrequency)
         val weeklySpend = normalizeToMonthly(flexibleSpend, plan.payFrequency)
             .divide(BigDecimal("4.3333"), SCALE, RoundingMode.HALF_UP)
             .setScale(2, RoundingMode.HALF_UP)
@@ -48,10 +67,10 @@ class CalculatePlanPreviewUseCase @Inject constructor() {
             incomePerPayday = plan.netIncomePerPayday.setScale(2, RoundingMode.HALF_UP),
             fixedCostsPerPayday = fixedCostsPerPayday.setScale(2, RoundingMode.HALF_UP),
             flexibleSpendPerPayday = flexibleSpend,
-            savingsPerPayday = savings,
-            investingPerPayday = investing,
-            cryptoPerPayday = crypto,
-            debtPerPayday = debt,
+            savingsPerPayday = savings.setScale(2, RoundingMode.HALF_UP),
+            investingPerPayday = investing.setScale(2, RoundingMode.HALF_UP),
+            cryptoPerPayday = crypto.setScale(2, RoundingMode.HALF_UP),
+            debtPerPayday = debt.setScale(2, RoundingMode.HALF_UP),
             weeklyFlexibleSpend = weeklySpend,
             monthlyGoalContribution = monthlyGoalContribution.setScale(2, RoundingMode.HALF_UP),
             nextPayday = nextPayday,
@@ -98,6 +117,23 @@ class CalculatePlanPreviewUseCase @Inject constructor() {
 
     private fun percentageOf(base: BigDecimal, percentage: BigDecimal): BigDecimal =
         base.multiply(percentage).setScale(2, RoundingMode.HALF_UP)
+
+    private fun generateRulesFromPreset(plan: SalaryPlan): List<PaydayRule> {
+        val weights = adjustedWeights(plan.focus, plan.preset)
+        val rules = mutableListOf<PaydayRule>()
+        
+        if (weights.savings > BigDecimal.ZERO) {
+            rules.add(PaydayRule(name = "Savings", amount = weights.savings.multiply(BigDecimal("100")), type = PaydayRuleType.SAVINGS, isPercentage = true))
+        }
+        if (weights.investing > BigDecimal.ZERO) {
+            rules.add(PaydayRule(name = "Investing", amount = weights.investing.multiply(BigDecimal("100")), type = PaydayRuleType.INVESTING, isPercentage = true))
+        }
+        if (weights.crypto > BigDecimal.ZERO) {
+            rules.add(PaydayRule(name = "Crypto", amount = weights.crypto.multiply(BigDecimal("100")), type = PaydayRuleType.CRYPTO, isPercentage = true))
+        }
+        
+        return rules
+    }
 
     private fun adjustedWeights(focus: PlanningFocus, preset: AllocationPreset): AllocationWeights {
         val base = when (focus) {

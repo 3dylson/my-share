@@ -12,14 +12,15 @@ import androidx.compose.ui.Modifier
 import com.google.android.gms.ads.MobileAds
 import dagger.hilt.android.AndroidEntryPoint
 import pt.ms.myshare.presentation.ui.theme.MyShareTheme
-import pt.ms.myshare.utils.ads.ConsentManager
+import pt.ms.myshare.presentation.ui.ads.AdsConsentManager
 import pt.ms.myshare.utils.isDarkTheme
 import pt.ms.myshare.utils.logs.FirebaseUtils
+import timber.log.Timber
 import java.util.Locale
 
 @AndroidEntryPoint
 class MainComposeActivity : ComponentActivity() {
-    private lateinit var consentManager: ConsentManager
+    private lateinit var consentManager: AdsConsentManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,12 +29,18 @@ class MainComposeActivity : ComponentActivity() {
         val sessions = prefs.getInt("session_count", 0) + 1
         prefs.edit().putInt("session_count", sessions).apply()
 
-        consentManager = ConsentManager(this)
-        consentManager.requestConsent(this) { canRequestAds ->
-            if (canRequestAds && sessions >= 2) {
-                MobileAds.initialize(this) {}
+        consentManager = AdsConsentManager(this)
+        consentManager.gatherConsent(object : AdsConsentManager.OnConsentGatheringFinishedListener {
+            override fun onConsentGatheringFinished(error: String?) {
+                if (error != null) {
+                    Timber.tag("AdsConsent").w("Consent error: %s", error)
+                }
+                
+                if (consentManager.canRequestAds && sessions >= 2) {
+                    MobileAds.initialize(this@MainComposeActivity) {}
+                }
             }
-        }
+        })
         
         enableEdgeToEdge()
         setContent {

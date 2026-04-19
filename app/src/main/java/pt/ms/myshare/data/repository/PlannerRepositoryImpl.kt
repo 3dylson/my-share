@@ -22,7 +22,11 @@ import pt.ms.myshare.domain.model.ReminderConfiguration
 import pt.ms.myshare.domain.model.SalaryPlan
 import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.model.GoalType
+import pt.ms.myshare.domain.model.PaydayRule
+import pt.ms.myshare.domain.model.PaydayRuleType
 import pt.ms.myshare.domain.repository.PlannerRepository
+import org.json.JSONArray
+import org.json.JSONObject
 import timber.log.Timber
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -60,10 +64,7 @@ class PlannerRepositoryImpl @Inject constructor(
             .putLong(KEY_BIWEEKLY_PAYDAY_EPOCH, plan.nextBiweeklyPayday?.toEpochDay() ?: NO_EPOCH)
             .remove(KEY_GOAL_NAME)
             .remove(KEY_GOAL_AMOUNT)
-            .putString(KEY_FLEXIBLE_SPEND, plan.flexibleSpend?.toPlainString() ?: "")
-            .putString(KEY_SAVINGS, plan.savings?.toPlainString() ?: "")
-            .putString(KEY_INVESTING, plan.investing?.toPlainString() ?: "")
-            .putString(KEY_CRYPTO, plan.crypto?.toPlainString() ?: "")
+            .putString(KEY_RULES_JSON, serializeRules(plan.rules))
             .putLong(KEY_PLAN_CREATED_AT_EPOCH, plan.createdAt.toEpochDay())
             .putString(KEY_PRESET, plan.preset.name)
             .apply()
@@ -83,10 +84,15 @@ class PlannerRepositoryImpl @Inject constructor(
                 "monthlyPayday" to (plan.monthlyPayday ?: 1),
                 "nextBiweeklyPaydayText" to (plan.nextBiweeklyPayday?.toString() ?: ""),
                 "preset" to plan.preset.name,
-                "flexibleSpend" to (plan.flexibleSpend?.toPlainString() ?: ""),
-                "savings" to (plan.savings?.toPlainString() ?: ""),
-                "investing" to (plan.investing?.toPlainString() ?: ""),
-                "crypto" to (plan.crypto?.toPlainString() ?: ""),
+                "rules" to plan.rules.map { rule ->
+                    mapOf(
+                        "id" to rule.id,
+                        "name" to rule.name,
+                        "amount" to rule.amount.toPlainString(),
+                        "isPercentage" to rule.isPercentage,
+                        "type" to rule.type.name
+                    )
+                },
                 "createdAtDate" to plan.createdAt.toString()
             )
             try {
@@ -130,10 +136,17 @@ class PlannerRepositoryImpl @Inject constructor(
                     monthlyPayday = planDoc.getLong("monthlyPayday")?.toInt(),
                     nextBiweeklyPayday = planDoc.getString("nextBiweeklyPaydayText")?.takeIf { it.isNotBlank() }?.let { LocalDate.parse(it) },
                     preset = preset,
-                    flexibleSpend = planDoc.getString("flexibleSpend")?.takeIf { it.isNotBlank() }?.toBigDecimalOrNull(),
-                    savings = planDoc.getString("savings")?.takeIf { it.isNotBlank() }?.toBigDecimalOrNull(),
-                    investing = planDoc.getString("investing")?.takeIf { it.isNotBlank() }?.toBigDecimalOrNull(),
-                    crypto = planDoc.getString("crypto")?.takeIf { it.isNotBlank() }?.toBigDecimalOrNull(),
+                    rules = (planDoc.get("rules") as? List<Map<String, Any>>)?.mapNotNull { map ->
+                        runCatching {
+                            PaydayRule(
+                                id = map["id"] as? String ?: java.util.UUID.randomUUID().toString(),
+                                name = map["name"] as? String ?: "",
+                                amount = (map["amount"] as? String)?.toBigDecimalOrNull() ?: BigDecimal.ZERO,
+                                isPercentage = map["isPercentage"] as? Boolean ?: true,
+                                type = (map["type"] as? String)?.let { PaydayRuleType.valueOf(it) } ?: PaydayRuleType.OTHER
+                            )
+                        }.getOrNull()
+                    } ?: emptyList(),
                     createdAt = planDoc.getString("createdAtDate")?.let { LocalDate.parse(it) } ?: LocalDate.now()
                 )
                 savePlan(plan)
@@ -375,14 +388,11 @@ class PlannerRepositoryImpl @Inject constructor(
         val payFrequency = prefs.getString(KEY_PAY_FREQUENCY, null)?.let { runCatching { PayFrequency.valueOf(it) }.getOrNull() } ?: PayFrequency.MONTHLY
         val preset = prefs.getString(KEY_PRESET, null)?.let { runCatching { AllocationPreset.valueOf(it) }.getOrNull() } ?: AllocationPreset.BALANCED
         val goalName = prefs.getString(KEY_GOAL_NAME, null).orEmpty().ifBlank { "Emergency fund" }
-        val goalAmount = prefs.getString(KEY_GOAL_AMOUNT, null)?.toBigDecimalOrNull() ?: BigDecimal.ZERO
         val createdAtEpoch = prefs.getLong(KEY_PLAN_CREATED_AT_EPOCH, LocalDate.now().toEpochDay())
         val monthlyPayday = prefs.getInt(KEY_MONTHLY_PAYDAY, 1).coerceIn(1, 31)
         val biweeklyEpoch = prefs.getLong(KEY_BIWEEKLY_PAYDAY_EPOCH, NO_EPOCH)
-        val flexibleSpend = prefs.getString(KEY_FLEXIBLE_SPEND, null)?.takeIf { it.isNotBlank() }?.toBigDecimalOrNull()
-        val savings = prefs.getString(KEY_SAVINGS, null)?.takeIf { it.isNotBlank() }?.toBigDecimalOrNull()
-        val investing = prefs.getString(KEY_INVESTING, null)?.takeIf { it.isNotBlank() }?.toBigDecimalOrNull()
-        val crypto = prefs.getString(KEY_CRYPTO, null)?.takeIf { it.isNotBlank() }?.toBigDecimalOrNull()
+        val rulesJson = prefs.getString(KEY_RULES_JSON, null)
+        val rules = deserializeRules(rulesJson)
 
         return SalaryPlan(
             focus = focus,
@@ -392,12 +402,47 @@ class PlannerRepositoryImpl @Inject constructor(
             monthlyPayday = monthlyPayday,
             nextBiweeklyPayday = biweeklyEpoch.takeIf { it != NO_EPOCH }?.let(LocalDate::ofEpochDay),
             preset = preset,
-            flexibleSpend = flexibleSpend,
-            savings = savings,
-            investing = investing,
-            crypto = crypto,
+            rules = rules,
             createdAt = LocalDate.ofEpochDay(createdAtEpoch)
         )
+    }
+
+    private fun serializeRules(rules: List<PaydayRule>): String {
+        val array = JSONArray()
+        rules.forEach { rule ->
+            val obj = JSONObject()
+            obj.put("id", rule.id)
+            obj.put("name", rule.name)
+            obj.put("amount", rule.amount.toPlainString())
+            obj.put("isPercentage", rule.isPercentage)
+            obj.put("type", rule.type.name)
+            array.put(obj)
+        }
+        return array.toString()
+    }
+
+    private fun deserializeRules(json: String?): List<PaydayRule> {
+        if (json.isNullOrBlank()) return emptyList()
+        return try {
+            val array = JSONArray(json)
+            val rules = mutableListOf<PaydayRule>()
+            for (i in 0 until array.length()) {
+                val obj = array.getJSONObject(i)
+                rules.add(
+                    PaydayRule(
+                        id = obj.optString("id", java.util.UUID.randomUUID().toString()),
+                        name = obj.getString("name"),
+                        amount = obj.getString("amount").toBigDecimal(),
+                        isPercentage = obj.getBoolean("isPercentage"),
+                        type = PaydayRuleType.valueOf(obj.getString("type"))
+                    )
+                )
+            }
+            rules
+        } catch (e: Exception) {
+            Timber.tag(TAG).e(e, "Failed to deserialize rules")
+            emptyList()
+        }
     }
 
     private fun readLatestReview(): ManualReview? {
@@ -444,6 +489,7 @@ class PlannerRepositoryImpl @Inject constructor(
         const val KEY_SAVINGS = "planner_savings"
         const val KEY_INVESTING = "planner_investing"
         const val KEY_CRYPTO = "planner_crypto"
+        const val KEY_RULES_JSON = "planner_rules_json"
         const val KEY_PLAN_CREATED_AT_EPOCH = "planner_plan_created_at_epoch"
         const val KEY_REVIEW_FLEXIBLE_SPEND = "planner_review_flexible_spend"
         const val KEY_REVIEW_GOAL_CONTRIBUTION = "planner_review_goal_contribution"
