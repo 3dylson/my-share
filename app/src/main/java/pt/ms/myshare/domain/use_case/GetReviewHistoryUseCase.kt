@@ -14,6 +14,9 @@ import javax.inject.Inject
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import java.time.LocalDate
 
+import kotlinx.coroutines.flow.combine
+import pt.ms.myshare.domain.model.Goal
+
 /**
  * Responsibility: Maps ManualReview records to UI-ready history items.
  * Calculates deltas between blueprint and actual performance.
@@ -23,41 +26,45 @@ class GetReviewHistoryUseCase @Inject constructor(
     private val calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase
 ) {
     fun execute(): Flow<List<ReviewHistoryItemState>> {
-        val plan = repository.loadPlan()
-        
-        return repository.observeReviews().map { reviews ->
+        return combine(
+            repository.observeReviews(),
+            repository.observePlan(),
+            repository.observeGoals()
+        ) { reviews, plan, goals ->
             reviews.sortedByDescending { it.createdAt }.map { review ->
-                mapToState(review, plan)
+                mapToState(review, plan, goals)
             }
         }
     }
 
-    private fun mapToState(review: ManualReview, plan: SalaryPlan?): ReviewHistoryItemState {
+    private fun mapToState(review: ManualReview, plan: SalaryPlan?, goals: List<Goal>): ReviewHistoryItemState {
         val currencyFormatter = NumberFormat.getCurrencyInstance(Locale.getDefault())
         val dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
         
         val dateLabel = review.createdAt.format(dateFormatter)
         
-        // Use plan defaults or review snapshots if we had them (future enhancement)
-        // For now, compare against the CURRENT plan blueprint
-        val goals = repository.loadGoals() // Need this to get the target amount for preview
-        val targetAmount = goals.firstOrNull()?.targetAmount ?: BigDecimal.ZERO
-        
-        val preview = plan?.let { calculatePlanPreviewUseCase.execute(it, targetAmount) }
-        
-        val blueprintFlexible = preview?.flexibleSpendPerPayday ?: BigDecimal.ZERO
-        val blueprintGoal = preview?.savingsPerPayday ?: BigDecimal.ZERO // In this app, Goal Contribution = Savings
+        // Use snapshots if available, otherwise calculate against current plan
+        val (blueprintFlexible, blueprintGoal) = if (review.plannedFlexibleSpend != null && review.plannedGoalContribution != null) {
+            review.plannedFlexibleSpend to review.plannedGoalContribution
+        } else {
+            val targetAmount = goals.firstOrNull()?.targetAmount ?: BigDecimal.ZERO
+            val preview = plan?.let { calculatePlanPreviewUseCase.execute(it, targetAmount) }
+            (preview?.flexibleSpendPerPayday ?: BigDecimal.ZERO) to (preview?.savingsPerPayday ?: BigDecimal.ZERO)
+        }
         
         val flexibleDelta = review.actualFlexibleSpend.subtract(blueprintFlexible)
         val goalDelta = review.actualGoalContribution.subtract(blueprintGoal)
         
+        // Positive performance: Spent less than or equal to flexible budget, saved more than or equal to goal target
         val isPositiveValue = flexibleDelta <= BigDecimal.ZERO && goalDelta >= BigDecimal.ZERO
 
         return ReviewHistoryItemState(
             id = review.id,
             dateLabel = dateLabel,
             flexibleSpendLabel = currencyFormatter.format(review.actualFlexibleSpend),
+            plannedFlexibleLabel = currencyFormatter.format(blueprintFlexible),
             goalContributionLabel = currencyFormatter.format(review.actualGoalContribution),
+            plannedGoalLabel = currencyFormatter.format(blueprintGoal),
             flexibleDeltaLabel = formatDelta(flexibleDelta, currencyFormatter),
             goalDeltaLabel = formatDelta(goalDelta, currencyFormatter),
             isPositive = isPositiveValue

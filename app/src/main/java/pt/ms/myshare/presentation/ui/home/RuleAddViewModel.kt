@@ -50,8 +50,8 @@ class RuleAddViewModel @Inject constructor(
     private fun loadExistingRule(id: String) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            val plan = repository.observePlan().first()
-            val rule = plan?.rules?.find { it.id == id }
+            val rules = repository.loadRules()
+            val rule = rules.find { it.id == id }
             if (rule != null) {
                 _state.update { 
                     it.copy(
@@ -95,12 +95,7 @@ class RuleAddViewModel @Inject constructor(
 
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
-            val currentPlan = repository.loadPlan()
-            if (currentPlan == null) {
-                _state.update { it.copy(isLoading = false, error = "No active plan found.") }
-                return@launch
-            }
-
+            
             val finalRule = PaydayRule(
                 id = _state.value.ruleId ?: UUID.randomUUID().toString(),
                 name = _state.value.name,
@@ -110,15 +105,7 @@ class RuleAddViewModel @Inject constructor(
                 createdAt = _state.value.createdAt ?: LocalDate.now()
             )
 
-            val updatedRules = currentPlan.rules.toMutableList()
-            val index = updatedRules.indexOfFirst { it.id == finalRule.id }
-            if (index != -1) {
-                updatedRules[index] = finalRule
-            } else {
-                updatedRules.add(finalRule)
-            }
-
-            repository.savePlan(currentPlan.copy(rules = updatedRules))
+            repository.saveRule(finalRule)
             _state.update { it.copy(isLoading = false, isSaved = true) }
         }
     }
@@ -127,9 +114,7 @@ class RuleAddViewModel @Inject constructor(
         val id = _state.value.ruleId ?: return
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
-            val currentPlan = repository.loadPlan() ?: return@launch
-            val updatedRules = currentPlan.rules.filterNot { it.id == id }
-            repository.savePlan(currentPlan.copy(rules = updatedRules))
+            repository.deleteRule(id)
             _state.update { it.copy(isLoading = false, isSaved = true) }
         }
     }

@@ -71,10 +71,19 @@ data class ReviewHistoryItemState(
     val id: String,
     val dateLabel: String,
     val flexibleSpendLabel: String,
+    val plannedFlexibleLabel: String = "", // Added for snapshots
     val goalContributionLabel: String,
+    val plannedGoalLabel: String = "", // Added for snapshots
     val flexibleDeltaLabel: String,
     val goalDeltaLabel: String,
     val isPositive: Boolean
+)
+
+data class PerformanceStatsState(
+    val healthScore: Int = 0,
+    val currentStreak: Int = 0,
+    val totalFlexSavingsLabel: String = "",
+    val totalReviews: Int = 0
 )
 
 data class HomeState(
@@ -85,6 +94,7 @@ data class HomeState(
     val goals: List<GoalCardState> = emptyList(),
     val reviewCard: ReviewCardState = ReviewCardState(),
     val reviewHistory: List<ReviewHistoryItemState> = emptyList(),
+    val performanceStats: PerformanceStatsState = PerformanceStatsState(),
     val moreCard: MoreCardState = MoreCardState(),
     val isLoading: Boolean = true,
     val emptyMessage: String? = null,

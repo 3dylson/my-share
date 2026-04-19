@@ -44,6 +44,7 @@ class PlannerRepositoryImpl @Inject constructor(
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     private val planState = MutableStateFlow(readPlan())
+    private val ruleState = MutableStateFlow<List<PaydayRule>>(emptyList())
     private val goalState = MutableStateFlow<List<Goal>>(emptyList())
     private val reviewState = MutableStateFlow<List<ManualReview>>(emptyList())
     private val reminderState = MutableStateFlow(readReminderConfiguration())
@@ -64,7 +65,6 @@ class PlannerRepositoryImpl @Inject constructor(
             .putLong(KEY_BIWEEKLY_PAYDAY_EPOCH, plan.nextBiweeklyPayday?.toEpochDay() ?: NO_EPOCH)
             .remove(KEY_GOAL_NAME)
             .remove(KEY_GOAL_AMOUNT)
-            .putString(KEY_RULES_JSON, serializeRules(plan.rules))
             .putLong(KEY_PLAN_CREATED_AT_EPOCH, plan.createdAt.toEpochDay())
             .putString(KEY_PRESET, plan.preset.name)
             .apply()
@@ -84,15 +84,6 @@ class PlannerRepositoryImpl @Inject constructor(
                 "monthlyPayday" to (plan.monthlyPayday ?: 1),
                 "nextBiweeklyPaydayText" to (plan.nextBiweeklyPayday?.toString() ?: ""),
                 "preset" to plan.preset.name,
-                "rules" to plan.rules.map { rule ->
-                    mapOf(
-                        "id" to rule.id,
-                        "name" to rule.name,
-                        "amount" to rule.amount.toPlainString(),
-                        "isPercentage" to rule.isPercentage,
-                        "type" to rule.type.name
-                    )
-                },
                 "createdAtDate" to plan.createdAt.toString()
             )
             try {
@@ -109,6 +100,7 @@ class PlannerRepositoryImpl @Inject constructor(
         Timber.tag(TAG).d("clearPlan")
         prefs.edit().clear().apply()
         planState.value = null
+        ruleState.value = emptyList()
         goalState.value = emptyList()
         reviewState.value = emptyList()
         automationState.value = false
@@ -136,23 +128,13 @@ class PlannerRepositoryImpl @Inject constructor(
                     monthlyPayday = planDoc.getLong("monthlyPayday")?.toInt(),
                     nextBiweeklyPayday = planDoc.getString("nextBiweeklyPaydayText")?.takeIf { it.isNotBlank() }?.let { LocalDate.parse(it) },
                     preset = preset,
-                    rules = (planDoc.get("rules") as? List<Map<String, Any>>)?.mapNotNull { map ->
-                        runCatching {
-                            PaydayRule(
-                                id = map["id"] as? String ?: java.util.UUID.randomUUID().toString(),
-                                name = map["name"] as? String ?: "",
-                                amount = (map["amount"] as? String)?.toBigDecimalOrNull() ?: BigDecimal.ZERO,
-                                isPercentage = map["isPercentage"] as? Boolean ?: true,
-                                type = (map["type"] as? String)?.let { PaydayRuleType.valueOf(it) } ?: PaydayRuleType.OTHER
-                            )
-                        }.getOrNull()
-                    } ?: emptyList(),
                     createdAt = planDoc.getString("createdAtDate")?.let { LocalDate.parse(it) } ?: LocalDate.now()
                 )
                 savePlan(plan)
             }
 
-            // 1.5 Sync Goals & Reviews (Collections)
+            // 1.5 Sync Rules, Goals & Reviews (Collections)
+            syncRulesFromFirestore(user.uid)
             syncGoalsFromFirestore(user.uid)
             syncReviewsFromFirestore(user.uid)
 
@@ -173,6 +155,27 @@ class PlannerRepositoryImpl @Inject constructor(
             Timber.tag(TAG).d("syncFromFirestore completed successfully")
         } catch (e: Exception) {
             Timber.tag(TAG).e(e, "syncFromFirestore failed")
+        }
+    }
+
+    private suspend fun syncRulesFromFirestore(uid: String) {
+        try {
+            val rulesSnapshot = firestore.collection("users").document(uid).collection("rules").get().await()
+            val rules = rulesSnapshot.documents.mapNotNull { doc ->
+                runCatching {
+                    PaydayRule(
+                        id = doc.id,
+                        name = doc.getString("name") ?: "",
+                        amount = doc.getString("amount")?.toBigDecimalOrNull() ?: BigDecimal.ZERO,
+                        isPercentage = doc.getBoolean("isPercentage") ?: true,
+                        type = doc.getString("type")?.let { PaydayRuleType.valueOf(it) } ?: PaydayRuleType.OTHER,
+                        createdAt = doc.getString("createdAtDate")?.let { LocalDate.parse(it) } ?: LocalDate.now()
+                    )
+                }.getOrNull()
+            }
+            ruleState.value = rules
+        } catch (e: Exception) {
+            Timber.tag(TAG).e(e, "syncRulesFromFirestore failed")
         }
     }
 
@@ -207,6 +210,8 @@ class PlannerRepositoryImpl @Inject constructor(
                         id = doc.id,
                         actualFlexibleSpend = doc.getString("actualFlexibleSpend")?.toBigDecimalOrNull() ?: BigDecimal.ZERO,
                         actualGoalContribution = doc.getString("actualGoalContribution")?.toBigDecimalOrNull() ?: BigDecimal.ZERO,
+                        plannedFlexibleSpend = doc.getString("plannedFlexibleSpend")?.toBigDecimalOrNull(),
+                        plannedGoalContribution = doc.getString("plannedGoalContribution")?.toBigDecimalOrNull(),
                         createdAt = doc.getString("createdAtDate")?.let { LocalDate.parse(it) } ?: LocalDate.now(),
                         paydayDate = doc.getString("paydayDate")?.takeIf { it.isNotEmpty() }?.let { LocalDate.parse(it) }
                     )
@@ -215,6 +220,55 @@ class PlannerRepositoryImpl @Inject constructor(
             reviewState.value = reviews
         } catch (e: Exception) {
             Timber.tag(TAG).e(e, "syncReviewsFromFirestore failed")
+        }
+    }
+
+    override fun observeRules(): Flow<List<PaydayRule>> = ruleState.asStateFlow()
+
+    override fun loadRules(): List<PaydayRule> = ruleState.value
+
+    override suspend fun saveRule(rule: PaydayRule) {
+        val user = firebaseAuth.currentUser ?: return
+        coroutineScope.launch {
+            val data = hashMapOf(
+                "id" to rule.id,
+                "name" to rule.name,
+                "amount" to rule.amount.toPlainString(),
+                "isPercentage" to rule.isPercentage,
+                "type" to rule.type.name,
+                "createdAtDate" to rule.createdAt.toString()
+            )
+            try {
+                firestore.collection("users").document(user.uid)
+                    .collection("rules").document(rule.id).set(data)
+                
+                // Update local state
+                val currentRules = ruleState.value.toMutableList()
+                val index = currentRules.indexOfFirst { it.id == rule.id }
+                if (index >= 0) {
+                    currentRules[index] = rule
+                } else {
+                    currentRules.add(rule)
+                }
+                ruleState.value = currentRules
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e, "Failed to save rule to Firestore")
+            }
+        }
+    }
+
+    override suspend fun deleteRule(ruleId: String) {
+        val user = firebaseAuth.currentUser ?: return
+        coroutineScope.launch {
+            try {
+                firestore.collection("users").document(user.uid)
+                    .collection("rules").document(ruleId).delete()
+                
+                // Update local state
+                ruleState.value = ruleState.value.filter { it.id != ruleId }
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e, "Failed to delete rule from Firestore")
+            }
         }
     }
 
@@ -291,6 +345,8 @@ class PlannerRepositoryImpl @Inject constructor(
                 "id" to review.id,
                 "actualFlexibleSpend" to review.actualFlexibleSpend.toPlainString(),
                 "actualGoalContribution" to review.actualGoalContribution.toPlainString(),
+                "plannedFlexibleSpend" to review.plannedFlexibleSpend?.toPlainString(),
+                "plannedGoalContribution" to review.plannedGoalContribution?.toPlainString(),
                 "createdAtDate" to review.createdAt.toString(),
                 "paydayDate" to (review.paydayDate?.toString() ?: "")
             )
@@ -393,9 +449,6 @@ class PlannerRepositoryImpl @Inject constructor(
         val createdAtEpoch = prefs.getLong(KEY_PLAN_CREATED_AT_EPOCH, LocalDate.now().toEpochDay())
         val monthlyPayday = prefs.getInt(KEY_MONTHLY_PAYDAY, 1).coerceIn(1, 31)
         val biweeklyEpoch = prefs.getLong(KEY_BIWEEKLY_PAYDAY_EPOCH, NO_EPOCH)
-        val rulesJson = prefs.getString(KEY_RULES_JSON, null)
-        val rules = deserializeRules(rulesJson)
-
         return SalaryPlan(
             focus = focus,
             netIncomePerPayday = income,
@@ -404,48 +457,10 @@ class PlannerRepositoryImpl @Inject constructor(
             monthlyPayday = monthlyPayday,
             nextBiweeklyPayday = biweeklyEpoch.takeIf { it != NO_EPOCH }?.let(LocalDate::ofEpochDay),
             preset = preset,
-            rules = rules,
             createdAt = LocalDate.ofEpochDay(createdAtEpoch)
         )
     }
 
-    private fun serializeRules(rules: List<PaydayRule>): String {
-        val array = JSONArray()
-        rules.forEach { rule ->
-            val obj = JSONObject()
-            obj.put("id", rule.id)
-            obj.put("name", rule.name)
-            obj.put("amount", rule.amount.toPlainString())
-            obj.put("isPercentage", rule.isPercentage)
-            obj.put("type", rule.type.name)
-            array.put(obj)
-        }
-        return array.toString()
-    }
-
-    private fun deserializeRules(json: String?): List<PaydayRule> {
-        if (json.isNullOrBlank()) return emptyList()
-        return try {
-            val array = JSONArray(json)
-            val rules = mutableListOf<PaydayRule>()
-            for (i in 0 until array.length()) {
-                val obj = array.getJSONObject(i)
-                rules.add(
-                    PaydayRule(
-                        id = obj.optString("id", java.util.UUID.randomUUID().toString()),
-                        name = obj.getString("name"),
-                        amount = obj.getString("amount").toBigDecimal(),
-                        isPercentage = obj.getBoolean("isPercentage"),
-                        type = PaydayRuleType.valueOf(obj.getString("type"))
-                    )
-                )
-            }
-            rules
-        } catch (e: Exception) {
-            Timber.tag(TAG).e(e, "Failed to deserialize rules")
-            emptyList()
-        }
-    }
 
     private fun readLatestReview(): ManualReview? {
         val actualFlexible = prefs.getString(KEY_REVIEW_FLEXIBLE_SPEND, null)?.toBigDecimalOrNull() ?: return null
@@ -491,7 +506,6 @@ class PlannerRepositoryImpl @Inject constructor(
         const val KEY_SAVINGS = "planner_savings"
         const val KEY_INVESTING = "planner_investing"
         const val KEY_CRYPTO = "planner_crypto"
-        const val KEY_RULES_JSON = "planner_rules_json"
         const val KEY_PLAN_CREATED_AT_EPOCH = "planner_plan_created_at_epoch"
         const val KEY_REVIEW_FLEXIBLE_SPEND = "planner_review_flexible_spend"
         const val KEY_REVIEW_GOAL_CONTRIBUTION = "planner_review_goal_contribution"

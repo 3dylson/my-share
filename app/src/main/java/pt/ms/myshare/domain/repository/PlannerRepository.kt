@@ -5,12 +5,19 @@ import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.ReminderConfiguration
 import pt.ms.myshare.domain.model.SalaryPlan
+import pt.ms.myshare.domain.model.PaydayRule
 
 interface PlannerRepository {
     fun observePlan(): Flow<SalaryPlan?>
     fun loadPlan(): SalaryPlan?
     suspend fun savePlan(plan: SalaryPlan)
     suspend fun clearPlan()
+    
+    // Decentralized Rules management
+    fun observeRules(): Flow<List<PaydayRule>>
+    fun loadRules(): List<PaydayRule>
+    suspend fun saveRule(rule: PaydayRule)
+    suspend fun deleteRule(ruleId: String)
     
     // Multi-Goal Support
     fun observeGoals(): Flow<List<Goal>>

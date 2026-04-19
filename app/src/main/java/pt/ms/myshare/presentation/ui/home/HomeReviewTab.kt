@@ -18,12 +18,51 @@ import pt.ms.myshare.presentation.ui.theme.MyShareSecondary
 fun LazyListScope.homeReviewTab(
     state: ReviewCardState,
     history: List<ReviewHistoryItemState>,
+    performanceStats: PerformanceStatsState,
     isPremium: Boolean,
     onFlexibleSpendChanged: (String) -> Unit,
     onGoalContributionChanged: (String) -> Unit,
     onSaveReview: () -> Unit,
     onDestinationSelected: (HomeDestination) -> Unit
 ) {
+    if (history.isNotEmpty()) {
+        item {
+            PremiumSectionHeader(title = "Performance Insights")
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Box(modifier = Modifier.weight(1f)) {
+                    PremiumMetricCard(
+                        label = "Trust Score",
+                        value = "${performanceStats.healthScore}%",
+                        subtitle = "${performanceStats.totalReviews} reviews",
+                        icon = Icons.Default.VerifiedUser
+                    )
+                }
+                Box(modifier = Modifier.weight(1f)) {
+                    PremiumMetricCard(
+                        label = "Streak",
+                        value = "${performanceStats.currentStreak}",
+                        subtitle = "Positive loop",
+                        icon = Icons.Default.Whatshot
+                    )
+                }
+            }
+            if (performanceStats.totalFlexSavingsLabel.isNotEmpty() && performanceStats.totalFlexSavingsLabel != "$0.00") {
+                PremiumBenefitCard(
+                    title = "Excess Savings: ${performanceStats.totalFlexSavingsLabel}",
+                    description = "This is how much you've stayed under budget across all your sessions. Great job!",
+                    icon = Icons.Default.Savings,
+                    onClick = {}
+                )
+                Spacer(Modifier.height(16.dp))
+            }
+        }
+    }
+
     item {
         PremiumSectionHeader(title = "The Habit Loop")
         PremiumInfoCard(
@@ -74,12 +113,20 @@ fun LazyListScope.homeReviewTab(
             item {
                 PremiumMetricCard(
                     label = item.dateLabel,
-                    value = item.flexibleDeltaLabel,
-                    subtitle = "Goal: ${item.goalDeltaLabel}",
+                    value = "Flex: ${item.flexibleSpendLabel}",
+                    subtitle = "Target: ${item.plannedFlexibleLabel} (${item.flexibleDeltaLabel})",
                     icon = if (item.isPositive) Icons.Default.TrendingDown else Icons.Default.TrendingUp,
                     color = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error
                 )
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(8.dp))
+                PremiumMetricCard(
+                    label = "Goal contribution",
+                    value = item.goalContributionLabel,
+                    subtitle = "Plan: ${item.plannedGoalLabel} (${item.goalDeltaLabel})",
+                    icon = if (item.isPositive) Icons.Default.Flag else Icons.Default.OutlinedFlag,
+                    color = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error
+                )
+                Spacer(Modifier.height(16.dp))
             }
         }
 

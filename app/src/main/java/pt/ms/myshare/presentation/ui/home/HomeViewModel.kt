@@ -23,6 +23,8 @@ import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
 import pt.ms.myshare.domain.use_case.GetReviewHistoryUseCase
 import pt.ms.myshare.domain.use_case.UpdateGoalProgressUseCase
+import pt.ms.myshare.domain.use_case.GetPerformanceStatsUseCase
+import pt.ms.myshare.domain.use_case.PerformanceStats
 import pt.ms.myshare.utils.logs.FirebaseUtils
 import timber.log.Timber
 import java.math.BigDecimal
@@ -40,7 +42,8 @@ class HomeViewModel @Inject constructor(
     private val createReviewInsightUseCase: CreateReviewInsightUseCase,
     private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase,
     private val getReviewHistoryUseCase: GetReviewHistoryUseCase,
-    private val updateGoalProgressUseCase: UpdateGoalProgressUseCase
+    private val updateGoalProgressUseCase: UpdateGoalProgressUseCase,
+    private val getPerformanceStatsUseCase: GetPerformanceStatsUseCase
 ) : ViewModel() {
 
     private val uiState = MutableStateFlow(HomeState())
@@ -92,12 +95,16 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val plannerFlow = combine(
                 plannerRepository.observePlan(),
+                plannerRepository.observeRules(),
                 plannerRepository.observeGoals(),
-                plannerRepository.observeLatestReview(),
-                plannerRepository.observeReminderConfiguration(),
-                plannerRepository.observeAutomationEnabled()
-            ) { plan, goals, latestReview, reminder, automation ->
-                PlannerGroup(plan, goals, latestReview, reminder, automation)
+                combine(
+                    plannerRepository.observeLatestReview(),
+                    plannerRepository.observeReminderConfiguration(),
+                    plannerRepository.observeAutomationEnabled(),
+                    getPerformanceStatsUseCase.execute()
+                ) { lr, rc, ae, st -> Quadruple(lr, rc, ae, st) }
+            ) { plan, rules, goals, extra ->
+                PlannerGroup(plan, rules, goals, extra.first, extra.second, extra.third, extra.fourth)
             }
 
             combine(
@@ -107,17 +114,28 @@ class HomeViewModel @Inject constructor(
                 authRepository.currentUser
             ) { planner, isPremium, products, user ->
                 val plan = planner.plan
+                val currentRules = planner.rules
                 val goals = planner.goals
                 val latestReview = planner.latestReview
                 val reminder = planner.reminder
                 val automation = planner.automation
+                val stats = planner.stats
                 
-                val emptyMessage = if (plan == null) "Build a salary plan first to unlock the repeat loop." else null
+                // Inject the observed rules into the plan object for preview calculation consistency
+                val updatedPlan = plan?.copy(rules = currentRules)
+
+                val emptyMessage = if (updatedPlan == null) "Build a salary plan first to unlock the repeat loop." else null
                 val primaryGoal = goals.firstOrNull()
-                val planCard = plan?.let { buildPlanCard(it, primaryGoal?.targetAmount ?: BigDecimal.ZERO) }
-                val goalCards = goals.map { buildGoalCard(it, plan) }
-                val ruleCards = (plan?.rules ?: emptyList()).map { buildRuleCard(it) }
-                val reviewCard = buildReviewCard(plan, latestReview)
+                val planCard = updatedPlan?.let { buildPlanCard(it, primaryGoal?.targetAmount ?: BigDecimal.ZERO) }
+                val goalCards = goals.map { buildGoalCard(it, updatedPlan) }
+                val ruleCards = currentRules.map { buildRuleCard(it) }
+                val reviewCard = buildReviewCard(updatedPlan, latestReview)
+                val performanceStats = PerformanceStatsState(
+                    healthScore = stats.healthScore,
+                    currentStreak = stats.currentStreak,
+                    totalFlexSavingsLabel = currencyFormat.format(stats.totalSavingsBeyondGoal),
+                    totalReviews = stats.totalReviews
+                )
 
                 // Map Store Products to pricing labels
                 val monthlyProduct = products.find { it.productId == "myshare_monthly" }
@@ -141,10 +159,11 @@ class HomeViewModel @Inject constructor(
                 )
                 HomeState(
                     selectedDestination = uiState.value.selectedDestination,
-                    plan = plan,
+                    plan = updatedPlan,
                     planCard = planCard,
                     goals = goalCards,
                     rules = ruleCards,
+                    performanceStats = performanceStats,
                     reviewCard = reviewCard,
                     reviewHistory = uiState.value.reviewHistory, // Keep existing history from separate observer
                     moreCard = moreCard,
@@ -160,10 +179,19 @@ class HomeViewModel @Inject constructor(
 
     private data class PlannerGroup(
         val plan: pt.ms.myshare.domain.model.SalaryPlan?,
+        val rules: List<pt.ms.myshare.domain.model.PaydayRule>,
         val goals: List<Goal>,
         val latestReview: ManualReview?,
         val reminder: pt.ms.myshare.domain.model.ReminderConfiguration,
-        val automation: Boolean
+        val automation: Boolean,
+        val stats: pt.ms.myshare.domain.use_case.PerformanceStats
+    )
+
+    private data class Quadruple<A, B, C, D>(
+        val first: A,
+        val second: B,
+        val third: C,
+        val fourth: D
     )
 
     private fun buildPlanCard(plan: pt.ms.myshare.domain.model.SalaryPlan, goalAmount: BigDecimal): HomePlanCardState {
@@ -260,15 +288,21 @@ class HomeViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            val goals = plannerRepository.loadGoals()
+            val targetAmount = goals.firstOrNull()?.targetAmount ?: BigDecimal.ZERO
+            val preview = calculatePlanPreviewUseCase.execute(currentPlan, targetAmount)
+
             val review = ManualReview(
                 actualFlexibleSpend = actualFlexible,
-                actualGoalContribution = actualGoal
+                actualGoalContribution = actualGoal,
+                plannedFlexibleSpend = preview.flexibleSpendPerPayday,
+                plannedGoalContribution = preview.savingsPerPayday
             )
             plannerRepository.saveReview(review)
             updateGoalProgressUseCase.execute(actualGoal)
             
             FirebaseUtils.logEvent("weekly_checkin_completed")
-            Timber.tag(TAG).d("Review saved and goals updated. flexible=%s goal=%s", actualFlexible, actualGoal)
+            Timber.tag(TAG).d("Review saved with snapshots. planFlex=%s planGoal=%s", preview.flexibleSpendPerPayday, preview.savingsPerPayday)
         }
     }
 

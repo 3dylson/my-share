@@ -60,8 +60,10 @@ data class ManualReview(
     val id: String = java.util.UUID.randomUUID().toString(),
     val actualFlexibleSpend: BigDecimal,
     val actualGoalContribution: BigDecimal,
+    val plannedFlexibleSpend: BigDecimal? = null, // Snapshot for historical accuracy
+    val plannedGoalContribution: BigDecimal? = null, // Snapshot for historical accuracy
     val createdAt: LocalDate = LocalDate.now(),
-    val paydayDate: LocalDate? = null // To link a review to a specific payday event
+    val paydayDate: LocalDate? = null
 )
 
 data class ReviewInsight(

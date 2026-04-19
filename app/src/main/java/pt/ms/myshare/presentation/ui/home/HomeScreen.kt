@@ -181,6 +181,7 @@ fun HomeScreen(
                     homeReviewTab(
                         state = state.reviewCard,
                         history = state.reviewHistory,
+                        performanceStats = state.performanceStats,
                         isPremium = state.moreCard.isPremium,
                         onFlexibleSpendChanged = onFlexibleSpendChanged,
                         onGoalContributionChanged = onGoalContributionChanged,
