@@ -24,6 +24,7 @@ fun LazyListScope.homeMoreTab(
     onToggleAutomation: (Boolean) -> Unit,
     onBillingPlanSelected: (BillingPlan) -> Unit,
     onUnlockPremium: (android.app.Activity) -> Unit,
+    onManageAdsConsent: () -> Unit,
     onLogout: () -> Unit
 ) {
     item {
@@ -58,7 +59,7 @@ fun LazyListScope.homeMoreTab(
         item {
             PremiumPaywallCard(
                 title = "Annual Membership",
-                price = "$49.99",
+                price = state.actualAnnualPrice ?: "$49.99",
                 period = "year",
                 description = "Unlock automation, multiple goals, and detailed sync.",
                 badge = "60% OFF",
@@ -69,7 +70,7 @@ fun LazyListScope.homeMoreTab(
         item {
             PremiumPaywallCard(
                 title = "Monthly Membership",
-                price = "$5.99",
+                price = state.actualMonthlyPrice ?: "$5.99",
                 period = "month",
                 description = "Flexible access to all premium features.",
                 isSelected = state.selectedBillingPlan == BillingPlan.MONTHLY,
@@ -124,6 +125,17 @@ fun LazyListScope.homeMoreTab(
                     icon = Icons.Default.Info,
                     onClick = { uriHandler.openUri("https://my-share-finance.web.app/") }
                 )
+                
+                if (state.showAdsConsentOption) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    PremiumMetricCard(
+                        label = "Ad Preferences",
+                        value = "Manage",
+                        subtitle = "Update choice for personalized ads",
+                        icon = Icons.Default.Settings,
+                        onClick = onManageAdsConsent
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))

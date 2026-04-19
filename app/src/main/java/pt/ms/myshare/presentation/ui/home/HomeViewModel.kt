@@ -103,8 +103,9 @@ class HomeViewModel @Inject constructor(
             combine(
                 plannerFlow,
                 entitlementRepository.isPro,
+                entitlementRepository.availableProducts,
                 authRepository.currentUser
-            ) { planner, isPremium, user ->
+            ) { planner, isPremium, products, user ->
                 val plan = planner.plan
                 val goals = planner.goals
                 val latestReview = planner.latestReview
@@ -117,6 +118,11 @@ class HomeViewModel @Inject constructor(
                 val goalCards = goals.map { buildGoalCard(it, plan) }
                 val ruleCards = (plan?.rules ?: emptyList()).map { buildRuleCard(it) }
                 val reviewCard = buildReviewCard(plan, latestReview)
+
+                // Map Store Products to pricing labels
+                val monthlyProduct = products.find { it.productId == "myshare_monthly" }
+                val annualProduct = products.find { it.productId == "myshare_annual" }
+
                 val moreCard = MoreCardState(
                     reminderEnabled = reminder.enabled,
                     reminderLabel = if (reminder.enabled) {
@@ -125,6 +131,9 @@ class HomeViewModel @Inject constructor(
                         "Reminders are off"
                     },
                     pricingStrategy = pricingStrategy,
+                    actualMonthlyPrice = monthlyProduct?.price ?: pricingStrategy.monthlyLabel,
+                    actualAnnualPrice = annualProduct?.price ?: pricingStrategy.annualLabel,
+                    showAdsConsentOption = uiState.value.moreCard.showAdsConsentOption, // Preserve this
                     selectedBillingPlan = pricingStrategy.heroPlan,
                     isPremium = isPremium,
                     automationEnabled = automation,
@@ -290,6 +299,11 @@ class HomeViewModel @Inject constructor(
                 Timber.tag(TAG).e("Cannot purchase: Product %s not found in store", storeProductId)
             }
         }
+    }
+
+    fun updateAdsConsentRequirement(isRequired: Boolean) {
+        uiState.update { it.copy(moreCard = it.moreCard.copy(showAdsConsentOption = isRequired)) }
+        Timber.tag(TAG).d("Ads consent option visibility updated: %s", isRequired)
     }
 
     fun onLogout(onComplete: () -> Unit) {

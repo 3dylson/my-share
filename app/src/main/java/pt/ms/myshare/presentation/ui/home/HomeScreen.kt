@@ -28,9 +28,18 @@ import pt.ms.myshare.presentation.ui.theme.*
 fun HomeRoute(
     modifier: Modifier = Modifier,
     navController: NavController,
+    onManageAdsConsent: () -> Unit = {},
+    adsConsentManager: pt.ms.myshare.presentation.ui.ads.AdsConsentManager? = null,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(adsConsentManager) {
+        adsConsentManager?.let {
+            viewModel.updateAdsConsentRequirement(it.isPrivacyOptionsRequired)
+        }
+    }
+
     HomeScreen(
         modifier = modifier,
         state = uiState,
@@ -49,6 +58,7 @@ fun HomeRoute(
                 }
             }
         },
+        onManageAdsConsent = onManageAdsConsent,
         onAddNewGoal = { navController.navigate("add_goal") },
         onEditGoal = { id -> navController.navigate("add_goal?goalId=$id") },
         onAddNewRule = { navController.navigate("add_rule") },
@@ -70,6 +80,7 @@ fun HomeScreen(
     onBillingPlanSelected: (BillingPlan) -> Unit,
     onUnlockPremium: (android.app.Activity) -> Unit,
     onLogout: () -> Unit,
+    onManageAdsConsent: () -> Unit,
     onAddNewGoal: () -> Unit,
     onEditGoal: (String) -> Unit,
     onAddNewRule: () -> Unit,
@@ -185,6 +196,7 @@ fun HomeScreen(
                         onToggleAutomation = onToggleAutomation,
                         onBillingPlanSelected = onBillingPlanSelected,
                         onUnlockPremium = onUnlockPremium,
+                        onManageAdsConsent = onManageAdsConsent,
                         onLogout = onLogout
                     )
                 }
@@ -230,6 +242,7 @@ private fun HomeScreenPreview() {
             onBillingPlanSelected = { _ -> },
             onUnlockPremium = {},
             onLogout = {},
+            onManageAdsConsent = {},
             onAddNewGoal = {},
             onEditGoal = {},
             onAddNewRule = {},

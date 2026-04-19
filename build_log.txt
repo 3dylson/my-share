@@ -38,8 +38,7 @@ Please, stop using it as it is unsupported and may apply no effect to your build
 > Task :app:kaptDebugKotlin UP-TO-DATE
 
 > Task :app:compileDebugKotlin FAILED
-e: file:///Users/3dylson/AndroidStudioProjects/my-share/app/src/main/java/pt/ms/myshare/presentation/ui/onboarding/SalaryAndScheduleScreen.kt:83:58 Unresolved reference 'FORTNIGHTLY'.
-e: file:///Users/3dylson/AndroidStudioProjects/my-share/app/src/main/java/pt/ms/myshare/presentation/ui/onboarding/SalaryAndScheduleScreen.kt:85:58 Unresolved reference 'FORTNIGHTLY'.
+e: file:///Users/3dylson/AndroidStudioProjects/my-share/app/src/main/java/pt/ms/myshare/presentation/ui/home/HomeScreen.kt:248:13 No value passed for parameter 'onManageAdsConsent'.
 
 [Incubating] Problems report is available at: file:///Users/3dylson/AndroidStudioProjects/my-share/build/reports/problems/problems-report.html
 

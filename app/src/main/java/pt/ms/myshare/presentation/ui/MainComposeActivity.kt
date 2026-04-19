@@ -49,7 +49,16 @@ class MainComposeActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize()
                         .background(MaterialTheme.colorScheme.background)
                 ) {
-                    AppNavigation()
+                    AppNavigation(
+                        onManageAdsConsent = {
+                            consentManager.showPrivacyOptionsForm { formError ->
+                                if (formError != null) {
+                                    Timber.tag("AdsConsent").w("Privacy options form error: %s", formError.message)
+                                }
+                            }
+                        },
+                        adsConsentManager = consentManager
+                    )
                 }
             }
         }

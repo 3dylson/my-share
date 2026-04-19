@@ -14,14 +14,20 @@ import pt.ms.myshare.presentation.ui.onboarding.OnboardingEntryRoute
 
 @Composable
 fun AppNavigation(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    onManageAdsConsent: () -> Unit = {},
+    adsConsentManager: pt.ms.myshare.presentation.ui.ads.AdsConsentManager? = null
 ) {
     NavHost(navController = navController, startDestination = "onboarding") {
         composable("onboarding") {
             OnboardingEntryRoute(parentNavController = navController)
         }
         composable("home") {
-            HomeRoute(navController = navController)
+            HomeRoute(
+                navController = navController,
+                onManageAdsConsent = onManageAdsConsent,
+                adsConsentManager = adsConsentManager
+            )
         }
         composable(
             route = "add_rule?ruleId={ruleId}",
