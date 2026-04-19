@@ -220,6 +220,8 @@ class PlannerRepositoryImpl @Inject constructor(
 
     override fun observeGoals(): Flow<List<Goal>> = goalState.asStateFlow()
 
+    override fun loadGoals(): List<Goal> = goalState.value
+
     override suspend fun saveGoal(goal: Goal) {
         val user = firebaseAuth.currentUser ?: return
         coroutineScope.launch {

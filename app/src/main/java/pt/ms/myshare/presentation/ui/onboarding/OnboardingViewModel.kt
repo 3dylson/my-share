@@ -203,6 +203,41 @@ class OnboardingViewModel @Inject constructor(
     }
 
 
+    fun skipToHomeWithDefaultPlan() {
+        state.update {
+            it.copy(
+                netIncomePerPayday = BigDecimal("1500"),
+                payFrequency = PayFrequency.MONTHLY,
+                monthlyPayday = 1,
+                monthlyFixedCosts = BigDecimal("600"),
+                preset = AllocationPreset.BALANCED,
+                allocatedFlexibleSpend = BigDecimal("400"),
+                allocatedSavings = BigDecimal("300"),
+                allocatedInvesting = BigDecimal("200"),
+                allocatedCrypto = BigDecimal.ZERO,
+                goalName = "Emergency Fund",
+                goalAmount = BigDecimal("5000"),
+                planSaved = true,
+                reminderSkipped = true,
+                bankSyncHandled = true
+            )
+        }
+        viewModelScope.launch {
+            val plan = SalaryPlan(
+                focus = PlanningFocus.SAVE_WITHOUT_STRESS,
+                netIncomePerPayday = BigDecimal("1500"),
+                monthlyFixedCosts = BigDecimal("600"),
+                payFrequency = PayFrequency.MONTHLY,
+                monthlyPayday = 1,
+                preset = AllocationPreset.BALANCED
+            )
+            plannerRepository.savePlan(plan)
+            plannerRepository.saveGoal(Goal(name = "Emergency Fund", targetAmount = BigDecimal("5000")))
+            plannerRepository.setOnboardingCompleted(true)
+            state.update { it.copy(onboardingCompleted = true) }
+        }
+    }
+
     fun restorePurchases(onRestored: (Boolean) -> Unit) {
         viewModelScope.launch {
             entitlementRepository.restorePurchases()

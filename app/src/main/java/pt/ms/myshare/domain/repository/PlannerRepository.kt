@@ -14,6 +14,7 @@ interface PlannerRepository {
     
     // Multi-Goal Support
     fun observeGoals(): Flow<List<Goal>>
+    fun loadGoals(): List<Goal>
     suspend fun saveGoal(goal: Goal)
     suspend fun deleteGoal(goalId: String)
 

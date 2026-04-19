@@ -30,6 +30,14 @@ import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
 import java.math.BigDecimal
 
+import pt.ms.myshare.domain.repository.AuthRepository
+import pt.ms.myshare.domain.use_case.GetReviewHistoryUseCase
+import pt.ms.myshare.domain.use_case.UpdateGoalProgressUseCase
+import pt.ms.myshare.domain.model.Goal
+import io.mockk.mockk
+import io.mockk.every
+import kotlinx.coroutines.flow.flowOf
+
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
 
@@ -38,6 +46,9 @@ class HomeViewModelTest {
     private lateinit var viewModel: HomeViewModel
     private lateinit var fakePlannerRepository: FakePlannerRepository
     private lateinit var fakeEntitlementRepository: TestFakeEntitlementRepository
+    private val mockAuthRepository = mockk<AuthRepository>(relaxed = true)
+    private val mockGetReviewHistoryUseCase = mockk<GetReviewHistoryUseCase>(relaxed = true)
+    private val mockUpdateGoalProgressUseCase = mockk<UpdateGoalProgressUseCase>(relaxed = true)
 
     @Before
     fun setup() {
@@ -45,12 +56,18 @@ class HomeViewModelTest {
         fakePlannerRepository = FakePlannerRepository()
         fakeEntitlementRepository = TestFakeEntitlementRepository()
         
+        every { mockAuthRepository.currentUser } returns flowOf(null)
+        every { mockGetReviewHistoryUseCase.execute() } returns flowOf(emptyList())
+
         viewModel = HomeViewModel(
             plannerRepository = fakePlannerRepository,
+            authRepository = mockAuthRepository,
             entitlementRepository = fakeEntitlementRepository,
             calculatePlanPreviewUseCase = CalculatePlanPreviewUseCase(),
             createReviewInsightUseCase = CreateReviewInsightUseCase(CalculatePlanPreviewUseCase()),
-            resolvePricingStrategyUseCase = ResolvePricingStrategyUseCase()
+            resolvePricingStrategyUseCase = ResolvePricingStrategyUseCase(),
+            getReviewHistoryUseCase = mockGetReviewHistoryUseCase,
+            updateGoalProgressUseCase = mockUpdateGoalProgressUseCase
         )
     }
 
@@ -69,11 +86,10 @@ class HomeViewModelTest {
             payFrequency = PayFrequency.MONTHLY,
             monthlyPayday = 1,
             nextBiweeklyPayday = null,
-            preset = AllocationPreset.BALANCED,
-            goalName = "Savings",
-            goalAmount = BigDecimal("500")
+            preset = AllocationPreset.BALANCED
         )
         fakePlannerRepository.savePlan(currentPlan)
+        fakePlannerRepository.saveGoal(Goal(name = "Savings", targetAmount = BigDecimal("500")))
         
         // Wait for View model flow combination
         advanceUntilIdle()
@@ -100,10 +116,7 @@ class HomeViewModelTest {
             monthlyFixedCosts = BigDecimal("400"),
             payFrequency = PayFrequency.MONTHLY,
             monthlyPayday = 1,
-            nextBiweeklyPayday = null,
-            preset = AllocationPreset.BALANCED,
-            goalName = "Savings",
-            goalAmount = BigDecimal("500")
+            preset = AllocationPreset.BALANCED
         )
         fakePlannerRepository.savePlan(currentPlan)
         advanceUntilIdle()
@@ -122,25 +135,49 @@ class HomeViewModelTest {
 
 class FakePlannerRepository : PlannerRepository {
     private val planFlow = MutableStateFlow<SalaryPlan?>(null)
+    private val goalsFlow = MutableStateFlow<List<Goal>>(emptyList())
     private val reviewFlow = MutableStateFlow<ManualReview?>(null)
+    private val reviewsFlow = MutableStateFlow<List<ManualReview>>(emptyList())
     private val reminderFlow = MutableStateFlow(ReminderConfiguration(false, 9, 0, ReminderCadence.PAYDAY))
+    private val automationFlow = MutableStateFlow(false)
     private var isOnboardingCompletedState = false
 
     override fun observePlan(): MutableStateFlow<SalaryPlan?> = planFlow
     override suspend fun savePlan(plan: SalaryPlan) { planFlow.emit(plan) }
     
+    override fun observeGoals(): Flow<List<Goal>> = goalsFlow.asStateFlow()
+    override suspend fun saveGoal(goal: Goal) { 
+        val current = goalsFlow.value.toMutableList()
+        current.add(goal)
+        goalsFlow.emit(current)
+    }
+    override fun loadGoals(): List<Goal> = goalsFlow.value
+    override suspend fun deleteGoal(goalId: String) {
+        goalsFlow.emit(goalsFlow.value.filter { it.id != goalId })
+    }
+
     override fun observeLatestReview(): MutableStateFlow<ManualReview?> = reviewFlow
-    override suspend fun saveReview(review: ManualReview) { reviewFlow.emit(review) }
+    override suspend fun saveReview(review: ManualReview) { 
+        reviewFlow.emit(review) 
+        val current = reviewsFlow.value.toMutableList()
+        current.add(review)
+        reviewsFlow.emit(current)
+    }
     override fun loadLatestReview(): ManualReview? = reviewFlow.value
+    override fun observeReviews(): Flow<List<ManualReview>> = reviewsFlow.asStateFlow()
     
     override fun observeReminderConfiguration(): MutableStateFlow<ReminderConfiguration> = reminderFlow
     override suspend fun saveReminderConfiguration(config: ReminderConfiguration) { reminderFlow.emit(config) }
     override fun loadReminderConfiguration(): ReminderConfiguration = reminderFlow.value
     
+    override fun observeAutomationEnabled(): Flow<Boolean> = automationFlow.asStateFlow()
+    override suspend fun saveAutomationEnabled(enabled: Boolean) { automationFlow.emit(enabled) }
+
     override fun isOnboardingCompleted(): Boolean = isOnboardingCompletedState
     override suspend fun setOnboardingCompleted(completed: Boolean) { isOnboardingCompletedState = completed }
     override fun loadPlan(): pt.ms.myshare.domain.model.SalaryPlan? = planFlow.value
     override suspend fun clearPlan() { planFlow.emit(null) }
+    override suspend fun syncFromFirestore() {}
 }
 
 class TestFakeEntitlementRepository : EntitlementRepository {

@@ -21,12 +21,10 @@ class CalculatePlanPreviewUseCaseTest {
             monthlyFixedCosts = BigDecimal("400"),
             payFrequency = PayFrequency.MONTHLY,
             monthlyPayday = 5,
-            preset = AllocationPreset.BALANCED,
-            goalName = "Emergency fund",
-            goalAmount = BigDecimal("3000")
+            preset = AllocationPreset.BALANCED
         )
 
-        val preview = useCase.execute(plan)
+        val preview = useCase.execute(plan, BigDecimal("3000"))
 
         assertEquals(BigDecimal("400.00"), preview.fixedCostsPerPayday)
         assertEquals(BigDecimal("600.00"), preview.flexibleSpendPerPayday + preview.savingsPerPayday + preview.investingPerPayday + preview.cryptoPerPayday + preview.debtPerPayday)
@@ -41,12 +39,10 @@ class CalculatePlanPreviewUseCaseTest {
             monthlyFixedCosts = BigDecimal("780"),
             payFrequency = PayFrequency.BIWEEKLY,
             nextBiweeklyPayday = java.time.LocalDate.now().plusDays(14),
-            preset = AllocationPreset.GROWTH,
-            goalName = "Investing base",
-            goalAmount = BigDecimal("10000")
+            preset = AllocationPreset.GROWTH
         )
 
-        val preview = useCase.execute(plan)
+        val preview = useCase.execute(plan, BigDecimal("10000"))
 
         assertEquals(BigDecimal("360.00"), preview.fixedCostsPerPayday)
         assertTrue(preview.weeklyFlexibleSpend > BigDecimal.ZERO)

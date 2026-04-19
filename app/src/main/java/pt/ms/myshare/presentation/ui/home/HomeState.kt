@@ -31,6 +31,8 @@ data class GoalCardState(
     val id: String,
     val goalName: String = "",
     val goalAmountLabel: String = "",
+    val progress: Float = 0f,
+    val progressLabel: String = "",
     val targetDateLabel: String = "",
     val progressNote: String = ""
 )
@@ -62,6 +64,16 @@ data class MoreCardState(
     val error: String? = null
 )
 
+data class ReviewHistoryItemState(
+    val id: String,
+    val dateLabel: String,
+    val flexibleSpendLabel: String,
+    val goalContributionLabel: String,
+    val flexibleDeltaLabel: String,
+    val goalDeltaLabel: String,
+    val isPositive: Boolean
+)
+
 data class HomeState(
     val selectedDestination: HomeDestination = HomeDestination.PLAN,
     val plan: SalaryPlan? = null,
@@ -69,6 +81,7 @@ data class HomeState(
     val rules: List<RuleCardState> = emptyList(),
     val goals: List<GoalCardState> = emptyList(),
     val reviewCard: ReviewCardState = ReviewCardState(),
+    val reviewHistory: List<ReviewHistoryItemState> = emptyList(),
     val moreCard: MoreCardState = MoreCardState(),
     val isLoading: Boolean = true,
     val emptyMessage: String? = null,

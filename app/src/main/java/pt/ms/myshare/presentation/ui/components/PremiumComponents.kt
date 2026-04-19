@@ -34,6 +34,8 @@ import androidx.compose.ui.res.stringResource
 import pt.ms.myshare.R
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.AutoGraph
 import androidx.compose.animation.core.*
 
 @Composable
@@ -192,6 +194,130 @@ fun PremiumMetricCard(
                         contentDescription = null,
                         tint = color,
                         modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PremiumGoalCard(
+    goalName: String,
+    targetAmountLabel: String,
+    progress: Float,
+    progressLabel: String,
+    targetDateLabel: String,
+    modifier: Modifier = Modifier,
+    icon: ImageVector = Icons.Default.Flag,
+    color: Color = MySharePrimary,
+    onClick: (() -> Unit)? = null
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier),
+        shape = RoundedCornerShape(24.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MyShareOutline.copy(alpha = 0.15f)),
+        shadowElevation = 2.dp
+    ) {
+        Column(modifier = Modifier.padding(20.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(color.copy(alpha = 0.1f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Flag,
+                        contentDescription = null,
+                        tint = color,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = goalName,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MyShareOnSurface,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = targetAmountLabel,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MyShareSecondary
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Column {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Progress",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MyShareSecondary,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "${(progress * 100).toInt()}%",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = color,
+                        fontWeight = FontWeight.Black
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                LinearProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp)
+                        .clip(RoundedCornerShape(4.dp)),
+                    color = color,
+                    trackColor = color.copy(alpha = 0.1f)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = progressLabel,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MyShareOnSurfaceVariant,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Surface(
+                color = MyShareSecondary.copy(alpha = 0.05f),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AutoGraph,
+                        contentDescription = null,
+                        tint = MyShareSecondary,
+                        modifier = Modifier.size(14.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = targetDateLabel,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MyShareSecondary,
+                        fontWeight = FontWeight.Medium
                     )
                 }
             }

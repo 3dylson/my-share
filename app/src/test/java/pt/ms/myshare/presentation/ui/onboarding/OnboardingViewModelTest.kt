@@ -104,7 +104,7 @@ class OnboardingViewModelTest {
             goalTargetDate = null,
             summary = "Preview snippet"
         )
-        every { calculatePlanPreviewUseCase.execute(any()) } returns previewResult
+        every { calculatePlanPreviewUseCase.execute(any(), any()) } returns previewResult
         
         viewModel.setFixedCostsAndBuild(BigDecimal("400"), AllocationPreset.BALANCED)
         viewModel.setAllocationsAndBuild(
@@ -137,7 +137,7 @@ class OnboardingViewModelTest {
     fun `completeOnboarding succeeds only if all guards met`() = runTest {
         // Set up valid preview to satisfy planSaved
         viewModel.setSalaryDetails(BigDecimal("1000"), PayFrequency.MONTHLY, 1, "")
-        every { calculatePlanPreviewUseCase.execute(any()) } returns mockk(relaxed = true)
+        every { calculatePlanPreviewUseCase.execute(any(), any()) } returns mockk(relaxed = true)
         viewModel.setFixedCostsAndBuild(BigDecimal("400"), AllocationPreset.BALANCED)
         advanceUntilIdle()
         
@@ -162,9 +162,7 @@ class OnboardingViewModelTest {
             netIncomePerPayday = BigDecimal("1000"),
             monthlyFixedCosts = BigDecimal("400"),
             payFrequency = PayFrequency.MONTHLY,
-            preset = AllocationPreset.BALANCED,
-            goalName = "Goal",
-            goalAmount = BigDecimal("500")
+            preset = AllocationPreset.BALANCED
         )
         every { plannerRepository.loadPlan() } returns plan
 
@@ -176,7 +174,7 @@ class OnboardingViewModelTest {
 
     @Test
     fun `skipToHomeWithDefaultPlan sets defaults and completes`() = runTest {
-        every { calculatePlanPreviewUseCase.execute(any()) } returns mockk(relaxed = true)
+        every { calculatePlanPreviewUseCase.execute(any(), any()) } returns mockk(relaxed = true)
         
         viewModel.skipToHomeWithDefaultPlan()
         advanceUntilIdle()

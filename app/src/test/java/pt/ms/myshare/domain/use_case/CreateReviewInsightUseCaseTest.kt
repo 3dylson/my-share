@@ -21,9 +21,7 @@ class CreateReviewInsightUseCaseTest {
             monthlyFixedCosts = BigDecimal("400"),
             payFrequency = PayFrequency.MONTHLY,
             monthlyPayday = 5,
-            preset = AllocationPreset.BALANCED,
-            goalName = "Emergency fund",
-            goalAmount = BigDecimal("3000")
+            preset = AllocationPreset.BALANCED
         )
         val review = ManualReview(
             actualFlexibleSpend = BigDecimal("250"),
@@ -32,8 +30,8 @@ class CreateReviewInsightUseCaseTest {
 
         val insight = reviewInsightUseCase.execute(plan, review)
 
-        assertEquals("You are on track", insight.headline)
-        assertEquals(BigDecimal("-20.00"), insight.flexibleSpendDelta)
-        assertEquals(BigDecimal("0.00"), insight.goalContributionDelta)
+        assertEquals("Safety net growing", insight.headline)
+        assertEquals(BigDecimal("-50.00"), insight.flexibleSpendDelta)
+        assertEquals(BigDecimal("30.00"), insight.goalContributionDelta)
     }
 }

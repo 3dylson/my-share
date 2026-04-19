@@ -14,12 +14,15 @@ import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.ReviewInsight
 import pt.ms.myshare.domain.model.Goal
+import pt.ms.myshare.domain.model.SalaryPlan
 import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
+import pt.ms.myshare.domain.use_case.GetReviewHistoryUseCase
+import pt.ms.myshare.domain.use_case.UpdateGoalProgressUseCase
 import pt.ms.myshare.utils.logs.FirebaseUtils
 import timber.log.Timber
 import java.math.BigDecimal
@@ -35,7 +38,9 @@ class HomeViewModel @Inject constructor(
     private val entitlementRepository: EntitlementRepository,
     private val calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase,
     private val createReviewInsightUseCase: CreateReviewInsightUseCase,
-    private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase
+    private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase,
+    private val getReviewHistoryUseCase: GetReviewHistoryUseCase,
+    private val updateGoalProgressUseCase: UpdateGoalProgressUseCase
 ) : ViewModel() {
 
     private val uiState = MutableStateFlow(HomeState())
@@ -52,6 +57,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             plannerRepository.saveAutomationEnabled(enabled)
             FirebaseUtils.logEvent(if (enabled) "automation_enabled" else "automation_disabled")
+            Timber.tag(TAG).d("Automation toggled: %s", enabled)
         }
     }
 
@@ -61,7 +67,17 @@ class HomeViewModel @Inject constructor(
         }
         observeProducts()
         observePlannerData()
+        observeReviewHistory()
         FirebaseUtils.logScreen("home")
+    }
+
+    private fun observeReviewHistory() {
+        viewModelScope.launch {
+            getReviewHistoryUseCase.execute().collect { history ->
+                uiState.update { it.copy(reviewHistory = history) }
+                Timber.tag(TAG).d("Review history updated: %d items", history.size)
+            }
+        }
     }
 
     private fun observeProducts() {
@@ -77,11 +93,11 @@ class HomeViewModel @Inject constructor(
             val plannerFlow = combine(
                 plannerRepository.observePlan(),
                 plannerRepository.observeGoals(),
-                plannerRepository.observeReviews(),
+                plannerRepository.observeLatestReview(),
                 plannerRepository.observeReminderConfiguration(),
                 plannerRepository.observeAutomationEnabled()
-            ) { plan, goals, reviews, reminder, automation ->
-                PlannerGroup(plan, goals, reviews, reminder, automation)
+            ) { plan, goals, latestReview, reminder, automation ->
+                PlannerGroup(plan, goals, latestReview, reminder, automation)
             }
 
             combine(
@@ -91,16 +107,16 @@ class HomeViewModel @Inject constructor(
             ) { planner, isPremium, user ->
                 val plan = planner.plan
                 val goals = planner.goals
-                val reviews = planner.reviews
+                val latestReview = planner.latestReview
                 val reminder = planner.reminder
                 val automation = planner.automation
                 
                 val emptyMessage = if (plan == null) "Build a salary plan first to unlock the repeat loop." else null
                 val primaryGoal = goals.firstOrNull()
                 val planCard = plan?.let { buildPlanCard(it, primaryGoal?.targetAmount ?: BigDecimal.ZERO) }
-                val goalCards = goals.map { buildGoalCard(it) }
+                val goalCards = goals.map { buildGoalCard(it, plan) }
                 val ruleCards = (plan?.rules ?: emptyList()).map { buildRuleCard(it) }
-                val reviewCard = buildReviewCard(plan, reviews.maxByOrNull { it.createdAt })
+                val reviewCard = buildReviewCard(plan, latestReview)
                 val moreCard = MoreCardState(
                     reminderEnabled = reminder.enabled,
                     reminderLabel = if (reminder.enabled) {
@@ -121,6 +137,7 @@ class HomeViewModel @Inject constructor(
                     goals = goalCards,
                     rules = ruleCards,
                     reviewCard = reviewCard,
+                    reviewHistory = uiState.value.reviewHistory, // Keep existing history from separate observer
                     moreCard = moreCard,
                     isLoading = false,
                     emptyMessage = emptyMessage,
@@ -135,7 +152,7 @@ class HomeViewModel @Inject constructor(
     private data class PlannerGroup(
         val plan: pt.ms.myshare.domain.model.SalaryPlan?,
         val goals: List<Goal>,
-        val reviews: List<ManualReview>,
+        val latestReview: ManualReview?,
         val reminder: pt.ms.myshare.domain.model.ReminderConfiguration,
         val automation: Boolean
     )
@@ -154,20 +171,28 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    private fun buildGoalCard(goal: Goal): GoalCardState {
-        val currentPlan = plannerRepository.loadPlan()
-        val preview = if (currentPlan != null) {
-            calculatePlanPreviewUseCase.execute(currentPlan, goal.targetAmount)
+    private fun buildGoalCard(goal: Goal, plan: SalaryPlan?): GoalCardState {
+        val preview = if (plan != null) {
+            calculatePlanPreviewUseCase.execute(plan, goal.targetAmount)
         } else null
 
-        val targetDateLabel = preview?.goalTargetDate?.let { "On pace for ${it.month.name.lowercase().replaceFirstChar(Char::titlecase)} ${it.year}" }
-            ?: "Add more goal contribution to see a target date"
+        val targetDateLabel = if (goal.isCompleted) "Mission Accomplished!" else {
+            preview?.goalTargetDate?.let { "On pace for ${it.month.name.lowercase().replaceFirstChar(Char::titlecase)} ${it.year}" }
+                ?: "Add more goal contribution to see a target date"
+        }
+        
+        val progressPercent = if (goal.targetAmount > BigDecimal.ZERO) {
+            goal.currentProgress.divide(goal.targetAmount, 4, java.math.RoundingMode.HALF_UP).toFloat()
+        } else 0f
+
         return GoalCardState(
             id = goal.id,
             goalName = goal.name,
             goalAmountLabel = currencyFormat.format(goal.targetAmount),
+            progress = progressPercent,
+            progressLabel = "${currencyFormat.format(goal.currentProgress)} of ${currencyFormat.format(goal.targetAmount)}",
             targetDateLabel = targetDateLabel,
-            progressNote = "One goal is free. Extra goals, recurring rules, and deeper reviews stay premium."
+            progressNote = if (goal.isCompleted) "Goal reached. Start your next vision!" else "Track your trajectory here."
         )
     }
 
@@ -231,8 +256,10 @@ class HomeViewModel @Inject constructor(
                 actualGoalContribution = actualGoal
             )
             plannerRepository.saveReview(review)
+            updateGoalProgressUseCase.execute(actualGoal)
+            
             FirebaseUtils.logEvent("weekly_checkin_completed")
-            Timber.tag(TAG).d("Review saved flexible=%s goal=%s", actualFlexible, actualGoal)
+            Timber.tag(TAG).d("Review saved and goals updated. flexible=%s goal=%s", actualFlexible, actualGoal)
         }
     }
 
