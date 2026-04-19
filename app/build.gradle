@@ -64,6 +64,11 @@ android {
         viewBinding true
         dataBinding true
         compose true
+        buildConfig true
+    }
+    
+    defaultConfig {
+        buildConfigField "String", "GOOGLE_CLIENT_ID", "\"${project.findProperty('GOOGLE_CLIENT_ID') ?: 'YOUR_CLIENT_ID_HERE'}\""
     }
     namespace appId
 }

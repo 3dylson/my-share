@@ -43,8 +43,8 @@ object OnboardingPrefs {
     fun savePlanInput(context: Context, input: PlanInput) {
         prefs(context).edit {
             putString(KEY_GOAL_TYPE, input.goal.type.name)
-            putString(KEY_GOAL_AMOUNT, input.goal.amount.toPlainString())
-            putString(KEY_GOAL_LABEL, input.goal.label ?: "")
+            putString(KEY_GOAL_AMOUNT, input.goal.targetAmount.toPlainString())
+            putString(KEY_GOAL_LABEL, input.goal.name)
             putString(KEY_NET_SALARY, input.netSalary.toPlainString())
             putString(KEY_PRESET, input.preset.name)
             when (val schedule = input.schedule) {
@@ -94,7 +94,7 @@ object OnboardingPrefs {
             netSalary = netSalary,
             schedule = schedule,
             preset = preset,
-            goal = Goal(amount = goalAmount, type = goalType, label = goalLabel)
+            goal = Goal(targetAmount = goalAmount, type = goalType, name = goalLabel ?: "Emergency Fund")
         )
     }
 

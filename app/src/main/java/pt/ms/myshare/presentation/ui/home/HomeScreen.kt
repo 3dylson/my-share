@@ -53,7 +53,8 @@ fun HomeRoute(
                     popUpTo("home") { inclusive = true }
                 }
             }
-        }
+        },
+        onAddNewGoal = { navController.navigate("add_goal") }
     )
 }
 
@@ -70,7 +71,8 @@ fun HomeScreen(
     onToggleAutomation: (Boolean) -> Unit,
     onBillingPlanSelected: (BillingPlan) -> Unit,
     onUnlockPremium: (android.app.Activity) -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onAddNewGoal: () -> Unit
 ) {
     val activity = androidx.activity.compose.LocalActivity.current
     Scaffold(
@@ -232,7 +234,7 @@ fun HomeScreen(
                             item {
                                 PremiumButton(
                                     text = "Add New Goal",
-                                    onClick = { /* Implement multi-goal logic or placeholder Toast */ },
+                                    onClick = onAddNewGoal,
                                     icon = Icons.Default.Add,
                                     containerColor = MySharePrimaryContainer,
                                     contentColor = MySharePrimary
@@ -270,6 +272,20 @@ fun HomeScreen(
                                 onClick = onSaveReview,
                                 modifier = Modifier.padding(top = 8.dp)
                             )
+                        }
+                    }
+                    
+                    // History / Experiment Area (Ads Zone)
+                    if (!state.moreCard.isPremium) {
+                        item {
+                            PremiumSectionHeader(title = "Previous Sessions")
+                            PremiumInfoCard(
+                                title = "History is Premium", 
+                                body = "Detailed plan-vs-actual history is available for pro members. Your last session is shown above.",
+                                icon = Icons.Default.Lock
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            PremiumAdBanner()
                         }
                     }
                 }
@@ -352,7 +368,28 @@ fun HomeScreen(
                                 )
                                 Spacer(modifier = Modifier.height(16.dp))
                             }
+
+                                val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
+                                PremiumSectionHeader(title = "Legal & Privacy")
+                                Column {
+                                    PremiumMetricCard(
+                                        label = "Terms of Service",
+                                        value = "View",
+                                        subtitle = "User Agreement & Logic License",
+                                        icon = Icons.Default.Info,
+                                        onClick = { uriHandler.openUri("https://myshare.pt/terms") }
+                                    )
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    PremiumMetricCard(
+                                        label = "Privacy Policy",
+                                        value = "View",
+                                        subtitle = "Data Handling & Ad Consent",
+                                        icon = Icons.Default.Info,
+                                        onClick = { uriHandler.openUri("https://myshare.pt/privacy") }
+                                    )
+                                }
                             
+                            Spacer(modifier = Modifier.height(24.dp))
                             PremiumButton(
                                 text = "Logout",
                                 onClick = onLogout,
@@ -365,12 +402,6 @@ fun HomeScreen(
                 }
             }
             
-            if (!state.moreCard.isPremium) {
-                item {
-                    Spacer(modifier = Modifier.height(20.dp))
-                    PremiumAdBanner()
-                }
-            }
         }
     }
 }
@@ -408,7 +439,8 @@ private fun HomeScreenPreview() {
             onToggleAutomation = { _ -> },
             onBillingPlanSelected = { _ -> },
             onUnlockPremium = {},
-            onLogout = {}
+            onLogout = {},
+            onAddNewGoal = {}
         )
     }
 }

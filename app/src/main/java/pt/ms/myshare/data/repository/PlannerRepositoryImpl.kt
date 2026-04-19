@@ -6,6 +6,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +20,8 @@ import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.domain.model.ReminderConfiguration
 import pt.ms.myshare.domain.model.SalaryPlan
+import pt.ms.myshare.domain.model.Goal
+import pt.ms.myshare.domain.model.GoalType
 import pt.ms.myshare.domain.repository.PlannerRepository
 import timber.log.Timber
 import java.math.BigDecimal
@@ -37,7 +40,8 @@ class PlannerRepositoryImpl @Inject constructor(
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     private val planState = MutableStateFlow(readPlan())
-    private val reviewState = MutableStateFlow(readLatestReview())
+    private val goalState = MutableStateFlow<List<Goal>>(emptyList())
+    private val reviewState = MutableStateFlow<List<ManualReview>>(emptyList())
     private val reminderState = MutableStateFlow(readReminderConfiguration())
     private val automationState = MutableStateFlow(readAutomationEnabled())
 
@@ -54,8 +58,8 @@ class PlannerRepositoryImpl @Inject constructor(
             .putString(KEY_PAY_FREQUENCY, plan.payFrequency.name)
             .putInt(KEY_MONTHLY_PAYDAY, plan.monthlyPayday ?: 1)
             .putLong(KEY_BIWEEKLY_PAYDAY_EPOCH, plan.nextBiweeklyPayday?.toEpochDay() ?: NO_EPOCH)
-            .putString(KEY_GOAL_NAME, plan.goalName)
-            .putString(KEY_GOAL_AMOUNT, plan.goalAmount.toPlainString())
+            .remove(KEY_GOAL_NAME)
+            .remove(KEY_GOAL_AMOUNT)
             .putString(KEY_FLEXIBLE_SPEND, plan.flexibleSpend?.toPlainString() ?: "")
             .putString(KEY_SAVINGS, plan.savings?.toPlainString() ?: "")
             .putString(KEY_INVESTING, plan.investing?.toPlainString() ?: "")
@@ -79,8 +83,6 @@ class PlannerRepositoryImpl @Inject constructor(
                 "monthlyPayday" to (plan.monthlyPayday ?: 1),
                 "nextBiweeklyPaydayText" to (plan.nextBiweeklyPayday?.toString() ?: ""),
                 "preset" to plan.preset.name,
-                "goalName" to plan.goalName,
-                "goalAmount" to plan.goalAmount.toPlainString(),
                 "flexibleSpend" to (plan.flexibleSpend?.toPlainString() ?: ""),
                 "savings" to (plan.savings?.toPlainString() ?: ""),
                 "investing" to (plan.investing?.toPlainString() ?: ""),
@@ -101,7 +103,8 @@ class PlannerRepositoryImpl @Inject constructor(
         Timber.tag(TAG).d("clearPlan")
         prefs.edit().clear().apply()
         planState.value = null
-        reviewState.value = null
+        goalState.value = emptyList()
+        reviewState.value = emptyList()
         automationState.value = false
     }
 
@@ -127,8 +130,6 @@ class PlannerRepositoryImpl @Inject constructor(
                     monthlyPayday = planDoc.getLong("monthlyPayday")?.toInt(),
                     nextBiweeklyPayday = planDoc.getString("nextBiweeklyPaydayText")?.takeIf { it.isNotBlank() }?.let { LocalDate.parse(it) },
                     preset = preset,
-                    goalName = planDoc.getString("goalName") ?: "Emergency fund",
-                    goalAmount = planDoc.getString("goalAmount")?.toBigDecimalOrNull() ?: BigDecimal.ZERO,
                     flexibleSpend = planDoc.getString("flexibleSpend")?.takeIf { it.isNotBlank() }?.toBigDecimalOrNull(),
                     savings = planDoc.getString("savings")?.takeIf { it.isNotBlank() }?.toBigDecimalOrNull(),
                     investing = planDoc.getString("investing")?.takeIf { it.isNotBlank() }?.toBigDecimalOrNull(),
@@ -137,6 +138,10 @@ class PlannerRepositoryImpl @Inject constructor(
                 )
                 savePlan(plan)
             }
+
+            // 1.5 Sync Goals & Reviews (Collections)
+            syncGoalsFromFirestore(user.uid)
+            syncReviewsFromFirestore(user.uid)
 
             // 2. Sync Onboarding State
             val userDoc = firestore.collection("users").document(user.uid).get().await()
@@ -158,31 +163,125 @@ class PlannerRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun observeLatestReview(): Flow<ManualReview?> = reviewState.asStateFlow()
+    private suspend fun syncGoalsFromFirestore(uid: String) {
+        try {
+            val goalsSnapshot = firestore.collection("users").document(uid).collection("goals").get().await()
+            val goals = goalsSnapshot.documents.mapNotNull { doc ->
+                runCatching {
+                    Goal(
+                        id = doc.id,
+                        targetAmount = doc.getString("targetAmount")?.toBigDecimalOrNull() ?: BigDecimal.ZERO,
+                        currentProgress = doc.getString("currentProgress")?.toBigDecimalOrNull() ?: BigDecimal.ZERO,
+                        type = doc.getString("type")?.let { GoalType.valueOf(it) } ?: GoalType.CUSTOM,
+                        name = doc.getString("name") ?: "Goal",
+                        createdAt = doc.getString("createdAtDate")?.let { LocalDate.parse(it) } ?: LocalDate.now(),
+                        isCompleted = doc.getBoolean("isCompleted") ?: false
+                    )
+                }.getOrNull()
+            }
+            goalState.value = goals
+        } catch (e: Exception) {
+            Timber.tag(TAG).e(e, "syncGoalsFromFirestore failed")
+        }
+    }
 
-    override fun loadLatestReview(): ManualReview? = reviewState.value
+    private suspend fun syncReviewsFromFirestore(uid: String) {
+        try {
+            val reviewsSnapshot = firestore.collection("users").document(uid).collection("reviews").get().await()
+            val reviews = reviewsSnapshot.documents.mapNotNull { doc ->
+                runCatching {
+                    ManualReview(
+                        id = doc.id,
+                        actualFlexibleSpend = doc.getString("actualFlexibleSpend")?.toBigDecimalOrNull() ?: BigDecimal.ZERO,
+                        actualGoalContribution = doc.getString("actualGoalContribution")?.toBigDecimalOrNull() ?: BigDecimal.ZERO,
+                        createdAt = doc.getString("createdAtDate")?.let { LocalDate.parse(it) } ?: LocalDate.now(),
+                        paydayDate = doc.getString("paydayDate")?.takeIf { it.isNotEmpty() }?.let { LocalDate.parse(it) }
+                    )
+                }.getOrNull()
+            }
+            reviewState.value = reviews
+        } catch (e: Exception) {
+            Timber.tag(TAG).e(e, "syncReviewsFromFirestore failed")
+        }
+    }
+
+    override fun observeGoals(): Flow<List<Goal>> = goalState.asStateFlow()
+
+    override suspend fun saveGoal(goal: Goal) {
+        val user = firebaseAuth.currentUser ?: return
+        coroutineScope.launch {
+            val data = hashMapOf(
+                "id" to goal.id,
+                "targetAmount" to goal.targetAmount.toPlainString(),
+                "currentProgress" to goal.currentProgress.toPlainString(),
+                "type" to goal.type.name,
+                "name" to goal.name,
+                "createdAtDate" to goal.createdAt.toString(),
+                "isCompleted" to goal.isCompleted
+            )
+            try {
+                firestore.collection("users").document(user.uid)
+                    .collection("goals").document(goal.id).set(data)
+                
+                // Update local state
+                val currentGoals = goalState.value.toMutableList()
+                val index = currentGoals.indexOfFirst { it.id == goal.id }
+                if (index >= 0) {
+                    currentGoals[index] = goal
+                } else {
+                    currentGoals.add(goal)
+                }
+                goalState.value = currentGoals
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e, "Failed to save goal to Firestore")
+            }
+        }
+    }
+
+    override suspend fun deleteGoal(goalId: String) {
+        val user = firebaseAuth.currentUser ?: return
+        coroutineScope.launch {
+            try {
+                firestore.collection("users").document(user.uid)
+                    .collection("goals").document(goalId).delete()
+                
+                // Update local state
+                goalState.value = goalState.value.filter { it.id != goalId }
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e, "Failed to delete goal from Firestore")
+            }
+        }
+    }
+
+    override fun observeReviews(): Flow<List<ManualReview>> = reviewState.asStateFlow()
+
+    override fun observeLatestReview(): Flow<ManualReview?> = reviewState.asStateFlow().map { it.maxByOrNull { r -> r.createdAt } }
+
+    override fun loadLatestReview(): ManualReview? = reviewState.value.maxByOrNull { it.createdAt }
 
     override suspend fun saveReview(review: ManualReview) {
         Timber.tag(TAG).d("saveReview actualFlexible=%s actualGoal=%s", review.actualFlexibleSpend, review.actualGoalContribution)
-        prefs.edit()
-            .putString(KEY_REVIEW_FLEXIBLE_SPEND, review.actualFlexibleSpend.toPlainString())
-            .putString(KEY_REVIEW_GOAL_CONTRIBUTION, review.actualGoalContribution.toPlainString())
-            .putLong(KEY_REVIEW_CREATED_AT_EPOCH, review.createdAt.toEpochDay())
-            .apply()
-        reviewState.value = review
         syncReviewToFirestore(review)
+        
+        // Update local state
+        val currentReviews = reviewState.value.toMutableList()
+        currentReviews.add(review)
+        reviewState.value = currentReviews
     }
 
     private fun syncReviewToFirestore(review: ManualReview) {
         val user = firebaseAuth.currentUser ?: return
         coroutineScope.launch {
             val data = hashMapOf(
+                "id" to review.id,
                 "actualFlexibleSpend" to review.actualFlexibleSpend.toPlainString(),
                 "actualGoalContribution" to review.actualGoalContribution.toPlainString(),
-                "createdAtDate" to review.createdAt.toString()
+                "createdAtDate" to review.createdAt.toString(),
+                "paydayDate" to (review.paydayDate?.toString() ?: "")
             )
             try {
-                firestore.collection("users").document(user.uid).collection("reviews").document("latest").set(data)
+                firestore.collection("users").document(user.uid)
+                    .collection("reviews").document(review.id).set(data)
             } catch (e: Exception) {
                 Timber.tag(TAG).e(e, "Failed to sync review to Firestore")
             }
@@ -293,8 +392,6 @@ class PlannerRepositoryImpl @Inject constructor(
             monthlyPayday = monthlyPayday,
             nextBiweeklyPayday = biweeklyEpoch.takeIf { it != NO_EPOCH }?.let(LocalDate::ofEpochDay),
             preset = preset,
-            goalName = goalName,
-            goalAmount = goalAmount,
             flexibleSpend = flexibleSpend,
             savings = savings,
             investing = investing,

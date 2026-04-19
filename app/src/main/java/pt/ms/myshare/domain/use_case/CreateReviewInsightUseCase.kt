@@ -12,7 +12,8 @@ class CreateReviewInsightUseCase @Inject constructor(
 ) {
 
     fun execute(plan: SalaryPlan, review: ManualReview): ReviewInsight {
-        val preview = calculatePlanPreviewUseCase.execute(plan)
+        // Goal amount doesn't affect delta calculation, using ZERO as placeholder for target date logic which isn't used here
+        val preview = calculatePlanPreviewUseCase.execute(plan, BigDecimal.ZERO)
         val flexibleDelta = review.actualFlexibleSpend.subtract(preview.flexibleSpendPerPayday).setScale(2, RoundingMode.HALF_UP)
         val goalDelta = review.actualGoalContribution.subtract(preview.monthlyGoalContribution).setScale(2, RoundingMode.HALF_UP)
 

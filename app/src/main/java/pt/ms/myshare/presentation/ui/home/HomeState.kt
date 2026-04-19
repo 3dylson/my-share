@@ -27,6 +27,7 @@ data class HomePlanCardState(
 )
 
 data class GoalCardState(
+    val id: String,
     val goalName: String = "",
     val goalAmountLabel: String = "",
     val targetDateLabel: String = "",
@@ -48,14 +49,15 @@ data class MoreCardState(
     val pricingStrategy: PricingStrategy? = null,
     val selectedBillingPlan: BillingPlan = BillingPlan.MONTHLY,
     val isPremium: Boolean = false,
-    val userEmail: String? = null
+    val userEmail: String? = null,
+    val error: String? = null
 )
 
 data class HomeState(
     val selectedDestination: HomeDestination = HomeDestination.PLAN,
     val plan: SalaryPlan? = null,
     val planCard: HomePlanCardState? = null,
-    val goalCard: GoalCardState? = null,
+    val goals: List<GoalCardState> = emptyList(),
     val reviewCard: ReviewCardState = ReviewCardState(),
     val moreCard: MoreCardState = MoreCardState(),
     val isLoading: Boolean = true,

@@ -11,9 +11,13 @@ enum class GoalType {
 }
 
 data class Goal(
-    val amount: BigDecimal,
-    val type: GoalType,
-    val label: String? = null
+    val id: String = java.util.UUID.randomUUID().toString(),
+    val name: String,
+    val targetAmount: BigDecimal,
+    val currentProgress: BigDecimal = BigDecimal.ZERO,
+    val type: GoalType = GoalType.CUSTOM,
+    val createdAt: LocalDate = LocalDate.now(),
+    val isCompleted: Boolean = false
 )
 
 sealed class PaySchedule {

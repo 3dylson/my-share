@@ -140,10 +140,13 @@ fun PremiumMetricCard(
     subtitle: String? = null,
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
-    color: Color = MySharePrimary
+    color: Color = MySharePrimary,
+    onClick: (() -> Unit)? = null
 ) {
     Surface(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier),
         shape = RoundedCornerShape(20.dp),
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(1.dp, MyShareOutline.copy(alpha = 0.2f)),

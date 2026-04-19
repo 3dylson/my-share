@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.ReviewInsight
+import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
@@ -40,6 +41,8 @@ class HomeViewModel @Inject constructor(
     private val uiState = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = uiState.asStateFlow()
 
+    private var availableStoreProducts: List<pt.ms.myshare.domain.model.StoreProduct> = emptyList()
+
     private val locale: Locale = Locale.getDefault()
     private val currencyFormat = NumberFormat.getCurrencyInstance(locale)
     private val dateFormatter = DateTimeFormatter.ofPattern("d MMM", locale)
@@ -56,19 +59,29 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             plannerRepository.syncFromFirestore()
         }
+        observeProducts()
         observePlannerData()
         FirebaseUtils.logScreen("home")
+    }
+
+    private fun observeProducts() {
+        viewModelScope.launch {
+            entitlementRepository.availableProducts.collect { products ->
+                availableStoreProducts = products
+            }
+        }
     }
 
     private fun observePlannerData() {
         viewModelScope.launch {
             val plannerFlow = combine(
                 plannerRepository.observePlan(),
-                plannerRepository.observeLatestReview(),
+                plannerRepository.observeGoals(),
+                plannerRepository.observeReviews(),
                 plannerRepository.observeReminderConfiguration(),
                 plannerRepository.observeAutomationEnabled()
-            ) { plan, review, reminder, automation ->
-                PlannerGroup(plan, review, reminder, automation)
+            ) { plan, goals, reviews, reminder, automation ->
+                PlannerGroup(plan, goals, reviews, reminder, automation)
             }
 
             combine(
@@ -77,14 +90,16 @@ class HomeViewModel @Inject constructor(
                 authRepository.currentUser
             ) { planner, isPremium, user ->
                 val plan = planner.plan
-                val review = planner.review
+                val goals = planner.goals
+                val reviews = planner.reviews
                 val reminder = planner.reminder
                 val automation = planner.automation
                 
                 val emptyMessage = if (plan == null) "Build a salary plan first to unlock the repeat loop." else null
-                val planCard = plan?.let { buildPlanCard(it) }
-                val goalCard = plan?.let { buildGoalCard(it) }
-                val reviewCard = buildReviewCard(plan, review)
+                val primaryGoal = goals.firstOrNull()
+                val planCard = plan?.let { buildPlanCard(it, primaryGoal?.targetAmount ?: BigDecimal.ZERO) }
+                val goalCards = goals.map { buildGoalCard(it) }
+                val reviewCard = buildReviewCard(plan, reviews.maxByOrNull { it.createdAt })
                 val moreCard = MoreCardState(
                     reminderEnabled = reminder.enabled,
                     reminderLabel = if (reminder.enabled) {
@@ -102,7 +117,7 @@ class HomeViewModel @Inject constructor(
                     selectedDestination = uiState.value.selectedDestination,
                     plan = plan,
                     planCard = planCard,
-                    goalCard = goalCard,
+                    goals = goalCards,
                     reviewCard = reviewCard,
                     moreCard = moreCard,
                     isLoading = false,
@@ -117,13 +132,14 @@ class HomeViewModel @Inject constructor(
 
     private data class PlannerGroup(
         val plan: pt.ms.myshare.domain.model.SalaryPlan?,
-        val review: pt.ms.myshare.domain.model.ManualReview?,
+        val goals: List<Goal>,
+        val reviews: List<ManualReview>,
         val reminder: pt.ms.myshare.domain.model.ReminderConfiguration,
         val automation: Boolean
     )
 
-    private fun buildPlanCard(plan: pt.ms.myshare.domain.model.SalaryPlan): HomePlanCardState {
-        val preview = calculatePlanPreviewUseCase.execute(plan)
+    private fun buildPlanCard(plan: pt.ms.myshare.domain.model.SalaryPlan, goalAmount: BigDecimal): HomePlanCardState {
+        val preview = calculatePlanPreviewUseCase.execute(plan, goalAmount)
         return HomePlanCardState(
             nextPaydayLabel = "Next payday ${preview.nextPayday.format(dateFormatter)}",
             incomeLabel = currencyFormat.format(preview.incomePerPayday),
@@ -136,13 +152,18 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    private fun buildGoalCard(plan: pt.ms.myshare.domain.model.SalaryPlan): GoalCardState {
-        val preview = calculatePlanPreviewUseCase.execute(plan)
-        val targetDateLabel = preview.goalTargetDate?.let { "On pace for ${it.month.name.lowercase().replaceFirstChar(Char::titlecase)} ${it.year}" }
+    private fun buildGoalCard(goal: Goal): GoalCardState {
+        val currentPlan = plannerRepository.loadPlan()
+        val preview = if (currentPlan != null) {
+            calculatePlanPreviewUseCase.execute(currentPlan, goal.targetAmount)
+        } else null
+
+        val targetDateLabel = preview?.goalTargetDate?.let { "On pace for ${it.month.name.lowercase().replaceFirstChar(Char::titlecase)} ${it.year}" }
             ?: "Add more goal contribution to see a target date"
         return GoalCardState(
-            goalName = plan.goalName,
-            goalAmountLabel = currencyFormat.format(plan.goalAmount),
+            id = goal.id,
+            goalName = goal.name,
+            goalAmountLabel = currencyFormat.format(goal.targetAmount),
             targetDateLabel = targetDateLabel,
             progressNote = "One goal is free. Extra goals, recurring rules, and deeper reviews stay premium."
         )
@@ -216,16 +237,17 @@ class HomeViewModel @Inject constructor(
 
     fun unlockPremium(activity: android.app.Activity) {
         val storeProductId = if (uiState.value.moreCard.selectedBillingPlan == BillingPlan.ANNUAL) "myshare_annual" else "myshare_monthly"
-        val product = pt.ms.myshare.domain.model.StoreProduct(storeProductId, "Premium", "Unlock premium features", "$0.00", "subs", null)
-
+        
+        val realProduct = availableStoreProducts.find { it.productId == storeProductId }
+        
         viewModelScope.launch {
-            if (pt.ms.myshare.BuildConfig.DEBUG) {
-                // For test setup: Automatically succeed in debug
-                entitlementRepository.setPro(true)
-                FirebaseUtils.logEvent("purchase_mock_success")
-            } else {
-                entitlementRepository.purchasePlan(activity, product)
+            if (realProduct != null) {
+                entitlementRepository.purchasePlan(activity, realProduct)
                 FirebaseUtils.logEvent("purchase_started")
+            } else {
+                // If products are not loaded, show error
+                uiState.update { it.copy(moreCard = it.moreCard.copy(error = "Products not loaded yet. Please check your internet connection.")) }
+                Timber.tag(TAG).e("Cannot purchase: Product %s not found in store", storeProductId)
             }
         }
     }

@@ -30,8 +30,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
     NavHost(navController = navController, startDestination = OnboardingRoute.Welcome.route) {
         composable(OnboardingRoute.Welcome.route) {
             WelcomeScreen(
-                onContinue = { navController.navigate(OnboardingRoute.GoalPicker.route) },
-                onSkip = { viewModel.skipToHomeWithDefaultPlan() }
+                onContinue = { navController.navigate(OnboardingRoute.GoalPicker.route) }
             )
         }
         composable(OnboardingRoute.GoalPicker.route) {
@@ -128,11 +127,6 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
             SignupScreen(
                 onSignup = { idToken ->
                     viewModel.signInWithGoogle(idToken) {
-                        navController.navigate(OnboardingRoute.Trajectory.route)
-                    }
-                },
-                onSkip = {
-                    viewModel.skipSignIn {
                         navController.navigate(OnboardingRoute.Trajectory.route)
                     }
                 }

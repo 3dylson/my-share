@@ -9,7 +9,7 @@ class BuildPaydayNotificationMessageUseCase @Inject constructor(
     private val calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase
 ) {
     fun execute(plan: SalaryPlan, locale: Locale = Locale.getDefault()): String {
-        val preview = calculatePlanPreviewUseCase.execute(plan)
+        val preview = calculatePlanPreviewUseCase.execute(plan, java.math.BigDecimal.ZERO)
         val currency = NumberFormat.getCurrencyInstance(locale)
         return "It’s payday — fixed ${currency.format(preview.fixedCostsPerPayday)}, spend ${currency.format(preview.flexibleSpendPerPayday)}, save ${currency.format(preview.savingsPerPayday)}, invest ${currency.format(preview.investingPerPayday)}."
     }

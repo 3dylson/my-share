@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 class CalculatePlanPreviewUseCase @Inject constructor() {
 
-    fun execute(plan: SalaryPlan): PlanPreview {
+    fun execute(plan: SalaryPlan, goalAmount: BigDecimal): PlanPreview {
         val fixedCostsPerPayday = fixedCostsPerPayday(plan.monthlyFixedCosts, plan.payFrequency)
         val remainingAfterFixed = plan.netIncomePerPayday.subtract(fixedCostsPerPayday).max(BigDecimal.ZERO)
 
@@ -36,7 +36,7 @@ class CalculatePlanPreviewUseCase @Inject constructor() {
             .setScale(2, RoundingMode.HALF_UP)
 
         val nextPayday = nextPayday(plan)
-        val goalTargetDate = calculateGoalTargetDate(plan.goalAmount, monthlyGoalContribution)
+        val goalTargetDate = calculateGoalTargetDate(goalAmount, monthlyGoalContribution)
         val summary = when (plan.focus) {
             PlanningFocus.SAVE_WITHOUT_STRESS -> "A calm split that protects essentials and builds savings."
             PlanningFocus.INVEST_WITH_DISCIPLINE -> "A disciplined split that keeps investing consistent each payday."

@@ -17,8 +17,7 @@ import pt.ms.myshare.presentation.ui.theme.*
 
 @Composable
 fun WelcomeScreen(
-    onContinue: () -> Unit,
-    onSkip: () -> Unit
+    onContinue: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -83,17 +82,6 @@ fun WelcomeScreen(
                     text = "Get Started",
                     onClick = onContinue
                 )
-                
-                TextButton(
-                    onClick = onSkip,
-                    modifier = Modifier.height(48.dp)
-                ) {
-                    Text(
-                        "Explore the app first", 
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MyShareSecondary
-                    )
-                }
             }
             
             Spacer(Modifier.height(16.dp))

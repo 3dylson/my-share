@@ -15,6 +15,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pt.ms.myshare.domain.model.AllocationPreset
 import pt.ms.myshare.domain.model.BillingPlan
+import pt.ms.myshare.domain.model.Goal
+import pt.ms.myshare.domain.model.GoalType
 import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.domain.model.ReminderCadence
@@ -127,10 +129,21 @@ class OnboardingViewModel @Inject constructor(
         val income = current.netIncomePerPayday ?: return false
         val fixedCosts = current.monthlyFixedCosts ?: return false
         val plan = buildPlan(current, income, fixedCosts) ?: return false
-        val preview = calculatePlanPreviewUseCase.execute(plan)
+        val preview = calculatePlanPreviewUseCase.execute(plan, current.goalAmount)
         state.update { it.copy(planPreview = preview, error = null, planSaved = true) }
         viewModelScope.launch {
             plannerRepository.savePlan(plan)
+            plannerRepository.saveGoal(
+                Goal(
+                    targetAmount = current.goalAmount,
+                    type = when(current.selectedFocus) {
+                        PlanningFocus.SAVE_WITHOUT_STRESS -> GoalType.EMERGENCY_FUND
+                        PlanningFocus.INVEST_WITH_DISCIPLINE -> GoalType.INVEST_TARGET
+                        else -> GoalType.CUSTOM
+                    },
+                    name = current.goalName
+                )
+            )
             FirebaseUtils.logEvent("create_plan_completed", Bundle().apply {
                 putString("country_cluster", current.pricingStrategy?.marketCluster)
                 putString("language", Locale.getDefault().language)
@@ -187,43 +200,6 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    fun mockSignIn(onComplete: () -> Unit) {
-        viewModelScope.launch {
-            val result = authRepository.signInAnonymously()
-            if (result.isSuccess) {
-                FirebaseUtils.logEvent("mock_login_success")
-                onComplete()
-            } else {
-                state.update { it.copy(error = "Mock login failed: ${result.exceptionOrNull()?.message}") }
-            }
-        }
-    }
-
-    fun skipSignIn(onComplete: () -> Unit) {
-        FirebaseUtils.logEvent("signup_skipped")
-        onComplete()
-    }
-
-    fun skipToHomeWithDefaultPlan() {
-        viewModelScope.launch {
-            val pricing = state.value.pricingStrategy
-            state.update { 
-                it.copy(
-                    netIncomePerPayday = BigDecimal("1500"),
-                    monthlyFixedCosts = BigDecimal("600"),
-                    selectedFocus = PlanningFocus.SAVE_WITHOUT_STRESS,
-                    preset = AllocationPreset.BALANCED,
-                    planSaved = true,
-                    reminderSkipped = true,
-                    bankSyncHandled = true
-                )
-            }
-            buildPreview()
-            plannerRepository.setOnboardingCompleted(true)
-            state.update { it.copy(onboardingCompleted = true) }
-            FirebaseUtils.logEvent("onboarding_skipped_with_defaults")
-        }
-    }
 
     fun restorePurchases(onRestored: (Boolean) -> Unit) {
         viewModelScope.launch {
@@ -324,8 +300,6 @@ class OnboardingViewModel @Inject constructor(
             monthlyPayday = current.monthlyPayday.coerceIn(1, 28),
             nextBiweeklyPayday = nextBiweeklyPayday,
             preset = current.preset,
-            goalName = current.goalName,
-            goalAmount = current.goalAmount,
             flexibleSpend = current.allocatedFlexibleSpend,
             savings = current.allocatedSavings,
             investing = current.allocatedInvesting,

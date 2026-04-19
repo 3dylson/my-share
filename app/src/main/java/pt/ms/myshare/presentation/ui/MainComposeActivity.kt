@@ -24,10 +24,13 @@ class MainComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
+        val prefs = getSharedPreferences("myshare_prefs", MODE_PRIVATE)
+        val sessions = prefs.getInt("session_count", 0) + 1
+        prefs.edit().putInt("session_count", sessions).apply()
+
         consentManager = ConsentManager(this)
         consentManager.requestConsent(this) { canRequestAds ->
-            if (canRequestAds) {
-                // Initialize the Mobile Ads SDK immediately after consent
+            if (canRequestAds && sessions >= 2) {
                 MobileAds.initialize(this) {}
             }
         }

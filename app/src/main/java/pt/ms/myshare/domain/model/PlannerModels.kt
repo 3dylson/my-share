@@ -23,8 +23,6 @@ data class SalaryPlan(
     val monthlyPayday: Int? = null,
     val nextBiweeklyPayday: LocalDate? = null,
     val preset: AllocationPreset,
-    val goalName: String,
-    val goalAmount: BigDecimal,
     val flexibleSpend: BigDecimal? = null,
     val savings: BigDecimal? = null,
     val investing: BigDecimal? = null,
@@ -45,9 +43,11 @@ enum class ReminderCadence {
 }
 
 data class ManualReview(
+    val id: String = java.util.UUID.randomUUID().toString(),
     val actualFlexibleSpend: BigDecimal,
     val actualGoalContribution: BigDecimal,
-    val createdAt: LocalDate = LocalDate.now()
+    val createdAt: LocalDate = LocalDate.now(),
+    val paydayDate: LocalDate? = null // To link a review to a specific payday event
 )
 
 data class ReviewInsight(

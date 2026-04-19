@@ -32,8 +32,7 @@ import timber.log.Timber
 
 @Composable
 fun SignupScreen(
-    onSignup: (String) -> Unit,
-    onSkip: () -> Unit
+    onSignup: (String) -> Unit
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -71,13 +70,13 @@ fun SignupScreen(
                     icon = Icons.Default.Lock
                 )
                 SecurityFeature(
-                    title = "Cloud Sync",
-                    description = "Access your plan across all your devices.",
+                    title = "Account Sync",
+                    description = "Your data is securely tied to your Google account.",
                     icon = Icons.Default.Cloud
                 )
                 SecurityFeature(
-                    title = "Safe & Secure",
-                    description = "Biometric protection for your sensitive data.",
+                    title = "Privacy First",
+                    description = "We prioritize your financial data privacy.",
                     icon = Icons.Default.Fingerprint
                 )
             }
@@ -92,7 +91,7 @@ fun SignupScreen(
                             val credentialManager = CredentialManager.create(context)
                             val googleIdOption = GetGoogleIdOption.Builder()
                                 .setFilterByAuthorizedAccounts(false)
-                                .setServerClientId("564550726509-g94sj76hhfhjdpufiqp1feqei5f1gbuh.apps.googleusercontent.com")
+                                .setServerClientId(pt.ms.myshare.BuildConfig.GOOGLE_CLIENT_ID)
                                 .build()
                             
                             val request = GetCredentialRequest.Builder()
@@ -115,28 +114,6 @@ fun SignupScreen(
                     }
                 }
             )
-            
-            Spacer(Modifier.height(12.dp))
-
-            OutlinedButton(
-                onClick = { onSignup("mock_token") },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = RoundedCornerShape(16.dp),
-                border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.3f))
-            ) {
-                Text("Continue with Mock Login", color = MySharePrimary)
-            }
-            
-            TextButton(
-                onClick = onSkip,
-                modifier = Modifier.fillMaxWidth().height(56.dp)
-            ) {
-                Text(
-                    stringResource(R.string.onboarding_signup_skip), 
-                    style = MaterialTheme.typography.labelLarge, 
-                    color = MyShareSecondary
-                )
-            }
             
             Spacer(Modifier.height(24.dp))
         }
