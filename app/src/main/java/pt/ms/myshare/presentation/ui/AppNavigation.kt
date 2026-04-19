@@ -12,6 +12,6 @@ fun AppNavigation() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "onboarding") {
         composable("onboarding") { OnboardingEntryRoute(parentNavController = navController) }
-        composable("home") { HomeRoute() }
+        composable("home") { HomeRoute(navController = navController) }
     }
 }

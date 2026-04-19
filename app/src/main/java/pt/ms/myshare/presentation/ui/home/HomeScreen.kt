@@ -22,14 +22,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import pt.ms.myshare.domain.model.BillingPlan
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.Logout
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.theme.*
 
 @Composable
 fun HomeRoute(
     modifier: Modifier = Modifier,
+    navController: NavController,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
@@ -43,7 +46,14 @@ fun HomeRoute(
         onToggleReminder = viewModel::toggleReminder,
         onToggleAutomation = viewModel::onToggleAutomation,
         onBillingPlanSelected = viewModel::chooseBillingPlan,
-        onUnlockPremium = viewModel::unlockPremium
+        onUnlockPremium = viewModel::unlockPremium,
+        onLogout = {
+            viewModel.onLogout {
+                navController.navigate("onboarding") {
+                    popUpTo("home") { inclusive = true }
+                }
+            }
+        }
     )
 }
 
@@ -59,14 +69,18 @@ fun HomeScreen(
     onToggleReminder: (Boolean) -> Unit,
     onToggleAutomation: (Boolean) -> Unit,
     onBillingPlanSelected: (BillingPlan) -> Unit,
-    onUnlockPremium: (android.app.Activity) -> Unit
+    onUnlockPremium: (android.app.Activity) -> Unit,
+    onLogout: () -> Unit
 ) {
     val activity = androidx.activity.compose.LocalActivity.current
     Scaffold(
         modifier = modifier,
         containerColor = MyShareBackground,
         topBar = {
-            Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 20.dp)) {
+            Column(modifier = Modifier
+                .statusBarsPadding()
+                .padding(horizontal = 24.dp, vertical = 20.dp)
+            ) {
                 PremiumAppHeader(
                     title = "My Share",
                     subtitle = "Financial clarity, simplified."
@@ -326,6 +340,28 @@ fun HomeScreen(
                             )
                         }
                     }
+                    
+                    item {
+                        PremiumSectionHeader(title = "Account")
+                        Column {
+                            state.moreCard.userEmail?.let { email ->
+                                PremiumMetricCard(
+                                    label = "Signed in as",
+                                    value = email,
+                                    icon = Icons.Default.AccountCircle
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                            }
+                            
+                            PremiumButton(
+                                text = "Logout",
+                                onClick = onLogout,
+                                containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
+                                contentColor = MaterialTheme.colorScheme.error,
+                                icon = Icons.AutoMirrored.Filled.Logout
+                            )
+                        }
+                    }
                 }
             }
             
@@ -371,7 +407,8 @@ private fun HomeScreenPreview() {
             onToggleReminder = { _ -> },
             onToggleAutomation = { _ -> },
             onBillingPlanSelected = { _ -> },
-            onUnlockPremium = {}
+            onUnlockPremium = {},
+            onLogout = {}
         )
     }
 }

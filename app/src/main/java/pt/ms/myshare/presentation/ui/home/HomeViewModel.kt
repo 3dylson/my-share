@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.ReviewInsight
+import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
@@ -29,6 +30,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val plannerRepository: PlannerRepository,
+    private val authRepository: AuthRepository,
     private val entitlementRepository: EntitlementRepository,
     private val calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase,
     private val createReviewInsightUseCase: CreateReviewInsightUseCase,
@@ -51,19 +53,34 @@ class HomeViewModel @Inject constructor(
     }
 
     init {
+        viewModelScope.launch {
+            plannerRepository.syncFromFirestore()
+        }
         observePlannerData()
         FirebaseUtils.logScreen("home")
     }
 
     private fun observePlannerData() {
         viewModelScope.launch {
-            combine(
+            val plannerFlow = combine(
                 plannerRepository.observePlan(),
                 plannerRepository.observeLatestReview(),
                 plannerRepository.observeReminderConfiguration(),
-                plannerRepository.observeAutomationEnabled(),
-                entitlementRepository.isPro
-            ) { plan, review, reminder, automation, isPremium ->
+                plannerRepository.observeAutomationEnabled()
+            ) { plan, review, reminder, automation ->
+                PlannerGroup(plan, review, reminder, automation)
+            }
+
+            combine(
+                plannerFlow,
+                entitlementRepository.isPro,
+                authRepository.currentUser
+            ) { planner, isPremium, user ->
+                val plan = planner.plan
+                val review = planner.review
+                val reminder = planner.reminder
+                val automation = planner.automation
+                
                 val emptyMessage = if (plan == null) "Build a salary plan first to unlock the repeat loop." else null
                 val planCard = plan?.let { buildPlanCard(it) }
                 val goalCard = plan?.let { buildGoalCard(it) }
@@ -78,7 +95,8 @@ class HomeViewModel @Inject constructor(
                     pricingStrategy = pricingStrategy,
                     selectedBillingPlan = pricingStrategy.heroPlan,
                     isPremium = isPremium,
-                    automationEnabled = automation
+                    automationEnabled = automation,
+                    userEmail = user?.email
                 )
                 HomeState(
                     selectedDestination = uiState.value.selectedDestination,
@@ -96,6 +114,13 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
+    private data class PlannerGroup(
+        val plan: pt.ms.myshare.domain.model.SalaryPlan?,
+        val review: pt.ms.myshare.domain.model.ManualReview?,
+        val reminder: pt.ms.myshare.domain.model.ReminderConfiguration,
+        val automation: Boolean
+    )
 
     private fun buildPlanCard(plan: pt.ms.myshare.domain.model.SalaryPlan): HomePlanCardState {
         val preview = calculatePlanPreviewUseCase.execute(plan)
@@ -194,8 +219,24 @@ class HomeViewModel @Inject constructor(
         val product = pt.ms.myshare.domain.model.StoreProduct(storeProductId, "Premium", "Unlock premium features", "$0.00", "subs", null)
 
         viewModelScope.launch {
-            entitlementRepository.purchasePlan(activity, product)
-            FirebaseUtils.logEvent("purchase_started")
+            if (pt.ms.myshare.BuildConfig.DEBUG) {
+                // For test setup: Automatically succeed in debug
+                entitlementRepository.setPro(true)
+                FirebaseUtils.logEvent("purchase_mock_success")
+            } else {
+                entitlementRepository.purchasePlan(activity, product)
+                FirebaseUtils.logEvent("purchase_started")
+            }
+        }
+    }
+
+    fun onLogout(onComplete: () -> Unit) {
+        viewModelScope.launch {
+            authRepository.signOut()
+            plannerRepository.clearPlan() // Reset local state on logout
+            plannerRepository.setOnboardingCompleted(false) // Force back to onboarding
+            FirebaseUtils.logEvent("user_logged_out")
+            onComplete()
         }
     }
 

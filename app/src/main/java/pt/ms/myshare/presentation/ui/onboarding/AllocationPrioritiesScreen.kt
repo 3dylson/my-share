@@ -47,6 +47,7 @@ fun AllocationPrioritiesScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .statusBarsPadding()
                 .padding(horizontal = 24.dp)
         ) {
             Spacer(Modifier.height(16.dp))

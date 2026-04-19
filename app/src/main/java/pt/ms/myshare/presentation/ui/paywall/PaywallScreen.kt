@@ -55,6 +55,7 @@ fun PaywallScreen(
         topBar = {
             Row(
                 modifier = Modifier
+                    .statusBarsPadding()
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.End

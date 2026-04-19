@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import pt.ms.myshare.domain.model.AllocationPreset
@@ -98,22 +99,63 @@ class PlannerRepositoryImpl @Inject constructor(
 
     override suspend fun clearPlan() {
         Timber.tag(TAG).d("clearPlan")
-        prefs.edit()
-            .remove(KEY_FOCUS)
-            .remove(KEY_NET_INCOME)
-            .remove(KEY_MONTHLY_FIXED_COSTS)
-            .remove(KEY_PAY_FREQUENCY)
-            .remove(KEY_MONTHLY_PAYDAY)
-            .remove(KEY_PRESET)
-            .remove(KEY_GOAL_NAME)
-            .remove(KEY_GOAL_AMOUNT)
-            .remove(KEY_FLEXIBLE_SPEND)
-            .remove(KEY_SAVINGS)
-            .remove(KEY_INVESTING)
-            .remove(KEY_CRYPTO)
-            .remove(KEY_PLAN_CREATED_AT_EPOCH)
-            .apply()
+        prefs.edit().clear().apply()
         planState.value = null
+        reviewState.value = null
+        automationState.value = false
+    }
+
+    override suspend fun syncFromFirestore() {
+        val user = firebaseAuth.currentUser ?: return
+        Timber.tag(TAG).d("syncFromFirestore starting for user %s", user.uid)
+        
+        try {
+            // 1. Sync Plan
+            val planDoc = firestore.collection("users").document(user.uid).collection("plans").document("current").get().await()
+            if (planDoc.exists()) {
+                val focus = planDoc.getString("focus")?.let { PlanningFocus.valueOf(it) } ?: PlanningFocus.SAVE_WITHOUT_STRESS
+                val income = planDoc.getString("netIncomePerPayday")?.toBigDecimalOrNull() ?: BigDecimal.ZERO
+                val fixed = planDoc.getString("monthlyFixedCosts")?.toBigDecimalOrNull() ?: BigDecimal.ZERO
+                val freq = planDoc.getString("payFrequency")?.let { PayFrequency.valueOf(it) } ?: PayFrequency.MONTHLY
+                val preset = planDoc.getString("preset")?.let { AllocationPreset.valueOf(it) } ?: AllocationPreset.BALANCED
+                
+                val plan = SalaryPlan(
+                    focus = focus,
+                    netIncomePerPayday = income,
+                    monthlyFixedCosts = fixed,
+                    payFrequency = freq,
+                    monthlyPayday = planDoc.getLong("monthlyPayday")?.toInt(),
+                    nextBiweeklyPayday = planDoc.getString("nextBiweeklyPaydayText")?.takeIf { it.isNotBlank() }?.let { LocalDate.parse(it) },
+                    preset = preset,
+                    goalName = planDoc.getString("goalName") ?: "Emergency fund",
+                    goalAmount = planDoc.getString("goalAmount")?.toBigDecimalOrNull() ?: BigDecimal.ZERO,
+                    flexibleSpend = planDoc.getString("flexibleSpend")?.takeIf { it.isNotBlank() }?.toBigDecimalOrNull(),
+                    savings = planDoc.getString("savings")?.takeIf { it.isNotBlank() }?.toBigDecimalOrNull(),
+                    investing = planDoc.getString("investing")?.takeIf { it.isNotBlank() }?.toBigDecimalOrNull(),
+                    crypto = planDoc.getString("crypto")?.takeIf { it.isNotBlank() }?.toBigDecimalOrNull(),
+                    createdAt = planDoc.getString("createdAtDate")?.let { LocalDate.parse(it) } ?: LocalDate.now()
+                )
+                savePlan(plan)
+            }
+
+            // 2. Sync Onboarding State
+            val userDoc = firestore.collection("users").document(user.uid).get().await()
+            if (userDoc.exists()) {
+                val completed = userDoc.getBoolean("onboardingCompleted") ?: false
+                prefs.edit().putBoolean(KEY_ONBOARDING_COMPLETED, completed).apply()
+            }
+            
+            // 3. Sync Settings (Automation)
+            val settingsDoc = firestore.collection("users").document(user.uid).collection("settings").document("automation").get().await()
+            if (settingsDoc.exists()) {
+                val automationEnabled = settingsDoc.getBoolean("automationEnabled") ?: false
+                saveAutomationEnabled(automationEnabled)
+            }
+            
+            Timber.tag(TAG).d("syncFromFirestore completed successfully")
+        } catch (e: Exception) {
+            Timber.tag(TAG).e(e, "syncFromFirestore failed")
+        }
     }
 
     override fun observeLatestReview(): Flow<ManualReview?> = reviewState.asStateFlow()

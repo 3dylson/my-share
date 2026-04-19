@@ -171,18 +171,31 @@ class OnboardingViewModel @Inject constructor(
 
     fun signInWithGoogle(idToken: String, onComplete: () -> Unit) {
         viewModelScope.launch {
-            authRepository.signInWithGoogle(idToken)
-                .onSuccess {
-                    FirebaseUtils.logEvent("signup_completed")
-                    plannerRepository.loadPlan()?.let { plan ->
-                        plannerRepository.savePlan(plan)
-                    }
-                    onComplete()
-                }
-                .onFailure { error ->
-                    Timber.tag(TAG).e(error, "Sign in failed")
-                    state.update { it.copy(error = "Sign in failed. Please try again or continue locally.") }
-                }
+            val result = if (idToken == "mock_token") {
+                authRepository.signInAnonymously()
+            } else {
+                authRepository.signInWithGoogle(idToken)
+            }
+            
+            if (result.isSuccess) {
+                FirebaseUtils.logEvent("login_success")
+                onComplete()
+            } else {
+                FirebaseUtils.logEvent("login_failed")
+                state.update { it.copy(error = "Authentication failed: ${result.exceptionOrNull()?.message}") }
+            }
+        }
+    }
+
+    fun mockSignIn(onComplete: () -> Unit) {
+        viewModelScope.launch {
+            val result = authRepository.signInAnonymously()
+            if (result.isSuccess) {
+                FirebaseUtils.logEvent("mock_login_success")
+                onComplete()
+            } else {
+                state.update { it.copy(error = "Mock login failed: ${result.exceptionOrNull()?.message}") }
+            }
         }
     }
 

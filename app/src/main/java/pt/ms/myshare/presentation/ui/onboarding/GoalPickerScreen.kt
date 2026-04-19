@@ -61,6 +61,7 @@ fun GoalPickerScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .statusBarsPadding()
                 .padding(horizontal = 24.dp)
                 .verticalScroll(scrollState)
         ) {

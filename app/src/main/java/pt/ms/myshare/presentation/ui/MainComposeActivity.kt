@@ -24,13 +24,13 @@ class MainComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-//        consentManager = ConsentManager(this)
-//        consentManager.requestConsent(this) { canRequestAds ->
-//            if (canRequestAds) {
-//                // Initialize the Mobile Ads SDK immediately after consent
-//                MobileAds.initialize(this) {}
-//            }
-//        }
+        consentManager = ConsentManager(this)
+        consentManager.requestConsent(this) { canRequestAds ->
+            if (canRequestAds) {
+                // Initialize the Mobile Ads SDK immediately after consent
+                MobileAds.initialize(this) {}
+            }
+        }
         
         enableEdgeToEdge()
         setContent {

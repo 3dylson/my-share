@@ -47,7 +47,8 @@ data class MoreCardState(
     val automationEnabled: Boolean = false,
     val pricingStrategy: PricingStrategy? = null,
     val selectedBillingPlan: BillingPlan = BillingPlan.MONTHLY,
-    val isPremium: Boolean = false
+    val isPremium: Boolean = false,
+    val userEmail: String? = null
 )
 
 data class HomeState(

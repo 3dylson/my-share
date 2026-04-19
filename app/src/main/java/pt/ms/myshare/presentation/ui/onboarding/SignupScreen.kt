@@ -1,8 +1,10 @@
 package pt.ms.myshare.presentation.ui.onboarding
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Fingerprint
@@ -40,6 +42,7 @@ fun SignupScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .statusBarsPadding()
                 .padding(horizontal = 24.dp)
         ) {
             Spacer(Modifier.height(40.dp))
@@ -112,6 +115,17 @@ fun SignupScreen(
                     }
                 }
             )
+            
+            Spacer(Modifier.height(12.dp))
+
+            OutlinedButton(
+                onClick = { onSignup("mock_token") },
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = RoundedCornerShape(16.dp),
+                border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.3f))
+            ) {
+                Text("Continue with Mock Login", color = MySharePrimary)
+            }
             
             TextButton(
                 onClick = onSkip,

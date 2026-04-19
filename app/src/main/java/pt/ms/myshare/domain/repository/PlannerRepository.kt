@@ -24,4 +24,6 @@ interface PlannerRepository {
 
     fun isOnboardingCompleted(): Boolean
     suspend fun setOnboardingCompleted(completed: Boolean)
+    
+    suspend fun syncFromFirestore()
 }
