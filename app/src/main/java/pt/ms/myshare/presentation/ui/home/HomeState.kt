@@ -41,8 +41,16 @@ data class ReviewCardState(
     val actualFlexibleSpend: String = "",
     val actualGoalContribution: String = "",
     val insight: ReviewInsight? = null,
+    val coachingInsights: List<ReviewInsightState> = emptyList(),
     val savedReviewDate: String? = null,
     val error: String? = null
+)
+
+data class ReviewInsightState(
+    val headline: String,
+    val supportingText: String,
+    val type: pt.ms.myshare.domain.model.InsightType,
+    val actionLabel: String? = null
 )
 
 data class RuleCardState(
@@ -83,7 +91,8 @@ data class PerformanceStatsState(
     val healthScore: Int = 0,
     val currentStreak: Int = 0,
     val totalFlexSavingsLabel: String = "",
-    val totalReviews: Int = 0
+    val totalReviews: Int = 0,
+    val performanceTrend: List<Float> = emptyList() // Values 0..1 for sparkline
 )
 
 data class HomeState(

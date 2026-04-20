@@ -6,11 +6,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cloud
-import androidx.compose.material.icons.filled.Fingerprint
-import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +26,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.launch
 import pt.ms.myshare.R
 import pt.ms.myshare.presentation.ui.components.PremiumButton
+import pt.ms.myshare.presentation.ui.components.GoogleSignInButton
 import pt.ms.myshare.presentation.ui.theme.*
 import timber.log.Timber
 
@@ -83,39 +83,66 @@ fun SignupScreen(
             
             Spacer(Modifier.weight(1f))
             
-            PremiumButton(
-                text = stringResource(R.string.onboarding_signup_google),
-                onClick = {
-                    coroutineScope.launch {
-                        try {
-                            val credentialManager = CredentialManager.create(context)
-                            val googleIdOption = GetGoogleIdOption.Builder()
-                                .setFilterByAuthorizedAccounts(false)
-                                .setServerClientId(pt.ms.myshare.BuildConfig.GOOGLE_CLIENT_ID)
-                                .build()
-                            
-                            val request = GetCredentialRequest.Builder()
-                                .addCredentialOption(googleIdOption)
-                                .build()
-                                
-                            val result = credentialManager.getCredential(
-                                request = request,
-                                context = context
-                            )
-                            
-                            val credential = result.credential
-                            if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-                                onSignup(googleIdTokenCredential.idToken)
-                            }
-                        } catch (e: Exception) {
-                            Timber.e(e, "Google Sign-In failed")
-                        }
-                    }
-                }
-            )
+            // Error messaging state (using local snackbar for premium feel)
+            val snackbarHostState = remember { SnackbarHostState() }
             
-            Spacer(Modifier.height(24.dp))
+            Box(contentAlignment = Alignment.BottomCenter) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    GoogleSignInButton(
+                        text = stringResource(R.string.onboarding_signup_google),
+                        onClick = {
+                            coroutineScope.launch {
+                                try {
+                                    val credentialManager = CredentialManager.create(context)
+                                    val googleIdOption = GetGoogleIdOption.Builder()
+                                        .setFilterByAuthorizedAccounts(false)
+                                        .setServerClientId(pt.ms.myshare.BuildConfig.GOOGLE_CLIENT_ID)
+                                        .build()
+                                    
+                                    val request = GetCredentialRequest.Builder()
+                                        .addCredentialOption(googleIdOption)
+                                        .build()
+                                        
+                                    val result = credentialManager.getCredential(
+                                        request = request,
+                                        context = context
+                                    )
+                                    
+                                    val credential = result.credential
+                                    if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                                        val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                                        onSignup(googleIdTokenCredential.idToken)
+                                    }
+                                } catch (e: Exception) {
+                                    Timber.e(e, "Google Sign-In failed")
+                                    snackbarHostState.showSnackbar(
+                                        message = "Sign-in failed. Please check your internet or Google account.",
+                                        duration = SnackbarDuration.Short
+                                    )
+                                }
+                            }
+                        }
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+
+                    TextButton(
+                        onClick = { onSignup("mock_token") },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.textButtonColors(contentColor = MyShareOnSurfaceVariant.copy(alpha = 0.6f))
+                    ) {
+                        Text(
+                            "Skip Cloud Sync (Run Locally)", 
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                    
+                    Spacer(Modifier.height(24.dp))
+                }
+                
+                SnackbarHost(hostState = snackbarHostState)
+            }
         }
     }
 }

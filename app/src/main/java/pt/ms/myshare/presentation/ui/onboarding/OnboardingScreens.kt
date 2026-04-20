@@ -199,10 +199,23 @@ fun PaywallScreen(
         ) {
             Spacer(Modifier.height(16.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                IconButton(onClick = onClose) {
-                    Icon(Icons.Default.Close, contentDescription = "Close", tint = MyShareSecondary)
+                IconButton(
+                    onClick = onClose,
+                    modifier = Modifier
+                        .size(80.dp) // Larger hit box
+                        .padding(16.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Close, 
+                        contentDescription = "Close", 
+                        tint = MyShareSecondary,
+                        modifier = Modifier.size(48.dp) // Larger icon
+                    )
                 }
-                TextButton(onClick = onRestore) { 
+                TextButton(
+                    onClick = onRestore,
+                    modifier = Modifier.padding(top = 8.dp)
+                ) { 
                     Text("Restore", color = MyShareSecondary, style = MaterialTheme.typography.labelLarge) 
                 }
             }

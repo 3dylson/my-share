@@ -24,6 +24,7 @@ import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
 import pt.ms.myshare.domain.use_case.GetReviewHistoryUseCase
 import pt.ms.myshare.domain.use_case.UpdateGoalProgressUseCase
 import pt.ms.myshare.domain.use_case.GetPerformanceStatsUseCase
+import pt.ms.myshare.domain.use_case.GetCoachingInsightsUseCase
 import pt.ms.myshare.domain.use_case.PerformanceStats
 import pt.ms.myshare.utils.logs.FirebaseUtils
 import timber.log.Timber
@@ -43,7 +44,8 @@ class HomeViewModel @Inject constructor(
     private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase,
     private val getReviewHistoryUseCase: GetReviewHistoryUseCase,
     private val updateGoalProgressUseCase: UpdateGoalProgressUseCase,
-    private val getPerformanceStatsUseCase: GetPerformanceStatsUseCase
+    private val getPerformanceStatsUseCase: GetPerformanceStatsUseCase,
+    private val getCoachingInsightsUseCase: GetCoachingInsightsUseCase
 ) : ViewModel() {
 
     private val uiState = MutableStateFlow(HomeState())
@@ -97,14 +99,55 @@ class HomeViewModel @Inject constructor(
                 plannerRepository.observePlan(),
                 plannerRepository.observeRules(),
                 plannerRepository.observeGoals(),
-                combine(
-                    plannerRepository.observeLatestReview(),
-                    plannerRepository.observeReminderConfiguration(),
-                    plannerRepository.observeAutomationEnabled(),
-                    getPerformanceStatsUseCase.execute()
-                ) { lr, rc, ae, st -> Quadruple(lr, rc, ae, st) }
-            ) { plan, rules, goals, extra ->
-                PlannerGroup(plan, rules, goals, extra.first, extra.second, extra.third, extra.fourth)
+                plannerRepository.observeLatestReview(),
+                plannerRepository.observeReminderConfiguration(),
+                plannerRepository.observeAutomationEnabled(),
+                plannerRepository.observeReviews(),
+                getPerformanceStatsUseCase.execute()
+            ) { args: Array<Any?> ->
+                val plan = args[0] as pt.ms.myshare.domain.model.SalaryPlan?
+                val rules = args[1] as List<pt.ms.myshare.domain.model.PaydayRule>
+                val goals = args[2] as List<Goal>
+                val lr = args[3] as ManualReview?
+                val rc = args[4] as pt.ms.myshare.domain.model.ReminderConfiguration
+                val ae = args[5] as Boolean
+                val history = args[6] as List<ManualReview>
+                val stats = args[7] as PerformanceStats
+
+                val coaching = if (plan != null) {
+                    getCoachingInsightsUseCase.execute(plan, history)
+                } else {
+                    emptyList()
+                }
+                
+                val trend = if (plan != null) {
+                    history.reversed().takeLast(5).map { review ->
+                        val preview = calculatePlanPreviewUseCase.execute(plan, BigDecimal.ZERO)
+                        val flexTarget = review.plannedFlexibleSpend ?: preview.flexibleSpendPerPayday
+                        val goalTarget = review.plannedGoalContribution ?: preview.savingsPerPayday
+                        
+                        val flexPerformance = if (review.actualFlexibleSpend <= flexTarget) 1.0f else 
+                            (flexTarget.toDouble() / review.actualFlexibleSpend.toDouble()).coerceIn(0.0, 1.0).toFloat()
+                        
+                        val goalPerformance = if (review.actualGoalContribution >= goalTarget) 1.0f else
+                            (review.actualGoalContribution.toDouble() / goalTarget.toDouble()).coerceIn(0.0, 1.0).toFloat()
+                            
+                        (flexPerformance + goalPerformance) / 2f
+                    }
+                } else {
+                    emptyList()
+                }
+                
+                PlannerGroup(
+                    plan = plan,
+                    rules = rules,
+                    goals = goals,
+                    latestReview = lr,
+                    reminder = rc,
+                    automation = ae,
+                    stats = stats,
+                    combined = Triple(history, stats, coaching to trend)
+                )
             }
 
             combine(
@@ -119,9 +162,8 @@ class HomeViewModel @Inject constructor(
                 val latestReview = planner.latestReview
                 val reminder = planner.reminder
                 val automation = planner.automation
-                val stats = planner.stats
+                val combined = planner.combined
                 
-                // Inject the observed rules into the plan object for preview calculation consistency
                 val updatedPlan = plan?.copy(rules = currentRules)
 
                 val emptyMessage = if (updatedPlan == null) "Build a salary plan first to unlock the repeat loop." else null
@@ -130,14 +172,7 @@ class HomeViewModel @Inject constructor(
                 val goalCards = goals.map { buildGoalCard(it, updatedPlan) }
                 val ruleCards = currentRules.map { buildRuleCard(it) }
                 val reviewCard = buildReviewCard(updatedPlan, latestReview)
-                val performanceStats = PerformanceStatsState(
-                    healthScore = stats.healthScore,
-                    currentStreak = stats.currentStreak,
-                    totalFlexSavingsLabel = currencyFormat.format(stats.totalSavingsBeyondGoal),
-                    totalReviews = stats.totalReviews
-                )
-
-                // Map Store Products to pricing labels
+                
                 val monthlyProduct = products.find { it.productId == "myshare_monthly" }
                 val annualProduct = products.find { it.productId == "myshare_annual" }
 
@@ -151,7 +186,7 @@ class HomeViewModel @Inject constructor(
                     pricingStrategy = pricingStrategy,
                     actualMonthlyPrice = monthlyProduct?.price ?: pricingStrategy.monthlyLabel,
                     actualAnnualPrice = annualProduct?.price ?: pricingStrategy.annualLabel,
-                    showAdsConsentOption = uiState.value.moreCard.showAdsConsentOption, // Preserve this
+                    showAdsConsentOption = uiState.value.moreCard.showAdsConsentOption,
                     selectedBillingPlan = pricingStrategy.heroPlan,
                     isPremium = isPremium,
                     automationEnabled = automation,
@@ -163,9 +198,9 @@ class HomeViewModel @Inject constructor(
                     planCard = planCard,
                     goals = goalCards,
                     rules = ruleCards,
-                    performanceStats = performanceStats,
-                    reviewCard = reviewCard,
-                    reviewHistory = uiState.value.reviewHistory, // Keep existing history from separate observer
+                    performanceStats = combined.second.toState(combined.third.second),
+                    reviewCard = reviewCard.copy(coachingInsights = combined.third.first.map { it.toState() }),
+                    reviewHistory = combined.first.map { it.toState() },
                     moreCard = moreCard,
                     isLoading = false,
                     emptyMessage = emptyMessage,
@@ -184,7 +219,8 @@ class HomeViewModel @Inject constructor(
         val latestReview: ManualReview?,
         val reminder: pt.ms.myshare.domain.model.ReminderConfiguration,
         val automation: Boolean,
-        val stats: pt.ms.myshare.domain.use_case.PerformanceStats
+        val stats: PerformanceStats,
+        val combined: Triple<List<ManualReview>, PerformanceStats, Pair<List<ReviewInsight>, List<Float>>>
     )
 
     private data class Quadruple<A, B, C, D>(
@@ -192,6 +228,14 @@ class HomeViewModel @Inject constructor(
         val second: B,
         val third: C,
         val fourth: D
+    )
+
+    private data class Quintuple<A, B, C, D, E>(
+        val first: A,
+        val second: B,
+        val third: C,
+        val fourth: D,
+        val fifth: E
     )
 
     private fun buildPlanCard(plan: pt.ms.myshare.domain.model.SalaryPlan, goalAmount: BigDecimal): HomePlanCardState {
@@ -348,6 +392,44 @@ class HomeViewModel @Inject constructor(
             FirebaseUtils.logEvent("user_logged_out")
             onComplete()
         }
+    }
+
+    private fun PerformanceStats.toState(trend: List<Float> = emptyList()): PerformanceStatsState {
+        return PerformanceStatsState(
+            healthScore = healthScore,
+            currentStreak = currentStreak,
+            totalFlexSavingsLabel = currencyFormat.format(totalSavingsBeyondGoal),
+            totalReviews = totalReviews,
+            performanceTrend = trend
+        )
+    }
+
+    private fun ReviewInsight.toState(): ReviewInsightState {
+        return ReviewInsightState(
+            headline = headline,
+            supportingText = supportingText,
+            type = type,
+            actionLabel = actionLabel
+        )
+    }
+
+    private fun ManualReview.toState(): ReviewHistoryItemState {
+        val flexTarget = plannedFlexibleSpend ?: BigDecimal.ZERO
+        val flexDelta = actualFlexibleSpend.subtract(flexTarget)
+        val goalTarget = plannedGoalContribution ?: BigDecimal.ZERO
+        val goalDelta = actualGoalContribution.subtract(goalTarget)
+
+        return ReviewHistoryItemState(
+            id = id,
+            dateLabel = createdAt.format(dateFormatter),
+            flexibleSpendLabel = currencyFormat.format(actualFlexibleSpend),
+            plannedFlexibleLabel = currencyFormat.format(flexTarget),
+            goalContributionLabel = currencyFormat.format(actualGoalContribution),
+            plannedGoalLabel = currencyFormat.format(goalTarget),
+            flexibleDeltaLabel = (if (flexDelta > BigDecimal.ZERO) "+" else "") + currencyFormat.format(flexDelta),
+            goalDeltaLabel = (if (goalDelta > BigDecimal.ZERO) "+" else "") + currencyFormat.format(goalDelta),
+            isPositive = flexDelta <= BigDecimal.ZERO && goalDelta >= BigDecimal.ZERO
+        )
     }
 
     private fun sanitizeNumber(value: String): String = value.filter { it.isDigit() || it == '.' }

@@ -9,6 +9,12 @@ import androidx.compose.ui.unit.dp
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
 import pt.ms.myshare.presentation.ui.theme.MySharePrimaryContainer
+import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.FlightTakeoff
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.filled.Flag
 
 /**
  * Responsibility: Renders the Financial Milestones (Goals) list and strategy notes.
@@ -35,6 +41,15 @@ fun LazyListScope.homeGoalsTab(
             PremiumSectionHeader(title = "Financial Milestones")
         }
         goals.forEach { goalCard ->
+            val goalIcon = when {
+                goalCard.goalName.contains("Emergency", ignoreCase = true) -> Icons.Default.Shield
+                goalCard.goalName.contains("Vacation", ignoreCase = true) || goalCard.goalName.contains("Travel", ignoreCase = true) -> Icons.Default.FlightTakeoff
+                goalCard.goalName.contains("Home", ignoreCase = true) || goalCard.goalName.contains("House", ignoreCase = true) -> Icons.Default.Home
+                goalCard.goalName.contains("Car", ignoreCase = true) -> Icons.Default.DirectionsCar
+                goalCard.goalName.contains("Invest", ignoreCase = true) -> Icons.Default.TrendingUp
+                else -> Icons.Default.Flag
+            }
+            
             item {
                 PremiumGoalCard(
                     goalName = goalCard.goalName,
@@ -42,6 +57,7 @@ fun LazyListScope.homeGoalsTab(
                     progress = goalCard.progress,
                     progressLabel = goalCard.progressLabel,
                     targetDateLabel = goalCard.targetDateLabel,
+                    icon = goalIcon,
                     onClick = { onEditGoal(goalCard.id) }
                 )
                 Spacer(Modifier.height(16.dp))
@@ -75,7 +91,7 @@ fun LazyListScope.homeGoalsTab(
             title = "Strategy Note",
             body = "Focus is your superpower. While we support multiple goals, keeping your 'Primary Objective' in mind helps maintain momentum.",
             icon = Icons.Default.TipsAndUpdates,
-            backgroundColor = MySharePrimary.copy(alpha = 0.05f)
+            backgroundColor = MySharePrimaryContainer.copy(alpha = 0.6f)
         )
     }
 }

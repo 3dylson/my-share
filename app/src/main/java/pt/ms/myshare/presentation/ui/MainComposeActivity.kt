@@ -2,12 +2,16 @@ package pt.ms.myshare.presentation.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import com.google.android.gms.ads.MobileAds
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,7 +47,28 @@ class MainComposeActivity : ComponentActivity() {
         })
         
         enableEdgeToEdge()
+        
         setContent {
+            val isDarkTheme = isSystemInDarkTheme()
+            val systemBarsColor = if (isDarkTheme) {
+                pt.ms.myshare.presentation.ui.theme.MyShareBackground.toArgb()
+            } else {
+                pt.ms.myshare.presentation.ui.theme.MyShareBackground.toArgb()
+            }
+
+            LaunchedEffect(isDarkTheme) {
+                enableEdgeToEdge(
+                    statusBarStyle = SystemBarStyle.auto(
+                        android.graphics.Color.TRANSPARENT,
+                        android.graphics.Color.TRANSPARENT,
+                    ) { isDarkTheme },
+                    navigationBarStyle = SystemBarStyle.auto(
+                        android.graphics.Color.TRANSPARENT,
+                        android.graphics.Color.TRANSPARENT,
+                    ) { isDarkTheme }
+                )
+            }
+
             MyShareTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize()

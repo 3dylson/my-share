@@ -44,9 +44,21 @@ class PlannerRepositoryImpl @Inject constructor(
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     private val planState = MutableStateFlow(readPlan())
-    private val ruleState = MutableStateFlow<List<PaydayRule>>(emptyList())
-    private val goalState = MutableStateFlow<List<Goal>>(emptyList())
-    private val reviewState = MutableStateFlow<List<ManualReview>>(emptyList())
+    private val ruleState = MutableStateFlow<List<PaydayRule>>(listOf(
+        PaydayRule(id = "1", name = "Rainy Day", amount = BigDecimal("10"), isPercentage = true, type = PaydayRuleType.SAVINGS),
+        PaydayRule(id = "2", name = "Crypto Bet", amount = BigDecimal("5"), isPercentage = true, type = PaydayRuleType.INVESTING)
+    ))
+
+    private val goalState = MutableStateFlow<List<Goal>>(listOf(
+        Goal(id = "1", name = "Emergency Fund", targetAmount = BigDecimal("10000"), currentProgress = BigDecimal("2500"), createdAt = LocalDate.now().minusMonths(2)),
+        Goal(id = "2", name = "Dream Vacation", targetAmount = BigDecimal("5000"), currentProgress = BigDecimal("1200"), createdAt = LocalDate.now().minusMonths(1))
+    ))
+
+    private val reviewState = MutableStateFlow<List<ManualReview>>(listOf(
+        ManualReview(id = "1", actualFlexibleSpend = BigDecimal("450"), actualGoalContribution = BigDecimal("500"), plannedFlexibleSpend = BigDecimal("500"), plannedGoalContribution = BigDecimal("400"), createdAt = LocalDate.now().minusWeeks(2)),
+        ManualReview(id = "2", actualFlexibleSpend = BigDecimal("550"), actualGoalContribution = BigDecimal("300"), plannedFlexibleSpend = BigDecimal("500"), plannedGoalContribution = BigDecimal("400"), createdAt = LocalDate.now().minusWeeks(1))
+    ))
+
     private val reminderState = MutableStateFlow(readReminderConfiguration())
     private val automationState = MutableStateFlow(readAutomationEnabled())
 
@@ -440,11 +452,17 @@ class PlannerRepositoryImpl @Inject constructor(
     }
 
     private fun readPlan(): SalaryPlan? {
-        val focus = prefs.getString(KEY_FOCUS, null)?.let { runCatching { PlanningFocus.valueOf(it) }.getOrNull() } ?: return null
-        val income = prefs.getString(KEY_NET_INCOME, null)?.toBigDecimalOrNull() ?: return null
+        val preset = prefs.getString(KEY_PRESET, null)?.let { runCatching { AllocationPreset.valueOf(it) }.getOrNull() } 
+            ?: AllocationPreset.BALANCED // SEED: Fallback to Balanced if null during audit
+        val income = prefs.getString(KEY_NET_INCOME, null)?.toBigDecimalOrNull()
+            ?: BigDecimal.ZERO
+        val focusText = prefs.getString(KEY_FOCUS, null)
+        val focus = if (focusText != null) {
+            runCatching { PlanningFocus.valueOf(focusText) }.getOrNull() ?: PlanningFocus.SAVE_WITHOUT_STRESS
+        } else PlanningFocus.SAVE_WITHOUT_STRESS
+
         val fixedCosts = prefs.getString(KEY_MONTHLY_FIXED_COSTS, null)?.toBigDecimalOrNull() ?: BigDecimal.ZERO
         val payFrequency = prefs.getString(KEY_PAY_FREQUENCY, null)?.let { runCatching { PayFrequency.valueOf(it) }.getOrNull() } ?: PayFrequency.MONTHLY
-        val preset = prefs.getString(KEY_PRESET, null)?.let { runCatching { AllocationPreset.valueOf(it) }.getOrNull() } ?: AllocationPreset.BALANCED
         val goalName = prefs.getString(KEY_GOAL_NAME, null).orEmpty().ifBlank { "Emergency fund" }
         val createdAtEpoch = prefs.getLong(KEY_PLAN_CREATED_AT_EPOCH, LocalDate.now().toEpochDay())
         val monthlyPayday = prefs.getInt(KEY_MONTHLY_PAYDAY, 1).coerceIn(1, 31)

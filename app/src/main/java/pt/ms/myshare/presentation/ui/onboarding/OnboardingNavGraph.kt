@@ -30,7 +30,8 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
     NavHost(navController = navController, startDestination = OnboardingRoute.Welcome.route) {
         composable(OnboardingRoute.Welcome.route) {
             WelcomeScreen(
-                onContinue = { navController.navigate(OnboardingRoute.GoalPicker.route) }
+                onContinue = { navController.navigate(OnboardingRoute.GoalPicker.route) },
+                onSkipDev = viewModel::skipToHomeWithDefaultPlan
             )
         }
         composable(OnboardingRoute.GoalPicker.route) {

@@ -1,15 +1,20 @@
 package pt.ms.myshare.presentation.ui.home
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.*
 import androidx.compose.ui.unit.dp
 import pt.ms.myshare.presentation.ui.components.*
-import pt.ms.myshare.presentation.ui.theme.MyShareSecondary
+import pt.ms.myshare.presentation.ui.theme.*
 
 /**
  * Responsibility: Renders the Manual Review form and historical performance records.
@@ -25,33 +30,95 @@ fun LazyListScope.homeReviewTab(
     onSaveReview: () -> Unit,
     onDestinationSelected: (HomeDestination) -> Unit
 ) {
+    val coachingInsights = state.coachingInsights
+    
     if (history.isNotEmpty()) {
         item {
             PremiumSectionHeader(title = "Performance Insights")
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            
+            if (performanceStats.performanceTrend.isNotEmpty()) {
+                PremiumSparkline(
+                    points = performanceStats.performanceTrend,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(110.dp)
+                        .padding(vertical = 12.dp)
+                )
+            }
+
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                color = MySharePrimaryContainer.copy(alpha = 0.2f),
+                border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.1f))
             ) {
-                Box(modifier = Modifier.weight(1f)) {
-                    PremiumMetricCard(
-                        label = "Trust Score",
-                        value = "${performanceStats.healthScore}%",
-                        subtitle = "${performanceStats.totalReviews} reviews",
-                        icon = Icons.Default.VerifiedUser
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Trust Score",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MyShareSecondary,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "${performanceStats.healthScore}%",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Black,
+                            color = MyShareOnSurface
+                        )
+                        Text(
+                            text = "${performanceStats.totalReviews} reviews",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MyShareOnSurfaceVariant
+                        )
+                    }
+                    
+                    Box(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .height(40.dp)
+                            .align(Alignment.CenterVertically)
+                            .background(MyShareOutline.copy(alpha = 0.2f))
                     )
-                }
-                Box(modifier = Modifier.weight(1f)) {
-                    PremiumMetricCard(
-                        label = "Streak",
-                        value = "${performanceStats.currentStreak}",
-                        subtitle = "Positive loop",
-                        icon = Icons.Default.Whatshot
-                    )
+                    
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Current Streak",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MyShareSecondary,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "${performanceStats.currentStreak}",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Black,
+                                color = MyShareOnSurface
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Icon(
+                                imageVector = Icons.Default.Whatshot,
+                                contentDescription = null,
+                                tint = pt.ms.myshare.presentation.ui.theme.MyShareSecondary,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                        Text(
+                            text = "Day streak",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MyShareOnSurfaceVariant
+                        )
+                    }
                 }
             }
-            if (performanceStats.totalFlexSavingsLabel.isNotEmpty() && performanceStats.totalFlexSavingsLabel != "$0.00") {
+            Spacer(Modifier.height(16.dp))
+        }
+
+        if (performanceStats.totalFlexSavingsLabel.isNotEmpty() && performanceStats.totalFlexSavingsLabel != "$0.00") {
+            item {
                 PremiumBenefitCard(
                     title = "Excess Savings: ${performanceStats.totalFlexSavingsLabel}",
                     description = "This is how much you've stayed under budget across all your sessions. Great job!",
@@ -63,12 +130,40 @@ fun LazyListScope.homeReviewTab(
         }
     }
 
+    if (coachingInsights.isNotEmpty() && isPremium) {
+        item {
+            PremiumSectionHeader(title = "Coach's Corner")
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                coachingInsights.forEach { insight ->
+                    val icon = when (insight.type) {
+                        pt.ms.myshare.domain.model.InsightType.SUCCESS -> Icons.Default.CheckCircle
+                        pt.ms.myshare.domain.model.InsightType.WARNING -> Icons.Default.Warning
+                        pt.ms.myshare.domain.model.InsightType.TIP -> Icons.Default.AutoAwesome
+                    }
+
+                    PremiumBenefitCard(
+                        title = insight.headline,
+                        description = insight.supportingText,
+                        icon = icon,
+                        onClick = {}
+                    )
+                }
+            }
+        }
+    }
+
     item {
         PremiumSectionHeader(title = "The Habit Loop")
         PremiumInfoCard(
             title = "Manual Check-in",
             body = "Log actual spend vs. blueprint. This feedback loop is the key to financial awareness.",
-            icon = Icons.Default.HistoryEdu
+            icon = Icons.Default.HistoryEdu,
+            backgroundColor = pt.ms.myshare.presentation.ui.theme.MySharePrimary.copy(alpha = 0.05f)
         )
     }
     item {
@@ -116,17 +211,21 @@ fun LazyListScope.homeReviewTab(
                     value = "Flex: ${item.flexibleSpendLabel}",
                     subtitle = "Target: ${item.plannedFlexibleLabel} (${item.flexibleDeltaLabel})",
                     icon = if (item.isPositive) Icons.Default.TrendingDown else Icons.Default.TrendingUp,
-                    color = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error
+                    color = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error,
+                    indicatorColor = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error,
+                    onClick = {}
                 )
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(12.dp))
                 PremiumMetricCard(
                     label = "Goal contribution",
                     value = item.goalContributionLabel,
                     subtitle = "Plan: ${item.plannedGoalLabel} (${item.goalDeltaLabel})",
                     icon = if (item.isPositive) Icons.Default.Flag else Icons.Default.OutlinedFlag,
-                    color = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error
+                    color = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error,
+                    indicatorColor = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error,
+                    onClick = {}
                 )
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(20.dp))
             }
         }
 

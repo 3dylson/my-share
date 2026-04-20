@@ -3,6 +3,7 @@ package pt.ms.myshare.domain.use_case
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.ReviewInsight
 import pt.ms.myshare.domain.model.SalaryPlan
+import pt.ms.myshare.domain.model.InsightType
 import java.math.BigDecimal
 import java.math.RoundingMode
 import javax.inject.Inject
@@ -54,6 +55,8 @@ class CreateReviewInsightUseCase @Inject constructor(
             }
         }
 
+        val type = if (isOverspending || isGoalShort) InsightType.WARNING else InsightType.SUCCESS
+
         return ReviewInsight(
             plannedFlexibleSpend = preview.flexibleSpendPerPayday,
             actualFlexibleSpend = review.actualFlexibleSpend,
@@ -62,7 +65,8 @@ class CreateReviewInsightUseCase @Inject constructor(
             actualGoalContribution = review.actualGoalContribution,
             goalContributionDelta = goalDelta,
             headline = headline,
-            supportingText = supportingText
+            supportingText = supportingText,
+            type = type
         )
     }
 }

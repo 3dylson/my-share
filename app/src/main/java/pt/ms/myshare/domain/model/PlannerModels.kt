@@ -66,6 +66,12 @@ data class ManualReview(
     val paydayDate: LocalDate? = null
 )
 
+enum class InsightType {
+    SUCCESS,
+    WARNING,
+    TIP
+}
+
 data class ReviewInsight(
     val plannedFlexibleSpend: BigDecimal,
     val actualFlexibleSpend: BigDecimal,
@@ -74,7 +80,9 @@ data class ReviewInsight(
     val actualGoalContribution: BigDecimal,
     val goalContributionDelta: BigDecimal,
     val headline: String,
-    val supportingText: String
+    val supportingText: String,
+    val type: InsightType = InsightType.SUCCESS,
+    val actionLabel: String? = null
 )
 
 enum class BillingPlan {

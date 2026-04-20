@@ -10,6 +10,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.theme.MyShareSecondary
+import pt.ms.myshare.presentation.ui.theme.MySharePositive
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.Lock
 
 /**
  * Responsibility: Renders the core financial plan dashboard (Income, Metrics, Allocation Preview).
@@ -30,35 +35,28 @@ fun LazyListScope.homePlanTab(
         item {
             PremiumSectionHeader(title = "Core Metrics")
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                PremiumMetricCard(
+                HeroMetricCard(
                     label = "Income per payday",
                     value = card.incomeLabel,
                     icon = Icons.Default.Payments
                 )
-                PremiumMetricCard(
+                HeroMetricCard(
                     label = "Weekly Guide",
                     value = card.weeklySpendLabel,
                     subtitle = "Safe to spend every week",
-                    icon = Icons.Default.AccountBalanceWallet
+                    icon = Icons.Default.AccountBalanceWallet,
+                    containerColor = MySharePositive
                 )
             }
         }
         item {
             PremiumSectionHeader(title = "Allocation Preview")
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                PremiumMetricCard(
-                    label = "Fixed",
-                    value = card.fixedCostsLabel,
-                    modifier = Modifier.weight(1f),
-                    color = MyShareSecondary
-                )
-                PremiumMetricCard(
-                    label = "Flexible",
-                    value = card.flexibleSpendLabel,
-                    modifier = Modifier.weight(1f),
-                    color = MyShareSecondary
-                )
-            }
+            AllocationPreviewMetric(
+                fixedLabel = "Fixed",
+                fixedValue = card.fixedCostsLabel,
+                flexibleLabel = "Flexible",
+                flexibleValue = card.flexibleSpendLabel
+            )
         }
         if (!isPremium) {
             item {

@@ -32,19 +32,19 @@ fun LazyListScope.homeRulesTab(
         }
     } else {
         item {
-            PremiumSectionHeader(title = "Payday Rules")
-        }
-        rules.forEach { ruleCard ->
-            item {
-                PremiumMetricCard(
-                    label = ruleCard.name,
-                    value = ruleCard.amountLabel,
-                    subtitle = ruleCard.typeLabel,
-                    icon = if (ruleCard.isPercentage) Icons.Default.Percent else Icons.Default.Savings,
-                    onClick = { onEditRule(ruleCard.id) }
-                )
-                Spacer(Modifier.height(12.dp))
+            PremiumSettingsGroup(title = "Primary Rules") {
+                rules.forEachIndexed { index, ruleCard ->
+                    PremiumSettingsRow(
+                        title = ruleCard.name,
+                        subtitle = "${ruleCard.amountLabel} • ${ruleCard.typeLabel}",
+                        icon = if (ruleCard.isPercentage) Icons.Default.Percent else Icons.Default.Savings,
+                        iconColor = if (ruleCard.isPercentage) pt.ms.myshare.presentation.ui.theme.MySharePrimary else pt.ms.myshare.presentation.ui.theme.MyShareSecondary,
+                        onClick = { onEditRule(ruleCard.id) },
+                        showDivider = index < rules.size - 1
+                    )
+                }
             }
+            Spacer(Modifier.height(24.dp))
         }
     }
 
@@ -74,7 +74,7 @@ fun LazyListScope.homeRulesTab(
             title = "Logic Flow",
             body = "Rules are applied in order. Percentage rules take from the *remaining* balance after fixed costs and previous fixed rules.",
             icon = Icons.Default.Lightbulb,
-            backgroundColor = MySharePrimary.copy(alpha = 0.05f)
+            backgroundColor = MySharePrimaryContainer.copy(alpha = 0.6f)
         )
     }
 }

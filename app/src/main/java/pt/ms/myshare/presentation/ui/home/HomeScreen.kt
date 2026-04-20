@@ -2,6 +2,8 @@ package pt.ms.myshare.presentation.ui.home
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
@@ -146,60 +148,71 @@ fun HomeScreen(
             return@Scaffold
         }
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(innerPadding),
-            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            when (state.selectedDestination) {
-                HomeDestination.PLAN -> {
-                    homePlanTab(
-                        planCard = state.planCard,
-                        isPremium = state.moreCard.isPremium,
-                        onDestinationSelected = onDestinationSelected
-                    )
-                }
-                HomeDestination.RULES -> {
-                    homeRulesTab(
-                        rules = state.rules,
-                        isPremium = state.moreCard.isPremium,
-                        onAddNewRule = onAddNewRule,
-                        onEditRule = onEditRule,
-                        onDestinationSelected = onDestinationSelected
-                    )
-                }
-                HomeDestination.GOALS -> {
-                    homeGoalsTab(
-                        goals = state.goals,
-                        isPremium = state.moreCard.isPremium,
-                        onAddNewGoal = onAddNewGoal,
-                        onEditGoal = onEditGoal,
-                        onDestinationSelected = onDestinationSelected
-                    )
-                }
-                HomeDestination.REVIEW -> {
-                    homeReviewTab(
-                        state = state.reviewCard,
-                        history = state.reviewHistory,
-                        performanceStats = state.performanceStats,
-                        isPremium = state.moreCard.isPremium,
-                        onFlexibleSpendChanged = onFlexibleSpendChanged,
-                        onGoalContributionChanged = onGoalContributionChanged,
-                        onSaveReview = onSaveReview,
-                        onDestinationSelected = onDestinationSelected
-                    )
-                }
-                HomeDestination.MORE -> {
-                    homeMoreTab(
-                        state = state.moreCard,
-                        activity = activity,
-                        onToggleReminder = onToggleReminder,
-                        onToggleAutomation = onToggleAutomation,
-                        onBillingPlanSelected = onBillingPlanSelected,
-                        onUnlockPremium = onUnlockPremium,
-                        onManageAdsConsent = onManageAdsConsent,
-                        onLogout = onLogout
-                    )
+        AnimatedContent(
+            targetState = state.selectedDestination,
+            transitionSpec = {
+                (fadeIn(animationSpec = tween(300, delayMillis = 100)) + 
+                 slideInVertically(initialOffsetY = { 20 }, animationSpec = tween(300, delayMillis = 100)))
+                .togetherWith(fadeOut(animationSpec = tween(150)))
+            },
+            label = "TabTransition",
+            modifier = Modifier.fillMaxSize().padding(innerPadding)
+        ) { targetDestination ->
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(horizontal = 24.dp, vertical = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
+                when (targetDestination) {
+                    HomeDestination.PLAN -> {
+                        homePlanTab(
+                            planCard = state.planCard,
+                            isPremium = state.moreCard.isPremium,
+                            onDestinationSelected = onDestinationSelected
+                        )
+                    }
+                    HomeDestination.RULES -> {
+                        homeRulesTab(
+                            rules = state.rules,
+                            isPremium = state.moreCard.isPremium,
+                            onAddNewRule = onAddNewRule,
+                            onEditRule = onEditRule,
+                            onDestinationSelected = onDestinationSelected
+                        )
+                    }
+                    HomeDestination.GOALS -> {
+                        homeGoalsTab(
+                            goals = state.goals,
+                            isPremium = state.moreCard.isPremium,
+                            onAddNewGoal = onAddNewGoal,
+                            onEditGoal = onEditGoal,
+                            onDestinationSelected = onDestinationSelected
+                        )
+                    }
+                    HomeDestination.REVIEW -> {
+                        homeReviewTab(
+                            state = state.reviewCard,
+                            history = state.reviewHistory,
+                            performanceStats = state.performanceStats,
+                            isPremium = state.moreCard.isPremium,
+                            onFlexibleSpendChanged = onFlexibleSpendChanged,
+                            onGoalContributionChanged = onGoalContributionChanged,
+                            onSaveReview = onSaveReview,
+                            onDestinationSelected = onDestinationSelected
+                        )
+                    }
+                    HomeDestination.MORE -> {
+                        homeMoreTab(
+                            state = state.moreCard,
+                            activity = activity,
+                            onToggleReminder = onToggleReminder,
+                            onToggleAutomation = onToggleAutomation,
+                            onBillingPlanSelected = onBillingPlanSelected,
+                            onUnlockPremium = onUnlockPremium,
+                            onManageAdsConsent = onManageAdsConsent,
+                            onLogout = onLogout
+                        )
+                    }
                 }
             }
         }

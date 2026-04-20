@@ -186,11 +186,13 @@ class OnboardingViewModel @Inject constructor(
 
     fun signInWithGoogle(idToken: String, onComplete: () -> Unit) {
         viewModelScope.launch {
-            val result = if (idToken == "mock_token") {
-                authRepository.signInAnonymously()
-            } else {
-                authRepository.signInWithGoogle(idToken)
+            if (idToken == "mock_token") {
+                FirebaseUtils.logEvent("login_success_mock")
+                onComplete()
+                return@launch
             }
+            
+            val result = authRepository.signInWithGoogle(idToken)
             
             if (result.isSuccess) {
                 FirebaseUtils.logEvent("login_success")
