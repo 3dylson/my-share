@@ -131,7 +131,8 @@ fun GoalPickerScreen(
                 onValueChange = { goalAmountText = it.replace(',', '.') },
                 label = "Target Amount",
                 prefix = { Text("€ ") },
-                placeholder = "0.00"
+                placeholder = "0.00",
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )
 
             Spacer(Modifier.height(40.dp))

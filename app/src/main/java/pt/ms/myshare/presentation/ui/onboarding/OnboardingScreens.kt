@@ -125,6 +125,13 @@ fun PlanPreviewScreen(
                                 )
                             }
                             
+                            Spacer(Modifier.height(12.dp))
+                            Text(
+                                "Allocating ${currency.format(preview.savingsPerPayday)} per payday",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MyShareSecondary
+                            )
+                            
                             preview.goalTargetDate?.let { date ->
                                 Spacer(Modifier.height(8.dp))
                                 Text(

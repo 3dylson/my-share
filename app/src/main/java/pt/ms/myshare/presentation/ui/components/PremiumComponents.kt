@@ -413,7 +413,8 @@ fun PremiumTextField(
     prefix: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
     placeholder: String? = null,
-    description: String? = null
+    description: String? = null,
+    keyboardOptions: androidx.compose.foundation.text.KeyboardOptions = androidx.compose.foundation.text.KeyboardOptions.Default
 ) {
     Column {
         OutlinedTextField(
@@ -431,7 +432,8 @@ fun PremiumTextField(
             ),
             prefix = prefix,
             isError = isError,
-            singleLine = true
+            singleLine = true,
+            keyboardOptions = keyboardOptions
         )
         if (description != null) {
             Text(

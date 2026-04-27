@@ -3,6 +3,7 @@ package pt.ms.myshare.presentation.ui.home
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Rule
 import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -27,7 +28,7 @@ fun LazyListScope.homeRulesTab(
             PremiumInfoCard(
                 title = "Your Rules, Your Money",
                 body = "Add payday rules to automate how your surplus is distributed between savings, debt, and other categories.",
-                icon = Icons.Default.Rule
+                icon = Icons.AutoMirrored.Filled.Rule
             )
         }
     } else {
@@ -72,7 +73,7 @@ fun LazyListScope.homeRulesTab(
     item {
         PremiumInfoCard(
             title = "Logic Flow",
-            body = "Rules are applied in order. Percentage rules take from the *remaining* balance after fixed costs and previous fixed rules.",
+            body = "Rules are applied in order each payday. Fixed-amount rules reserve an exact sum; percentage rules take from the remaining balance after fixed costs and previous rules.",
             icon = Icons.Default.Lightbulb,
             backgroundColor = MySharePrimaryContainer.copy(alpha = 0.6f)
         )

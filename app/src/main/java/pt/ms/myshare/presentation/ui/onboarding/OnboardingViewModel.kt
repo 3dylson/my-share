@@ -135,6 +135,9 @@ class OnboardingViewModel @Inject constructor(
         state.update { it.copy(planPreview = preview, error = null, planSaved = true) }
         viewModelScope.launch {
             plannerRepository.savePlan(plan)
+            // Persist rules: clear stale entries then write each onboarding-generated rule
+            plannerRepository.loadRules().forEach { plannerRepository.deleteRule(it.id) }
+            plan.rules.forEach { plannerRepository.saveRule(it) }
             plannerRepository.saveGoal(
                 Goal(
                     targetAmount = current.goalAmount,
@@ -334,13 +337,13 @@ class OnboardingViewModel @Inject constructor(
 
         val rules = mutableListOf<PaydayRule>()
         current.allocatedSavings?.let { 
-            if (it > BigDecimal.ZERO) rules.add(PaydayRule(name = "Savings", amount = it, type = PaydayRuleType.SAVINGS, isPercentage = true)) 
+            if (it > BigDecimal.ZERO) rules.add(PaydayRule(name = "Savings", amount = it, type = PaydayRuleType.SAVINGS, isPercentage = false)) 
         }
         current.allocatedInvesting?.let { 
-            if (it > BigDecimal.ZERO) rules.add(PaydayRule(name = "Investing", amount = it, type = PaydayRuleType.INVESTING, isPercentage = true)) 
+            if (it > BigDecimal.ZERO) rules.add(PaydayRule(name = "Investing", amount = it, type = PaydayRuleType.INVESTING, isPercentage = false)) 
         }
         current.allocatedCrypto?.let { 
-            if (it > BigDecimal.ZERO) rules.add(PaydayRule(name = "Crypto", amount = it, type = PaydayRuleType.CRYPTO, isPercentage = true)) 
+            if (it > BigDecimal.ZERO) rules.add(PaydayRule(name = "Crypto", amount = it, type = PaydayRuleType.CRYPTO, isPercentage = false)) 
         }
 
         return SalaryPlan(

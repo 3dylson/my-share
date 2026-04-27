@@ -2,11 +2,13 @@ package pt.ms.myshare.presentation.ui.onboarding
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.ms.myshare.domain.model.AllocationPreset
@@ -70,7 +72,8 @@ fun FixedCostsScreen(
                 label = "Monthly Fixed Costs",
                 placeholder = "0.00",
                 prefix = { Text("€ ") },
-                isError = fixedCostsText.isNotEmpty() && fixedCosts == null
+                isError = fixedCostsText.isNotEmpty() && fixedCosts == null,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )
 
             if (fixedCostsText.isNotEmpty() && fixedCosts == null) {

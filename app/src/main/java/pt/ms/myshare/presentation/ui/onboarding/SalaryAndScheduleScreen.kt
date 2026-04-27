@@ -2,6 +2,7 @@ package pt.ms.myshare.presentation.ui.onboarding
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -10,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.ms.myshare.domain.model.PayFrequency
@@ -76,7 +78,8 @@ fun SalaryAndScheduleScreen(
                 onValueChange = { incomeText = it.replace(',', '.') },
                 label = "Next Net Payday Amount",
                 placeholder = "0.00",
-                prefix = { Text("€ ") }
+                prefix = { Text("€ ") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )
 
             Spacer(Modifier.height(32.dp))
@@ -113,7 +116,8 @@ fun SalaryAndScheduleScreen(
                     value = paydayText,
                     onValueChange = { if (it.length <= 2) paydayText = it },
                     label = "Typical Payday (Day of month)",
-                    placeholder = "e.g. 28"
+                    placeholder = "e.g. 28",
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
             } else {
                 PremiumTextField(

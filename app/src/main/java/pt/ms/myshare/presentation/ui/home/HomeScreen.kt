@@ -1,6 +1,7 @@
 package pt.ms.myshare.presentation.ui.home
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
@@ -105,8 +106,9 @@ fun HomeScreen(
         },
         bottomBar = {
             NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surface,
-                tonalElevation = 8.dp
+                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
+                tonalElevation = 8.dp,
+                modifier = Modifier.background(MaterialTheme.colorScheme.surface.copy(alpha = 0.95f))
             ) {
                 HomeDestination.entries.forEach { destination ->
                     val isSelected = state.selectedDestination == destination
@@ -156,11 +158,16 @@ fun HomeScreen(
                 .togetherWith(fadeOut(animationSpec = tween(150)))
             },
             label = "TabTransition",
-            modifier = Modifier.fillMaxSize().padding(innerPadding)
+            modifier = Modifier.fillMaxSize()
         ) { targetDestination ->
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = 24.dp, vertical = 24.dp),
+                contentPadding = PaddingValues(
+                    start = 24.dp,
+                    end = 24.dp,
+                    top = innerPadding.calculateTopPadding() + 24.dp,
+                    bottom = innerPadding.calculateBottomPadding() + 48.dp
+                ),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 when (targetDestination) {

@@ -2,10 +2,12 @@ package pt.ms.myshare.presentation.ui.onboarding
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.ms.myshare.presentation.ui.components.PremiumButton
@@ -119,7 +121,8 @@ fun AllocationPrioritiesScreen(
                         label = "Flexible Spending",
                         prefix = { Text("$symbol ") },
                         placeholder = "0.00",
-                        description = "Groceries, dining, hobbies, and day-to-day life."
+                        description = "Groceries, dining, hobbies, and day-to-day life.",
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                     )
                 }
                 item {
@@ -129,7 +132,8 @@ fun AllocationPrioritiesScreen(
                         label = "Savings",
                         prefix = { Text("$symbol ") },
                         placeholder = "0.00",
-                        description = "Cushion for emergencies and short-term goals."
+                        description = "Cushion for emergencies and short-term goals.",
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                     )
                 }
                 item {
@@ -139,7 +143,8 @@ fun AllocationPrioritiesScreen(
                         label = "Investing",
                         prefix = { Text("$symbol ") },
                         placeholder = "0.00",
-                        description = "Long-term growth and market exposure."
+                        description = "Long-term growth and market exposure.",
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                     )
                 }
                 item {
@@ -149,7 +154,8 @@ fun AllocationPrioritiesScreen(
                         label = "Speculative / Crypto",
                         prefix = { Text("$symbol ") },
                         placeholder = "0.00",
-                        description = "High-risk allocations (optional)."
+                        description = "High-risk allocations (optional).",
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                     )
                 }
             }
