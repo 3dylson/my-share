@@ -47,21 +47,7 @@ class PlayBillingEntitlementRepository(
                 }
             }
         }
-        CoroutineScope(Dispatchers.IO).launch {
-            isPro.collect { proStatus ->
-                val user = firebaseAuth.currentUser ?: return@collect
-                val data = hashMapOf(
-                    "isPro" to proStatus,
-                    "updatedAtDate" to java.time.LocalDate.now().toString()
-                )
-                try {
-                    firestore.collection("users").document(user.uid)
-                        .collection("entitlements").document("snapshot").set(data)
-                } catch (e: Exception) {
-                    // Ignored
-                }
-            }
-        }
+
     }
 
     private fun verifyAndAcknowledge(purchase: Purchase) {

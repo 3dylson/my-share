@@ -5,6 +5,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
 import dagger.hilt.android.HiltAndroidApp
+import pt.ms.myshare.BuildConfig
+import pt.ms.myshare.utils.logs.CrashlyticsTree
 import pt.ms.myshare.utils.logs.FirebaseUtils
 import timber.log.Timber
 
@@ -13,6 +15,14 @@ class MyShareApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        
+        // Initialize Timber
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        }
+        // Always plant CrashlyticsTree so we catch non-fatal errors in both Debug/Release
+        Timber.plant(CrashlyticsTree())
+
         FirebaseUtils.init(this)
         
 

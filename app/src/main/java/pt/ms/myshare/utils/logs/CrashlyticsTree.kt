@@ -11,14 +11,23 @@ class CrashlyticsTree : Timber.Tree() {
             return
         }
         val crashlytics = FirebaseCrashlytics.getInstance()
-        crashlytics.setCustomKey(CRASHLYTICS_KEY_PRIORITY, priority)
-        crashlytics.setCustomKey(CRASHLYTICS_KEY_TAG, tag ?: "NO_TAG")
-        crashlytics.setCustomKey(CRASHLYTICS_KEY_MESSAGE, message)
+        
+        // Add log as a breadcrumb that will be attached to any subsequent crash/exception
+        crashlytics.log("${priorityAsString(priority)} - ${tag ?: "NO_TAG"}: $message")
 
-        if (t == null) {
-            crashlytics.recordException(Exception(message))
-        } else {
+        if (t != null) {
             crashlytics.recordException(t)
+        } else if (priority == Log.ERROR) {
+            // Only record non-fatal exceptions for ERROR level to avoid spamming Crashlytics with WARNs
+            crashlytics.recordException(Exception(message))
+        }
+    }
+
+    private fun priorityAsString(priority: Int): String {
+        return when (priority) {
+            Log.ERROR -> "E"
+            Log.WARN -> "W"
+            else -> priority.toString()
         }
     }
 

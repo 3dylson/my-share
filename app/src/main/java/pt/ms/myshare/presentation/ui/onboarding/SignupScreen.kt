@@ -32,7 +32,8 @@ import timber.log.Timber
 
 @Composable
 fun SignupScreen(
-    onSignup: (String) -> Unit
+    onSignup: (String) -> Unit,
+    onSignupAnonymously: () -> Unit
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -127,7 +128,7 @@ fun SignupScreen(
                     Spacer(Modifier.height(16.dp))
 
                     TextButton(
-                        onClick = { onSignup("mock_token") },
+                        onClick = onSignupAnonymously,
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.textButtonColors(contentColor = MyShareOnSurfaceVariant.copy(alpha = 0.6f))
                     ) {

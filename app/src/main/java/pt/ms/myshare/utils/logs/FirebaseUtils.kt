@@ -2,7 +2,12 @@ package pt.ms.myshare.utils.logs
 
 import android.content.Context
 import android.os.Bundle
+import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.appcheck.FirebaseAppCheck
+import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
+import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
+import pt.ms.myshare.BuildConfig
 import timber.log.Timber
 
 object FirebaseUtils {
@@ -10,7 +15,40 @@ object FirebaseUtils {
     private lateinit var firebaseAnalytics: FirebaseAnalytics
 
     fun init(context: Context) {
+        // Ensure Firebase is initialized first
+        FirebaseApp.initializeApp(context)
+        
         this.firebaseAnalytics = FirebaseAnalytics.getInstance(context)
+
+        // Initialize App Check
+        val firebaseAppCheck = FirebaseAppCheck.getInstance()
+        if (BuildConfig.DEBUG) {
+            firebaseAppCheck.installAppCheckProviderFactory(
+                DebugAppCheckProviderFactory.getInstance()
+            )
+            Timber.d("Firebase App Check initialized with Debug provider")
+        } else {
+            firebaseAppCheck.installAppCheckProviderFactory(
+                PlayIntegrityAppCheckProviderFactory.getInstance()
+            )
+            Timber.d("Firebase App Check initialized with Play Integrity provider")
+        }
+    }
+
+    fun setUserProperty(propertyName: String, propertyValue: String?) {
+        if (::firebaseAnalytics.isInitialized) {
+            firebaseAnalytics.setUserProperty(propertyName, propertyValue)
+        } else {
+            Timber.e("FirebaseUtils not initialized")
+        }
+    }
+
+    fun setUserId(userId: String?) {
+        if (::firebaseAnalytics.isInitialized) {
+            firebaseAnalytics.setUserId(userId)
+        } else {
+            Timber.e("FirebaseUtils not initialized")
+        }
     }
 
     fun logScreen(screenName: String) {

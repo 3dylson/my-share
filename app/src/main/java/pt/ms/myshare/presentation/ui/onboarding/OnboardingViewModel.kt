@@ -189,12 +189,6 @@ class OnboardingViewModel @Inject constructor(
 
     fun signInWithGoogle(idToken: String, onComplete: () -> Unit) {
         viewModelScope.launch {
-            if (idToken == "mock_token") {
-                FirebaseUtils.logEvent("login_success_mock")
-                onComplete()
-                return@launch
-            }
-            
             val result = authRepository.signInWithGoogle(idToken)
             
             if (result.isSuccess) {
@@ -203,6 +197,20 @@ class OnboardingViewModel @Inject constructor(
             } else {
                 FirebaseUtils.logEvent("login_failed")
                 state.update { it.copy(error = "Authentication failed: ${result.exceptionOrNull()?.message}") }
+            }
+        }
+    }
+
+    fun signInAnonymously(onComplete: () -> Unit) {
+        viewModelScope.launch {
+            val result = authRepository.signInAnonymously()
+            
+            if (result.isSuccess) {
+                FirebaseUtils.logEvent("login_success_anonymous")
+                onComplete()
+            } else {
+                FirebaseUtils.logEvent("login_failed_anonymous")
+                state.update { it.copy(error = "Anonymous login failed: ${result.exceptionOrNull()?.message}") }
             }
         }
     }

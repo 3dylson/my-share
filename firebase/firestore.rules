@@ -4,7 +4,10 @@ service cloud.firestore {
 
     // A user can only read/write their own document
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null && request.auth.uid == userId;
+      // Prevent clients from modifying billing status fields
+      allow write: if request.auth != null && request.auth.uid == userId 
+                   && (!request.resource.data.diff(resource == null ? {} : resource.data).affectedKeys().hasAny(['isPro', 'proExpiry', 'lastVerifiedAt']));
 
       // Entitlement snapshot — written by the server (Cloud Function) and
       // readable by the owning user only
@@ -14,12 +17,23 @@ service cloud.firestore {
         allow write: if false;
       }
 
-      // Salary plans and reminder configs — owned by the user
+      // Salary plans — owned by the user
       match /plans/{doc} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
 
-      match /reminders/{doc} {
+      // Rules — owned by the user
+      match /rules/{doc} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Goals — owned by the user
+      match /goals/{doc} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Settings (including reminders and automation) — owned by the user
+      match /settings/{doc} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
 

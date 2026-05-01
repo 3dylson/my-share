@@ -130,6 +130,11 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                     viewModel.signInWithGoogle(idToken) {
                         navController.navigate(OnboardingRoute.Trajectory.route)
                     }
+                },
+                onSignupAnonymously = {
+                    viewModel.signInAnonymously {
+                        navController.navigate(OnboardingRoute.Trajectory.route)
+                    }
                 }
             )
         }
