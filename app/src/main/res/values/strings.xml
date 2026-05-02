@@ -49,9 +49,9 @@
     <string name="onboarding_signup_google">Sign up with Google</string>
     <string name="onboarding_signup_skip">Continue locally</string>
     
-    <string name="onboarding_banksync_title">Bank sync (Optional)</string>
-    <string name="onboarding_banksync_subtitle">My Share works perfectly as a manual planner. If you prefer, securely link your bank to track income automatically.</string>
-    <string name="onboarding_banksync_link">Link Bank Account</string>
+    <string name="onboarding_banksync_title">Bank Sync — Coming Soon</string>
+    <string name="onboarding_banksync_subtitle">My Share works great as a manual planner. Bank sync is on our roadmap — register your interest and we'll notify you the moment it's available.</string>
+    <string name="onboarding_banksync_link">Notify Me When It's Ready</string>
     <string name="onboarding_banksync_skip">Not now</string>
 
     <!-- Plan Preview -->

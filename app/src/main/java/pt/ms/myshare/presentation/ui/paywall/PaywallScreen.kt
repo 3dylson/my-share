@@ -79,16 +79,16 @@ fun PaywallScreen(
         ) {
             PremiumAppHeader(
                 title = "Master Your Share",
-                subtitle = "Unlock the full system and automate your path to financial freedom."
+                subtitle = "Automate your plan and stay on track every payday."
             )
             
             Spacer(Modifier.height(32.dp))
 
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 FeatureRow("Unlimited Intentional Goals", "Build savings for everything that matters.")
+                FeatureRow("Automated Rules", "Transfer rules that execute every payday automatically.")
+                FeatureRow("Check-in History", "Full timeline of your plan vs. actual performance.")
                 FeatureRow("Smart Budget Automation", "Automatically adjust guides based on past performance.")
-                FeatureRow("Advanced Trajectory Analytics", "Visual forecast of your wealth over 12 months.")
-                FeatureRow("Direct Concierge Support", "Priority access to our financial design team.")
             }
 
             Spacer(Modifier.height(48.dp))
@@ -106,7 +106,6 @@ fun PaywallScreen(
                 availableProducts.forEach { product ->
                     val isAnnual = product.name.contains("Year", ignoreCase = true)
                     val period = if (isAnnual) "year" else "month"
-                    
                     PremiumPaywallCard(
                         title = product.name,
                         price = product.price,

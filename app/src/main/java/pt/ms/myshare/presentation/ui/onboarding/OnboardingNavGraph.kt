@@ -8,6 +8,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import pt.ms.myshare.BuildConfig
 import androidx.navigation.compose.rememberNavController
 
 @Composable
@@ -31,7 +32,8 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
         composable(OnboardingRoute.Welcome.route) {
             WelcomeScreen(
                 onContinue = { navController.navigate(OnboardingRoute.GoalPicker.route) },
-                onSkipDev = viewModel::skipToHomeWithDefaultPlan
+                // Only wire the dev skip in debug builds; null means the button is hidden
+                onSkipDev = if (BuildConfig.DEBUG) viewModel::skipToHomeWithDefaultPlan else null
             )
         }
         composable(OnboardingRoute.GoalPicker.route) {
@@ -162,6 +164,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
             if (pricing != null) {
                 PaywallScreen(
                     pricingStrategy = pricing,
+                    availableProducts = state.availableProducts,
                     selectedPlan = state.selectedBillingPlan,
                     onPlanSelected = viewModel::setSelectedBillingPlan,
                     onClose = { navController.navigate(OnboardingRoute.ReminderSetup.route) },
@@ -175,6 +178,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                     onPurchaseSelected = { activity -> viewModel.purchasePremium(activity) }
                 )
             }
+
         }
         composable(OnboardingRoute.ReminderSetup.route) {
             ReminderSetupScreen(

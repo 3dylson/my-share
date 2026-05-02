@@ -65,7 +65,16 @@ class OnboardingViewModel @Inject constructor(
             val isPremium = entitlementRepository.isPro.first()
             state.update { current -> current.copy(isPremium = isPremium) }
         }
+        // Collect live Play Billing products so the paywall always shows
+        // real, country-correct prices from the Play Store instead of locale estimates.
+        viewModelScope.launch {
+            entitlementRepository.availableProducts.collect { products ->
+                Timber.d("OnboardingVM: received ${products.size} live billing products")
+                state.update { it.copy(availableProducts = products) }
+            }
+        }
     }
+
 
     fun setFocus(focus: PlanningFocus, defaultGoalName: String, defaultGoalAmount: BigDecimal) {
         state.update {

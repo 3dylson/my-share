@@ -6,6 +6,7 @@ import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.domain.model.PlanPreview
 import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.domain.model.PricingStrategy
+import pt.ms.myshare.domain.model.StoreProduct
 import java.math.BigDecimal
 
 data class OnboardingState(
@@ -24,6 +25,8 @@ data class OnboardingState(
     val allocatedCrypto: BigDecimal? = null,
     val planPreview: PlanPreview? = null,
     val pricingStrategy: PricingStrategy? = null,
+    // Live prices fetched from Google Play Billing; empty until billing client connects
+    val availableProducts: List<StoreProduct> = emptyList(),
     val selectedBillingPlan: BillingPlan = BillingPlan.MONTHLY,
     val planSaved: Boolean = false,
     val reminderSaved: Boolean = false,

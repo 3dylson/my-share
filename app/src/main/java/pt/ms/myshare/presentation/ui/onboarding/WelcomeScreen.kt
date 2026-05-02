@@ -18,7 +18,8 @@ import pt.ms.myshare.presentation.ui.theme.*
 @Composable
 fun WelcomeScreen(
     onContinue: () -> Unit,
-    onSkipDev: () -> Unit = {}
+    // Dev-only: use a lambda parameter so release builds pass a no-op
+    onSkipDev: (() -> Unit)? = null
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -84,11 +85,11 @@ fun WelcomeScreen(
                     onClick = onContinue
                 )
 
-                // Dev-only skip button
-                TextButton(
-                    onClick = onSkipDev
-                ) {
-                    Text("Skip to Home (Dev)", color = MyShareSecondary.copy(alpha = 0.5f))
+                // Only shown in debug builds; compiled away in release
+                if (onSkipDev != null) {
+                    TextButton(onClick = onSkipDev) {
+                        Text("Skip to Home (Dev)", color = MyShareSecondary.copy(alpha = 0.5f))
+                    }
                 }
             }
             

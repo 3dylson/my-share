@@ -188,6 +188,7 @@ fun PlanPreviewScreen(
 @Composable
 fun PaywallScreen(
     pricingStrategy: pt.ms.myshare.domain.model.PricingStrategy,
+    availableProducts: List<pt.ms.myshare.domain.model.StoreProduct> = emptyList(),
     selectedPlan: BillingPlan,
     onPlanSelected: (BillingPlan) -> Unit,
     onClose: () -> Unit,
@@ -254,25 +255,33 @@ fun PaywallScreen(
                 FeatureRowNew("Automation", "Recurring rules for every payday.")
                 FeatureRowNew("Reminders", "Never forget to log your major spends.")
                 FeatureRowNew("Unlimited Goals", "Track all your dreams simultaneously.")
-                FeatureRowNew("Exclusive Deals", "Early access to partner financial tools.")
+                FeatureRowNew("Plan vs. Actual Tracking", "See exactly how your spending compares to your blueprint.")
             }
 
             Spacer(Modifier.height(48.dp))
 
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                // Prefer live Play Billing prices; fall back to locale-estimated labels
+                // while the billing client is still connecting (typically < 2s).
+                val monthlyProduct = availableProducts.find { it.productId.contains("monthly", ignoreCase = true) }
+                val annualProduct = availableProducts.find { it.productId.contains("annual", ignoreCase = true) }
+                val hasLivePrices = monthlyProduct != null || annualProduct != null
+
                 PremiumPaywallCard(
                     title = "Monthly",
-                    price = pricingStrategy.monthlyLabel,
+                    price = monthlyProduct?.price ?: pricingStrategy.monthlyLabel,
                     period = "month",
                     description = "Flexible commitment",
+                    badge = if (!hasLivePrices) "Loading…" else null,
                     isSelected = selectedPlan == BillingPlan.MONTHLY,
                     onClick = { onPlanSelected(BillingPlan.MONTHLY) }
                 )
                 PremiumPaywallCard(
                     title = "Annual",
-                    price = pricingStrategy.annualLabel,
+                    price = annualProduct?.price ?: pricingStrategy.annualLabel,
                     period = "year",
-                    description = "Best value for long-term growth",
+                    description = "Best value — save more per year",
+                    badge = if (hasLivePrices) "BEST VALUE" else "Loading…",
                     isSelected = selectedPlan == BillingPlan.ANNUAL,
                     onClick = { onPlanSelected(BillingPlan.ANNUAL) }
                 )

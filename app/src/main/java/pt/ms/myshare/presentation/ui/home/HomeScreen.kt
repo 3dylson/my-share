@@ -119,7 +119,11 @@ fun HomeScreen(
         },
         bottomBar = {
             Column {
-                if (!state.moreCard.isPremium) {
+                // Ads are restricted to low-sensitivity informational surfaces only.
+                // Never shown on REVIEW (financial data entry) or MORE (settings/billing).
+                val isLowSensitivityTab = state.selectedDestination == HomeDestination.PLAN ||
+                        state.selectedDestination == HomeDestination.STRATEGY
+                if (!state.moreCard.isPremium && isLowSensitivityTab) {
                     PremiumAdBanner(
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
