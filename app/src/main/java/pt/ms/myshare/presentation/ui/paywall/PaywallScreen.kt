@@ -11,11 +11,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import pt.ms.myshare.R
 import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.components.PremiumPaywallCard
 import pt.ms.myshare.presentation.ui.components.*
@@ -63,7 +65,7 @@ fun PaywallScreen(
                 IconButton(onClick = onBack) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Close",
+                        contentDescription = stringResource(R.string.paywall_close_content_description),
                         tint = MyShareSecondary
                     )
                 }
@@ -78,17 +80,17 @@ fun PaywallScreen(
                 .verticalScroll(scrollState)
         ) {
             PremiumAppHeader(
-                title = "Master Your Share",
-                subtitle = "Automate your plan and stay on track every payday."
+                title = stringResource(R.string.paywall_title),
+                subtitle = stringResource(R.string.paywall_subtitle)
             )
             
             Spacer(Modifier.height(32.dp))
 
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                FeatureRow("Unlimited Intentional Goals", "Build savings for everything that matters.")
-                FeatureRow("Automated Rules", "Transfer rules that execute every payday automatically.")
-                FeatureRow("Check-in History", "Full timeline of your plan vs. actual performance.")
-                FeatureRow("Smart Budget Automation", "Automatically adjust guides based on past performance.")
+                FeatureRow(stringResource(R.string.paywall_feature_goals_title), stringResource(R.string.paywall_feature_goals_desc))
+                FeatureRow(stringResource(R.string.paywall_feature_automation_title), stringResource(R.string.paywall_feature_automation_desc))
+                FeatureRow(stringResource(R.string.paywall_feature_reminders_title), stringResource(R.string.paywall_feature_reminders_desc))
+                FeatureRow(stringResource(R.string.paywall_feature_tracking_title), stringResource(R.string.paywall_feature_tracking_desc))
             }
 
             Spacer(Modifier.height(48.dp))
@@ -109,9 +111,9 @@ fun PaywallScreen(
                     PremiumPaywallCard(
                         title = product.name,
                         price = product.price,
-                        period = period,
-                        description = if (isAnnual) "Focus on long-term wealth" else "Start small, expand later",
-                        badge = if (isAnnual) "60% OFF" else null,
+                        period = if (isAnnual) stringResource(R.string.paywall_period_year) else stringResource(R.string.paywall_period_month),
+                        description = if (isAnnual) stringResource(R.string.paywall_desc_annual) else stringResource(R.string.paywall_desc_monthly),
+                        badge = if (isAnnual) stringResource(R.string.paywall_badge_best_value) else null,
                         isSelected = selectedProduct?.productId == product.productId,
                         onClick = { selectedProduct = product },
                         modifier = Modifier.padding(bottom = 16.dp)
@@ -123,7 +125,7 @@ fun PaywallScreen(
 
             selectedProduct?.let { product ->
                 PremiumButton(
-                    text = "Upgrade to Unlimited",
+                    text = stringResource(R.string.paywall_upgrade_button),
                     onClick = { activity?.let { viewModel.purchasePlan(it, product) } }
                 )
             }
@@ -133,7 +135,7 @@ fun PaywallScreen(
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
             ) {
                 Text(
-                    "Restore Purchases",
+                    stringResource(R.string.paywall_restore_button),
                     style = MaterialTheme.typography.labelLarge,
                     color = MyShareSecondary,
                     fontWeight = FontWeight.Medium

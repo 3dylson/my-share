@@ -253,26 +253,25 @@
     <string name="onboarding_building_step_savings">Calculating weekly safe-to-spend</string>
 
     <!-- Onboarding: Plan Preview -->
-    <string name="onboarding_plan_preview_title">Final Blueprint</string>
-    <string name="onboarding_plan_preview_subtitle">Created for your payday on %1$s</string>
-    <string name="onboarding_plan_preview_label_initial">Initial Balance</string>
-    <string name="onboarding_plan_preview_label_fixed">Fixed Costs</string>
-    <string name="onboarding_plan_preview_label_flexible">Flexible</string>
-    <string name="onboarding_plan_preview_weekly_subtitle">%1$s / week</string>
-    <string name="onboarding_plan_preview_label_goal">Savings Goal</string>
-    <string name="onboarding_plan_preview_target_label">target</string>
-    <string name="onboarding_plan_preview_allocation_body">Allocating %1$s per payday</string>
-    <string name="onboarding_plan_preview_estimated_date">Estimated: %1$s %2$s</string>
-    <string name="onboarding_plan_preview_label_investing">Investing</string>
-    <string name="onboarding_plan_preview_label_crypto">Crypto</string>
-    <string name="onboarding_plan_preview_button_secure">Secure My Plan</string>
-    <string name="onboarding_plan_preview_button_basic">Start with basic plan</string>
+    <string name="onboarding_plan_preview_title">Your Payday Action Plan</string>
+    <string name="onboarding_plan_preview_subtitle">On %1$s, money arrives. Here is your mission:</string>
+    <string name="onboarding_plan_preview_step_fixed_title">1. Secure your bills</string>
+    <string name="onboarding_plan_preview_step_fixed_body">Move %1$s to your fixed costs account immediately.</string>
+    <string name="onboarding_plan_preview_step_goal_title">2. Fuel your vision: %1$s</string>
+    <string name="onboarding_plan_preview_step_goal_body">Contribute %1$s to stay on track for %2$s.</string>
+    <string name="onboarding_plan_preview_step_flex_title">3. Enjoy your life</string>
+    <string name="onboarding_plan_preview_step_flex_body">You have %1$s left for the month (%2$s per week).</string>
+    <string name="onboarding_plan_preview_impact_title">The Big Picture</string>
+    <string name="onboarding_plan_preview_impact_body">Follow this mission and you’ll reach your goal by %1$s %2$s!</string>
+    <string name="onboarding_plan_preview_reminder_callout">We’ll remind you on %1$s to execute this mission.</string>
+    <string name="onboarding_plan_preview_button_secure">Automate My Mission</string>
+    <string name="onboarding_plan_preview_button_basic">I’ll do it manually</string>
 
     <!-- Paywall -->
     <string name="paywall_close_content_description">Close</string>
     <string name="paywall_restore_button">Restore</string>
-    <string name="paywall_title">Master Your Share</string>
-    <string name="paywall_subtitle">Automate your plan and stay on track every payday.</string>
+    <string name="paywall_title">Secure Your Payday</string>
+    <string name="paywall_subtitle">Don’t just calculate. Automate your mission and never wonder where your money went.</string>
     <string name="paywall_feature_automation_title">Automation</string>
     <string name="paywall_feature_automation_desc">Recurring rules for every payday.</string>
     <string name="paywall_feature_reminders_title">Reminders</string>
@@ -297,8 +296,8 @@
     <string name="paywall_subhead_emerging">Monthly is the easier starting point here. Annual stays available once the value is clear.</string>
     <string name="paywall_headline_brazil">Turn your salary plan into a repeatable routine</string>
     <string name="paywall_subhead_brazil">Monthly is highlighted first. Annual is there for committed users.</string>
-    <string name="paywall_headline_default">Automate the plan you just built</string>
-    <string name="paywall_subhead_default">Annual is highlighted where subscription tolerance is stronger.</string>
+    <string name="paywall_headline_default">Automate your Payday Action Plan</string>
+    <string name="paywall_subhead_default">Secure your mission with recurring rules and payday reminders.</string>
 
     <!-- Review Insights -->
     <string name="insight_review_save_stress_success_headline">Safety net growing</string>
@@ -330,11 +329,11 @@
     <string name="coaching_first_step_headline">First Step Mastery</string>
     <string name="coaching_first_step_body">Great start with your first review! The more you log, the smarter your habit loop becomes.</string>
 
-    <!-- Notifications -->
-    <string name="notification_payday_message">It’s payday — fixed %1$s, spend %2$s, save %3$s, invest %4$s.</string>
+    <string name="notification_payday_title">Your Payday Mission</string>
+    <string name="notification_payday_body">Secure %1$s for bills and save %3$s. You have %2$s for safe spending.</string>
 
     <!-- Home ViewModel Additions -->
-    <string name="home_plan_next_payday">Next payday %1$s</string>
+    <string name="home_plan_next_payday">Your Next Payday Mission: %1$s</string>
     <string name="home_goal_mission_accomplished">Mission Accomplished!</string>
     <string name="home_goal_on_pace">On pace for %1$s</string>
     <string name="home_goal_no_trajectory">Add more goal contribution to see a target date</string>

@@ -1,17 +1,35 @@
 package pt.ms.myshare.presentation.ui.onboarding
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import pt.ms.myshare.R
+import pt.ms.myshare.domain.model.PlanPreview
+import pt.ms.myshare.presentation.ui.theme.*
+import java.math.BigDecimal
+import java.text.NumberFormat
+import java.time.format.DateTimeFormatter
+import java.util.*
 
+@Composable
 @Composable
 fun PlanPreviewScreen(
     preview: PlanPreview,
@@ -34,7 +52,7 @@ fun PlanPreviewScreen(
             
             Text(
                 stringResource(R.string.onboarding_plan_preview_title), 
-                style = MaterialTheme.typography.headlineLarge,
+                style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.ExtraBold,
                 color = MyShareOnSurface
             )
@@ -52,100 +70,49 @@ fun PlanPreviewScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(bottom = 24.dp)
             ) {
+                // Mission Step 1: Fixed Costs
                 item {
-                    PremiumMetricCard(
-                        label = stringResource(R.string.onboarding_plan_preview_label_initial),
-                        value = currency.format(preview.incomePerPayday),
-                        subtitle = preview.summary
+                    MissionStepCard(
+                        title = stringResource(R.string.onboarding_plan_preview_step_fixed_title),
+                        body = stringResource(R.string.onboarding_plan_preview_step_fixed_body, currency.format(preview.fixedCostsPerPayday)),
+                        icon = Icons.Default.Security,
+                        iconColor = MySharePrimary,
+                        amount = currency.format(preview.fixedCostsPerPayday)
                     )
                 }
 
+                // Mission Step 2: Goal Contribution
                 item {
-                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        PremiumMetricCard(
-                            label = stringResource(R.string.onboarding_plan_preview_label_fixed), 
-                            value = currency.format(preview.fixedCostsPerPayday), 
-                            modifier = Modifier.weight(1f)
-                        )
-                        PremiumMetricCard(
-                            label = stringResource(R.string.onboarding_plan_preview_label_flexible), 
-                            value = currency.format(preview.flexibleSpendPerPayday), 
-                            modifier = Modifier.weight(1f),
-                            subtitle = stringResource(R.string.onboarding_plan_preview_weekly_subtitle, currency.format(preview.weeklyFlexibleSpend))
-                        )
-                    }
+                    MissionStepCard(
+                        title = stringResource(R.string.onboarding_plan_preview_step_goal_title, goalName),
+                        body = stringResource(R.string.onboarding_plan_preview_step_goal_body, currency.format(preview.savingsPerPayday), goalName),
+                        icon = Icons.Default.Flag,
+                        iconColor = MySharePositive,
+                        amount = currency.format(preview.savingsPerPayday)
+                    )
                 }
 
+                // Mission Step 3: Flexible Spending
                 item {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = MySharePrimaryContainer.copy(alpha = 0.5f)),
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp)
-                    ) {
-                        Column(Modifier.padding(24.dp)) {
-                            Text(
-                                stringResource(R.string.onboarding_plan_preview_label_goal), 
-                                style = MaterialTheme.typography.labelMedium, 
-                                color = MySharePrimary,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                goalName, 
-                                style = MaterialTheme.typography.headlineSmall, 
-                                fontWeight = FontWeight.ExtraBold,
-                                color = MyShareOnSurface
-                            )
-                            
-                            Spacer(Modifier.height(16.dp))
-                            
-                            Row(verticalAlignment = Alignment.Bottom) {
-                                Text(
-                                    currency.format(goalAmount), 
-                                    style = MaterialTheme.typography.titleLarge, 
-                                    fontWeight = FontWeight.Bold,
-                                    color = MyShareOnSurface
-                                )
-                                Spacer(Modifier.width(8.dp))
-                                Text(
-                                    stringResource(R.string.onboarding_plan_preview_target_label), 
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MyShareSecondary
-                                )
-                            }
-                            
-                            Spacer(Modifier.height(12.dp))
-                            Text(
-                                stringResource(R.string.onboarding_plan_preview_allocation_body, currency.format(preview.savingsPerPayday)),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MyShareSecondary
-                            )
-                            
-                            preview.goalTargetDate?.let { date ->
-                                Spacer(Modifier.height(8.dp))
-                                val monthName = date.month.getDisplayName(java.time.format.TextStyle.FULL, locale)
-                                    .lowercase().replaceFirstChar(Char::titlecase)
-                                Text(
-                                    stringResource(R.string.onboarding_plan_preview_estimated_date, monthName, date.year.toString()),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MySharePrimary,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-                    }
+                    MissionStepCard(
+                        title = stringResource(R.string.onboarding_plan_preview_step_flex_title),
+                        body = stringResource(R.string.onboarding_plan_preview_step_flex_body, currency.format(preview.flexibleSpendPerPayday), currency.format(preview.weeklyFlexibleSpend)),
+                        icon = Icons.Default.Celebration,
+                        iconColor = MyShareWarning,
+                        amount = currency.format(preview.flexibleSpendPerPayday)
+                    )
                 }
 
+                // The Big Picture Impact
                 item {
-                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        PremiumMetricCard(
-                            label = stringResource(R.string.onboarding_plan_preview_label_investing), 
-                            value = currency.format(preview.investingPerPayday), 
-                            modifier = Modifier.weight(1f)
-                        )
-                        PremiumMetricCard(
-                            label = stringResource(R.string.onboarding_plan_preview_label_crypto), 
-                            value = currency.format(preview.cryptoPerPayday), 
-                            modifier = Modifier.weight(1f)
+                    preview.goalTargetDate?.let { date ->
+                        val monthName = date.month.getDisplayName(java.time.format.TextStyle.FULL, locale)
+                            .lowercase().replaceFirstChar(Char::titlecase)
+                        
+                        ImpactSummaryCard(
+                            title = stringResource(R.string.onboarding_plan_preview_impact_title),
+                            body = stringResource(R.string.onboarding_plan_preview_impact_body, monthName, date.year.toString()),
+                            reminderText = stringResource(R.string.onboarding_plan_preview_reminder_callout, preview.nextPayday.format(dateFormatter))
                         )
                     }
                 }
@@ -323,6 +290,113 @@ private fun FeatureRowNew(title: String, body: String) {
         Column {
             Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MyShareOnSurface)
             Text(body, style = MaterialTheme.typography.bodyMedium, color = MyShareSecondary)
+        }
+    }
+}
+
+@Composable
+fun MissionStepCard(
+    title: String,
+    body: String,
+    icon: ImageVector,
+    iconColor: Color,
+    amount: String
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(24.dp),
+        border = BorderStroke(1.dp, MyShareSecondary.copy(alpha = 0.1f))
+    ) {
+        Row(
+            modifier = Modifier.padding(20.dp),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(iconColor.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = iconColor,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MyShareOnSurface
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    body,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MyShareSecondary,
+                    lineHeight = 20.sp
+                )
+            }
+
+            Text(
+                amount,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.ExtraBold,
+                color = MyShareOnSurface
+            )
+        }
+    }
+}
+
+@Composable
+fun ImpactSummaryCard(
+    title: String,
+    body: String,
+    reminderText: String
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MySharePrimaryContainer.copy(alpha = 0.5f)),
+        shape = RoundedCornerShape(24.dp)
+    ) {
+        Column(Modifier.padding(24.dp)) {
+            Text(
+                title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MySharePrimary
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                body,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MyShareOnSurface,
+                lineHeight = 24.sp
+            )
+            Spacer(Modifier.height(16.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.NotificationsActive,
+                    contentDescription = null,
+                    tint = MySharePrimary,
+                    modifier = Modifier.size(16.dp)
+                )
+                Text(
+                    reminderText,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MySharePrimary,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }
