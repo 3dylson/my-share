@@ -9,16 +9,20 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.components.PremiumChoiceCard
 import pt.ms.myshare.presentation.ui.components.PremiumTextField
 import pt.ms.myshare.presentation.ui.theme.*
 import java.math.BigDecimal
+import java.text.NumberFormat
+import java.util.Locale
 
 @Composable
 fun GoalPickerScreen(
@@ -32,6 +36,9 @@ fun GoalPickerScreen(
     var goalName by remember { mutableStateOf(initialGoalName) }
     var goalAmountText by remember { mutableStateOf(initialGoalAmount.toPlainString()) }
 
+    val currencySymbol = remember {
+        NumberFormat.getCurrencyInstance(Locale.getDefault()).currency?.symbol ?: ""
+    }
     val goalAmount = goalAmountText.toBigDecimalOrNull()
     val scrollState = rememberScrollState()
 
@@ -70,49 +77,70 @@ fun GoalPickerScreen(
                 onClick = onBack, 
                 contentPadding = PaddingValues(0.dp)
             ) { 
-                Text("Back", color = MyShareSecondary) 
+                Text(stringResource(R.string.back), color = MyShareSecondary) 
             }
             
             Spacer(Modifier.height(8.dp))
             
             Text(
-                "Pick your priority", 
+                stringResource(R.string.onboarding_goal_picker_title), 
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.ExtraBold,
+                textAlign = TextAlign.Center,
                 color = MyShareOnSurface
             )
             
             Text(
-                "We'll tailor your experience based on your current financial focus.", 
+                stringResource(R.string.onboarding_goal_picker_subtitle), 
                 color = MyShareSecondary,
                 style = MaterialTheme.typography.bodyLarge,
-                lineHeight = 24.sp
+                textAlign = TextAlign.Center,
+                lineHeight = 24.sp,
+                modifier = Modifier.padding(top = 16.dp)
             )
             
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(48.dp))
 
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                PlanningFocus.values().forEach { focus ->
-                    val (title, subtitle, icon) = when (focus) {
-                        PlanningFocus.SAVE_WITHOUT_STRESS -> Triple("Save without stress", "Build a safety net without overthinking.", Icons.Default.Savings)
-                        PlanningFocus.INVEST_WITH_DISCIPLINE -> Triple("Invest with discipline", "Market consistency starts with a plan.", Icons.Default.TrendingUp)
-                        PlanningFocus.STOP_OVERSPENDING -> Triple("Stop overspending", "Identify and plug the money leaks.", Icons.Default.Warning)
-                        PlanningFocus.PLAN_TOGETHER -> Triple("Plan together", "Coordinate finances with your partner.", Icons.Default.People)
-                    }
-                    PremiumChoiceCard(
-                        title = title,
-                        description = subtitle,
-                        isSelected = selectedFocus == focus,
-                        icon = icon,
-                        onClick = { setDefaultsForFocus(focus) }
-                    )
-                }
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                PremiumChoiceCard(
+                    title = stringResource(R.string.onboarding_goal_picker_emergency),
+                    description = "A safety net for life's surprises.",
+                    isSelected = selectedFocus == PlanningFocus.EMERGENCY_FUND,
+                    onClick = { selectedFocus = PlanningFocus.EMERGENCY_FUND }
+                )
+                PremiumChoiceCard(
+                    title = stringResource(R.string.onboarding_goal_picker_debt),
+                    description = "Breaking free from past obligations.",
+                    isSelected = selectedFocus == PlanningFocus.DEBT_PAYOFF,
+                    onClick = { selectedFocus = PlanningFocus.DEBT_PAYOFF }
+                )
+                PremiumChoiceCard(
+                    title = stringResource(R.string.onboarding_goal_picker_investment),
+                    description = "Making your capital work for you.",
+                    isSelected = selectedFocus == PlanningFocus.INVESTMENT,
+                    onClick = { selectedFocus = PlanningFocus.INVESTMENT }
+                )
+                PremiumChoiceCard(
+                    title = stringResource(R.string.onboarding_goal_picker_purchase),
+                    description = "Saving for a specific milestone or asset.",
+                    isSelected = selectedFocus == PlanningFocus.MAJOR_PURCHASE,
+                    onClick = { selectedFocus = PlanningFocus.MAJOR_PURCHASE }
+                )
+                PremiumChoiceCard(
+                    title = stringResource(R.string.onboarding_goal_picker_custom),
+                    description = "Define your own unique destination.",
+                    isSelected = selectedFocus == PlanningFocus.OTHER,
+                    onClick = { selectedFocus = PlanningFocus.OTHER }
+                )
             }
 
             Spacer(Modifier.height(40.dp))
 
             Text(
-                "Customize Goal", 
+                stringResource(R.string.onboarding_customize_goal), 
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MyShareOnSurface
@@ -122,15 +150,15 @@ fun GoalPickerScreen(
             PremiumTextField(
                 value = goalName,
                 onValueChange = { goalName = it },
-                label = "What are you saving for?",
-                placeholder = "e.g. Travel, House, Wedding"
+                label = stringResource(R.string.onboarding_goal_picker_label_name),
+                placeholder = stringResource(R.string.onboarding_goal_picker_placeholder_name)
             )
             Spacer(Modifier.height(16.dp))
             PremiumTextField(
                 value = goalAmountText,
                 onValueChange = { goalAmountText = it.replace(',', '.') },
-                label = "Target Amount",
-                prefix = { Text("€ ") },
+                label = stringResource(R.string.onboarding_goal_picker_label_amount),
+                prefix = { if (currencySymbol.isNotEmpty()) Text("$currencySymbol ") },
                 placeholder = "0.00",
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )
@@ -138,7 +166,7 @@ fun GoalPickerScreen(
             Spacer(Modifier.height(40.dp))
             
             PremiumButton(
-                text = "Continue",
+                text = stringResource(R.string.continue_button),
                 onClick = { onNext(selectedFocus, goalName.ifBlank { "Emergency fund" }, goalAmount ?: BigDecimal.ZERO) },
                 enabled = goalAmount != null && goalAmount > BigDecimal.ZERO
             )

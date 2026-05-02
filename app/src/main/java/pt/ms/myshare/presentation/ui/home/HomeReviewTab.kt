@@ -11,10 +11,16 @@ import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.unit.dp
+import pt.ms.myshare.R
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.theme.*
+import java.math.BigDecimal
+import java.text.NumberFormat
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 
 /**
  * Responsibility: Renders the Manual Review form and historical performance records.
@@ -35,7 +41,7 @@ fun LazyListScope.homeReviewTab(
     
     if (history.isNotEmpty()) {
         item {
-            PremiumSectionHeader(title = "Performance Insights")
+            PremiumSectionHeader(title = stringResource(R.string.home_review_performance_title))
             
             if (performanceStats.performanceTrend.isNotEmpty()) {
                 PremiumSparkline(
@@ -59,19 +65,19 @@ fun LazyListScope.homeReviewTab(
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Trust Score",
+                            text = stringResource(R.string.home_review_score_label),
                             style = MaterialTheme.typography.labelMedium,
                             color = MyShareSecondary,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "${performanceStats.healthScore}%",
+                            text = stringResource(R.string.home_review_streak_count, performanceStats.healthScore) + "%",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Black,
                             color = MyShareOnSurface
                         )
                         Text(
-                            text = "${performanceStats.totalReviews} reviews",
+                            text = stringResource(R.string.home_review_score_count, performanceStats.totalReviews),
                             style = MaterialTheme.typography.bodySmall,
                             color = MyShareOnSurfaceVariant
                         )
@@ -87,14 +93,14 @@ fun LazyListScope.homeReviewTab(
                     
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Current Streak",
+                            text = stringResource(R.string.home_review_streak_label),
                             style = MaterialTheme.typography.labelMedium,
                             color = MyShareSecondary,
                             fontWeight = FontWeight.Bold
                         )
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = "${performanceStats.currentStreak}",
+                                text = stringResource(R.string.home_review_streak_count, performanceStats.currentStreak),
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Black,
                                 color = MyShareOnSurface
@@ -108,7 +114,7 @@ fun LazyListScope.homeReviewTab(
                             )
                         }
                         Text(
-                            text = "Day streak",
+                            text = stringResource(R.string.home_review_streak_unit),
                             style = MaterialTheme.typography.bodySmall,
                             color = MyShareOnSurfaceVariant
                         )
@@ -118,11 +124,11 @@ fun LazyListScope.homeReviewTab(
             Spacer(Modifier.height(16.dp))
         }
 
-        if (performanceStats.totalFlexSavingsLabel.isNotEmpty() && performanceStats.totalFlexSavingsLabel != "$0.00") {
+        if (performanceStats.totalFlexSavingsLabel.isNotEmpty() && performanceStats.totalSavings > BigDecimal.ZERO) {
             item {
                 PremiumBenefitCard(
-                    title = "Excess Savings: ${performanceStats.totalFlexSavingsLabel}",
-                    description = "This is how much you've stayed under budget across all your sessions. Great job!",
+                    title = stringResource(R.string.home_review_savings_title, performanceStats.totalFlexSavingsLabel),
+                    description = stringResource(R.string.home_review_savings_desc),
                     icon = Icons.Default.Savings,
                     onClick = {}
                 )
@@ -131,9 +137,10 @@ fun LazyListScope.homeReviewTab(
         }
     }
 
+    val context = LocalContext.current
     if (coachingInsights.isNotEmpty() && isPremium) {
         item {
-            PremiumSectionHeader(title = "Coach's Corner")
+            PremiumSectionHeader(title = stringResource(R.string.home_review_coach_title))
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -141,6 +148,15 @@ fun LazyListScope.homeReviewTab(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 coachingInsights.forEach { insight ->
+                    val headline = remember(insight.headline) {
+                        val resId = context.resources.getIdentifier(insight.headline, "string", context.packageName)
+                        if (resId != 0) context.getString(resId) else insight.headline
+                    }
+                    val body = remember(insight.supportingText) {
+                        val resId = context.resources.getIdentifier(insight.supportingText, "string", context.packageName)
+                        if (resId != 0) context.getString(resId) else insight.supportingText
+                    }
+
                     val icon = when (insight.type) {
                         pt.ms.myshare.domain.model.InsightType.SUCCESS -> Icons.Default.CheckCircle
                         pt.ms.myshare.domain.model.InsightType.WARNING -> Icons.Default.Warning
@@ -148,8 +164,8 @@ fun LazyListScope.homeReviewTab(
                     }
 
                     PremiumBenefitCard(
-                        title = insight.headline,
-                        description = insight.supportingText,
+                        title = headline,
+                        description = body,
                         icon = icon,
                         onClick = {}
                     )
@@ -159,33 +175,50 @@ fun LazyListScope.homeReviewTab(
     }
 
     item {
-        PremiumSectionHeader(title = "The Habit Loop")
+        PremiumSectionHeader(title = stringResource(R.string.home_review_habit_title))
         PremiumInfoCard(
-            title = "Manual Check-in",
-            body = "Log actual spend vs. blueprint. This feedback loop is the key to financial awareness.",
+            title = stringResource(R.string.home_review_manual_title),
+            body = stringResource(R.string.home_review_manual_desc),
             icon = Icons.Default.HistoryEdu,
             backgroundColor = pt.ms.myshare.presentation.ui.theme.MySharePrimary.copy(alpha = 0.05f)
         )
     }
     item {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            val currencyFormat = remember { NumberFormat.getCurrencyInstance(Locale.getDefault()) }
+            
             PremiumSliderCard(
-                title = "Actual Flexible Spend",
+                title = stringResource(R.string.home_review_input_flex),
                 value = state.actualFlexibleSpend.toFloatOrNull() ?: 0f,
                 onValueChange = { onFlexibleSpendChanged(it.toInt().toString()) },
                 valueRange = 0f..5000f,
-                icon = Icons.Default.ShoppingCart
+                icon = Icons.Default.ShoppingCart,
+                formatValue = { currencyFormat.format(it) }
             )
             PremiumSliderCard(
-                title = "Actual Goal Contribution",
+                title = stringResource(R.string.home_review_input_goal),
                 value = state.actualGoalContribution.toFloatOrNull() ?: 0f,
                 onValueChange = { onGoalContributionChanged(it.toInt().toString()) },
                 valueRange = 0f..5000f,
-                icon = Icons.Default.Flag
+                icon = Icons.Default.Flag,
+                formatValue = { currencyFormat.format(it) }
             )
 
+            if (state.error != null) {
+                val errorMessage = remember(state.error) {
+                    val resId = context.resources.getIdentifier(state.error, "string", context.packageName)
+                    if (resId != 0) context.getString(resId) else state.error
+                }
+                Text(
+                    text = errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = 4.dp, start = 4.dp)
+                )
+            }
+
             PremiumButton(
-                text = "Submit Review",
+                text = stringResource(R.string.home_review_submit),
                 onClick = onSaveReview,
                 modifier = Modifier.padding(top = 8.dp)
             )
@@ -193,14 +226,14 @@ fun LazyListScope.homeReviewTab(
     }
 
     item {
-        PremiumSectionHeader(title = "Historical Performance")
+        PremiumSectionHeader(title = stringResource(R.string.home_review_history_title))
     }
 
     if (history.isEmpty()) {
         item {
             PremiumBenefitCard(
-                title = "No History Yet",
-                description = "Complete your first review above to start building a timeline of your financial mastery.",
+                title = stringResource(R.string.home_review_empty_history_title),
+                description = stringResource(R.string.home_review_empty_history_desc),
                 icon = Icons.Default.BarChart,
                 onClick = {}
             )
@@ -213,8 +246,8 @@ fun LazyListScope.homeReviewTab(
                 Column(modifier = Modifier.animateItemPlacement()) {
                     PremiumMetricCard(
                         label = item.dateLabel,
-                        value = "Flex: ${item.flexibleSpendLabel}",
-                        subtitle = "Target: ${item.plannedFlexibleLabel} (${item.flexibleDeltaLabel})",
+                        value = stringResource(R.string.home_review_history_flex, item.flexibleSpendLabel),
+                        subtitle = stringResource(R.string.home_review_history_flex_target, item.plannedFlexibleLabel, item.flexibleDeltaLabel),
                         icon = if (item.isPositive) Icons.Default.TrendingDown else Icons.Default.TrendingUp,
                         color = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error,
                         indicatorColor = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error,
@@ -222,9 +255,9 @@ fun LazyListScope.homeReviewTab(
                     )
                     Spacer(Modifier.height(12.dp))
                     PremiumMetricCard(
-                        label = "Goal contribution",
+                        label = stringResource(R.string.home_review_history_goal),
                         value = item.goalContributionLabel,
-                        subtitle = "Plan: ${item.plannedGoalLabel} (${item.goalDeltaLabel})",
+                        subtitle = stringResource(R.string.home_review_history_goal_plan, item.plannedGoalLabel, item.goalDeltaLabel),
                         icon = if (item.isPositive) Icons.Default.Flag else Icons.Default.OutlinedFlag,
                         color = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error,
                         indicatorColor = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error,
@@ -237,8 +270,8 @@ fun LazyListScope.homeReviewTab(
         if (!isPremium && history.size > 1) {
             item {
                 PremiumBenefitCard(
-                    title = "Trajectory Insights",
-                    description = "Upgrade to see the full list of past performances and detect spending patterns over time.",
+                    title = stringResource(R.string.home_review_history_trajectory_title),
+                    description = stringResource(R.string.home_review_history_trajectory_desc),
                     icon = Icons.Default.Lock,
                     onClick = onShowPaywall
                 )

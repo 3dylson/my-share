@@ -30,8 +30,8 @@ class GetCoachingInsightsUseCase @Inject constructor(
         if (goalSuccessCount >= 3) {
             insights.add(createInsight(
                 preview, latestReview,
-                "Consistency King",
-                "You've hit your goal target 3 times in a row. Your discipline is building real wealth. Keep this momentum!",
+                "coaching_consistency_king_headline",
+                "coaching_consistency_king_body",
                 InsightType.SUCCESS
             ))
         }
@@ -44,10 +44,10 @@ class GetCoachingInsightsUseCase @Inject constructor(
         if (flexSurplusCount >= 3) {
             insights.add(createInsight(
                 preview, latestReview,
-                "Hidden Opportunity",
-                "You consistently spend less than your flexible budget. Consider moving some of this extra 'buffer' to your goals.",
+                "coaching_hidden_opportunity_headline",
+                "coaching_hidden_opportunity_body",
                 InsightType.TIP,
-                "Optimize Rules"
+                "coaching_hidden_opportunity_action"
             ))
         }
 
@@ -64,8 +64,8 @@ class GetCoachingInsightsUseCase @Inject constructor(
                  if (lastThreeFlexDeltas[0] > lastThreeFlexDeltas[1] && lastThreeFlexDeltas[1] > lastThreeFlexDeltas[2]) {
                     insights.add(createInsight(
                         preview, latestReview,
-                        "Spending Drift",
-                        "Your flexible spending has increased for 3 consecutive periods. A quick check-in on non-essentials might be helpful.",
+                        "coaching_spending_drift_headline",
+                        "coaching_spending_drift_body",
                         InsightType.WARNING
                     ))
                  }
@@ -76,8 +76,8 @@ class GetCoachingInsightsUseCase @Inject constructor(
         if (insights.isEmpty() && history.size == 1) {
             insights.add(createInsight(
                 preview, latestReview,
-                "First Step Mastery",
-                "Great start with your first review! The more you log, the smarter your habit loop becomes.",
+                "coaching_first_step_headline",
+                "coaching_first_step_body",
                 InsightType.TIP
             ))
         }

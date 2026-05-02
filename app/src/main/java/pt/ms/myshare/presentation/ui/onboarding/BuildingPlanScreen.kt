@@ -7,13 +7,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.delay
-import pt.ms.myshare.presentation.ui.theme.*
+import androidx.compose.ui.res.stringResource
+import pt.ms.myshare.R
 
 @Composable
 fun BuildingPlanScreen(onBuilt: () -> Unit) {
@@ -57,14 +52,14 @@ fun BuildingPlanScreen(onBuilt: () -> Unit) {
             Spacer(modifier = Modifier.height(56.dp))
             
             Text(
-                "Finalizing Blueprint",
+                stringResource(R.string.onboarding_building_title),
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Black,
                 color = MyShareOnSurface
             )
             
             Text(
-                "Personalizing your logic and safety nets based on your journey.",
+                stringResource(R.string.onboarding_building_subtitle),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MyShareSecondary,
                 lineHeight = 24.sp,
@@ -74,9 +69,9 @@ fun BuildingPlanScreen(onBuilt: () -> Unit) {
             Spacer(modifier = Modifier.height(48.dp))
             
             Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
-                AnimatedStep(visible = step1Visible, text = "Aligning with your goals")
-                AnimatedStep(visible = step2Visible, text = "Structuring fixed costs")
-                AnimatedStep(visible = step3Visible, text = "Calculating weekly safe-to-spend")
+                AnimatedStep(visible = step1Visible, text = stringResource(R.string.onboarding_building_step_goals))
+                AnimatedStep(visible = step2Visible, text = stringResource(R.string.onboarding_building_step_costs))
+                AnimatedStep(visible = step3Visible, text = stringResource(R.string.onboarding_building_step_savings))
             }
         }
     }

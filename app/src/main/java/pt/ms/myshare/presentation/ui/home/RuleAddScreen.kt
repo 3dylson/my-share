@@ -12,10 +12,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.PaydayRuleType
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.theme.MyShareBackground
@@ -64,8 +66,8 @@ fun RuleAddScreen(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete Rule") },
-            text = { Text("Are you sure you want to remove this payday rule? Your calculations will be updated immediately.") },
+            title = { Text(stringResource(R.string.rule_add_delete_confirm_title)) },
+            text = { Text(stringResource(R.string.rule_add_delete_confirm_msg)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -74,12 +76,12 @@ fun RuleAddScreen(
                     },
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.rule_add_delete_confirm_btn))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.rule_add_delete_cancel_btn))
                 }
             }
         )
@@ -91,13 +93,13 @@ fun RuleAddScreen(
             CenterAlignedTopAppBar(
                 title = { 
                     Text(
-                        text = if (state.ruleId != null) "Edit Rule" else "New Allocation", 
+                        text = if (state.ruleId != null) stringResource(R.string.rule_add_title_edit) else stringResource(R.string.rule_add_title_new), 
                         style = MaterialTheme.typography.titleLarge
                     ) 
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.rule_add_back))
                     }
                 },
                 actions = {
@@ -105,7 +107,7 @@ fun RuleAddScreen(
                         IconButton(onClick = { showDeleteDialog = true }) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete Rule",
+                                contentDescription = stringResource(R.string.rule_add_delete),
                                 tint = MaterialTheme.colorScheme.error
                             )
                         }
@@ -129,26 +131,26 @@ fun RuleAddScreen(
             Spacer(modifier = Modifier.height(8.dp))
             
             PremiumAppHeader(
-                title = if (state.ruleId != null) "Refine Logic" else "Dynamic Rule",
-                subtitle = "Set how your money splits every payday."
+                title = if (state.ruleId != null) stringResource(R.string.rule_add_header_title_edit) else stringResource(R.string.rule_add_header_title_new),
+                subtitle = stringResource(R.string.rule_add_header_subtitle_new)
             )
 
             PremiumInfoCard(
-                title = "Rule Precision",
-                body = "Rules are applied after fixed costs. Percentage rules are relative to remaining income.",
+                title = stringResource(R.string.rule_add_info_title),
+                body = stringResource(R.string.rule_add_info_body),
                 icon = Icons.Default.Settings
             )
 
             PremiumTextField(
                 value = state.name,
                 onValueChange = onNameChanged,
-                label = "Rule Name",
-                placeholder = "e.g. Rainy Day Fund"
+                label = stringResource(R.string.rule_add_label_name),
+                placeholder = stringResource(R.string.rule_add_hint_name)
             )
 
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = "Allocation Type",
+                    text = stringResource(R.string.rule_add_label_type),
                     style = MaterialTheme.typography.labelLarge,
                     color = MyShareSecondary,
                     modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
@@ -160,7 +162,7 @@ fun RuleAddScreen(
                     FilterChip(
                         selected = state.isPercentage,
                         onClick = { onPercentageToggle(true) },
-                        label = { Text("Percentage (%)") },
+                        label = { Text(stringResource(R.string.rule_add_type_percentage)) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = MySharePrimary.copy(alpha = 0.1f),
                             selectedLabelColor = MySharePrimary,
@@ -170,7 +172,7 @@ fun RuleAddScreen(
                     FilterChip(
                         selected = !state.isPercentage,
                         onClick = { onPercentageToggle(false) },
-                        label = { Text("Fixed Amount ($)") },
+                        label = { Text(stringResource(R.string.rule_add_type_fixed)) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = MySharePrimary.copy(alpha = 0.1f),
                             selectedLabelColor = MySharePrimary,
@@ -183,11 +185,11 @@ fun RuleAddScreen(
             PremiumTextField(
                 value = state.amount,
                 onValueChange = onAmountChanged,
-                label = if (state.isPercentage) "Percentage Rate" else "Fixed Amount",
-                placeholder = if (state.isPercentage) "e.g. 10" else "e.g. 100",
+                label = if (state.isPercentage) stringResource(R.string.rule_add_label_rate) else stringResource(R.string.rule_add_label_amount),
+                placeholder = if (state.isPercentage) stringResource(R.string.rule_add_hint_rate) else stringResource(R.string.rule_add_hint_amount),
                 prefix = { 
                     Text(
-                        text = if (state.isPercentage) "% " else "$ ", 
+                        text = if (state.isPercentage) stringResource(R.string.percentage_prefix) else stringResource(R.string.currency_prefix), 
                         color = MyShareSecondary
                     ) 
                 }
@@ -195,7 +197,7 @@ fun RuleAddScreen(
 
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = "Category",
+                    text = stringResource(R.string.rule_add_label_category),
                     style = MaterialTheme.typography.labelLarge,
                     color = MyShareSecondary,
                     modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
@@ -230,7 +232,7 @@ fun RuleAddScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             PremiumButton(
-                text = if (state.isLoading) "Processing..." else if (state.ruleId != null) "Update Rule" else "Save Rule",
+                text = if (state.isLoading) stringResource(R.string.rule_add_button_loading) else if (state.ruleId != null) stringResource(R.string.rule_add_button_edit) else stringResource(R.string.rule_add_button_new),
                 onClick = onSave,
                 enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()

@@ -23,7 +23,9 @@ data class HomePlanCardState(
     val savingsLabel: String = "",
     val investingLabel: String = "",
     val weeklySpendLabel: String = "",
-    val summary: String = ""
+    val summary: String = "",
+    val nextPaydayKey: String? = null,
+    val nextPaydayArgs: List<String> = emptyList()
 )
 
 data class GoalCardState(
@@ -33,7 +35,12 @@ data class GoalCardState(
     val progress: Float = 0f,
     val progressLabel: String = "",
     val targetDateLabel: String = "",
-    val progressNote: String = ""
+    val targetDateKey: String? = null,
+    val targetDateArgs: List<String> = emptyList(),
+    val progressLabelKey: String? = null,
+    val progressLabelArgs: List<String> = emptyList(),
+    val progressNote: String = "",
+    val progressNoteKey: String? = null
 )
 
 data class ReviewCardState(
@@ -63,6 +70,7 @@ data class RuleCardState(
 data class MoreCardState(
     val reminderEnabled: Boolean = false,
     val reminderLabel: String = "",
+    val reminderLabelKey: String? = null,
     val automationEnabled: Boolean = false,
     val pricingStrategy: PricingStrategy? = null,
     val actualMonthlyPrice: String? = null,
@@ -90,6 +98,7 @@ data class PerformanceStatsState(
     val healthScore: Int = 0,
     val currentStreak: Int = 0,
     val totalFlexSavingsLabel: String = "",
+    val totalSavings: java.math.BigDecimal = java.math.BigDecimal.ZERO,
     val totalReviews: Int = 0,
     val performanceTrend: List<Float> = emptyList() // Values 0..1 for sparkline
 )

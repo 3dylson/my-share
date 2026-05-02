@@ -15,8 +15,8 @@ class ResolvePricingStrategyUseCase @Inject constructor() {
                 annualLabel = localizedCurrency(locale, annualMinor = 3999),
                 heroPlan = BillingPlan.MONTHLY,
                 trialDays = 7,
-                paywallHeadline = "Keep your payday plan running on autopilot",
-                paywallSubhead = "Monthly is the easier starting point here. Annual stays available once the value is clear."
+                paywallHeadline = "paywall_headline_emerging",
+                paywallSubhead = "paywall_subhead_emerging"
             )
             "BR" -> PricingStrategy(
                 marketCluster = "brazil_monthly_first",
@@ -24,8 +24,8 @@ class ResolvePricingStrategyUseCase @Inject constructor() {
                 annualLabel = localizedCurrency(locale, annualMinor = 8999),
                 heroPlan = BillingPlan.MONTHLY,
                 trialDays = 7,
-                paywallHeadline = "Turn your salary plan into a repeatable routine",
-                paywallSubhead = "Monthly is highlighted first. Annual is there for committed users."
+                paywallHeadline = "paywall_headline_brazil",
+                paywallSubhead = "paywall_subhead_brazil"
             )
             else -> PricingStrategy(
                 marketCluster = "rest_of_world_annual_first",
@@ -33,8 +33,8 @@ class ResolvePricingStrategyUseCase @Inject constructor() {
                 annualLabel = localizedCurrency(locale, annualMinor = 4999),
                 heroPlan = BillingPlan.ANNUAL,
                 trialDays = 7,
-                paywallHeadline = "Automate the plan you just built",
-                paywallSubhead = "Annual is highlighted where subscription tolerance is stronger."
+                paywallHeadline = "paywall_headline_default",
+                paywallSubhead = "paywall_subhead_default"
             )
         }
     }
@@ -42,8 +42,8 @@ class ResolvePricingStrategyUseCase @Inject constructor() {
     private fun localizedCurrency(locale: Locale, monthlyMinor: Int? = null, annualMinor: Int? = null): String {
         val format = java.text.NumberFormat.getCurrencyInstance(locale)
         return when {
-            monthlyMinor != null -> "${format.format(monthlyMinor / 100.0)} / month"
-            annualMinor != null -> "${format.format(annualMinor / 100.0)} / year"
+            monthlyMinor != null -> format.format(monthlyMinor / 100.0)
+            annualMinor != null -> format.format(annualMinor / 100.0)
             else -> error("Either monthlyMinor or annualMinor must be provided")
         }
     }

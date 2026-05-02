@@ -241,14 +241,11 @@ class HomeViewModel @Inject constructor(
     private fun buildPlanCard(plan: pt.ms.myshare.domain.model.SalaryPlan, goalAmount: BigDecimal): HomePlanCardState {
         val preview = calculatePlanPreviewUseCase.execute(plan, goalAmount)
         return HomePlanCardState(
-            nextPaydayLabel = "Next payday ${preview.nextPayday.format(dateFormatter)}",
-            incomeLabel = currencyFormat.format(preview.incomePerPayday),
-            fixedCostsLabel = currencyFormat.format(preview.fixedCostsPerPayday),
-            flexibleSpendLabel = currencyFormat.format(preview.flexibleSpendPerPayday),
-            savingsLabel = currencyFormat.format(preview.savingsPerPayday),
             investingLabel = currencyFormat.format(preview.investingPerPayday.add(preview.cryptoPerPayday)),
             weeklySpendLabel = currencyFormat.format(preview.weeklyFlexibleSpend),
-            summary = preview.summary
+            summary = preview.summary,
+            nextPaydayKey = "home_plan_next_payday",
+            nextPaydayArgs = listOf(preview.nextPayday.format(dateFormatter))
         )
     }
 
@@ -257,9 +254,13 @@ class HomeViewModel @Inject constructor(
             calculatePlanPreviewUseCase.execute(plan, goal.targetAmount)
         } else null
 
-        val targetDateLabel = if (goal.isCompleted) "Mission Accomplished!" else {
-            preview?.goalTargetDate?.let { "On pace for ${it.month.name.lowercase().replaceFirstChar(Char::titlecase)} ${it.year}" }
-                ?: "Add more goal contribution to see a target date"
+        val (targetDateKey, targetDateArgs) = if (goal.isCompleted) {
+            "home_goal_mission_accomplished" to emptyList()
+        } else {
+            preview?.goalTargetDate?.let { 
+                val monthStr = it.month.name.lowercase().replaceFirstChar(Char::titlecase)
+                "home_goal_on_pace" to listOf("$monthStr ${it.year}")
+            } ?: ("home_goal_no_trajectory" to emptyList())
         }
         
         val progressPercent = if (goal.targetAmount > BigDecimal.ZERO) {
@@ -271,9 +272,11 @@ class HomeViewModel @Inject constructor(
             goalName = goal.name,
             goalAmountLabel = currencyFormat.format(goal.targetAmount),
             progress = progressPercent,
-            progressLabel = "${currencyFormat.format(goal.currentProgress)} of ${currencyFormat.format(goal.targetAmount)}",
-            targetDateLabel = targetDateLabel,
-            progressNote = if (goal.isCompleted) "Goal reached. Start your next vision!" else "Track your trajectory here."
+            progressLabelKey = "home_goal_progress_label",
+            progressLabelArgs = listOf(currencyFormat.format(goal.currentProgress), currencyFormat.format(goal.targetAmount)),
+            targetDateKey = targetDateKey,
+            targetDateArgs = targetDateArgs,
+            progressNoteKey = if (goal.isCompleted) "home_goal_note_completed" else "home_goal_note_tracking"
         )
     }
 
@@ -318,16 +321,15 @@ class HomeViewModel @Inject constructor(
     }
 
     fun saveReview() {
-        val currentPlan = uiState.value.plan
         if (currentPlan == null) {
-            uiState.update { it.copy(reviewCard = it.reviewCard.copy(error = "Create a plan before saving a review.")) }
+            uiState.update { it.copy(reviewCard = it.reviewCard.copy(error = "home_review_error_no_plan")) }
             return
         }
 
         val actualFlexible = uiState.value.reviewCard.actualFlexibleSpend.toBigDecimalOrNull()
         val actualGoal = uiState.value.reviewCard.actualGoalContribution.toBigDecimalOrNull()
         if (actualFlexible == null || actualGoal == null) {
-            uiState.update { it.copy(reviewCard = it.reviewCard.copy(error = "Enter valid amounts for both review fields.")) }
+            uiState.update { it.copy(reviewCard = it.reviewCard.copy(error = "home_review_error_invalid_amounts")) }
             return
         }
 
@@ -358,6 +360,11 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private fun updateReminderState(enabled: Boolean) {
+        val labelKey = if (enabled) "home_more_reminders_on" else "home_more_reminders_off"
+        _uiState.update { it.copy(moreCard = it.moreCard.copy(reminderEnabled = enabled, reminderLabelKey = labelKey)) }
+    }
+
     fun chooseBillingPlan(plan: BillingPlan) {
         uiState.update { it.copy(moreCard = it.moreCard.copy(selectedBillingPlan = plan)) }
     }
@@ -373,7 +380,7 @@ class HomeViewModel @Inject constructor(
                 FirebaseUtils.logEvent("purchase_started")
             } else {
                 // If products are not loaded, show error
-                uiState.update { it.copy(moreCard = it.moreCard.copy(error = "Products not loaded yet. Please check your internet connection.")) }
+                uiState.update { it.copy(moreCard = it.moreCard.copy(error = "more_error_products_not_loaded")) }
                 Timber.tag(TAG).e("Cannot purchase: Product %s not found in store", storeProductId)
             }
         }
@@ -399,6 +406,7 @@ class HomeViewModel @Inject constructor(
             healthScore = healthScore,
             currentStreak = currentStreak,
             totalFlexSavingsLabel = currencyFormat.format(totalSavingsBeyondGoal),
+            totalSavings = totalSavingsBeyondGoal,
             totalReviews = totalReviews,
             performanceTrend = trend
         )

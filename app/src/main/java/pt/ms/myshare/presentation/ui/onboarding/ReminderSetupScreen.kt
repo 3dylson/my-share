@@ -13,11 +13,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.components.PremiumChoiceCard
@@ -40,7 +42,7 @@ fun ReminderSetupScreen(
             if (granted) {
                 onConfirm(time, cadence)
             } else {
-                message = "Notifications stayed off. You can still use the plan and turn reminders on later."
+                message = context.getString(R.string.onboarding_reminder_error_permission)
             }
         }
     )
@@ -68,7 +70,7 @@ fun ReminderSetupScreen(
             Spacer(Modifier.height(40.dp))
             
             Text(
-                "Stay on track",
+                stringResource(R.string.onboarding_reminder_title),
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.ExtraBold,
                 textAlign = TextAlign.Center,
@@ -76,7 +78,7 @@ fun ReminderSetupScreen(
             )
             
             Text(
-                "Consistent check-ins are the key to building wealth. We'll send a gentle nudge to help you follow your plan.",
+                stringResource(R.string.onboarding_reminder_subtitle),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MyShareSecondary,
                 textAlign = TextAlign.Center,
@@ -89,14 +91,14 @@ fun ReminderSetupScreen(
             // Cadence Selection
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 PremiumChoiceCard(
-                    title = "Every Payday",
-                    description = "Stay aligned with your plan at every income event.",
+                    title = stringResource(R.string.onboarding_reminder_cadence_payday),
+                    description = stringResource(R.string.onboarding_reminder_cadence_payday_desc),
                     isSelected = cadence == ReminderCadence.PAYDAY,
                     onClick = { cadence = ReminderCadence.PAYDAY }
                 )
                 PremiumChoiceCard(
-                    title = "Weekly Review",
-                    description = "Reflect and adjust your progress every Sunday.",
+                    title = stringResource(R.string.onboarding_reminder_cadence_weekly),
+                    description = stringResource(R.string.onboarding_reminder_cadence_weekly_desc),
                     isSelected = cadence == ReminderCadence.WEEKLY_REVIEW,
                     onClick = { cadence = ReminderCadence.WEEKLY_REVIEW }
                 )
@@ -107,7 +109,7 @@ fun ReminderSetupScreen(
             // Time Selector
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    "Reminder Time",
+                    stringResource(R.string.onboarding_reminder_time_title),
                     style = MaterialTheme.typography.labelLarge,
                     color = MySharePrimary,
                     fontWeight = FontWeight.Bold
@@ -157,7 +159,7 @@ fun ReminderSetupScreen(
             Spacer(Modifier.weight(1f))
 
             PremiumButton(
-                text = "Enable Reminders",
+                text = stringResource(R.string.onboarding_reminder_button),
                 onClick = { requestPermissionIfNeeded() }
             )
             
@@ -166,7 +168,7 @@ fun ReminderSetupScreen(
                 modifier = Modifier.fillMaxWidth().height(56.dp)
             ) {
                 Text(
-                    "I’ll do this later", 
+                    stringResource(R.string.onboarding_reminder_skip), 
                     style = MaterialTheme.typography.labelLarge, 
                     color = MyShareSecondary
                 )

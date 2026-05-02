@@ -264,19 +264,19 @@ private fun HomeScreenPreview() {
                 selectedDestination = HomeDestination.PLAN,
                 planCard = HomePlanCardState(
                     nextPaydayLabel = "Payday: 2 April",
-                    incomeLabel = "€1,500.00",
-                    fixedCostsLabel = "€620.00",
-                    flexibleSpendLabel = "€380.00",
-                    savingsLabel = "€300.00",
-                    investingLabel = "€120.00",
-                    weeklySpendLabel = "€87.00",
+                    incomeLabel = "$1,500.00",
+                    fixedCostsLabel = "$620.00",
+                    flexibleSpendLabel = "$380.00",
+                    savingsLabel = "$300.00",
+                    investingLabel = "$120.00",
+                    weeklySpendLabel = "$87.00",
                     summary = "A calm split that protects essentials and builds savings."
                 ),
                 goals = listOf(
                     GoalCardState(
                         id = "1",
                         goalName = "Emergency Fund",
-                        goalAmountLabel = "€3,000.00",
+                        goalAmountLabel = "$3,000.00",
                         targetDateLabel = "On pace for November 2026",
                         progressNote = "Consistency is your greatest asset."
                     )

@@ -9,10 +9,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import pt.ms.myshare.R
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.theme.MyShareBackground
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
@@ -56,8 +58,8 @@ fun GoalAddScreen(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete Goal") },
-            text = { Text("Are you sure you want to remove this financial milestone? This action cannot be undone.") },
+            title = { Text(stringResource(R.string.goal_add_delete_confirm_title)) },
+            text = { Text(stringResource(R.string.goal_add_delete_confirm_msg)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -66,12 +68,12 @@ fun GoalAddScreen(
                     },
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.goal_add_delete_confirm_btn))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.goal_add_delete_cancel_btn))
                 }
             }
         )
@@ -83,13 +85,13 @@ fun GoalAddScreen(
             CenterAlignedTopAppBar(
                 title = { 
                     Text(
-                        text = if (state.goalId != null) "Edit Goal" else "Add New Goal", 
+                        text = if (state.goalId != null) stringResource(R.string.goal_add_title_edit) else stringResource(R.string.goal_add_title_new), 
                         style = MaterialTheme.typography.titleLarge
                     ) 
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.goal_add_back))
                     }
                 },
                 actions = {
@@ -97,7 +99,7 @@ fun GoalAddScreen(
                         IconButton(onClick = { showDeleteDialog = true }) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete Goal",
+                                contentDescription = stringResource(R.string.goal_add_delete),
                                 tint = MaterialTheme.colorScheme.error
                             )
                         }
@@ -118,29 +120,29 @@ fun GoalAddScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             PremiumAppHeader(
-                title = if (state.goalId != null) "Refine Milestone" else "Vision Expansion",
-                subtitle = if (state.goalId != null) "Adjust your target and keep pushing." else "Define your next financial milestone."
+                title = if (state.goalId != null) stringResource(R.string.goal_add_header_title_edit) else stringResource(R.string.goal_add_header_title_new),
+                subtitle = if (state.goalId != null) stringResource(R.string.goal_add_header_subtitle_edit) else stringResource(R.string.goal_add_header_subtitle_new)
             )
 
             PremiumInfoCard(
-                title = "Multiple Goals",
-                body = "You can now track multiple goals simultaneously. This helps you split your savings effectively.",
+                title = stringResource(R.string.goal_add_info_title),
+                body = stringResource(R.string.goal_add_info_body),
                 icon = Icons.Default.Flag
             )
 
             PremiumTextField(
                 value = state.name,
                 onValueChange = onNameChanged,
-                label = "Goal Name",
-                placeholder = "e.g. New Home Deposit"
+                label = stringResource(R.string.goal_add_label_name),
+                placeholder = stringResource(R.string.goal_add_hint_name)
             )
 
             PremiumTextField(
                 value = state.amount,
                 onValueChange = onAmountChanged,
-                label = "Target Amount",
-                placeholder = "e.g. 50000",
-                prefix = { Text("$ ", color = MyShareSecondary) }
+                label = stringResource(R.string.goal_add_label_amount),
+                placeholder = stringResource(R.string.goal_add_hint_amount),
+                prefix = { Text(stringResource(R.string.currency_prefix), color = MyShareSecondary) }
             )
 
             if (state.error != null) {
@@ -154,7 +156,7 @@ fun GoalAddScreen(
             Spacer(modifier = Modifier.weight(1f))
 
             PremiumButton(
-                text = if (state.isLoading) "Processing..." else if (state.goalId != null) "Update Goal" else "Save Goal",
+                text = if (state.isLoading) stringResource(R.string.goal_add_button_loading) else if (state.goalId != null) stringResource(R.string.goal_add_button_edit) else stringResource(R.string.goal_add_button_new),
                 onClick = onSave,
                 enabled = !state.isLoading,
                 modifier = Modifier.fillMaxWidth()

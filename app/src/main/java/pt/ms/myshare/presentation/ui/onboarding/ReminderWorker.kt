@@ -42,8 +42,8 @@ class ReminderWorker(
         }
         if (!shouldNotify) return Result.success()
 
-        val notificationText = buildPaydayNotificationMessageUseCase.execute(plan)
-        showNotification(notificationText)
+        val content = buildPaydayNotificationMessageUseCase.execute(plan)
+        showNotification(content)
         Timber.tag(TAG).d("Reminder delivered cadence=%s", reminderConfiguration.cadence)
         return Result.success()
     }
@@ -61,15 +61,26 @@ class ReminderWorker(
         }
     }
 
-    private fun showNotification(text: String) {
+    private fun showNotification(content: pt.ms.myshare.domain.use_case.NotificationContent) {
         val permissionState = ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.POST_NOTIFICATIONS)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU && permissionState != android.content.pm.PackageManager.PERMISSION_GRANTED) {
             Timber.tag(TAG).w("Skipping notification because POST_NOTIFICATIONS is not granted")
             return
         }
+
+        val resId = applicationContext.resources.getIdentifier(content.messageKey, "string", applicationContext.packageName)
+        val text = if (resId != 0) {
+            applicationContext.getString(resId, *content.messageArgs.toTypedArray())
+        } else content.messageKey
+
+        val titleResId = applicationContext.resources.getIdentifier(content.titleKey, "string", applicationContext.packageName)
+        val title = if (titleResId != 0) {
+            applicationContext.getString(titleResId)
+        } else applicationContext.getString(R.string.app_name)
+
         val notification = NotificationCompat.Builder(applicationContext, MyShareApp.CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle(applicationContext.getString(R.string.app_name))
+            .setContentTitle(title)
             .setContentText(text)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .build()

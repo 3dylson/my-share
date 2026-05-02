@@ -23,35 +23,35 @@ class CreateReviewInsightUseCase @Inject constructor(
 
         val headline = when (plan.focus) {
             pt.ms.myshare.domain.model.PlanningFocus.SAVE_WITHOUT_STRESS -> {
-                if (!isGoalShort) "Safety net growing" else "Buffer needs priority"
+                if (!isGoalShort) "insight_review_save_stress_success_headline" else "insight_review_save_stress_failure_headline"
             }
             pt.ms.myshare.domain.model.PlanningFocus.INVEST_WITH_DISCIPLINE -> {
-                if (!isGoalShort) "Discipline paying off" else "Consistency gap detected"
+                if (!isGoalShort) "insight_review_invest_discipline_success_headline" else "insight_review_invest_discipline_failure_headline"
             }
             pt.ms.myshare.domain.model.PlanningFocus.STOP_OVERSPENDING -> {
-                if (!isOverspending) "Budget mastered" else "Leakage detected"
+                if (!isOverspending) "insight_review_stop_overspending_success_headline" else "insight_review_stop_overspending_failure_headline"
             }
             pt.ms.myshare.domain.model.PlanningFocus.PLAN_TOGETHER -> {
-                if (!isOverspending && !isGoalShort) "Harmony achieved" else "Plan needs alignment"
+                if (!isOverspending && !isGoalShort) "insight_review_plan_together_success_headline" else "insight_review_plan_together_failure_headline"
             }
         }
 
         val supportingText = when (plan.focus) {
             pt.ms.myshare.domain.model.PlanningFocus.SAVE_WITHOUT_STRESS -> {
-                if (!isGoalShort) "You're successfully building your cushion. Even if flexible spending varied, your core safety is intact."
-                else "Your savings contribution dipped. Try to protect those first to maintain your peace of mind."
+                if (!isGoalShort) "insight_review_save_stress_success_body"
+                else "insight_review_save_stress_failure_body"
             }
             pt.ms.myshare.domain.model.PlanningFocus.INVEST_WITH_DISCIPLINE -> {
-                if (!isGoalShort) "Market exposure is holding steady. This consistency is exactly what builds long-term wealth."
-                else "Discipline slipped this cycle. Remember, small gaps today have a large impact on your future compounding."
+                if (!isGoalShort) "insight_review_invest_discipline_success_body"
+                else "insight_review_invest_discipline_failure_body"
             }
             pt.ms.myshare.domain.model.PlanningFocus.STOP_OVERSPENDING -> {
-                if (!isOverspending) "You stayed within your flexible budget! This is a major win for your new financial habits."
-                else "Flexible spending ran ${flexibleDelta.abs()} over plan. Scan your transactions to see where the leak happened."
+                if (!isOverspending) "insight_review_stop_overspending_success_body"
+                else "insight_review_stop_overspending_failure_body"
             }
             pt.ms.myshare.domain.model.PlanningFocus.PLAN_TOGETHER -> {
-                if (!isOverspending && !isGoalShort) "You maintained perfect alignment with the shared blueprint. Progress is visible and stable."
-                else "There's a drift between the plan and reality. A quick check-in can help get the logic back on track."
+                if (!isOverspending && !isGoalShort) "insight_review_plan_together_success_body"
+                else "insight_review_plan_together_failure_body"
             }
         }
 

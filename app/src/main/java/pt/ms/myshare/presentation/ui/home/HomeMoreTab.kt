@@ -12,10 +12,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.remember
+import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.theme.*
@@ -36,7 +40,7 @@ fun LazyListScope.homeMoreTab(
 ) {
     item {
         PremiumProfileHeader(
-            email = state.userEmail ?: "Guest User",
+            email = state.userEmail ?: stringResource(R.string.home_more_guest),
             isPremium = state.isPremium,
             modifier = Modifier.padding(bottom = 24.dp)
         )
@@ -45,28 +49,41 @@ fun LazyListScope.homeMoreTab(
     if (!state.isPremium) {
         item {
             Column(modifier = Modifier.padding(bottom = 24.dp)) {
-                PremiumSectionHeader(title = "Go Unlimited")
+                PremiumSectionHeader(title = stringResource(R.string.home_more_premium_title))
                 PremiumPaywallCard(
-                    title = "Annual Membership",
+                    title = stringResource(R.string.home_more_annual_title),
                     price = state.actualAnnualPrice ?: "$49.99",
-                    period = "year",
-                    description = "Unlock automation, multiple goals, and detailed sync.",
-                    badge = "60% OFF",
+                    period = stringResource(R.string.period_year),
+                    description = stringResource(R.string.home_more_annual_desc),
+                    badge = stringResource(R.string.home_more_annual_badge),
                     isSelected = state.selectedBillingPlan == BillingPlan.ANNUAL,
                     onClick = { onBillingPlanSelected(BillingPlan.ANNUAL) }
                 )
                 Spacer(Modifier.height(12.dp))
                 PremiumPaywallCard(
-                    title = "Monthly Membership",
+                    title = stringResource(R.string.home_more_monthly_title),
                     price = state.actualMonthlyPrice ?: "$5.99",
-                    period = "month",
-                    description = "Flexible access to all premium features.",
+                    period = stringResource(R.string.period_month),
+                    description = stringResource(R.string.home_more_monthly_desc),
                     isSelected = state.selectedBillingPlan == BillingPlan.MONTHLY,
                     onClick = { onBillingPlanSelected(BillingPlan.MONTHLY) }
                 )
                 Spacer(Modifier.height(16.dp))
+                val context = LocalContext.current
+                if (state.error != null) {
+                    val errorMessage = remember(state.error) {
+                        val resId = context.resources.getIdentifier(state.error, "string", context.packageName)
+                        if (resId != 0) context.getString(resId) else state.error
+                    }
+                    Text(
+                        text = errorMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(bottom = 8.dp, start = 4.dp)
+                    )
+                }
                 PremiumButton(
-                    text = "Unlock Everything",
+                    text = stringResource(R.string.home_more_premium_button),
                     onClick = { activity?.let(onUnlockPremium) }
                 )
             }
@@ -74,10 +91,14 @@ fun LazyListScope.homeMoreTab(
     }
 
     item {
-        PremiumSettingsGroup(title = "App Preferences") {
+        PremiumSettingsGroup(title = stringResource(R.string.home_more_pref_title)) {
             PremiumSettingsRow(
-                title = "Smart Notifications",
-                subtitle = state.reminderLabel,
+                title = stringResource(R.string.home_more_pref_notifications),
+                subtitle = if (state.reminderLabelKey != null) {
+                    stringResource(
+                        LocalContext.current.resources.getIdentifier(state.reminderLabelKey, "string", LocalContext.current.packageName)
+                    )
+                } else state.reminderLabel,
                 icon = Icons.Default.Notifications,
                 iconColor = MySharePrimary,
                 trailingContent = {
@@ -95,8 +116,11 @@ fun LazyListScope.homeMoreTab(
                 onClick = { onToggleReminder(!state.reminderEnabled) }
             )
             PremiumSettingsRow(
-                title = "Smart Automation",
-                subtitle = if (state.automationEnabled) "Adaptive buffers active" else "System idle",
+                title = stringResource(R.string.home_more_pref_automation),
+                subtitle = if (state.automationEnabled) 
+                    stringResource(R.string.home_more_pref_automation_active) 
+                else 
+                    stringResource(R.string.home_more_pref_automation_idle),
                 icon = Icons.Default.PrecisionManufacturing,
                 iconColor = MyShareSecondary,
                 showDivider = false,
@@ -107,7 +131,7 @@ fun LazyListScope.homeMoreTab(
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
-                                text = "PREMIUM",
+                                text = stringResource(R.string.premium_badge),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MySharePrimary,
                                 fontWeight = FontWeight.Bold,
@@ -138,25 +162,25 @@ fun LazyListScope.homeMoreTab(
 
     item {
         val uriHandler = LocalUriHandler.current
-        PremiumSettingsGroup(title = "Legal & Support") {
+        PremiumSettingsGroup(title = stringResource(R.string.home_more_legal_title)) {
             PremiumSettingsRow(
-                title = "Terms of Service",
-                subtitle = "User agreement",
+                title = stringResource(R.string.home_more_legal_terms),
+                subtitle = stringResource(R.string.home_more_legal_terms_desc),
                 icon = Icons.Default.Description,
                 iconColor = Color(0xFF5C6BC0),
                 onClick = { uriHandler.openUri("https://myshare.pt/terms") }
             )
             PremiumSettingsRow(
-                title = "Privacy Policy",
-                subtitle = "Data handling",
+                title = stringResource(R.string.home_more_legal_privacy),
+                subtitle = stringResource(R.string.home_more_legal_privacy_desc),
                 icon = Icons.Default.PrivacyTip,
                 iconColor = Color(0xFF66BB6A),
                 onClick = { uriHandler.openUri("https://my-share-finance.web.app/") }
             )
             if (state.showAdsConsentOption) {
                 PremiumSettingsRow(
-                    title = "Ad Preferences",
-                    subtitle = "Manage consent",
+                    title = stringResource(R.string.home_more_legal_ads),
+                    subtitle = stringResource(R.string.home_more_legal_ads_desc),
                     icon = Icons.Default.AdsClick,
                     iconColor = Color(0xFFFFA726),
                     showDivider = false,
@@ -167,10 +191,10 @@ fun LazyListScope.homeMoreTab(
     }
 
     item {
-        PremiumSettingsGroup(title = "Account Actions") {
+        PremiumSettingsGroup(title = stringResource(R.string.home_more_account_title)) {
             PremiumSettingsRow(
-                title = "Sign Out",
-                subtitle = "Log out of your account safely",
+                title = stringResource(R.string.home_more_account_signout),
+                subtitle = stringResource(R.string.home_more_account_signout_desc),
                 icon = Icons.AutoMirrored.Filled.Logout,
                 iconColor = MaterialTheme.colorScheme.error,
                 titleColor = MaterialTheme.colorScheme.error,
@@ -192,7 +216,7 @@ fun LazyListScope.homeMoreTab(
                 letterSpacing = 1.sp
             )
             Text(
-                text = "Version 1.2.0 (Gold)",
+                text = stringResource(R.string.home_more_version_label, "1.2.0"),
                 style = MaterialTheme.typography.labelSmall,
                 color = MyShareOnSurfaceVariant.copy(alpha = 0.4f)
             )

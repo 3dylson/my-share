@@ -7,7 +7,10 @@ import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.PrecisionManufacturing
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import pt.ms.myshare.R
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.theme.MyShareSecondary
 import pt.ms.myshare.presentation.ui.theme.MySharePositive
@@ -27,42 +30,49 @@ fun LazyListScope.homePlanTab(
 ) {
     planCard?.let { card ->
         item {
+            val headline = if (card.nextPaydayKey != null) {
+                stringResource(
+                    LocalContext.current.resources.getIdentifier(card.nextPaydayKey, "string", LocalContext.current.packageName),
+                    *card.nextPaydayArgs.toTypedArray()
+                )
+            } else card.nextPaydayLabel
+
             PremiumPlanSummary(
-                headline = card.nextPaydayLabel,
+                headline = headline,
                 body = card.summary
             )
         }
         item {
-            PremiumSectionHeader(title = "Core Metrics")
+            PremiumSectionHeader(title = stringResource(R.string.home_plan_metrics_title))
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 HeroMetricCard(
-                    label = "Income per payday",
+                    label = stringResource(R.string.home_plan_label_income),
                     value = card.incomeLabel,
                     icon = Icons.Default.Payments
                 )
                 HeroMetricCard(
-                    label = "Weekly Guide",
+                    label = stringResource(R.string.home_plan_label_weekly),
                     value = card.weeklySpendLabel,
-                    subtitle = "Safe to spend every week",
+                    subtitle = stringResource(R.string.home_plan_desc_weekly),
                     icon = Icons.Default.AccountBalanceWallet,
                     containerColor = MySharePositive
                 )
             }
         }
         item {
-            PremiumSectionHeader(title = "Allocation Preview")
+            PremiumSectionHeader(title = stringResource(R.string.home_plan_allocation_title))
             AllocationPreviewMetric(
-                fixedLabel = "Fixed",
+                fixedLabel = stringResource(R.string.home_plan_label_fixed),
                 fixedValue = card.fixedCostsLabel,
-                flexibleLabel = "Flexible",
+                flexibleLabel = stringResource(R.string.home_plan_label_flexible),
                 flexibleValue = card.flexibleSpendLabel
             )
         }
         if (!isPremium) {
             item {
                 PremiumBenefitCard(
-                    title = "Smart Adjustments",
-                    description = "Enable Automation to automatically adjust your weekly guide based on last month's review.",
+                    title = stringResource(R.string.home_plan_benefit_title),
+                    description = stringResource(R.string.home_plan_benefit_desc),
                     icon = Icons.Default.PrecisionManufacturing,
                     onClick = { onDestinationSelected(HomeDestination.MORE) }
                 )

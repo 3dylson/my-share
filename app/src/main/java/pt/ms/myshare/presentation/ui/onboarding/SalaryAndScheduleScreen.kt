@@ -10,16 +10,20 @@ import androidx.compose.material.icons.filled.EventRepeat
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.components.PremiumChoiceCard
 import pt.ms.myshare.presentation.ui.components.PremiumTextField
 import pt.ms.myshare.presentation.ui.theme.*
 import java.math.BigDecimal
+import java.text.NumberFormat
+import java.util.Locale
 
 @Composable
 fun SalaryAndScheduleScreen(
@@ -35,6 +39,9 @@ fun SalaryAndScheduleScreen(
     var paydayText by remember { mutableStateOf(initialMonthlyPayday.toString()) }
     var biweeklyPaydayText by remember { mutableStateOf(initialNextBiweeklyPaydayText) }
 
+    val currencySymbol = remember {
+        NumberFormat.getCurrencyInstance(Locale.getDefault()).currency?.symbol ?: ""
+    }
     val income = incomeText.toBigDecimalOrNull()
     val payday = paydayText.toIntOrNull() ?: 1
     val scrollState = rememberScrollState()
@@ -52,20 +59,20 @@ fun SalaryAndScheduleScreen(
                 onClick = onBack, 
                 contentPadding = PaddingValues(0.dp)
             ) { 
-                Text("Back", color = MyShareSecondary) 
+                Text(stringResource(R.string.back), color = MyShareSecondary) 
             }
             
             Spacer(Modifier.height(8.dp))
             
             Text(
-                "Your Cash Flow", 
+                stringResource(R.string.onboarding_salary_title), 
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.ExtraBold,
                 color = MyShareOnSurface
             )
             
             Text(
-                "We need to know when your money arrives to build a plan that actually works.", 
+                stringResource(R.string.onboarding_salary_subtitle), 
                 color = MyShareSecondary,
                 style = MaterialTheme.typography.bodyLarge,
                 lineHeight = 24.sp
@@ -76,16 +83,16 @@ fun SalaryAndScheduleScreen(
             PremiumTextField(
                 value = incomeText,
                 onValueChange = { incomeText = it.replace(',', '.') },
-                label = "Next Net Payday Amount",
+                label = stringResource(R.string.onboarding_salary_label_amount),
                 placeholder = "0.00",
-                prefix = { Text("€ ") },
+                prefix = { if (currencySymbol.isNotEmpty()) Text("$currencySymbol ") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )
 
             Spacer(Modifier.height(32.dp))
 
             Text(
-                "Pay Frequency", 
+                stringResource(R.string.onboarding_salary_frequency_title), 
                 style = MaterialTheme.typography.titleMedium, 
                 fontWeight = FontWeight.Bold,
                 color = MyShareOnSurface
@@ -94,15 +101,15 @@ fun SalaryAndScheduleScreen(
             
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 PremiumChoiceCard(
-                    title = "Monthly",
-                    description = "I get paid once a month.",
+                    title = stringResource(R.string.onboarding_salary_frequency_monthly),
+                    description = stringResource(R.string.onboarding_salary_frequency_monthly_desc),
                     isSelected = frequency == PayFrequency.MONTHLY,
                     icon = Icons.Default.CalendarMonth,
                     onClick = { frequency = PayFrequency.MONTHLY }
                 )
                 PremiumChoiceCard(
-                    title = "Every 2 weeks",
-                    description = "I get paid bi-weekly.",
+                    title = stringResource(R.string.onboarding_salary_frequency_biweekly),
+                    description = stringResource(R.string.onboarding_salary_frequency_biweekly_desc),
                     isSelected = frequency == PayFrequency.BIWEEKLY,
                     icon = Icons.Default.EventRepeat,
                     onClick = { frequency = PayFrequency.BIWEEKLY }
@@ -115,7 +122,7 @@ fun SalaryAndScheduleScreen(
                 PremiumTextField(
                     value = paydayText,
                     onValueChange = { if (it.length <= 2) paydayText = it },
-                    label = "Typical Payday (Day of month)",
+                    label = stringResource(R.string.onboarding_salary_label_payday),
                     placeholder = "e.g. 28",
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
@@ -123,7 +130,7 @@ fun SalaryAndScheduleScreen(
                 PremiumTextField(
                     value = biweeklyPaydayText,
                     onValueChange = { biweeklyPaydayText = it },
-                    label = "Next Payday Date",
+                    label = stringResource(R.string.onboarding_salary_label_next_date),
                     placeholder = "e.g. Apr 25"
                 )
             }
@@ -131,7 +138,7 @@ fun SalaryAndScheduleScreen(
             Spacer(Modifier.height(40.dp))
             
             PremiumButton(
-                text = "Continue",
+                text = stringResource(R.string.continue_button),
                 onClick = {
                     onNext(income ?: BigDecimal.ZERO, frequency, payday, biweeklyPaydayText)
                 },

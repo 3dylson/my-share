@@ -8,10 +8,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import pt.ms.myshare.R
 import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.theme.*
 
@@ -54,7 +56,7 @@ fun WelcomeScreen(
             Spacer(Modifier.height(48.dp))
 
             Text(
-                "Your Money,\nBuilt for Intention", 
+                stringResource(R.string.onboarding_welcome_title), 
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.ExtraBold,
                 textAlign = TextAlign.Center,
@@ -65,7 +67,7 @@ fun WelcomeScreen(
             Spacer(Modifier.height(16.dp))
             
             Text(
-                "Stop reactive spending. Start building your blueprint for financial freedom today.",
+                stringResource(R.string.onboarding_welcome_subtitle),
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 color = MyShareSecondary,
@@ -79,16 +81,19 @@ fun WelcomeScreen(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+              ) {
                 PremiumButton(
-                    text = "Get Started",
+                    text = stringResource(R.string.onboarding_welcome_button_get_started),
                     onClick = onContinue
                 )
 
                 // Only shown in debug builds; compiled away in release
                 if (onSkipDev != null) {
                     TextButton(onClick = onSkipDev) {
-                        Text("Skip to Home (Dev)", color = MyShareSecondary.copy(alpha = 0.5f))
+                        Text(
+                            stringResource(R.string.onboarding_welcome_button_skip_dev), 
+                            color = MyShareSecondary.copy(alpha = 0.5f)
+                        )
                     }
                 }
             }

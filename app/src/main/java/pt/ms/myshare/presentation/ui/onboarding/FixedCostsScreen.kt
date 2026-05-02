@@ -7,16 +7,20 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.AllocationPreset
 import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.components.PremiumChoiceCard
 import pt.ms.myshare.presentation.ui.components.PremiumTextField
 import pt.ms.myshare.presentation.ui.theme.*
 import java.math.BigDecimal
+import java.text.NumberFormat
+import java.util.Locale
 
 @Composable
 fun FixedCostsScreen(
@@ -29,6 +33,9 @@ fun FixedCostsScreen(
     var fixedCostsText by remember { mutableStateOf(initialFixedCosts?.toPlainString() ?: "") }
     var preset by remember { mutableStateOf(initialPreset) }
 
+    val currencySymbol = remember {
+        NumberFormat.getCurrencyInstance(Locale.getDefault()).currency?.symbol ?: ""
+    }
     val fixedCosts = fixedCostsText.toBigDecimalOrNull()
     val scrollState = rememberScrollState()
 
@@ -45,20 +52,20 @@ fun FixedCostsScreen(
                 onClick = onBack, 
                 contentPadding = PaddingValues(0.dp)
             ) { 
-                Text("Back", color = MyShareSecondary) 
+                Text(stringResource(R.string.back), color = MyShareSecondary) 
             }
             
             Spacer(Modifier.height(8.dp))
             
             Text(
-                "Essentials & Bills", 
+                stringResource(R.string.onboarding_fixed_costs_title), 
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.ExtraBold,
                 color = MyShareOnSurface
             )
             
             Text(
-                "What must leave your account every month for rent, utilities, and absolute essentials?", 
+                stringResource(R.string.onboarding_fixed_costs_subtitle), 
                 color = MyShareSecondary,
                 style = MaterialTheme.typography.bodyLarge,
                 lineHeight = 24.sp
@@ -69,16 +76,16 @@ fun FixedCostsScreen(
             PremiumTextField(
                 value = fixedCostsText,
                 onValueChange = { fixedCostsText = it.replace(',', '.') },
-                label = "Monthly Fixed Costs",
+                label = stringResource(R.string.onboarding_fixed_costs_label_amount),
                 placeholder = "0.00",
-                prefix = { Text("€ ") },
+                prefix = { if (currencySymbol.isNotEmpty()) Text("$currencySymbol ") },
                 isError = fixedCostsText.isNotEmpty() && fixedCosts == null,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )
 
             if (fixedCostsText.isNotEmpty() && fixedCosts == null) {
                 Text(
-                    text = "Please enter a valid number for costs.",
+                    text = stringResource(R.string.error_invalid_number),
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(top = 4.dp, start = 8.dp)
@@ -88,7 +95,7 @@ fun FixedCostsScreen(
             Spacer(Modifier.height(32.dp))
 
             Text(
-                "Allocation Style", 
+                stringResource(R.string.onboarding_fixed_costs_preset_title), 
                 style = MaterialTheme.typography.titleMedium, 
                 fontWeight = FontWeight.Bold,
                 color = MyShareOnSurface
@@ -97,9 +104,9 @@ fun FixedCostsScreen(
             
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 val presets = listOf(
-                    Triple(AllocationPreset.CONSERVATIVE, "Conservative", "Prioritize safety and stability."),
-                    Triple(AllocationPreset.BALANCED, "Balanced", "A healthy mix of saving and spending."),
-                    Triple(AllocationPreset.GROWTH, "Growth", "Focused on aggressive wealth building.")
+                    Triple(AllocationPreset.CONSERVATIVE, stringResource(R.string.onboarding_fixed_costs_preset_conservative), stringResource(R.string.onboarding_fixed_costs_preset_conservative_desc)),
+                    Triple(AllocationPreset.BALANCED, stringResource(R.string.onboarding_fixed_costs_preset_balanced), stringResource(R.string.onboarding_fixed_costs_preset_balanced_desc)),
+                    Triple(AllocationPreset.GROWTH, stringResource(R.string.onboarding_fixed_costs_preset_growth), stringResource(R.string.onboarding_fixed_costs_preset_growth_desc))
                 )
                 
                 presets.forEach { (p, label, desc) ->
@@ -124,7 +131,7 @@ fun FixedCostsScreen(
             Spacer(Modifier.height(40.dp))
             
             PremiumButton(
-                text = "Continue",
+                text = stringResource(R.string.continue_button),
                 onClick = {
                     onNext(fixedCosts ?: BigDecimal.ZERO, preset)
                 },

@@ -6,10 +6,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import pt.ms.myshare.R
 import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.components.PremiumTextField
 import pt.ms.myshare.presentation.ui.theme.*
@@ -43,7 +45,7 @@ fun AllocationPrioritiesScreen(
 
     val locale = Locale.getDefault()
     val currency = NumberFormat.getCurrencyInstance(locale)
-    val symbol = currency.currency?.symbol ?: "€"
+    val symbol = currency.currency?.symbol ?: ""
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(
@@ -57,20 +59,20 @@ fun AllocationPrioritiesScreen(
                 onClick = onBack, 
                 contentPadding = PaddingValues(0.dp)
             ) { 
-                Text("Back", color = MyShareSecondary) 
+                Text(stringResource(R.string.back), color = MyShareSecondary) 
             }
             
             Spacer(Modifier.height(8.dp))
             
             Text(
-                "Money Allocation", 
+                stringResource(R.string.onboarding_priorities_title), 
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.ExtraBold,
                 color = MyShareOnSurface
             )
             
             Text(
-                "Give every cent a job. Distribute ${currency.format(totalAvailable)} to build your plan.", 
+                stringResource(R.string.onboarding_priorities_subtitle, currency.format(totalAvailable)), 
                 color = MyShareSecondary,
                 style = MaterialTheme.typography.bodyLarge,
                 lineHeight = 24.sp
@@ -94,12 +96,15 @@ fun AllocationPrioritiesScreen(
                 Spacer(Modifier.height(12.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(
-                        "Allocated: ${currency.format(allocated)}", 
+                        stringResource(R.string.onboarding_priorities_allocated, currency.format(allocated)), 
                         style = MaterialTheme.typography.labelLarge,
                         color = if (remaining < BigDecimal.ZERO) MaterialTheme.colorScheme.error else MyShareSecondary
                     )
                     Text(
-                        if (remaining >= BigDecimal.ZERO) "Remaining: ${currency.format(remaining)}" else "Over: ${currency.format(remaining.abs())}", 
+                        if (remaining >= BigDecimal.ZERO) 
+                            stringResource(R.string.onboarding_priorities_remaining, currency.format(remaining))
+                        else 
+                            stringResource(R.string.onboarding_priorities_over, currency.format(remaining.abs())), 
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
                         color = if (remaining < BigDecimal.ZERO) MaterialTheme.colorScheme.error else MySharePrimary
@@ -118,10 +123,10 @@ fun AllocationPrioritiesScreen(
                     PremiumTextField(
                         value = flex,
                         onValueChange = { flex = it.replace(',', '.') },
-                        label = "Flexible Spending",
+                        label = stringResource(R.string.onboarding_priorities_label_flex),
                         prefix = { Text("$symbol ") },
                         placeholder = "0.00",
-                        description = "Groceries, dining, hobbies, and day-to-day life.",
+                        description = stringResource(R.string.onboarding_priorities_desc_flex),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                     )
                 }
@@ -129,10 +134,10 @@ fun AllocationPrioritiesScreen(
                     PremiumTextField(
                         value = sav,
                         onValueChange = { sav = it.replace(',', '.') },
-                        label = "Savings",
+                        label = stringResource(R.string.onboarding_priorities_label_sav),
                         prefix = { Text("$symbol ") },
                         placeholder = "0.00",
-                        description = "Cushion for emergencies and short-term goals.",
+                        description = stringResource(R.string.onboarding_priorities_desc_sav),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                     )
                 }
@@ -140,10 +145,10 @@ fun AllocationPrioritiesScreen(
                     PremiumTextField(
                         value = inv,
                         onValueChange = { inv = it.replace(',', '.') },
-                        label = "Investing",
+                        label = stringResource(R.string.onboarding_priorities_label_inv),
                         prefix = { Text("$symbol ") },
                         placeholder = "0.00",
-                        description = "Long-term growth and market exposure.",
+                        description = stringResource(R.string.onboarding_priorities_desc_inv),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                     )
                 }
@@ -151,10 +156,10 @@ fun AllocationPrioritiesScreen(
                     PremiumTextField(
                         value = cry,
                         onValueChange = { cry = it.replace(',', '.') },
-                        label = "Speculative / Crypto",
+                        label = stringResource(R.string.onboarding_priorities_label_cry),
                         prefix = { Text("$symbol ") },
                         placeholder = "0.00",
-                        description = "High-risk allocations (optional).",
+                        description = stringResource(R.string.onboarding_priorities_desc_cry),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                     )
                 }
@@ -163,7 +168,7 @@ fun AllocationPrioritiesScreen(
             Spacer(Modifier.height(16.dp))
 
             PremiumButton(
-                text = if (isValid) "Build My Blueprint" else "Balance your allocation",
+                text = if (isValid) stringResource(R.string.onboarding_priorities_button_ready) else stringResource(R.string.onboarding_priorities_button_balance),
                 onClick = { onNext(parsedFlex, parsedSav, parsedInv, parsedCry) },
                 enabled = isValid
             )

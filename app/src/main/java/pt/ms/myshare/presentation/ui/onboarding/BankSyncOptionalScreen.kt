@@ -88,8 +88,8 @@ fun BankSyncOptionalScreen(
             AnimatedContent(targetState = isInterestRegistered, label = "interestState") { registered ->
                 if (registered) {
                     PremiumInfoCard(
-                        title = "Interest Registered!",
-                        body = "Bank sync is coming soon. We'll let you know as soon as it's ready.",
+                        title = stringResource(R.string.onboarding_banksync_interest_title),
+                        body = stringResource(R.string.onboarding_banksync_interest_body),
                         icon = Icons.Default.CheckCircle,
                         backgroundColor = MySharePrimaryContainer.copy(alpha = 0.4f),
                         modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)

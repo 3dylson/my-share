@@ -9,20 +9,8 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import pt.ms.myshare.domain.model.BillingPlan
-import pt.ms.myshare.domain.model.PlanPreview
-import pt.ms.myshare.presentation.ui.components.*
-import pt.ms.myshare.presentation.ui.theme.*
-import java.math.BigDecimal
-import java.text.NumberFormat
-import java.time.format.DateTimeFormatter
-import java.util.*
+import androidx.compose.ui.res.stringResource
+import pt.ms.myshare.R
 
 @Composable
 fun PlanPreviewScreen(
@@ -45,13 +33,13 @@ fun PlanPreviewScreen(
             Spacer(Modifier.height(40.dp))
             
             Text(
-                "Final Blueprint", 
+                stringResource(R.string.onboarding_plan_preview_title), 
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.ExtraBold,
                 color = MyShareOnSurface
             )
             Text(
-                "Created for your payday on ${preview.nextPayday.format(dateFormatter)}",
+                stringResource(R.string.onboarding_plan_preview_subtitle, preview.nextPayday.format(dateFormatter)),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MyShareSecondary,
                 lineHeight = 24.sp
@@ -66,7 +54,7 @@ fun PlanPreviewScreen(
             ) {
                 item {
                     PremiumMetricCard(
-                        label = "Initial Balance",
+                        label = stringResource(R.string.onboarding_plan_preview_label_initial),
                         value = currency.format(preview.incomePerPayday),
                         subtitle = preview.summary
                     )
@@ -75,15 +63,15 @@ fun PlanPreviewScreen(
                 item {
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         PremiumMetricCard(
-                            label = "Fixed Costs", 
+                            label = stringResource(R.string.onboarding_plan_preview_label_fixed), 
                             value = currency.format(preview.fixedCostsPerPayday), 
                             modifier = Modifier.weight(1f)
                         )
                         PremiumMetricCard(
-                            label = "Flexible", 
+                            label = stringResource(R.string.onboarding_plan_preview_label_flexible), 
                             value = currency.format(preview.flexibleSpendPerPayday), 
                             modifier = Modifier.weight(1f),
-                            subtitle = "${currency.format(preview.weeklyFlexibleSpend)} / week"
+                            subtitle = stringResource(R.string.onboarding_plan_preview_weekly_subtitle, currency.format(preview.weeklyFlexibleSpend))
                         )
                     }
                 }
@@ -96,7 +84,7 @@ fun PlanPreviewScreen(
                     ) {
                         Column(Modifier.padding(24.dp)) {
                             Text(
-                                "Savings Goal", 
+                                stringResource(R.string.onboarding_plan_preview_label_goal), 
                                 style = MaterialTheme.typography.labelMedium, 
                                 color = MySharePrimary,
                                 fontWeight = FontWeight.Bold
@@ -119,7 +107,7 @@ fun PlanPreviewScreen(
                                 )
                                 Spacer(Modifier.width(8.dp))
                                 Text(
-                                    "target", 
+                                    stringResource(R.string.onboarding_plan_preview_target_label), 
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MyShareSecondary
                                 )
@@ -127,15 +115,17 @@ fun PlanPreviewScreen(
                             
                             Spacer(Modifier.height(12.dp))
                             Text(
-                                "Allocating ${currency.format(preview.savingsPerPayday)} per payday",
+                                stringResource(R.string.onboarding_plan_preview_allocation_body, currency.format(preview.savingsPerPayday)),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MyShareSecondary
                             )
                             
                             preview.goalTargetDate?.let { date ->
                                 Spacer(Modifier.height(8.dp))
+                                val monthName = date.month.getDisplayName(java.time.format.TextStyle.FULL, locale)
+                                    .lowercase().replaceFirstChar(Char::titlecase)
                                 Text(
-                                    "Estimated: ${date.month.name.lowercase().replaceFirstChar(Char::titlecase)} ${date.year}",
+                                    stringResource(R.string.onboarding_plan_preview_estimated_date, monthName, date.year.toString()),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MySharePrimary,
                                     fontWeight = FontWeight.Bold
@@ -148,12 +138,12 @@ fun PlanPreviewScreen(
                 item {
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         PremiumMetricCard(
-                            label = "Investing", 
+                            label = stringResource(R.string.onboarding_plan_preview_label_investing), 
                             value = currency.format(preview.investingPerPayday), 
                             modifier = Modifier.weight(1f)
                         )
                         PremiumMetricCard(
-                            label = "Crypto", 
+                            label = stringResource(R.string.onboarding_plan_preview_label_crypto), 
                             value = currency.format(preview.cryptoPerPayday), 
                             modifier = Modifier.weight(1f)
                         )
@@ -166,7 +156,7 @@ fun PlanPreviewScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 PremiumButton(
-                    text = "Secure My Plan",
+                    text = stringResource(R.string.onboarding_plan_preview_button_secure),
                     onClick = onAutopilot
                 )
                 
@@ -175,7 +165,7 @@ fun PlanPreviewScreen(
                     modifier = Modifier.fillMaxWidth().height(48.dp)
                 ) {
                     Text(
-                        "Start with basic plan", 
+                        stringResource(R.string.onboarding_plan_preview_button_basic), 
                         style = MaterialTheme.typography.labelLarge, 
                         color = MyShareSecondary
                     )
@@ -215,7 +205,7 @@ fun PaywallScreen(
                 ) {
                     Icon(
                         Icons.Default.Close, 
-                        contentDescription = "Close", 
+                        contentDescription = stringResource(R.string.paywall_close_content_description), 
                         tint = MyShareSecondary,
                         modifier = Modifier.size(48.dp) // Larger icon
                     )
@@ -224,14 +214,24 @@ fun PaywallScreen(
                     onClick = onRestore,
                     modifier = Modifier.padding(top = 8.dp)
                 ) { 
-                    Text("Restore", color = MyShareSecondary, style = MaterialTheme.typography.labelLarge) 
+                    Text(stringResource(R.string.paywall_restore_button), color = MyShareSecondary, style = MaterialTheme.typography.labelLarge) 
                 }
             }
             
             Spacer(Modifier.height(8.dp))
 
+            val context = LocalContext.current
+            val headline = remember(pricingStrategy.paywallHeadline) {
+                val resId = context.resources.getIdentifier(pricingStrategy.paywallHeadline, "string", context.packageName)
+                if (resId != 0) context.getString(resId) else pricingStrategy.paywallHeadline
+            }
+            val subhead = remember(pricingStrategy.paywallSubhead) {
+                val resId = context.resources.getIdentifier(pricingStrategy.paywallSubhead, "string", context.packageName)
+                if (resId != 0) context.getString(resId) else pricingStrategy.paywallSubhead
+            }
+
             Text(
-                pricingStrategy.paywallHeadline, 
+                headline, 
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.ExtraBold,
                 textAlign = TextAlign.Center,
@@ -241,7 +241,7 @@ fun PaywallScreen(
             )
             
             Text(
-                pricingStrategy.paywallSubhead, 
+                subhead, 
                 style = MaterialTheme.typography.bodyLarge,
                 color = MyShareSecondary,
                 textAlign = TextAlign.Center,
@@ -252,36 +252,34 @@ fun PaywallScreen(
             Spacer(Modifier.height(40.dp))
 
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                FeatureRowNew("Automation", "Recurring rules for every payday.")
-                FeatureRowNew("Reminders", "Never forget to log your major spends.")
-                FeatureRowNew("Unlimited Goals", "Track all your dreams simultaneously.")
-                FeatureRowNew("Plan vs. Actual Tracking", "See exactly how your spending compares to your blueprint.")
+                FeatureRowNew(stringResource(R.string.paywall_feature_automation_title), stringResource(R.string.paywall_feature_automation_desc))
+                FeatureRowNew(stringResource(R.string.paywall_feature_reminders_title), stringResource(R.string.paywall_feature_reminders_desc))
+                FeatureRowNew(stringResource(R.string.paywall_feature_goals_title), stringResource(R.string.paywall_feature_goals_desc))
+                FeatureRowNew(stringResource(R.string.paywall_feature_tracking_title), stringResource(R.string.paywall_feature_tracking_desc))
             }
 
             Spacer(Modifier.height(48.dp))
 
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                // Prefer live Play Billing prices; fall back to locale-estimated labels
-                // while the billing client is still connecting (typically < 2s).
                 val monthlyProduct = availableProducts.find { it.productId.contains("monthly", ignoreCase = true) }
                 val annualProduct = availableProducts.find { it.productId.contains("annual", ignoreCase = true) }
                 val hasLivePrices = monthlyProduct != null || annualProduct != null
 
                 PremiumPaywallCard(
-                    title = "Monthly",
+                    title = stringResource(R.string.paywall_plan_monthly),
                     price = monthlyProduct?.price ?: pricingStrategy.monthlyLabel,
-                    period = "month",
-                    description = "Flexible commitment",
-                    badge = if (!hasLivePrices) "Loading…" else null,
+                    period = stringResource(R.string.paywall_period_month),
+                    description = stringResource(R.string.paywall_desc_monthly),
+                    badge = if (!hasLivePrices) stringResource(R.string.paywall_badge_loading) else null,
                     isSelected = selectedPlan == BillingPlan.MONTHLY,
                     onClick = { onPlanSelected(BillingPlan.MONTHLY) }
                 )
                 PremiumPaywallCard(
-                    title = "Annual",
+                    title = stringResource(R.string.paywall_plan_annual),
                     price = annualProduct?.price ?: pricingStrategy.annualLabel,
-                    period = "year",
-                    description = "Best value — save more per year",
-                    badge = if (hasLivePrices) "BEST VALUE" else "Loading…",
+                    period = stringResource(R.string.paywall_period_year),
+                    description = stringResource(R.string.paywall_desc_annual),
+                    badge = if (hasLivePrices) stringResource(R.string.paywall_badge_best_value) else stringResource(R.string.paywall_badge_loading),
                     isSelected = selectedPlan == BillingPlan.ANNUAL,
                     onClick = { onPlanSelected(BillingPlan.ANNUAL) }
                 )
@@ -290,7 +288,7 @@ fun PaywallScreen(
             Spacer(Modifier.height(24.dp))
             
             Text(
-                "Trial for ${pricingStrategy.trialDays} days. Cancel anytime.", 
+                stringResource(R.string.paywall_footer_trial, pricingStrategy.trialDays), 
                 style = MaterialTheme.typography.bodySmall,
                 color = MyShareSecondary,
                 modifier = Modifier.fillMaxWidth(),
@@ -300,7 +298,7 @@ fun PaywallScreen(
             Spacer(Modifier.height(40.dp))
             
             PremiumButton(
-                text = "Upgrade Now",
+                text = stringResource(R.string.paywall_upgrade_button),
                 onClick = { activity?.let(onPurchaseSelected) }
             )
             
