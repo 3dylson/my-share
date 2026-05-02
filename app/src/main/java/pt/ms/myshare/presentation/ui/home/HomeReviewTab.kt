@@ -20,6 +20,7 @@ import pt.ms.myshare.presentation.ui.theme.*
  * Responsibility: Renders the Manual Review form and historical performance records.
  * This file is part of the Home screen refactoring to follow SRP.
  */
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 fun LazyListScope.homeReviewTab(
     state: ReviewCardState,
     history: List<ReviewHistoryItemState>,
@@ -28,7 +29,7 @@ fun LazyListScope.homeReviewTab(
     onFlexibleSpendChanged: (String) -> Unit,
     onGoalContributionChanged: (String) -> Unit,
     onSaveReview: () -> Unit,
-    onDestinationSelected: (HomeDestination) -> Unit
+    onShowPaywall: () -> Unit
 ) {
     val coachingInsights = state.coachingInsights
     
@@ -168,17 +169,19 @@ fun LazyListScope.homeReviewTab(
     }
     item {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            PremiumTextField(
-                value = state.actualFlexibleSpend,
-                onValueChange = onFlexibleSpendChanged,
-                label = "Actual Flexible Spend",
-                prefix = { Text("$ ", color = MyShareSecondary) }
+            PremiumSliderCard(
+                title = "Actual Flexible Spend",
+                value = state.actualFlexibleSpend.toFloatOrNull() ?: 0f,
+                onValueChange = { onFlexibleSpendChanged(it.toInt().toString()) },
+                valueRange = 0f..5000f,
+                icon = Icons.Default.ShoppingCart
             )
-            PremiumTextField(
-                value = state.actualGoalContribution,
-                onValueChange = onGoalContributionChanged,
-                label = "Actual Goal Contribution",
-                prefix = { Text("$ ", color = MyShareSecondary) }
+            PremiumSliderCard(
+                title = "Actual Goal Contribution",
+                value = state.actualGoalContribution.toFloatOrNull() ?: 0f,
+                onValueChange = { onGoalContributionChanged(it.toInt().toString()) },
+                valueRange = 0f..5000f,
+                icon = Icons.Default.Flag
             )
 
             PremiumButton(
@@ -195,50 +198,51 @@ fun LazyListScope.homeReviewTab(
 
     if (history.isEmpty()) {
         item {
-            PremiumInfoCard(
+            PremiumBenefitCard(
                 title = "No History Yet",
-                body = "Complete your first review to start building a timeline of your financial mastery.",
-                icon = Icons.Default.BarChart
+                description = "Complete your first review above to start building a timeline of your financial mastery.",
+                icon = Icons.Default.BarChart,
+                onClick = {}
             )
         }
     } else {
         // Show history. If not premium, only show the first item and then a lock.
         val visibleHistory = if (isPremium) history else history.take(1)
         visibleHistory.forEach { item ->
-            item {
-                PremiumMetricCard(
-                    label = item.dateLabel,
-                    value = "Flex: ${item.flexibleSpendLabel}",
-                    subtitle = "Target: ${item.plannedFlexibleLabel} (${item.flexibleDeltaLabel})",
-                    icon = if (item.isPositive) Icons.Default.TrendingDown else Icons.Default.TrendingUp,
-                    color = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error,
-                    indicatorColor = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error,
-                    onClick = {}
-                )
-                Spacer(Modifier.height(12.dp))
-                PremiumMetricCard(
-                    label = "Goal contribution",
-                    value = item.goalContributionLabel,
-                    subtitle = "Plan: ${item.plannedGoalLabel} (${item.goalDeltaLabel})",
-                    icon = if (item.isPositive) Icons.Default.Flag else Icons.Default.OutlinedFlag,
-                    color = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error,
-                    indicatorColor = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error,
-                    onClick = {}
-                )
-                Spacer(Modifier.height(20.dp))
+            item(key = item.id) {
+                Column(modifier = Modifier.animateItemPlacement()) {
+                    PremiumMetricCard(
+                        label = item.dateLabel,
+                        value = "Flex: ${item.flexibleSpendLabel}",
+                        subtitle = "Target: ${item.plannedFlexibleLabel} (${item.flexibleDeltaLabel})",
+                        icon = if (item.isPositive) Icons.Default.TrendingDown else Icons.Default.TrendingUp,
+                        color = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error,
+                        indicatorColor = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error,
+                        onClick = {}
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    PremiumMetricCard(
+                        label = "Goal contribution",
+                        value = item.goalContributionLabel,
+                        subtitle = "Plan: ${item.plannedGoalLabel} (${item.goalDeltaLabel})",
+                        icon = if (item.isPositive) Icons.Default.Flag else Icons.Default.OutlinedFlag,
+                        color = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error,
+                        indicatorColor = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error,
+                        onClick = {}
+                    )
+                    Spacer(Modifier.height(20.dp))
+                }
             }
         }
-
         if (!isPremium && history.size > 1) {
             item {
                 PremiumBenefitCard(
                     title = "Trajectory Insights",
                     description = "Upgrade to see the full list of past performances and detect spending patterns over time.",
                     icon = Icons.Default.Lock,
-                    onClick = { onDestinationSelected(HomeDestination.MORE) }
+                    onClick = onShowPaywall
                 )
                 Spacer(Modifier.height(8.dp))
-                PremiumAdBanner()
             }
         }
     }

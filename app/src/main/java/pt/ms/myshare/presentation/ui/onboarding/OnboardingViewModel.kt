@@ -329,6 +329,10 @@ class OnboardingViewModel @Inject constructor(
         FirebaseUtils.logEvent("bank_sync_prompt_shown")
     }
 
+    fun logBankSyncInterestExpressed() {
+        FirebaseUtils.logEvent("bank_sync_interest_expressed")
+    }
+
     fun logBankSyncSkipped() {
         FirebaseUtils.logEvent("bank_sync_skipped")
     }

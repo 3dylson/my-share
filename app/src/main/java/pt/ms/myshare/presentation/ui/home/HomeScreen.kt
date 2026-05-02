@@ -90,6 +90,19 @@ fun HomeScreen(
     onEditRule: (String) -> Unit
 ) {
     val activity = androidx.activity.compose.LocalActivity.current
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+    var showPaywallSheet by remember { mutableStateOf(false) }
+
+    if (showPaywallSheet) {
+        PremiumPaywallBottomSheet(
+            onDismissRequest = { showPaywallSheet = false },
+            onUpgradeClick = { 
+                showPaywallSheet = false
+                activity?.let { onUnlockPremium(it) } 
+            }
+        )
+    }
+
     Scaffold(
         modifier = modifier,
         containerColor = MyShareBackground,
@@ -105,40 +118,49 @@ fun HomeScreen(
             }
         },
         bottomBar = {
-            NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
-                tonalElevation = 8.dp,
-                modifier = Modifier.background(MaterialTheme.colorScheme.surface.copy(alpha = 0.95f))
-            ) {
-                HomeDestination.entries.forEach { destination ->
-                    val isSelected = state.selectedDestination == destination
-                    NavigationBarItem(
-                        selected = isSelected,
-                        onClick = { onDestinationSelected(destination) },
-                        icon = {
-                            val icon = when (destination) {
-                                HomeDestination.PLAN -> if (isSelected) Icons.Filled.CalendarToday else Icons.Outlined.CalendarToday
-                                HomeDestination.RULES -> if (isSelected) Icons.Filled.SettingsSuggest else Icons.Outlined.SettingsSuggest
-                                HomeDestination.GOALS -> if (isSelected) Icons.Filled.Flag else Icons.Outlined.Flag
-                                HomeDestination.REVIEW -> if (isSelected) Icons.Filled.AutoGraph else Icons.Outlined.AutoGraph
-                                HomeDestination.MORE -> if (isSelected) Icons.Filled.MoreHoriz else Icons.Outlined.MoreHoriz
-                            }
-                            Icon(icon, contentDescription = null)
-                        },
-                        label = { 
-                            Text(
-                                destination.name.lowercase().replaceFirstChar(Char::titlecase),
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                            ) 
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = MySharePrimary,
-                            selectedTextColor = MySharePrimary,
-                            unselectedIconColor = MyShareSecondary,
-                            unselectedTextColor = MyShareSecondary,
-                            indicatorColor = MySharePrimaryContainer.copy(alpha = 0.5f)
-                        )
+            Column {
+                if (!state.moreCard.isPremium) {
+                    PremiumAdBanner(
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
+                }
+                NavigationBar(
+                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
+                    tonalElevation = 8.dp,
+                    modifier = Modifier.background(MaterialTheme.colorScheme.surface.copy(alpha = 0.95f))
+                ) {
+                    HomeDestination.entries.forEach { destination ->
+                        val isSelected = state.selectedDestination == destination
+                        NavigationBarItem(
+                            selected = isSelected,
+                            onClick = { 
+                                if (!isSelected) haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                                onDestinationSelected(destination) 
+                            },
+                            icon = {
+                                val icon = when (destination) {
+                                    HomeDestination.PLAN -> if (isSelected) Icons.Filled.CalendarToday else Icons.Outlined.CalendarToday
+                                    HomeDestination.STRATEGY -> if (isSelected) Icons.Filled.Lightbulb else Icons.Outlined.Lightbulb
+                                    HomeDestination.REVIEW -> if (isSelected) Icons.Filled.AutoGraph else Icons.Outlined.AutoGraph
+                                    HomeDestination.MORE -> if (isSelected) Icons.Filled.MoreHoriz else Icons.Outlined.MoreHoriz
+                                }
+                                Icon(icon, contentDescription = null)
+                            },
+                            label = { 
+                                Text(
+                                    destination.name.lowercase().replaceFirstChar(Char::titlecase),
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                ) 
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = MySharePrimary,
+                                selectedTextColor = MySharePrimary,
+                                unselectedIconColor = MyShareSecondary,
+                                unselectedTextColor = MyShareSecondary,
+                                indicatorColor = MySharePrimaryContainer.copy(alpha = 0.5f)
+                            )
+                        )
+                    }
                 }
             }
         }
@@ -178,22 +200,16 @@ fun HomeScreen(
                             onDestinationSelected = onDestinationSelected
                         )
                     }
-                    HomeDestination.RULES -> {
-                        homeRulesTab(
-                            rules = state.rules,
-                            isPremium = state.moreCard.isPremium,
-                            onAddNewRule = onAddNewRule,
-                            onEditRule = onEditRule,
-                            onDestinationSelected = onDestinationSelected
-                        )
-                    }
-                    HomeDestination.GOALS -> {
-                        homeGoalsTab(
+                    HomeDestination.STRATEGY -> {
+                        homeStrategyTab(
                             goals = state.goals,
+                            rules = state.rules,
                             isPremium = state.moreCard.isPremium,
                             onAddNewGoal = onAddNewGoal,
                             onEditGoal = onEditGoal,
-                            onDestinationSelected = onDestinationSelected
+                            onAddNewRule = onAddNewRule,
+                            onEditRule = onEditRule,
+                            onShowPaywall = { showPaywallSheet = true }
                         )
                     }
                     HomeDestination.REVIEW -> {
@@ -204,8 +220,16 @@ fun HomeScreen(
                             isPremium = state.moreCard.isPremium,
                             onFlexibleSpendChanged = onFlexibleSpendChanged,
                             onGoalContributionChanged = onGoalContributionChanged,
-                            onSaveReview = onSaveReview,
-                            onDestinationSelected = onDestinationSelected
+                            onSaveReview = {
+                                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                                onSaveReview()
+                                if (!state.moreCard.isPremium) {
+                                    activity?.let {
+                                        pt.ms.myshare.presentation.ui.ads.InterstitialAdManager.showAd(it) {}
+                                    }
+                                }
+                            },
+                            onShowPaywall = { showPaywallSheet = true }
                         )
                     }
                     HomeDestination.MORE -> {

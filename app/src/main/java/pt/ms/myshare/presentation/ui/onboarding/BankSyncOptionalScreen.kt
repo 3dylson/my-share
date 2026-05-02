@@ -1,12 +1,15 @@
 package pt.ms.myshare.presentation.ui.onboarding
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -14,15 +17,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 import pt.ms.myshare.R
 import pt.ms.myshare.presentation.ui.components.PremiumButton
+import pt.ms.myshare.presentation.ui.components.PremiumInfoCard
 import pt.ms.myshare.presentation.ui.theme.*
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun BankSyncOptionalScreen(
     onSync: () -> Unit,
     onSkip: () -> Unit
 ) {
+    var isInterestRegistered by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isInterestRegistered) {
+        if (isInterestRegistered) {
+            delay(3000)
+            onSync()
+        }
+    }
+
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(
             modifier = Modifier
@@ -70,23 +85,37 @@ fun BankSyncOptionalScreen(
             
             Spacer(Modifier.weight(1f))
             
-            PremiumButton(
-                text = stringResource(R.string.onboarding_banksync_link),
-                onClick = onSync
-            )
-            
-            TextButton(
-                onClick = onSkip,
-                modifier = Modifier.fillMaxWidth().height(56.dp)
-            ) {
-                Text(
-                    stringResource(R.string.onboarding_banksync_skip), 
-                    style = MaterialTheme.typography.labelLarge, 
-                    color = MyShareSecondary
-                )
+            AnimatedContent(targetState = isInterestRegistered, label = "interestState") { registered ->
+                if (registered) {
+                    PremiumInfoCard(
+                        title = "Interest Registered!",
+                        body = "Bank sync is coming soon. We'll let you know as soon as it's ready.",
+                        icon = Icons.Default.CheckCircle,
+                        backgroundColor = MySharePrimaryContainer.copy(alpha = 0.4f),
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)
+                    )
+                } else {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        PremiumButton(
+                            text = stringResource(R.string.onboarding_banksync_link),
+                            onClick = { isInterestRegistered = true }
+                        )
+                        
+                        TextButton(
+                            onClick = onSkip,
+                            modifier = Modifier.fillMaxWidth().height(56.dp)
+                        ) {
+                            Text(
+                                stringResource(R.string.onboarding_banksync_skip), 
+                                style = MaterialTheme.typography.labelLarge, 
+                                color = MyShareSecondary
+                            )
+                        }
+                        
+                        Spacer(Modifier.height(24.dp))
+                    }
+                }
             }
-            
-            Spacer(Modifier.height(24.dp))
         }
     }
 }

@@ -192,6 +192,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
             LaunchedEffect(Unit) { viewModel.logBankSyncPromptShown() }
             BankSyncOptionalScreen(
                 onSync = { 
+                    viewModel.logBankSyncInterestExpressed()
                     viewModel.setBankSyncHandled()
                     viewModel.completeOnboarding() 
                 },

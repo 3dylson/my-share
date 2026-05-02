@@ -10,8 +10,7 @@ import java.time.YearMonth
 
 enum class HomeDestination {
     PLAN,
-    RULES,
-    GOALS,
+    STRATEGY,
     REVIEW,
     MORE
 }

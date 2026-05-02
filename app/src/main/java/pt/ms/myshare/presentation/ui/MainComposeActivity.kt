@@ -41,7 +41,9 @@ class MainComposeActivity : ComponentActivity() {
                 }
                 
                 if (consentManager.canRequestAds && sessions >= 2) {
-                    MobileAds.initialize(this@MainComposeActivity) {}
+                    MobileAds.initialize(this@MainComposeActivity) {
+                        pt.ms.myshare.presentation.ui.ads.InterstitialAdManager.loadAd(this@MainComposeActivity)
+                    }
                 }
             }
         })
