@@ -12,6 +12,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.android.billingclient.api.Purchase
+import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
 import timber.log.Timber
 
 class PlayBillingEntitlementRepository(
@@ -23,8 +24,11 @@ class PlayBillingEntitlementRepository(
 
     override val isPro: Flow<Boolean> = billingClientWrapper.purchases.map { purchases ->
         purchases.any { purchase ->
-            (purchase.products.contains("myshare_annual") || purchase.products.contains("myshare_monthly")) && 
-            purchase.purchaseState == com.android.billingclient.api.Purchase.PurchaseState.PURCHASED
+            (
+                purchase.products.contains(PremiumSubscriptionProducts.ANNUAL_ID) ||
+                    purchase.products.contains(PremiumSubscriptionProducts.MONTHLY_ID)
+                ) &&
+                purchase.purchaseState == Purchase.PurchaseState.PURCHASED
         }
     }
 

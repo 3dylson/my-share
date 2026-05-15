@@ -5,6 +5,7 @@ import android.app.Activity
 import com.android.billingclient.api.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
 import pt.ms.myshare.domain.model.StoreProduct
 import timber.log.Timber
 
@@ -20,10 +21,6 @@ class BillingClientWrapper(context: Context) : PurchasesUpdatedListener {
 
     private val _purchases = MutableStateFlow<List<Purchase>>(emptyList())
     val purchases = _purchases.asStateFlow()
-
-    // We only have one premium subscription product id currently
-    private val MONTHLY_ID = "myshare_monthly"
-    private val ANNUAL_ID = "myshare_annual"
 
     fun startBillingConnection() {
         billingClient.startConnection(object : BillingClientStateListener {
@@ -47,11 +44,11 @@ class BillingClientWrapper(context: Context) : PurchasesUpdatedListener {
             .setProductList(
                 listOf(
                     QueryProductDetailsParams.Product.newBuilder()
-                        .setProductId(MONTHLY_ID)
+                        .setProductId(PremiumSubscriptionProducts.MONTHLY_ID)
                         .setProductType(BillingClient.ProductType.SUBS)
                         .build(),
                     QueryProductDetailsParams.Product.newBuilder()
-                        .setProductId(ANNUAL_ID)
+                        .setProductId(PremiumSubscriptionProducts.ANNUAL_ID)
                         .setProductType(BillingClient.ProductType.SUBS)
                         .build()
                 )

@@ -14,6 +14,7 @@ import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.ReviewInsight
 import pt.ms.myshare.domain.model.Goal
+import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
 import pt.ms.myshare.domain.model.SalaryPlan
 import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
@@ -176,8 +177,8 @@ class HomeViewModel @Inject constructor(
                 val ruleCards = currentRules.map { buildRuleCard(it) }
                 val reviewCard = buildReviewCard(updatedPlan, latestReview)
                 
-                val monthlyProduct = products.find { it.productId == "myshare_monthly" }
-                val annualProduct = products.find { it.productId == "myshare_annual" }
+                val monthlyProduct = products.find { it.productId == PremiumSubscriptionProducts.MONTHLY_ID }
+                val annualProduct = products.find { it.productId == PremiumSubscriptionProducts.ANNUAL_ID }
 
                 val moreCard = MoreCardState(
                     reminderEnabled = reminder.enabled,
@@ -399,7 +400,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun unlockPremium(activity: android.app.Activity) {
-        val storeProductId = if (uiState.value.moreCard.selectedBillingPlan == BillingPlan.ANNUAL) "myshare_annual" else "myshare_monthly"
+        val storeProductId = PremiumSubscriptionProducts.productIdFor(uiState.value.moreCard.selectedBillingPlan)
         
         val realProduct = availableStoreProducts.find { it.productId == storeProductId }
         

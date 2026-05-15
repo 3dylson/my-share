@@ -19,6 +19,7 @@ import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.model.GoalType
 import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.domain.model.PlanningFocus
+import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
 import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.domain.model.ReminderConfiguration
 import pt.ms.myshare.domain.model.SalaryPlan
@@ -198,7 +199,7 @@ class OnboardingViewModel @Inject constructor(
     }
 
     fun purchasePremium(activity: android.app.Activity) {
-        val storeProductId = if (state.value.selectedBillingPlan == BillingPlan.ANNUAL) "myshare_annual" else "myshare_monthly"
+        val storeProductId = PremiumSubscriptionProducts.productIdFor(state.value.selectedBillingPlan)
         viewModelScope.launch {
             state.update { it.copy(isBillingActionInProgress = true, billingMessage = "paywall_billing_starting") }
             val products = entitlementRepository.availableProducts.first()
