@@ -5,9 +5,15 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -60,36 +66,71 @@ fun ReminderSetupScreen(
         }
     }
 
-    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        bottomBar = {
+            Surface(color = MaterialTheme.colorScheme.background) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .navigationBarsPadding()
+                        .padding(horizontal = 24.dp, vertical = 14.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    PremiumButton(
+                        text = stringResource(R.string.onboarding_reminder_button),
+                        onClick = { requestPermissionIfNeeded() }
+                    )
+
+                    TextButton(
+                        onClick = onSkip,
+                        modifier = Modifier.fillMaxWidth().height(52.dp)
+                    ) {
+                        Text(
+                            stringResource(R.string.onboarding_reminder_skip),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp),
+                .padding(innerPadding)
+                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
+                .padding(horizontal = 24.dp)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(40.dp))
+            Spacer(Modifier.height(12.dp))
+
+            ReminderHeroIcon()
+
+            Spacer(Modifier.height(14.dp))
             
             Text(
                 stringResource(R.string.onboarding_reminder_title),
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.ExtraBold,
                 textAlign = TextAlign.Center,
-                color = MyShareOnSurface
+                color = MaterialTheme.colorScheme.onSurface
             )
             
             Text(
                 stringResource(R.string.onboarding_reminder_subtitle),
                 style = MaterialTheme.typography.bodyLarge,
-                color = MyShareSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 lineHeight = 24.sp,
                 modifier = Modifier.padding(top = 8.dp)
             )
             
-            Spacer(Modifier.height(48.dp))
+            Spacer(Modifier.height(20.dp))
 
-            // Cadence Selection
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 PremiumChoiceCard(
                     title = stringResource(R.string.onboarding_reminder_cadence_payday),
                     description = stringResource(R.string.onboarding_reminder_cadence_payday_desc),
@@ -104,47 +145,20 @@ fun ReminderSetupScreen(
                 )
             }
 
-            Spacer(Modifier.height(48.dp))
+            Spacer(Modifier.height(16.dp))
 
-            // Time Selector
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    stringResource(R.string.onboarding_reminder_time_title),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MySharePrimary,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(Modifier.height(16.dp))
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(32.dp)
-                ) {
-                    IconButton(
-                        onClick = { time = time.minusHours(1) },
-                        modifier = Modifier
-                            .size(56.dp)
-                            .background(MySharePrimaryContainer, CircleShape)
-                    ) {
-                        Text("-", fontSize = 28.sp, color = MySharePrimary, fontWeight = FontWeight.Bold)
-                    }
+            ReminderTimeCard(
+                time = time,
+                onDecrease = { time = time.minusHours(1) },
+                onIncrease = { time = time.plusHours(1) }
+            )
 
-                    Text(
-                        "${time.hour.toString().padStart(2, '0')}:${time.minute.toString().padStart(2, '0')}",
-                        style = MaterialTheme.typography.displayMedium,
-                        fontWeight = FontWeight.Black,
-                        color = MyShareOnSurface
-                    )
+            Spacer(Modifier.height(12.dp))
 
-                    IconButton(
-                        onClick = { time = time.plusHours(1) },
-                        modifier = Modifier
-                            .size(56.dp)
-                            .background(MySharePrimaryContainer, CircleShape)
-                    ) {
-                        Text("+", fontSize = 28.sp, color = MySharePrimary, fontWeight = FontWeight.Bold)
-                    }
-                }
-            }
+            ReminderRoutineCard(
+                cadence = cadence,
+                time = time
+            )
 
             message?.let { 
                 Spacer(Modifier.height(16.dp))
@@ -156,25 +170,160 @@ fun ReminderSetupScreen(
                 ) 
             }
 
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.height(24.dp))
+        }
+    }
+}
 
-            PremiumButton(
-                text = stringResource(R.string.onboarding_reminder_button),
-                onClick = { requestPermissionIfNeeded() }
+@Composable
+private fun ReminderHeroIcon() {
+    Surface(
+        modifier = Modifier.size(84.dp),
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.78f),
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.42f))
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Icon(
+                imageVector = Icons.Default.Notifications,
+                contentDescription = null,
+                tint = MySharePrimary,
+                modifier = Modifier.size(32.dp)
             )
-            
-            TextButton(
-                onClick = onSkip,
-                modifier = Modifier.fillMaxWidth().height(56.dp)
+        }
+    }
+}
+
+@Composable
+private fun ReminderTimeCard(
+    time: LocalTime,
+    onDecrease: () -> Unit,
+    onIncrease: () -> Unit
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
+        shadowElevation = 2.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(14.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                Icon(
+                    imageVector = Icons.Default.Schedule,
+                    contentDescription = null,
+                    tint = MySharePrimary,
+                    modifier = Modifier.size(18.dp)
+                )
                 Text(
-                    stringResource(R.string.onboarding_reminder_skip), 
-                    style = MaterialTheme.typography.labelLarge, 
-                    color = MyShareSecondary
+                    stringResource(R.string.onboarding_reminder_time_title),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MySharePrimary,
+                    fontWeight = FontWeight.Bold
                 )
             }
-            
-            Spacer(Modifier.height(24.dp))
+
+            Spacer(Modifier.height(14.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                ReminderTimeButton(
+                    icon = Icons.Default.Remove,
+                    onClick = onDecrease
+                )
+
+                Text(
+                    "${time.hour.toString().padStart(2, '0')}:${time.minute.toString().padStart(2, '0')}",
+                    style = MaterialTheme.typography.displayMedium,
+                    fontWeight = FontWeight.Black,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                ReminderTimeButton(
+                    icon = Icons.Default.Add,
+                    onClick = onIncrease
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReminderTimeButton(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onClick: () -> Unit
+) {
+    IconButton(
+        onClick = onClick,
+        modifier = Modifier
+            .size(48.dp)
+            .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MySharePrimary,
+            modifier = Modifier.size(22.dp)
+        )
+    }
+}
+
+@Composable
+private fun ReminderRoutineCard(
+    cadence: ReminderCadence,
+    time: LocalTime
+) {
+    val cadenceLabel = when (cadence) {
+        ReminderCadence.PAYDAY -> stringResource(R.string.onboarding_reminder_cadence_payday)
+        ReminderCadence.WEEKLY_REVIEW -> stringResource(R.string.onboarding_reminder_cadence_weekly)
+    }
+    val timeLabel = "${time.hour.toString().padStart(2, '0')}:${time.minute.toString().padStart(2, '0')}"
+
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f),
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.35f))
+    ) {
+        Row(
+            modifier = Modifier.padding(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Icon(
+                imageVector = Icons.Default.CheckCircle,
+                contentDescription = null,
+                tint = MySharePrimary,
+                modifier = Modifier.size(24.dp)
+            )
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = stringResource(R.string.onboarding_reminder_routine_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Text(
+                    text = stringResource(R.string.onboarding_reminder_selected_format, cadenceLabel, timeLabel),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Text(
+                    text = stringResource(R.string.onboarding_reminder_routine_body),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.76f),
+                    lineHeight = 18.sp
+                )
+            }
         }
     }
 }

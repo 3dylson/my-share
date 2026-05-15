@@ -84,7 +84,7 @@ fun FixedCostsScreen(
                 stringResource(R.string.onboarding_fixed_costs_preset_title), 
                 style = MaterialTheme.typography.titleMedium, 
                 fontWeight = FontWeight.Bold,
-                color = MyShareOnSurface
+                color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(Modifier.height(16.dp))
             

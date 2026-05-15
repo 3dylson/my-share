@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,7 +58,7 @@ fun PremiumCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MyShareOutline.copy(alpha = 0.15f)),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
         shadowElevation = 2.dp
     ) {
         Column(content = content)
@@ -75,10 +76,10 @@ fun PremiumChoiceCard(
     badge: String? = null
 ) {
     val backgroundColor by animateColorAsState(
-        if (isSelected) MySharePrimaryContainer else MaterialTheme.colorScheme.surface
+        if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
     )
     val borderColor by animateColorAsState(
-        if (isSelected) MySharePrimary else MyShareOutline.copy(alpha = 0.5f)
+        if (isSelected) MySharePrimary else MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
     )
     val elevation by animateDpAsState(if (isSelected) 4.dp else 1.dp)
 
@@ -102,13 +103,13 @@ fun PremiumChoiceCard(
                         modifier = Modifier
                             .size(48.dp)
                             .clip(RoundedCornerShape(12.dp))
-                            .background(if (isSelected) MySharePrimary else MyShareSurfaceVariant),
+                            .background(if (isSelected) MySharePrimary else MaterialTheme.colorScheme.surfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = icon,
                             contentDescription = null,
-                            tint = if (isSelected) MyShareOnPrimary else MyShareOnSurfaceVariant
+                            tint = if (isSelected) MyShareOnPrimary else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                     Spacer(modifier = Modifier.width(16.dp))
@@ -118,14 +119,14 @@ fun PremiumChoiceCard(
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleMedium,
-                        color = MyShareOnSurface,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.SemiBold
                     )
                     if (description.isNotEmpty()) {
                         Text(
                             text = description,
                             style = MaterialTheme.typography.bodySmall,
-                            color = MyShareOnSurfaceVariant,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             lineHeight = 16.sp
                         )
                     }
@@ -178,7 +179,7 @@ fun PremiumMetricCard(
             .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier),
         shape = RoundedCornerShape(20.dp),
         color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MyShareOutline.copy(alpha = 0.2f)),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.22f)),
         shadowElevation = 4.dp
     ) {
         Row(
@@ -201,7 +202,7 @@ fun PremiumMetricCard(
                     Text(
                         text = label,
                         style = MaterialTheme.typography.labelMedium,
-                        color = MyShareSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Medium
                     )
                     Spacer(modifier = Modifier.height(4.dp))
@@ -216,7 +217,7 @@ fun PremiumMetricCard(
                         Text(
                             text = subtitle,
                             style = MaterialTheme.typography.bodySmall,
-                            color = MyShareOnSurfaceVariant.copy(alpha = 0.7f)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                         )
                     }
                 }
@@ -260,7 +261,7 @@ fun PremiumGoalCard(
             .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier),
         shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MyShareOutline.copy(alpha = 0.15f)),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
         shadowElevation = 2.dp
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
@@ -284,13 +285,13 @@ fun PremiumGoalCard(
                     Text(
                         text = goalName,
                         style = MaterialTheme.typography.titleMedium,
-                        color = MyShareOnSurface,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = targetAmountLabel,
                         style = MaterialTheme.typography.labelMedium,
-                        color = MyShareSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -306,7 +307,7 @@ fun PremiumGoalCard(
                     Text(
                         text = stringResource(R.string.progress_label),
                         style = MaterialTheme.typography.labelSmall,
-                        color = MyShareSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
@@ -325,7 +326,7 @@ fun PremiumGoalCard(
                 Text(
                     text = progressLabel,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MyShareOnSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Medium
                 )
             }
@@ -333,7 +334,7 @@ fun PremiumGoalCard(
             Spacer(modifier = Modifier.height(16.dp))
 
             Surface(
-                color = MyShareSecondary.copy(alpha = 0.05f),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Row(
@@ -345,14 +346,14 @@ fun PremiumGoalCard(
                     Icon(
                         imageVector = Icons.Default.AutoGraph,
                         contentDescription = null,
-                        tint = MyShareSecondary,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(14.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = targetDateLabel,
                         style = MaterialTheme.typography.labelSmall,
-                        color = MyShareSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -463,7 +464,7 @@ fun PremiumTextField(
             shape = RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MySharePrimary,
-                unfocusedBorderColor = MyShareOutline,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                 focusedLabelColor = MySharePrimary,
                 cursorColor = MySharePrimary
             ),
@@ -476,7 +477,7 @@ fun PremiumTextField(
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
-                color = MyShareSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(start = 12.dp, top = 4.dp)
             )
         }
@@ -490,15 +491,17 @@ fun PremiumPaywallCard(
     period: String,
     description: String? = null,
     badge: String? = null,
+    comparisonPrice: String? = null,
+    savingsLabel: String? = null,
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val borderColor by animateColorAsState(
-        if (isSelected) MySharePrimary else MyShareOutline.copy(alpha = 0.5f)
+        if (isSelected) MySharePrimary else MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
     )
     val backgroundColor by animateColorAsState(
-        if (isSelected) MySharePrimaryContainer.copy(alpha = 0.5f) else MaterialTheme.colorScheme.surface
+        if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f) else MaterialTheme.colorScheme.surface
     )
     
     Box(
@@ -524,13 +527,13 @@ fun PremiumPaywallCard(
                         text = title,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = MyShareOnSurface
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     if (description != null) {
                         Text(
                             text = description,
                             style = MaterialTheme.typography.bodySmall,
-                            color = MyShareSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -551,16 +554,34 @@ fun PremiumPaywallCard(
                     text = price,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Black,
-                    color = MyShareOnSurface
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 if (!price.contains(period, ignoreCase = true)) {
                     Text(
                         text = stringResource(R.string.price_period_suffix, period),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MyShareSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(bottom = 2.dp, start = 4.dp)
                     )
                 }
+                if (comparisonPrice != null) {
+                    Text(
+                        text = stringResource(R.string.price_per_period, comparisonPrice, period),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textDecoration = TextDecoration.LineThrough,
+                        modifier = Modifier.padding(bottom = 2.dp, start = 10.dp)
+                    )
+                }
+            }
+            if (savingsLabel != null) {
+                Text(
+                    text = savingsLabel,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(top = 6.dp)
+                )
             }
         }
 
@@ -602,7 +623,7 @@ fun PremiumSectionHeader(
             text = title,
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Black,
-            color = MyShareOnSurface
+            color = MaterialTheme.colorScheme.onBackground
         )
         if (actionText != null && onActionClick != null) {
             TextButton(onClick = onActionClick) {
@@ -623,7 +644,7 @@ fun PremiumInfoCard(
     body: String,
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
-    backgroundColor: Color = MySharePrimaryContainer.copy(alpha = 0.4f)
+    backgroundColor: Color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -649,13 +670,13 @@ fun PremiumInfoCard(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MyShareOnSurface
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = body,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MyShareSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = 20.sp
                 )
             }
@@ -724,14 +745,14 @@ fun PremiumAppHeader(
             text = title,
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Black,
-            color = MyShareOnSurface,
+            color = MaterialTheme.colorScheme.onBackground,
             letterSpacing = (-1.5).sp
         )
         if (subtitle != null) {
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodyLarge,
-                color = MyShareSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.Medium,
                 letterSpacing = 0.5.sp
             )
@@ -779,7 +800,7 @@ fun PremiumAdBanner(
         Text(
             text = stringResource(R.string.advertisement_label),
             style = MaterialTheme.typography.labelSmall,
-            color = MyShareSecondary.copy(alpha = 0.5f),
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
             modifier = Modifier.align(Alignment.TopStart).padding(4.dp)
         )
     }
@@ -798,8 +819,8 @@ fun PremiumBenefitCard(
             .fillMaxWidth()
             .clickable { onClick() },
         shape = RoundedCornerShape(20.dp),
-        color = MySharePrimary.copy(alpha = 0.03f),
-        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.1f))
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.16f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.18f))
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -825,12 +846,12 @@ fun PremiumBenefitCard(
                     text = title,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color = MyShareOnSurface
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MyShareSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -1046,7 +1067,7 @@ fun AllocationPreviewMetric(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MyShareOutline.copy(alpha = 0.15f)),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
         shadowElevation = 2.dp
     ) {
         Row(
@@ -1057,7 +1078,7 @@ fun AllocationPreviewMetric(
                 Text(
                     text = fixedLabel.uppercase(), 
                     style = MaterialTheme.typography.labelSmall, 
-                    color = MyShareSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(4.dp))
@@ -1065,7 +1086,7 @@ fun AllocationPreviewMetric(
                     text = fixedValue, 
                     style = MaterialTheme.typography.titleLarge, 
                     fontWeight = FontWeight.Black, 
-                    color = MyShareOnSurface,
+                    color = MaterialTheme.colorScheme.onSurface,
                     letterSpacing = (-0.5).sp
                 )
             }
@@ -1076,7 +1097,11 @@ fun AllocationPreviewMetric(
                     .height(40.dp)
                     .background(
                         Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, MyShareOutline.copy(alpha = 0.3f), Color.Transparent)
+                            colors = listOf(
+                                Color.Transparent,
+                                MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                                Color.Transparent
+                            )
                         )
                     )
             )
@@ -1085,7 +1110,7 @@ fun AllocationPreviewMetric(
                 Text(
                     text = flexibleLabel.uppercase(), 
                     style = MaterialTheme.typography.labelSmall, 
-                    color = MyShareSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(4.dp))
@@ -1093,7 +1118,7 @@ fun AllocationPreviewMetric(
                     text = flexibleValue, 
                     style = MaterialTheme.typography.titleLarge, 
                     fontWeight = FontWeight.Black, 
-                    color = MyShareOnSurface,
+                    color = MaterialTheme.colorScheme.onSurface,
                     letterSpacing = (-0.5).sp
                 )
             }
@@ -1101,10 +1126,6 @@ fun AllocationPreviewMetric(
     }
 }
 
-/**
- * An official-compliant Google Sign-In button.
- * Following Branding Guidelines: White Background, Gray border, Roboto-like font.
- */
 @Composable
 fun GoogleSignInButton(
     onClick: () -> Unit,
@@ -1116,90 +1137,88 @@ fun GoogleSignInButton(
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .height(52.dp)
+            .height(54.dp)
             .clickable(enabled = !isLoading) { onClick() },
-        shape = RoundedCornerShape(4.dp), 
+        shape = RoundedCornerShape(14.dp),
         color = Color.White,
         border = BorderStroke(1.dp, Color(0xFFDADCE0)),
-        shadowElevation = 1.dp
+        shadowElevation = 2.dp
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 18.dp),
+            contentAlignment = Alignment.Center
         ) {
             if (isLoading) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .size(20.dp),
                     color = Color(0xFF4285F4),
                     strokeWidth = 2.dp
                 )
             } else {
-                // Drawing a minimalist "G" logo using quadrants
-                Box(
+                GoogleLogo(
                     modifier = Modifier
-                        .size(18.dp)
-                ) {
-                    Canvas(modifier = Modifier.fillMaxSize()) {
-                        val strokeWidthPx = 3.5.dp.toPx()
-                        val radius = size.width / 2
-                        
-                        // Red Quadrant (Top)
-                        drawArc(
-                            color = Color(0xFFEA4335),
-                            startAngle = 180f,
-                            sweepAngle = 135f,
-                            useCenter = false,
-                            style = Stroke(width = strokeWidthPx, cap = StrokeCap.Round)
-                        )
-                        // Yellow Quadrant (Left)
-                        drawArc(
-                            color = Color(0xFFFBBC05),
-                            startAngle = 135f,
-                            sweepAngle = 45f,
-                            useCenter = false,
-                            style = Stroke(width = strokeWidthPx, cap = StrokeCap.Round)
-                        )
-                        // Green Quadrant (Bottom)
-                        drawArc(
-                            color = Color(0xFF34A853),
-                            startAngle = 45f,
-                            sweepAngle = 90f,
-                            useCenter = false,
-                            style = Stroke(width = strokeWidthPx, cap = StrokeCap.Round)
-                        )
-                        // Blue Quadrant (Right + Bar)
-                        drawArc(
-                            color = Color(0xFF4285F4),
-                            startAngle = 315f,
-                            sweepAngle = 90f,
-                            useCenter = false,
-                            style = Stroke(width = strokeWidthPx, cap = StrokeCap.Round)
-                        )
-                        
-                        // The "G" bar
-                        drawLine(
-                            color = Color(0xFF4285F4),
-                            start = androidx.compose.ui.geometry.Offset(radius, radius),
-                            end = androidx.compose.ui.geometry.Offset(size.width, radius),
-                            strokeWidth = strokeWidthPx,
-                            cap = StrokeCap.Round
-                        )
-                    }
-                }
-                
-                Spacer(Modifier.width(24.dp))
-                
-                Text(
-                    text = buttonText,
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        color = Color.Black.copy(alpha = 0.54f),
-                        fontWeight = FontWeight.Medium,
-                        letterSpacing = 0.2.sp
-                    )
+                        .align(Alignment.CenterStart)
+                        .size(22.dp)
                 )
             }
+
+            Text(
+                text = buttonText,
+                style = MaterialTheme.typography.labelLarge,
+                color = Color(0xFF3C4043),
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = 0.sp,
+                maxLines = 1
+            )
         }
+    }
+}
+
+@Composable
+private fun GoogleLogo(modifier: Modifier = Modifier) {
+    Canvas(modifier = modifier) {
+        val strokeWidthPx = 3.4.dp.toPx()
+        val radius = size.width / 2
+
+        drawArc(
+            color = Color(0xFFEA4335),
+            startAngle = 180f,
+            sweepAngle = 135f,
+            useCenter = false,
+            style = Stroke(width = strokeWidthPx, cap = StrokeCap.Round)
+        )
+        drawArc(
+            color = Color(0xFFFBBC05),
+            startAngle = 135f,
+            sweepAngle = 45f,
+            useCenter = false,
+            style = Stroke(width = strokeWidthPx, cap = StrokeCap.Round)
+        )
+        drawArc(
+            color = Color(0xFF34A853),
+            startAngle = 45f,
+            sweepAngle = 90f,
+            useCenter = false,
+            style = Stroke(width = strokeWidthPx, cap = StrokeCap.Round)
+        )
+        drawArc(
+            color = Color(0xFF4285F4),
+            startAngle = 315f,
+            sweepAngle = 90f,
+            useCenter = false,
+            style = Stroke(width = strokeWidthPx, cap = StrokeCap.Round)
+        )
+        drawLine(
+            color = Color(0xFF4285F4),
+            start = androidx.compose.ui.geometry.Offset(radius, radius),
+            end = androidx.compose.ui.geometry.Offset(size.width, radius),
+            strokeWidth = strokeWidthPx,
+            cap = StrokeCap.Round
+        )
     }
 }
 
@@ -1245,7 +1264,7 @@ fun PremiumSettingsGroup(
             Text(
                 text = title.uppercase(),
                 style = MaterialTheme.typography.labelMedium,
-                color = MyShareSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 16.dp, bottom = 8.dp, top = 24.dp),
                 letterSpacing = 1.sp
@@ -1255,7 +1274,7 @@ fun PremiumSettingsGroup(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(24.dp),
             color = MaterialTheme.colorScheme.surface,
-            border = BorderStroke(1.dp, MyShareOutline.copy(alpha = 0.1f)),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.16f)),
             shadowElevation = 2.dp
         ) {
             Column {
@@ -1272,7 +1291,7 @@ fun PremiumSettingsRow(
     iconColor: Color,
     modifier: Modifier = Modifier,
     subtitle: String? = null,
-    titleColor: Color = MyShareOnSurface,
+    titleColor: Color? = null,
     trailingContent: @Composable (RowScope.() -> Unit)? = null,
     showDivider: Boolean = true,
     onClick: () -> Unit
@@ -1305,14 +1324,15 @@ fun PremiumSettingsRow(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = titleColor
+                    color = titleColor ?: MaterialTheme.colorScheme.onSurface
                 )
                 if (subtitle != null) {
                     Text(
                         text = subtitle,
                         style = MaterialTheme.typography.bodySmall,
-                        color = MyShareOnSurfaceVariant,
-                        maxLines = 1
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2,
+                        lineHeight = 17.sp
                     )
                 }
             }
@@ -1322,7 +1342,7 @@ fun PremiumSettingsRow(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = null,
-                    tint = MyShareSecondary.copy(alpha = 0.5f),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -1333,7 +1353,7 @@ fun PremiumSettingsRow(
                     .fillMaxWidth()
                     .padding(start = 72.dp)
                     .height(1.dp)
-                    .background(MyShareOutline.copy(alpha = 0.1f))
+                    .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.14f))
             )
         }
     }
@@ -1355,7 +1375,7 @@ fun PremiumProfileHeader(
             .clickable { onAccountClick() },
         shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MyShareOutline.copy(alpha = 0.1f)),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.16f)),
         shadowElevation = 4.dp
     ) {
         Row(
@@ -1369,7 +1389,7 @@ fun PremiumProfileHeader(
                     .clip(RoundedCornerShape(22.dp))
                     .background(
                         Brush.linearGradient(
-                            colors = listOf(MySharePrimary, MyShareSecondary)
+                            colors = listOf(MySharePrimary, MaterialTheme.colorScheme.secondary)
                         )
                     ),
                 contentAlignment = Alignment.Center
@@ -1388,14 +1408,14 @@ fun PremiumProfileHeader(
                 Text(
                     text = accountLabel,
                     style = MaterialTheme.typography.labelMedium,
-                    color = MyShareSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = email,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Black,
-                    color = MyShareOnSurface,
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1
                 )
                 Spacer(modifier = Modifier.height(4.dp))
@@ -1428,7 +1448,7 @@ fun PremiumProfileHeader(
                     Text(
                         text = membershipLabel,
                         style = MaterialTheme.typography.bodySmall,
-                        color = MyShareOnSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -1436,7 +1456,7 @@ fun PremiumProfileHeader(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null,
-                tint = MyShareSecondary.copy(alpha = 0.3f)
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.35f)
             )
         }
     }

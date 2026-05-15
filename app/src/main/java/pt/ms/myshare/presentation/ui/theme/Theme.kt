@@ -31,17 +31,19 @@ private val LightColorScheme = lightColorScheme(
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = MySharePrimaryContainer,
-    onPrimary = MyShareOnPrimaryContainer,
+    primary = androidx.compose.ui.graphics.Color(0xFFA5B4FC),
+    onPrimary = androidx.compose.ui.graphics.Color(0xFF111827),
+    primaryContainer = androidx.compose.ui.graphics.Color(0xFF3730A3),
+    onPrimaryContainer = androidx.compose.ui.graphics.Color(0xFFE0E7FF),
     secondary = MyShareSecondary,
     onSecondary = MyShareOnSecondary,
-    background = androidx.compose.ui.graphics.Color(0xFF030712), // Deepest Navy/Black
-    onBackground = androidx.compose.ui.graphics.Color(0xFFF9FAFB),
-    surface = androidx.compose.ui.graphics.Color(0xFF111827), // Elevated Navy/Grey
-    onSurface = androidx.compose.ui.graphics.Color(0xFFF9FAFB),
-    surfaceVariant = androidx.compose.ui.graphics.Color(0xFF374151),
-    onSurfaceVariant = androidx.compose.ui.graphics.Color(0xFFE5E7EB),
-    outline = androidx.compose.ui.graphics.Color(0xFF6B7280),
+    background = androidx.compose.ui.graphics.Color(0xFF0B1120),
+    onBackground = androidx.compose.ui.graphics.Color(0xFFF8FAFC),
+    surface = androidx.compose.ui.graphics.Color(0xFF111827),
+    onSurface = androidx.compose.ui.graphics.Color(0xFFF8FAFC),
+    surfaceVariant = androidx.compose.ui.graphics.Color(0xFF1F2937),
+    onSurfaceVariant = androidx.compose.ui.graphics.Color(0xFFD1D5DB),
+    outline = androidx.compose.ui.graphics.Color(0xFF4B5563),
     error = androidx.compose.ui.graphics.Color(0xFFFCA5A5),
     onError = androidx.compose.ui.graphics.Color(0xFF7F1D1D)
 )

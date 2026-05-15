@@ -29,12 +29,7 @@ import pt.ms.myshare.R
 import pt.ms.myshare.presentation.ui.components.PremiumBenefitCard
 import pt.ms.myshare.presentation.ui.components.PremiumProgressBar
 import pt.ms.myshare.presentation.ui.components.PremiumSectionHeader
-import pt.ms.myshare.presentation.ui.theme.MyShareOnSurface
-import pt.ms.myshare.presentation.ui.theme.MyShareOnSurfaceVariant
-import pt.ms.myshare.presentation.ui.theme.MyShareOutline
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
-import pt.ms.myshare.presentation.ui.theme.MySharePrimaryContainer
-import pt.ms.myshare.presentation.ui.theme.MyShareSecondary
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -210,7 +205,7 @@ private fun CompactStrategyGoalCard(
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(22.dp),
         color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MyShareOutline.copy(alpha = 0.16f)),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.22f)),
         shadowElevation = 2.dp
     ) {
         Column(
@@ -234,7 +229,7 @@ private fun CompactStrategyGoalCard(
                     Text(
                         text = goalName,
                         style = MaterialTheme.typography.titleMedium,
-                        color = MyShareOnSurface,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Black,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -242,7 +237,7 @@ private fun CompactStrategyGoalCard(
                     Text(
                         text = targetAmountLabel,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MyShareSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
@@ -289,7 +284,7 @@ private fun CompactStrategyRuleCard(
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(18.dp),
         color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MyShareOutline.copy(alpha = 0.16f)),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.22f)),
         shadowElevation = 1.dp
     ) {
         Row(
@@ -312,7 +307,7 @@ private fun CompactStrategyRuleCard(
                 Text(
                     text = ruleName,
                     style = MaterialTheme.typography.titleSmall,
-                    color = MyShareOnSurface,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -320,13 +315,13 @@ private fun CompactStrategyRuleCard(
                 Text(
                     text = typeLabel,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MyShareSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             Text(
                 text = amountLabel,
                 style = MaterialTheme.typography.titleMedium,
-                color = MyShareOnSurface,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Black
             )
         }
@@ -342,7 +337,7 @@ private fun StrategyStatusChip(
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(12.dp),
-        color = MySharePrimaryContainer.copy(alpha = 0.28f)
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.28f)
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
@@ -352,13 +347,13 @@ private fun StrategyStatusChip(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = MyShareSecondary,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(14.dp)
             )
             Text(
                 text = text,
                 style = MaterialTheme.typography.labelSmall,
-                color = MyShareSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -377,7 +372,7 @@ private fun EmptyStrategyWorkspace(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
         color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MyShareOutline.copy(alpha = 0.16f)),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.22f)),
         shadowElevation = 2.dp
     ) {
         Column(
@@ -387,7 +382,7 @@ private fun EmptyStrategyWorkspace(
             Text(
                 text = stringResource(R.string.home_strategy_workspace_body),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MyShareOnSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             StrategyActionRow(
                 title = stringResource(R.string.home_strategy_goal_empty_title),
@@ -418,7 +413,7 @@ private fun StrategyActionRow(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
-        color = MySharePrimaryContainer.copy(alpha = 0.24f)
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.24f)
     ) {
         Row(
             modifier = Modifier.padding(14.dp),
@@ -440,13 +435,13 @@ private fun StrategyActionRow(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleSmall,
-                    color = MyShareOnSurface,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MyShareSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             Icon(

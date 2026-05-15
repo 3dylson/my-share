@@ -44,14 +44,8 @@ import androidx.compose.ui.unit.sp
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.PlanPreview
 import pt.ms.myshare.presentation.ui.components.PremiumButton
-import pt.ms.myshare.presentation.ui.theme.MyShareBackground
-import pt.ms.myshare.presentation.ui.theme.MyShareOnSurface
-import pt.ms.myshare.presentation.ui.theme.MyShareOutline
 import pt.ms.myshare.presentation.ui.theme.MySharePositive
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
-import pt.ms.myshare.presentation.ui.theme.MySharePrimaryContainer
-import pt.ms.myshare.presentation.ui.theme.MyShareSecondary
-import pt.ms.myshare.presentation.ui.theme.MyShareSurface
 import java.text.NumberFormat
 import java.util.Calendar
 import java.util.Locale
@@ -65,9 +59,9 @@ fun TrajectoryScreen(
     val currencyFormat = NumberFormat.getCurrencyInstance(Locale.getDefault())
 
     Scaffold(
-        containerColor = MyShareBackground,
+        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
-            Surface(color = MyShareBackground) {
+            Surface(color = MaterialTheme.colorScheme.background) {
                 PremiumButton(
                     text = stringResource(R.string.onboarding_trajectory_button),
                     onClick = onNext,
@@ -93,12 +87,12 @@ fun TrajectoryScreen(
                 text = stringResource(R.string.onboarding_trajectory_title),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.ExtraBold,
-                color = MyShareOnSurface
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Text(
                 text = stringResource(R.string.onboarding_trajectory_subtitle),
-                color = MyShareSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium,
                 lineHeight = 21.sp,
                 modifier = Modifier.padding(top = 8.dp)
@@ -130,7 +124,7 @@ fun TrajectoryScreen(
                 Text(
                     text = stringResource(R.string.onboarding_trajectory_footer),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MyShareSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = 20.sp
                 )
             } else {
@@ -159,8 +153,8 @@ private fun TrajectorySummaryCard(
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
-        color = MyShareSurface,
-        border = BorderStroke(1.dp, MyShareOutline.copy(alpha = 0.55f))
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.55f))
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -202,7 +196,7 @@ private fun TrajectorySummaryRow(
     Row(verticalAlignment = Alignment.CenterVertically) {
         Surface(
             shape = CircleShape,
-            color = MySharePrimaryContainer.copy(alpha = 0.55f)
+            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f)
         ) {
             Box(
                 modifier = Modifier.size(42.dp),
@@ -221,7 +215,7 @@ private fun TrajectorySummaryRow(
             Text(
                 text = title,
                 style = MaterialTheme.typography.labelLarge,
-                color = MyShareSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -229,14 +223,14 @@ private fun TrajectorySummaryRow(
                 text = value,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = MyShareOnSurface,
+                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = body,
                 style = MaterialTheme.typography.bodySmall,
-                color = MyShareSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )

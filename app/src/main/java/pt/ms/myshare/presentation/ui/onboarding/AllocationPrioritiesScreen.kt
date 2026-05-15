@@ -69,7 +69,7 @@ fun AllocationPrioritiesScreen(
                     progress = { progress.coerceAtMost(1f) },
                     modifier = Modifier.fillMaxWidth().height(12.dp),
                     color = if (remaining < BigDecimal.ZERO) MaterialTheme.colorScheme.error else MySharePrimary,
-                    trackColor = MySharePrimaryContainer,
+                    trackColor = MaterialTheme.colorScheme.primaryContainer,
                     strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
                 )
                 Spacer(Modifier.height(12.dp))
@@ -77,7 +77,7 @@ fun AllocationPrioritiesScreen(
                     Text(
                         stringResource(R.string.onboarding_priorities_allocated, currency.format(allocated)), 
                         style = MaterialTheme.typography.labelLarge,
-                        color = if (remaining < BigDecimal.ZERO) MaterialTheme.colorScheme.error else MyShareSecondary
+                        color = if (remaining < BigDecimal.ZERO) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
                         if (remaining >= BigDecimal.ZERO) 

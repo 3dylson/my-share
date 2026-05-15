@@ -16,6 +16,7 @@ import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.ReviewInsight
 import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
+import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.domain.model.ReminderConfiguration
 import pt.ms.myshare.domain.model.SalaryPlan
 import pt.ms.myshare.domain.model.StoreProduct
@@ -31,6 +32,8 @@ import pt.ms.myshare.domain.use_case.GetPerformanceStatsUseCase
 import pt.ms.myshare.domain.use_case.GetCoachingInsightsUseCase
 import pt.ms.myshare.domain.use_case.PerformanceStats
 import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
+import pt.ms.myshare.presentation.ui.formatting.SubscriptionSavingsFormatter
+import pt.ms.myshare.presentation.ui.onboarding.ReminderWorkScheduler
 import pt.ms.myshare.utils.logs.FirebaseUtils
 import timber.log.Timber
 import java.math.BigDecimal
@@ -50,7 +53,8 @@ class HomeViewModel @Inject constructor(
     private val getReviewHistoryUseCase: GetReviewHistoryUseCase,
     private val updateGoalProgressUseCase: UpdateGoalProgressUseCase,
     private val getPerformanceStatsUseCase: GetPerformanceStatsUseCase,
-    private val getCoachingInsightsUseCase: GetCoachingInsightsUseCase
+    private val getCoachingInsightsUseCase: GetCoachingInsightsUseCase,
+    private val reminderWorkScheduler: ReminderWorkScheduler
 ) : ViewModel() {
 
     private val uiState = MutableStateFlow(HomeState())
@@ -193,6 +197,11 @@ class HomeViewModel @Inject constructor(
                 
                 val monthlyProduct = products.find { it.productId == PremiumSubscriptionProducts.MONTHLY_ID }
                 val annualProduct = products.find { it.productId == PremiumSubscriptionProducts.ANNUAL_ID }
+                val annualComparison = SubscriptionSavingsFormatter.formatAnnualComparison(
+                    monthlyProduct = monthlyProduct,
+                    annualProduct = annualProduct,
+                    locale = locale
+                )
                 val currentMore = uiState.value.moreCard
                 val selectedBillingPlan = if (currentMore.pricingStrategy == null) {
                     pricingStrategy.heroPlan
@@ -220,9 +229,14 @@ class HomeViewModel @Inject constructor(
                     } else {
                         emptyList()
                     },
+                    reminderHourOfDay = reminder.hourOfDay,
+                    reminderMinute = reminder.minute,
+                    reminderCadence = reminder.cadence,
                     pricingStrategy = pricingStrategy,
                     actualMonthlyPrice = monthlyProduct?.price,
                     actualAnnualPrice = annualProduct?.price,
+                    annualMonthlyEquivalentPrice = annualComparison?.monthlyEquivalentPrice,
+                    annualSavingsPrice = annualComparison?.savingsPrice,
                     actualMonthlyTrialDays = monthlyProduct?.freeTrialDays?.takeIf { it > 0 },
                     actualAnnualTrialDays = annualProduct?.freeTrialDays?.takeIf { it > 0 },
                     showAdsConsentOption = uiState.value.moreCard.showAdsConsentOption,
@@ -232,6 +246,10 @@ class HomeViewModel @Inject constructor(
                     isPremium = isPremium,
                     automationEnabled = automation,
                     userEmail = user?.email,
+                    canConnectGoogle = user?.email.isNullOrBlank(),
+                    isGoogleConnectionInProgress = currentMore.isGoogleConnectionInProgress,
+                    googleConnectionMessage = currentMore.googleConnectionMessage,
+                    googleConnectionError = currentMore.googleConnectionError,
                     error = currentMore.error.takeUnless { shouldClearUnavailableMessage }
                 )
                 HomeState(
@@ -417,14 +435,32 @@ class HomeViewModel @Inject constructor(
     fun toggleReminder(enabled: Boolean) {
         viewModelScope.launch {
             val current = plannerRepository.loadReminderConfiguration()
-            plannerRepository.saveReminderConfiguration(current.copy(enabled = enabled))
+            val configuration = current.copy(enabled = enabled)
+            plannerRepository.saveReminderConfiguration(configuration)
+            reminderWorkScheduler.sync(configuration)
             FirebaseUtils.logEvent(if (enabled) "reminder_enabled" else "reminder_disabled")
+            Timber.tag(TAG).d("Reminder toggled enabled=%s", enabled)
         }
     }
 
-    private fun updateReminderState(enabled: Boolean) {
-        val labelKey = if (enabled) "home_more_reminders_on" else "home_more_reminders_off"
-        uiState.update { it.copy(moreCard = it.moreCard.copy(reminderEnabled = enabled, reminderLabelKey = labelKey)) }
+    fun saveReminderConfiguration(hourOfDay: Int, minute: Int, cadence: ReminderCadence) {
+        viewModelScope.launch {
+            val configuration = ReminderConfiguration(
+                enabled = true,
+                hourOfDay = hourOfDay.coerceIn(0, 23),
+                minute = minute.coerceIn(0, 59),
+                cadence = cadence
+            )
+            plannerRepository.saveReminderConfiguration(configuration)
+            reminderWorkScheduler.sync(configuration)
+            FirebaseUtils.logEvent("reminder_settings_saved")
+            Timber.tag(TAG).d(
+                "Reminder settings saved hour=%s minute=%s cadence=%s",
+                configuration.hourOfDay,
+                configuration.minute,
+                configuration.cadence
+            )
+        }
     }
 
     fun chooseBillingPlan(plan: BillingPlan) {
@@ -434,6 +470,64 @@ class HomeViewModel @Inject constructor(
             putString("price_cluster", pricingStrategy.marketCluster)
             putString("source", "home_more")
         })
+    }
+
+    fun connectGoogleAccount(idToken: String) {
+        viewModelScope.launch {
+            uiState.update {
+                it.copy(
+                    moreCard = it.moreCard.copy(
+                        isGoogleConnectionInProgress = true,
+                        googleConnectionMessage = null,
+                        googleConnectionError = null
+                    )
+                )
+            }
+
+            val result = authRepository.connectGoogleAccount(idToken)
+            result.fold(
+                onSuccess = { user ->
+                    uiState.update {
+                        it.copy(
+                            moreCard = it.moreCard.copy(
+                                isGoogleConnectionInProgress = false,
+                                googleConnectionMessage = "home_more_account_connect_google_success",
+                                googleConnectionError = null,
+                                userEmail = user.email,
+                                canConnectGoogle = user.email.isNullOrBlank()
+                            )
+                        )
+                    }
+                    FirebaseUtils.logEvent("google_account_connected")
+                    Timber.tag(TAG).d("Google account connected from Home")
+                },
+                onFailure = { throwable ->
+                    uiState.update {
+                        it.copy(
+                            moreCard = it.moreCard.copy(
+                                isGoogleConnectionInProgress = false,
+                                googleConnectionMessage = null,
+                                googleConnectionError = "home_more_account_connect_google_error_generic"
+                            )
+                        )
+                    }
+                    FirebaseUtils.logEvent("google_account_connect_failed")
+                    Timber.tag(TAG).e(throwable, "Google account connection failed from Home")
+                }
+            )
+        }
+    }
+
+    fun setGoogleConnectionCredentialError(errorKey: String) {
+        uiState.update {
+            it.copy(
+                moreCard = it.moreCard.copy(
+                    isGoogleConnectionInProgress = false,
+                    googleConnectionMessage = null,
+                    googleConnectionError = errorKey
+                )
+            )
+        }
     }
 
     fun logPremiumGateViewed(gate: HomePremiumGate) {

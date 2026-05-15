@@ -22,9 +22,7 @@ import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.PaydayRuleType
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
-import pt.ms.myshare.presentation.ui.theme.MyShareBackground
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
-import pt.ms.myshare.presentation.ui.theme.MyShareSecondary
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -69,31 +67,25 @@ fun RuleAddScreen(
     val isEditMode = state.requestedRuleId != null || state.ruleId != null
 
     if (showDeleteDialog) {
-        AlertDialog(
+        MyShareAlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text(stringResource(R.string.rule_add_delete_confirm_title)) },
-            text = { Text(stringResource(R.string.rule_add_delete_confirm_msg)) },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showDeleteDialog = false
-                        onDelete()
-                    },
-                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                ) {
-                    Text(stringResource(R.string.rule_add_delete_confirm_btn))
-                }
+            icon = Icons.Default.Warning,
+            iconTint = MaterialTheme.colorScheme.error,
+            title = stringResource(R.string.rule_add_delete_confirm_title),
+            message = stringResource(R.string.rule_add_delete_confirm_msg),
+            confirmText = stringResource(R.string.rule_add_delete_confirm_btn),
+            onConfirm = {
+                showDeleteDialog = false
+                onDelete()
             },
-            dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) {
-                    Text(stringResource(R.string.rule_add_delete_cancel_btn))
-                }
-            }
+            dismissText = stringResource(R.string.rule_add_delete_cancel_btn),
+            onDismiss = { showDeleteDialog = false },
+            actionStyle = MyShareDialogActionStyle.Destructive
         )
     }
 
     Scaffold(
-        containerColor = MyShareBackground,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             CenterAlignedTopAppBar(
                 title = { 
@@ -119,13 +111,13 @@ fun RuleAddScreen(
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MyShareBackground
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         },
         bottomBar = {
             if (!state.isMissingExistingRule) {
-                Surface(color = MyShareBackground) {
+                Surface(color = MaterialTheme.colorScheme.background) {
                     PremiumButton(
                         text = if (state.isLoading) stringResource(R.string.rule_add_button_loading) else if (isEditMode) stringResource(R.string.rule_add_button_edit) else stringResource(R.string.rule_add_button_new),
                         onClick = onSave,
@@ -181,7 +173,7 @@ fun RuleAddScreen(
                 Text(
                     text = stringResource(R.string.rule_add_label_type),
                     style = MaterialTheme.typography.labelLarge,
-                    color = MyShareSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
                 )
                 Row(
@@ -219,7 +211,7 @@ fun RuleAddScreen(
                 prefix = { 
                     Text(
                         text = if (state.isPercentage) stringResource(R.string.percentage_prefix) else LocalizedAmountFormatter.currencySymbol(),
-                        color = MyShareSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     ) 
                 }
             )
@@ -228,7 +220,7 @@ fun RuleAddScreen(
                 Text(
                     text = stringResource(R.string.rule_add_label_category),
                     style = MaterialTheme.typography.labelLarge,
-                    color = MyShareSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
                 )
                 FlowRow(

@@ -23,12 +23,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import pt.ms.myshare.presentation.ui.theme.MyShareOnSurface
-import pt.ms.myshare.presentation.ui.theme.MyShareOutline
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
-import pt.ms.myshare.presentation.ui.theme.MySharePrimaryContainer
-import pt.ms.myshare.presentation.ui.theme.MyShareSecondary
-import pt.ms.myshare.presentation.ui.theme.MyShareSurface
 
 @Composable
 fun StrategyFormHeaderCard(
@@ -40,8 +35,8 @@ fun StrategyFormHeaderCard(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
-        color = MyShareSurface,
-        border = BorderStroke(1.dp, MyShareOutline.copy(alpha = 0.55f))
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.55f))
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -50,7 +45,7 @@ fun StrategyFormHeaderCard(
         ) {
             Surface(
                 shape = CircleShape,
-                color = MySharePrimaryContainer.copy(alpha = 0.75f)
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.75f)
             ) {
                 Box(
                     modifier = Modifier.size(42.dp),
@@ -73,14 +68,14 @@ fun StrategyFormHeaderCard(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MyShareOnSurface,
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = body,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MyShareSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )

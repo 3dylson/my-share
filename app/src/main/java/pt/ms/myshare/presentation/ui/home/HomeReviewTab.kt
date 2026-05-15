@@ -62,8 +62,8 @@ fun LazyListScope.homeReviewTab(
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
-                color = MySharePrimaryContainer.copy(alpha = 0.2f),
-                border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.1f))
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.18f),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.16f))
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),
@@ -73,19 +73,19 @@ fun LazyListScope.homeReviewTab(
                         Text(
                             text = stringResource(R.string.home_review_score_label),
                             style = MaterialTheme.typography.labelMedium,
-                            color = MyShareSecondary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
                             text = stringResource(R.string.home_review_score_percent, performanceStats.healthScore),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Black,
-                            color = MyShareOnSurface
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
                             text = stringResource(R.string.home_review_score_count, performanceStats.totalReviews),
                             style = MaterialTheme.typography.bodySmall,
-                            color = MyShareOnSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                     
@@ -94,21 +94,21 @@ fun LazyListScope.homeReviewTab(
                             .width(1.dp)
                             .height(40.dp)
                             .align(Alignment.CenterVertically)
-                            .background(MyShareOutline.copy(alpha = 0.2f))
+                            .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.24f))
                     )
                     
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = stringResource(R.string.home_review_streak_label),
                             style = MaterialTheme.typography.labelMedium,
-                            color = MyShareSecondary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
                             text = stringResource(R.string.home_review_streak_count, performanceStats.currentStreak),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Black,
-                            color = MyShareOnSurface
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
@@ -225,12 +225,12 @@ private fun CompactReviewHistoryCard(
     item: ReviewHistoryItemState,
     modifier: Modifier = Modifier
 ) {
-    val accentColor = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error
+    val accentColor = if (item.isPositive) MySharePositive else MaterialTheme.colorScheme.error
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MyShareOutline.copy(alpha = 0.14f)),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.22f)),
         shadowElevation = 2.dp
     ) {
         Column(
@@ -242,7 +242,7 @@ private fun CompactReviewHistoryCard(
                     Text(
                         text = item.dateLabel,
                         style = MaterialTheme.typography.labelLarge,
-                        color = MyShareSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
@@ -252,7 +252,7 @@ private fun CompactReviewHistoryCard(
                             stringResource(R.string.home_review_history_needs_attention)
                         },
                         style = MaterialTheme.typography.bodySmall,
-                        color = MyShareOnSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 Surface(
@@ -300,7 +300,7 @@ private fun CompactHistoryMetric(
     Surface(
         modifier = modifier.heightIn(min = 86.dp),
         shape = RoundedCornerShape(14.dp),
-        color = MySharePrimaryContainer.copy(alpha = 0.22f)
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.22f)
     ) {
         Column(
             modifier = Modifier.padding(12.dp),
@@ -309,20 +309,20 @@ private fun CompactHistoryMetric(
             Text(
                 text = label.uppercase(),
                 style = MaterialTheme.typography.labelSmall,
-                color = MyShareSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.Bold
             )
             Text(
                 text = value,
                 style = MaterialTheme.typography.titleMedium,
-                color = MyShareOnSurface,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Black,
                 modifier = Modifier.padding(top = 2.dp)
             )
             Text(
                 text = support,
                 style = MaterialTheme.typography.labelSmall,
-                color = MyShareOnSurfaceVariant,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1
             )
         }
@@ -361,7 +361,7 @@ private fun CompactReviewEntryCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
         color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MyShareOutline.copy(alpha = 0.16f)),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.22f)),
         shadowElevation = 2.dp
     ) {
         Column(
@@ -387,13 +387,13 @@ private fun CompactReviewEntryCard(
                     Text(
                         text = stringResource(R.string.home_review_manual_title),
                         style = MaterialTheme.typography.titleMedium,
-                        color = MyShareOnSurface,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Black
                     )
                     Text(
                         text = stringResource(R.string.home_review_manual_desc),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MyShareSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 18.sp
                     )
                 }

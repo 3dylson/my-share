@@ -1,10 +1,16 @@
 package pt.ms.myshare.presentation.ui.home
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
+import androidx.core.content.ContextCompat
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
@@ -17,12 +23,19 @@ import androidx.compose.ui.zIndex
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.compose.ui.res.stringResource
+import androidx.credentials.CredentialManager
+import kotlinx.coroutines.launch
+import pt.ms.myshare.BuildConfig
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.BillingPlan
+import pt.ms.myshare.domain.model.ReminderCadence
+import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReadResult
+import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReader
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.theme.*
 import timber.log.Timber
@@ -62,11 +75,14 @@ fun HomeRoute(
         onGoalContributionChanged = viewModel::onGoalContributionChanged,
         onSaveReview = viewModel::saveReview,
         onToggleReminder = viewModel::toggleReminder,
+        onSaveReminderConfiguration = viewModel::saveReminderConfiguration,
         onToggleAutomation = viewModel::onToggleAutomation,
         onBillingPlanSelected = viewModel::chooseBillingPlan,
         onUnlockPremium = viewModel::unlockPremium,
         onPremiumGateViewed = viewModel::logPremiumGateViewed,
         onPremiumGateUpgradeClicked = viewModel::logPremiumGateUpgradeClicked,
+        onConnectGoogleAccount = viewModel::connectGoogleAccount,
+        onGoogleConnectionCredentialError = viewModel::setGoogleConnectionCredentialError,
         onLogout = {
             viewModel.onLogout {
                 navController.navigate("onboarding") {
@@ -92,11 +108,14 @@ fun HomeScreen(
     onGoalContributionChanged: (String) -> Unit,
     onSaveReview: () -> Unit,
     onToggleReminder: (Boolean) -> Unit,
+    onSaveReminderConfiguration: (Int, Int, ReminderCadence) -> Unit,
     onToggleAutomation: (Boolean) -> Unit,
     onBillingPlanSelected: (BillingPlan) -> Unit,
     onUnlockPremium: (android.app.Activity, String) -> Unit,
     onPremiumGateViewed: (HomePremiumGate) -> Unit,
     onPremiumGateUpgradeClicked: (HomePremiumGate) -> Unit,
+    onConnectGoogleAccount: (String) -> Unit,
+    onGoogleConnectionCredentialError: (String) -> Unit,
     onLogout: () -> Unit,
     onManageAdsConsent: () -> Unit,
     onAddNewGoal: () -> Unit,
@@ -105,19 +124,69 @@ fun HomeScreen(
     onEditRule: (String) -> Unit
 ) {
     val activity = androidx.activity.compose.LocalActivity.current
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val googleIdTokenReader = remember(context) {
+        GoogleIdTokenReader(
+            credentialManager = CredentialManager.create(context),
+            serverClientId = BuildConfig.GOOGLE_CLIENT_ID
+        )
+    }
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     val snackbarHostState = remember { SnackbarHostState() }
     val reviewSavedMessage = stringResource(R.string.home_review_saved_feedback)
     var showPaywallSheet by remember { mutableStateOf(false) }
     var premiumGate by remember { mutableStateOf(HomePremiumGate.General) }
     var showAutomationLockDialog by remember { mutableStateOf(false) }
+    var showReminderSettingsDialog by remember { mutableStateOf(false) }
     var showSignOutDialog by remember { mutableStateOf(false) }
     var showAccountDetailsDialog by remember { mutableStateOf(false) }
     var previousReviewCount by remember { mutableStateOf<Int?>(null) }
+    var isGoogleCredentialRequestInProgress by remember { mutableStateOf(false) }
+    var pendingReminderSelection by remember { mutableStateOf<ReminderSettingsSelection?>(null) }
+    val notificationPermissionDeniedMessage = stringResource(R.string.onboarding_reminder_error_permission)
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { granted ->
+            val selection = pendingReminderSelection
+            pendingReminderSelection = null
+            if (granted && selection != null) {
+                onSaveReminderConfiguration(selection.hourOfDay, selection.minute, selection.cadence)
+            } else {
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar(notificationPermissionDeniedMessage)
+                }
+            }
+        }
+    )
+    val saveReminderWithPermission: (ReminderSettingsSelection) -> Unit = { selection ->
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+        ) {
+            onSaveReminderConfiguration(selection.hourOfDay, selection.minute, selection.cadence)
+        } else {
+            pendingReminderSelection = selection
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
     val openPremiumGate: (HomePremiumGate) -> Unit = { gate ->
         premiumGate = gate
         showPaywallSheet = true
         onPremiumGateViewed(gate)
+    }
+    val startGoogleAccountConnection: () -> Unit = {
+        if (!isGoogleCredentialRequestInProgress && !state.moreCard.isGoogleConnectionInProgress) {
+            coroutineScope.launch {
+                isGoogleCredentialRequestInProgress = true
+                when (val result = googleIdTokenReader.readIdToken(context, "home_more")) {
+                    is GoogleIdTokenReadResult.Success -> onConnectGoogleAccount(result.idToken)
+                    GoogleIdTokenReadResult.NoCredential -> onGoogleConnectionCredentialError("home_more_account_connect_google_error_no_credentials")
+                    GoogleIdTokenReadResult.UnsupportedCredential -> onGoogleConnectionCredentialError("home_more_account_connect_google_error_generic")
+                    is GoogleIdTokenReadResult.Failure -> onGoogleConnectionCredentialError("home_more_account_connect_google_error_generic")
+                }
+                isGoogleCredentialRequestInProgress = false
+            }
+        }
     }
 
     LaunchedEffect(state.reviewHistory.size) {
@@ -146,135 +215,111 @@ fun HomeScreen(
     }
 
     if (showAutomationLockDialog) {
-        AlertDialog(
+        MyShareAlertDialog(
             onDismissRequest = { showAutomationLockDialog = false },
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.PrecisionManufacturing,
-                    contentDescription = null,
-                    tint = MySharePrimary
-                )
+            icon = Icons.Default.PrecisionManufacturing,
+            title = stringResource(R.string.home_more_automation_locked_title),
+            message = stringResource(R.string.home_more_automation_locked_body),
+            confirmText = stringResource(R.string.home_more_automation_locked_action),
+            onConfirm = {
+                Timber.tag("HomeScreen").d("Premium gate opened from Smart automation lock")
+                showAutomationLockDialog = false
+                openPremiumGate(HomePremiumGate.SmartAutomation)
             },
-            title = { Text(text = stringResource(R.string.home_more_automation_locked_title)) },
-            text = {
-                Text(
-                    text = stringResource(R.string.home_more_automation_locked_body)
-                )
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        Timber.tag("HomeScreen").d("Premium gate opened from Smart automation lock")
-                        showAutomationLockDialog = false
-                        openPremiumGate(HomePremiumGate.SmartAutomation)
-                    }
-                ) {
-                    Text(text = stringResource(R.string.home_more_automation_locked_action))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showAutomationLockDialog = false }) {
-                    Text(text = stringResource(R.string.dialog_not_now))
-                }
+            dismissText = stringResource(R.string.dialog_not_now),
+            onDismiss = {
+                showAutomationLockDialog = false
+            }
+        )
+    }
+
+    if (showReminderSettingsDialog) {
+        HomeReminderSettingsDialog(
+            initialHourOfDay = state.moreCard.reminderHourOfDay,
+            initialMinute = state.moreCard.reminderMinute,
+            initialCadence = state.moreCard.reminderCadence,
+            onDismissRequest = { showReminderSettingsDialog = false },
+            onSave = { hourOfDay, minute, cadence ->
+                showReminderSettingsDialog = false
+                saveReminderWithPermission(ReminderSettingsSelection(hourOfDay, minute, cadence))
             }
         )
     }
 
     if (showAccountDetailsDialog) {
-        AlertDialog(
+        val accountLabel = state.moreCard.userEmail
+            ?.takeIf { it.isNotBlank() }
+            ?: stringResource(R.string.home_more_guest)
+        MyShareAlertDialog(
             onDismissRequest = { showAccountDetailsDialog = false },
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.AccountCircle,
-                    contentDescription = null,
-                    tint = MySharePrimary
-                )
-            },
-            title = { Text(text = stringResource(R.string.home_more_account_details_title)) },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(
-                        text = stringResource(
-                            R.string.home_more_account_details_email,
-                            state.moreCard.userEmail ?: stringResource(R.string.home_more_guest)
-                        )
-                    )
-                    Text(
-                        text = stringResource(
-                            R.string.home_more_account_details_membership,
-                            if (state.moreCard.isPremium) {
-                                stringResource(R.string.home_more_account_premium_member_display)
-                            } else {
-                                stringResource(R.string.home_more_account_basic_member)
-                            }
-                        )
-                    )
-                    if (!state.moreCard.isPremium) {
-                        Text(
-                            text = stringResource(R.string.home_more_account_details_sync_note),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MyShareSecondary
-                        )
+            icon = Icons.Default.AccountCircle,
+            title = stringResource(R.string.home_more_account_details_title),
+            confirmText = stringResource(R.string.dialog_close),
+            onConfirm = { showAccountDetailsDialog = false },
+            actionStyle = MyShareDialogActionStyle.Text
+        ) {
+            Text(
+                text = stringResource(
+                    R.string.home_more_account_details_email,
+                    accountLabel
+                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(
+                text = stringResource(
+                    R.string.home_more_account_details_membership,
+                    if (state.moreCard.isPremium) {
+                        stringResource(R.string.home_more_account_premium_member_display)
+                    } else {
+                        stringResource(R.string.home_more_account_basic_member)
                     }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = { showAccountDetailsDialog = false }) {
-                    Text(text = stringResource(R.string.dialog_close))
-                }
+                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyLarge
+            )
+            if (!state.moreCard.isPremium) {
+                Text(
+                    text = stringResource(R.string.home_more_account_details_sync_note),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
-        )
+        }
     }
 
     if (showSignOutDialog) {
-        AlertDialog(
+        MyShareAlertDialog(
             onDismissRequest = { showSignOutDialog = false },
-            icon = {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Logout,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.error
-                )
+            icon = Icons.AutoMirrored.Filled.Logout,
+            iconTint = MaterialTheme.colorScheme.error,
+            title = stringResource(R.string.home_more_signout_confirm_title),
+            message = stringResource(R.string.home_more_signout_confirm_body),
+            confirmText = stringResource(R.string.home_more_account_signout),
+            onConfirm = {
+                Timber.tag("HomeScreen").d("Sign out confirmed from More tab")
+                showSignOutDialog = false
+                onLogout()
             },
-            title = { Text(text = stringResource(R.string.home_more_signout_confirm_title)) },
-            text = {
-                Text(
-                    text = stringResource(R.string.home_more_signout_confirm_body)
-                )
+            dismissText = stringResource(R.string.dialog_cancel),
+            onDismiss = {
+                showSignOutDialog = false
             },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        Timber.tag("HomeScreen").d("Sign out confirmed from More tab")
-                        showSignOutDialog = false
-                        onLogout()
-                    }
-                ) {
-                    Text(
-                        text = stringResource(R.string.home_more_account_signout),
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showSignOutDialog = false }) {
-                    Text(text = stringResource(R.string.dialog_cancel))
-                }
-            }
+            actionStyle = MyShareDialogActionStyle.Destructive
         )
     }
 
     Scaffold(
         modifier = modifier,
-        containerColor = MyShareBackground,
+        containerColor = MaterialTheme.colorScheme.background,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MyShareBackground)
+                    .background(MaterialTheme.colorScheme.background)
                     .zIndex(1f),
-                color = MyShareBackground,
+                color = MaterialTheme.colorScheme.background,
                 tonalElevation = 2.dp
             ) {
                 Row(
@@ -288,13 +333,13 @@ fun HomeScreen(
                         Text(
                             text = stringResource(R.string.app_name),
                             style = MaterialTheme.typography.titleLarge,
-                            color = MyShareOnSurface,
+                            color = MaterialTheme.colorScheme.onBackground,
                             fontWeight = FontWeight.Black
                         )
                         Text(
                             text = stringResource(state.selectedDestination.labelRes),
                             style = MaterialTheme.typography.labelMedium,
-                            color = MyShareSecondary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontWeight = FontWeight.SemiBold
                         )
                     }
@@ -349,9 +394,9 @@ fun HomeScreen(
                             colors = NavigationBarItemDefaults.colors(
                                 selectedIconColor = MySharePrimary,
                                 selectedTextColor = MySharePrimary,
-                                unselectedIconColor = MyShareSecondary,
-                                unselectedTextColor = MyShareSecondary,
-                                indicatorColor = MySharePrimaryContainer.copy(alpha = 0.5f)
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                indicatorColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f)
                             )
                         )
                     }
@@ -377,7 +422,9 @@ fun HomeScreen(
             modifier = Modifier.fillMaxSize()
         ) { targetDestination ->
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background),
                 contentPadding = PaddingValues(
                     start = 24.dp,
                     end = 24.dp,
@@ -430,7 +477,17 @@ fun HomeScreen(
                         homeMoreTab(
                             state = state.moreCard,
                             activity = activity,
-                            onToggleReminder = onToggleReminder,
+                            onToggleReminder = { enabled ->
+                                if (enabled) {
+                                    showReminderSettingsDialog = true
+                                } else {
+                                    onToggleReminder(false)
+                                }
+                            },
+                            onConfigureReminder = {
+                                Timber.tag("HomeScreen").d("Reminder settings opened from More tab")
+                                showReminderSettingsDialog = true
+                            },
                             onToggleAutomation = onToggleAutomation,
                             onBillingPlanSelected = onBillingPlanSelected,
                             onUnlockPremium = onUnlockPremium,
@@ -443,6 +500,8 @@ fun HomeScreen(
                                 Timber.tag("HomeScreen").d("Account details opened from More tab")
                                 showAccountDetailsDialog = true
                             },
+                            isGoogleCredentialRequestInProgress = isGoogleCredentialRequestInProgress,
+                            onConnectGoogle = startGoogleAccountConnection,
                             onLogout = {
                                 Timber.tag("HomeScreen").d("Sign out confirmation requested")
                                 showSignOutDialog = true
@@ -462,6 +521,12 @@ private val HomeDestination.labelRes: Int
         HomeDestination.REVIEW -> R.string.home_tab_review
         HomeDestination.MORE -> R.string.home_tab_more
     }
+
+private data class ReminderSettingsSelection(
+    val hourOfDay: Int,
+    val minute: Int,
+    val cadence: ReminderCadence
+)
 
 @Preview(showBackground = true)
 @Composable
@@ -497,11 +562,14 @@ private fun HomeScreenPreview() {
             onGoalContributionChanged = { _ -> },
             onSaveReview = {},
             onToggleReminder = { _ -> },
+            onSaveReminderConfiguration = { _, _, _ -> },
             onToggleAutomation = { _ -> },
             onBillingPlanSelected = { _ -> },
             onUnlockPremium = { _, _ -> },
             onPremiumGateViewed = { _ -> },
             onPremiumGateUpgradeClicked = { _ -> },
+            onConnectGoogleAccount = { _ -> },
+            onGoogleConnectionCredentialError = { _ -> },
             onLogout = {},
             onManageAdsConsent = {},
             onAddNewGoal = {},

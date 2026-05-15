@@ -39,8 +39,11 @@ import pt.ms.myshare.domain.use_case.UpdateGoalProgressUseCase
 import pt.ms.myshare.domain.use_case.GetPerformanceStatsUseCase
 import pt.ms.myshare.domain.use_case.GetCoachingInsightsUseCase
 import pt.ms.myshare.domain.model.Goal
+import pt.ms.myshare.domain.model.User
+import pt.ms.myshare.presentation.ui.onboarding.ReminderWorkScheduler
 import io.mockk.mockk
 import io.mockk.every
+import io.mockk.coEvery
 import kotlinx.coroutines.flow.flowOf
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -54,6 +57,7 @@ class HomeViewModelTest {
     private val mockAuthRepository = mockk<AuthRepository>(relaxed = true)
     private val mockGetReviewHistoryUseCase = mockk<GetReviewHistoryUseCase>(relaxed = true)
     private val mockUpdateGoalProgressUseCase = mockk<UpdateGoalProgressUseCase>(relaxed = true)
+    private val mockReminderWorkScheduler = mockk<ReminderWorkScheduler>(relaxed = true)
 
     @Before
     fun setup() {
@@ -74,7 +78,8 @@ class HomeViewModelTest {
             getReviewHistoryUseCase = mockGetReviewHistoryUseCase,
             updateGoalProgressUseCase = mockUpdateGoalProgressUseCase,
             getPerformanceStatsUseCase = GetPerformanceStatsUseCase(fakePlannerRepository),
-            getCoachingInsightsUseCase = GetCoachingInsightsUseCase(CalculatePlanPreviewUseCase())
+            getCoachingInsightsUseCase = GetCoachingInsightsUseCase(CalculatePlanPreviewUseCase()),
+            reminderWorkScheduler = mockReminderWorkScheduler
         )
     }
 
@@ -185,6 +190,23 @@ class HomeViewModelTest {
 
         assertEquals(null, viewModel.state.value.moreCard.billingMessage)
         assertEquals(null, viewModel.state.value.moreCard.error)
+    }
+
+    @Test
+    fun `connectGoogleAccount shows success feedback`() = runTest {
+        coEvery { mockAuthRepository.connectGoogleAccount("google-token") } returns Result.success(
+            User(email = "user@example.com")
+        )
+
+        viewModel.connectGoogleAccount("google-token")
+        advanceUntilIdle()
+
+        assertEquals(false, viewModel.state.value.moreCard.isGoogleConnectionInProgress)
+        assertEquals(
+            "home_more_account_connect_google_success",
+            viewModel.state.value.moreCard.googleConnectionMessage
+        )
+        assertEquals(null, viewModel.state.value.moreCard.googleConnectionError)
     }
 }
 

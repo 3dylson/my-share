@@ -91,7 +91,7 @@ fun SalaryAndScheduleScreen(
                 stringResource(R.string.onboarding_salary_frequency_title), 
                 style = MaterialTheme.typography.titleMedium, 
                 fontWeight = FontWeight.Bold,
-                color = MyShareOnSurface
+                color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(Modifier.height(16.dp))
             

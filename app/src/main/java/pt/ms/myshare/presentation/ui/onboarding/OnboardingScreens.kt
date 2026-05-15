@@ -32,6 +32,7 @@ import pt.ms.myshare.domain.model.StoreProduct
 import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.components.PremiumInfoCard
 import pt.ms.myshare.presentation.ui.components.PremiumPaywallCard
+import pt.ms.myshare.presentation.ui.formatting.SubscriptionSavingsFormatter
 import pt.ms.myshare.presentation.ui.theme.*
 import java.math.BigDecimal
 import java.text.NumberFormat
@@ -75,7 +76,7 @@ fun PlanPreviewScreen(
                         Text(
                             stringResource(R.string.onboarding_plan_preview_button_basic),
                             style = MaterialTheme.typography.labelLarge,
-                            color = MyShareSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -94,12 +95,12 @@ fun PlanPreviewScreen(
                 stringResource(R.string.onboarding_plan_preview_title), 
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.ExtraBold,
-                color = MyShareOnSurface
+                color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 stringResource(R.string.onboarding_plan_preview_subtitle, preview.nextPayday.format(dateFormatter)),
                 style = MaterialTheme.typography.bodyLarge,
-                color = MyShareSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 lineHeight = 24.sp
             )
 
@@ -176,6 +177,39 @@ fun PaywallScreen(
     val activity = androidx.activity.compose.LocalActivity.current
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val monthlyProduct = availableProducts.find { it.productId.contains("monthly", ignoreCase = true) }
+    val annualProduct = availableProducts.find { it.productId.contains("annual", ignoreCase = true) }
+    val annualComparison = remember(monthlyProduct, annualProduct) {
+        SubscriptionSavingsFormatter.formatAnnualComparison(
+            monthlyProduct = monthlyProduct,
+            annualProduct = annualProduct,
+            locale = Locale.getDefault()
+        )
+    }
+    val selectedProduct = when (selectedPlan) {
+        BillingPlan.MONTHLY -> monthlyProduct
+        BillingPlan.ANNUAL -> annualProduct
+    }
+    val selectedPeriod = when (selectedPlan) {
+        BillingPlan.MONTHLY -> stringResource(R.string.paywall_period_month)
+        BillingPlan.ANNUAL -> stringResource(R.string.paywall_period_year)
+    }
+    val selectedTrialDays = selectedProduct?.freeTrialDays?.takeIf { it > 0 }
+    val checkoutTerms = when {
+        selectedProduct == null -> stringResource(R.string.paywall_footer_store_terms_unavailable)
+        selectedTrialDays != null -> stringResource(
+            R.string.paywall_footer_trial_terms,
+            selectedTrialDays,
+            selectedProduct.price,
+            selectedPeriod
+        )
+        else -> stringResource(
+            R.string.paywall_footer_no_trial_terms,
+            selectedProduct.price,
+            selectedPeriod
+        )
+    }
+    val isPurchaseReady = selectedProduct != null && !isBillingActionInProgress
     val resolvedBillingMessage = remember(billingMessage, context) {
         billingMessage?.let {
             val resId = context.resources.getIdentifier(it, "string", context.packageName)
@@ -186,32 +220,6 @@ fun PaywallScreen(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
-            val selectedProduct = availableProducts.find {
-                when (selectedPlan) {
-                    BillingPlan.MONTHLY -> it.productId.contains("monthly", ignoreCase = true)
-                    BillingPlan.ANNUAL -> it.productId.contains("annual", ignoreCase = true)
-                }
-            }
-            val isPurchaseReady = selectedProduct != null && !isBillingActionInProgress
-            val selectedPeriod = when (selectedPlan) {
-                BillingPlan.MONTHLY -> stringResource(R.string.paywall_period_month)
-                BillingPlan.ANNUAL -> stringResource(R.string.paywall_period_year)
-            }
-            val selectedTrialDays = selectedProduct?.freeTrialDays?.takeIf { it > 0 }
-            val checkoutTerms = when {
-                selectedProduct == null -> stringResource(R.string.paywall_footer_store_terms_unavailable)
-                selectedTrialDays != null -> stringResource(
-                    R.string.paywall_footer_trial_terms,
-                    selectedTrialDays,
-                    selectedProduct.price,
-                    selectedPeriod
-                )
-                else -> stringResource(
-                    R.string.paywall_footer_no_trial_terms,
-                    selectedProduct.price,
-                    selectedPeriod
-                )
-            }
             PaywallPurchaseFooter(
                 checkoutTerms = checkoutTerms,
                 ctaText = when {
@@ -250,7 +258,7 @@ fun PaywallScreen(
                     Icon(
                         Icons.Default.Close, 
                         contentDescription = stringResource(R.string.paywall_close_content_description), 
-                        tint = MyShareSecondary,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(22.dp)
                     )
                 }
@@ -258,7 +266,7 @@ fun PaywallScreen(
                     onClick = onRestore,
                     enabled = !isBillingActionInProgress
                 ) { 
-                    Text(stringResource(R.string.paywall_restore_button), color = MyShareSecondary, style = MaterialTheme.typography.labelLarge) 
+                    Text(stringResource(R.string.paywall_restore_button), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelLarge)
                 }
             }
             
@@ -273,38 +281,21 @@ fun PaywallScreen(
                 if (resId != 0) context.getString(resId) else pricingStrategy.paywallSubhead
             }
 
-            Text(
-                headline, 
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.ExtraBold,
-                textAlign = TextAlign.Center,
-                lineHeight = 34.sp,
-                color = MyShareOnSurface,
-                modifier = Modifier.fillMaxWidth()
+            PaywallHeroCard(
+                headline = headline,
+                subhead = subhead,
+                badge = if (selectedTrialDays != null) {
+                    stringResource(R.string.paywall_hero_trial_badge, selectedTrialDays)
+                } else {
+                    stringResource(R.string.premium_badge)
+                }
             )
             
-            Text(
-                subhead, 
-                style = MaterialTheme.typography.bodyMedium,
-                color = MyShareSecondary,
-                textAlign = TextAlign.Center,
-                lineHeight = 21.sp,
-                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
-            )
-            
-            Spacer(Modifier.height(28.dp))
-
-            PaywallFeatureGrid()
-
-            Spacer(Modifier.height(16.dp))
-
-            PaywallTrustList()
-
             Spacer(Modifier.height(22.dp))
 
+            PaywallSectionLabel(text = stringResource(R.string.paywall_plan_section_title))
+
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                val monthlyProduct = availableProducts.find { it.productId.contains("monthly", ignoreCase = true) }
-                val annualProduct = availableProducts.find { it.productId.contains("annual", ignoreCase = true) }
                 val hasLivePrices = monthlyProduct != null || annualProduct != null
                 val planCards = remember(pricingStrategy.heroPlan, monthlyProduct, annualProduct, selectedPlan, hasLivePrices) {
                     val monthlyCard = PaywallPlanCardState(
@@ -335,15 +326,112 @@ fun PaywallScreen(
                         period = stringResource(card.plan.periodRes),
                         description = stringResource(card.plan.descriptionRes),
                         badge = card.badgeKey?.let { stringResource(it) },
+                        comparisonPrice = if (card.plan == BillingPlan.ANNUAL) {
+                            annualComparison?.monthlyEquivalentPrice
+                        } else {
+                            null
+                        },
+                        savingsLabel = if (card.plan == BillingPlan.ANNUAL) {
+                            annualComparison?.savingsPrice?.let { stringResource(R.string.paywall_annual_savings_label, it) }
+                        } else {
+                            null
+                        },
                         isSelected = selectedPlan == card.plan,
                         onClick = { onPlanSelected(card.plan) }
                     )
                 }
             }
 
+            Spacer(Modifier.height(20.dp))
+
+            PaywallSectionLabel(text = stringResource(R.string.paywall_value_section_title))
+
+            Spacer(Modifier.height(10.dp))
+
+            PaywallFeatureGrid()
+
+            Spacer(Modifier.height(16.dp))
+
+            PaywallTrustList()
+
             Spacer(Modifier.height(24.dp))
         }
     }
+}
+
+@Composable
+private fun PaywallHeroCard(
+    headline: String,
+    subhead: String,
+    badge: String,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.78f),
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.55f))
+    ) {
+        Column(
+            modifier = Modifier.padding(22.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Surface(
+                shape = CircleShape,
+                color = MySharePrimary.copy(alpha = 0.18f)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.WorkspacePremium,
+                    contentDescription = null,
+                    tint = MySharePrimary,
+                    modifier = Modifier.padding(12.dp).size(28.dp)
+                )
+            }
+            Spacer(Modifier.height(14.dp))
+            Surface(
+                shape = RoundedCornerShape(999.dp),
+                color = MySharePrimary
+            ) {
+                Text(
+                    text = badge.uppercase(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White,
+                    fontWeight = FontWeight.Black,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                )
+            }
+            Spacer(Modifier.height(14.dp))
+            Text(
+                headline,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.ExtraBold,
+                textAlign = TextAlign.Center,
+                lineHeight = 34.sp,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Text(
+                subhead,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.78f),
+                textAlign = TextAlign.Center,
+                lineHeight = 21.sp,
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun PaywallSectionLabel(text: String) {
+    Text(
+        text = text.uppercase(),
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        fontWeight = FontWeight.Bold,
+        letterSpacing = 1.sp,
+        modifier = Modifier.padding(start = 4.dp, bottom = 10.dp)
+    )
 }
 
 @Composable
@@ -375,7 +463,7 @@ private fun PaywallPurchaseFooter(
             Text(
                 checkoutTerms,
                 style = MaterialTheme.typography.bodySmall,
-                color = MyShareSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
@@ -418,7 +506,7 @@ private fun PaywallFooterBillingNotice(
             Text(
                 text = message,
                 style = MaterialTheme.typography.bodySmall,
-                color = MyShareSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
@@ -461,7 +549,7 @@ private fun PaywallTrustRow(
     ) {
         Surface(
             shape = RoundedCornerShape(8.dp),
-            color = MySharePrimaryContainer.copy(alpha = 0.42f)
+            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.42f)
         ) {
             Icon(
                 imageVector = icon,
@@ -474,13 +562,13 @@ private fun PaywallTrustRow(
             Text(
                 text = title,
                 style = MaterialTheme.typography.labelLarge,
-                color = MyShareOnSurface,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold
             )
             Text(
                 text = body,
                 style = MaterialTheme.typography.bodySmall,
-                color = MyShareSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 lineHeight = 17.sp
             )
         }
@@ -533,7 +621,7 @@ private fun CompactPaywallFeature(
         modifier = modifier,
         color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(1.dp, MyShareOutline.copy(alpha = 0.45f))
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.45f))
     ) {
         Column(
             modifier = Modifier.padding(12.dp),
@@ -549,14 +637,14 @@ private fun CompactPaywallFeature(
                 title,
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
-                color = MyShareOnSurface,
+                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
                 body,
                 style = MaterialTheme.typography.bodySmall,
-                color = MyShareSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
@@ -600,7 +688,7 @@ fun MissionStepCard(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(24.dp),
-        border = BorderStroke(1.dp, MyShareSecondary.copy(alpha = 0.1f))
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f))
     ) {
         Row(
             modifier = Modifier.padding(20.dp),
@@ -627,13 +715,13 @@ fun MissionStepCard(
                     title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MyShareOnSurface
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
                     body,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MyShareSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = 20.sp
                 )
             }
@@ -642,7 +730,7 @@ fun MissionStepCard(
                 amount,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.ExtraBold,
-                color = MyShareOnSurface
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }
@@ -656,7 +744,7 @@ fun ImpactSummaryCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MySharePrimaryContainer.copy(alpha = 0.5f)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)),
         shape = RoundedCornerShape(24.dp)
     ) {
         Column(Modifier.padding(24.dp)) {
@@ -664,13 +752,13 @@ fun ImpactSummaryCard(
                 title,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = MySharePrimary
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Spacer(Modifier.height(8.dp))
             Text(
                 body,
                 style = MaterialTheme.typography.bodyLarge,
-                color = MyShareOnSurface,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
                 lineHeight = 24.sp
             )
             Spacer(Modifier.height(16.dp))
@@ -681,13 +769,13 @@ fun ImpactSummaryCard(
                 Icon(
                     imageVector = Icons.Default.NotificationsActive,
                     contentDescription = null,
-                    tint = MySharePrimary,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.size(16.dp)
                 )
                 Text(
                     reminderText,
                     style = MaterialTheme.typography.labelSmall,
-                    color = MySharePrimary,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     fontWeight = FontWeight.Bold
                 )
             }

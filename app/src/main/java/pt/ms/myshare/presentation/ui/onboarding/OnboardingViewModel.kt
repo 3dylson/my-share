@@ -3,9 +3,6 @@ package pt.ms.myshare.presentation.ui.onboarding
 import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,7 +33,6 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -46,7 +42,7 @@ class OnboardingViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase,
     private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase,
-    private val workManager: WorkManager
+    private val reminderWorkScheduler: ReminderWorkScheduler
 ) : ViewModel() {
 
     private val state = MutableStateFlow(OnboardingState())
@@ -368,15 +364,14 @@ class OnboardingViewModel @Inject constructor(
 
     fun saveReminderConfiguration(time: LocalTime, cadence: ReminderCadence) {
         viewModelScope.launch {
-            plannerRepository.saveReminderConfiguration(
-                ReminderConfiguration(
-                    enabled = true,
-                    hourOfDay = time.hour,
-                    minute = time.minute,
-                    cadence = cadence
-                )
+            val configuration = ReminderConfiguration(
+                enabled = true,
+                hourOfDay = time.hour,
+                minute = time.minute,
+                cadence = cadence
             )
-            scheduleReminderWork()
+            plannerRepository.saveReminderConfiguration(configuration)
+            reminderWorkScheduler.sync(configuration)
             state.update { it.copy(reminderSaved = true, reminderSkipped = false) }
             FirebaseUtils.logEvent("reminder_enabled")
         }
@@ -384,7 +379,9 @@ class OnboardingViewModel @Inject constructor(
 
     fun skipReminderConfiguration() {
         viewModelScope.launch {
-            plannerRepository.saveReminderConfiguration(ReminderConfiguration(enabled = false))
+            val configuration = ReminderConfiguration(enabled = false)
+            plannerRepository.saveReminderConfiguration(configuration)
+            reminderWorkScheduler.sync(configuration)
             state.update { it.copy(reminderSaved = false, reminderSkipped = true) }
             FirebaseUtils.logEvent("reminder_skipped")
         }
@@ -448,18 +445,6 @@ class OnboardingViewModel @Inject constructor(
             preset = current.preset,
             rules = rules
         )
-    }
-
-    private fun scheduleReminderWork() {
-        val request = PeriodicWorkRequestBuilder<ReminderWorker>(1, TimeUnit.DAYS)
-            .addTag(ReminderWorker.UNIQUE_NAME)
-            .build()
-        workManager.enqueueUniquePeriodicWork(
-            ReminderWorker.UNIQUE_NAME,
-            ExistingPeriodicWorkPolicy.UPDATE,
-            request
-        )
-        Timber.tag(TAG).d("Reminder work scheduled")
     }
 
     companion object {

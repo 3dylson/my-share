@@ -32,9 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.ms.myshare.R
 import pt.ms.myshare.presentation.ui.components.PremiumButton
-import pt.ms.myshare.presentation.ui.theme.MyShareBackground
-import pt.ms.myshare.presentation.ui.theme.MyShareOnSurface
-import pt.ms.myshare.presentation.ui.theme.MyShareSecondary
 
 @Composable
 fun OnboardingStepScaffold(
@@ -47,9 +44,9 @@ fun OnboardingStepScaffold(
     content: @Composable ColumnScope.() -> Unit
 ) {
     Scaffold(
-        containerColor = MyShareBackground,
+        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
-            Surface(color = MyShareBackground) {
+            Surface(color = MaterialTheme.colorScheme.background) {
                 PremiumButton(
                     text = actionText,
                     onClick = onAction,
@@ -77,7 +74,7 @@ fun OnboardingStepScaffold(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back),
-                        tint = MyShareSecondary
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             )
@@ -88,12 +85,12 @@ fun OnboardingStepScaffold(
                 text = title,
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.ExtraBold,
-                color = MyShareOnSurface
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Text(
                 text = subtitle,
-                color = MyShareSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium,
                 lineHeight = 21.sp,
                 modifier = Modifier.padding(top = 8.dp)

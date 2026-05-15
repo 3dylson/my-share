@@ -7,6 +7,8 @@ data class StoreProduct(
     val price: String,
     val basePlanId: String?,
     val offerToken: String?,
+    val priceAmountMicros: Long? = null,
+    val priceCurrencyCode: String? = null,
     val recurringBillingPeriod: String? = null,
     val offerId: String? = null,
     val offerTags: List<String> = emptyList(),

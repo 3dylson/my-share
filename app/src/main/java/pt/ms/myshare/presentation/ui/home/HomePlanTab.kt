@@ -29,11 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.ms.myshare.R
 import pt.ms.myshare.presentation.ui.components.*
-import pt.ms.myshare.presentation.ui.theme.MyShareOnSurface
-import pt.ms.myshare.presentation.ui.theme.MyShareOutline
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
-import pt.ms.myshare.presentation.ui.theme.MySharePrimaryContainer
-import pt.ms.myshare.presentation.ui.theme.MyShareSecondary
 import pt.ms.myshare.presentation.ui.theme.MySharePositive
 
 /**
@@ -182,7 +178,7 @@ private fun CompactPlanMetric(
         modifier = modifier.heightIn(min = 124.dp),
         shape = RoundedCornerShape(18.dp),
         color = MaterialTheme.colorScheme.surface,
-        border = androidx.compose.foundation.BorderStroke(1.dp, MyShareOutline.copy(alpha = 0.16f)),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.24f)),
         shadowElevation = 1.dp
     ) {
         Column(
@@ -204,13 +200,13 @@ private fun CompactPlanMetric(
                 Text(
                     text = label.uppercase(),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MyShareSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = value,
                     style = MaterialTheme.typography.titleLarge,
-                    color = MyShareOnSurface,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Black,
                     modifier = Modifier.padding(top = 4.dp)
                 )
@@ -235,7 +231,7 @@ private fun CompactAllocationGrid(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         color = MaterialTheme.colorScheme.surface,
-        border = androidx.compose.foundation.BorderStroke(1.dp, MyShareOutline.copy(alpha = 0.14f)),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.22f)),
         shadowElevation = 1.dp
     ) {
         Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -264,7 +260,7 @@ private fun AllocationGridCell(
     Surface(
         modifier = modifier.heightIn(min = 82.dp),
         shape = RoundedCornerShape(14.dp),
-        color = MySharePrimaryContainer.copy(alpha = 0.26f)
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.22f)
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
@@ -281,13 +277,13 @@ private fun AllocationGridCell(
                 Text(
                     text = item.label.uppercase(),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MyShareSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = item.value,
                     style = MaterialTheme.typography.titleMedium,
-                    color = MyShareOnSurface,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Black,
                     modifier = Modifier.padding(top = 2.dp)
                 )

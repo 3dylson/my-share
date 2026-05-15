@@ -51,7 +51,7 @@ fun BankSyncOptionalScreen(
                 modifier = Modifier
                     .size(96.dp)
                     .background(
-                        color = MySharePrimaryContainer.copy(alpha = 0.5f),
+                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
                         shape = CircleShape
                     ),
                 contentAlignment = Alignment.Center
@@ -71,12 +71,12 @@ fun BankSyncOptionalScreen(
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.ExtraBold,
                 textAlign = TextAlign.Center,
-                color = MyShareOnSurface
+                color = MaterialTheme.colorScheme.onSurface
             )
             
             Text(
                 stringResource(R.string.onboarding_banksync_subtitle), 
-                color = MyShareSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 lineHeight = 24.sp,
@@ -91,7 +91,7 @@ fun BankSyncOptionalScreen(
                         title = stringResource(R.string.onboarding_banksync_interest_title),
                         body = stringResource(R.string.onboarding_banksync_interest_body),
                         icon = Icons.Default.CheckCircle,
-                        backgroundColor = MySharePrimaryContainer.copy(alpha = 0.4f),
+                        backgroundColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
                         modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)
                     )
                 } else {
@@ -108,7 +108,7 @@ fun BankSyncOptionalScreen(
                             Text(
                                 stringResource(R.string.onboarding_banksync_link),
                                 style = MaterialTheme.typography.labelLarge, 
-                                color = MyShareSecondary
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         

@@ -1,6 +1,5 @@
 package pt.ms.myshare.presentation.ui.onboarding
 
-import androidx.work.WorkManager
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -45,7 +44,7 @@ class OnboardingViewModelTest {
     private val authRepository: AuthRepository = mockk(relaxed = true)
     private val calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase = mockk()
     private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase = mockk()
-    private val workManager: WorkManager = mockk(relaxed = true)
+    private val reminderWorkScheduler: ReminderWorkScheduler = mockk(relaxed = true)
 
     private lateinit var viewModel: OnboardingViewModel
 
@@ -72,7 +71,7 @@ class OnboardingViewModelTest {
             authRepository,
             calculatePlanPreviewUseCase,
             resolvePricingStrategyUseCase,
-            workManager
+            reminderWorkScheduler
         )
     }
 

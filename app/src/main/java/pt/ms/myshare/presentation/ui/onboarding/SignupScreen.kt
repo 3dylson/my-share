@@ -24,13 +24,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.credentials.CredentialManager
-import androidx.credentials.CustomCredential
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.exceptions.NoCredentialException
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.launch
+import pt.ms.myshare.BuildConfig
 import pt.ms.myshare.R
+import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReadResult
+import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReader
 import pt.ms.myshare.presentation.ui.components.GoogleSignInButton
 import pt.ms.myshare.presentation.ui.theme.*
 import timber.log.Timber
@@ -42,6 +40,12 @@ fun SignupScreen(
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    val googleIdTokenReader = remember(context) {
+        GoogleIdTokenReader(
+            credentialManager = CredentialManager.create(context),
+            serverClientId = BuildConfig.GOOGLE_CLIENT_ID
+        )
+    }
     var googleSignInError by remember { mutableStateOf<String?>(null) }
     var googleSignInLoading by remember { mutableStateOf(false) }
 
@@ -49,41 +53,20 @@ fun SignupScreen(
         coroutineScope.launch {
             googleSignInLoading = true
             googleSignInError = null
-            try {
-                Timber.d("Starting Google sign-in from onboarding")
-                val credentialManager = CredentialManager.create(context)
-                val googleIdOption = GetGoogleIdOption.Builder()
-                    .setFilterByAuthorizedAccounts(false)
-                    .setServerClientId(pt.ms.myshare.BuildConfig.GOOGLE_CLIENT_ID)
-                    .build()
-
-                val request = GetCredentialRequest.Builder()
-                    .addCredentialOption(googleIdOption)
-                    .build()
-
-                val result = credentialManager.getCredential(
-                    request = request,
-                    context = context
-                )
-
-                val credential = result.credential
-                if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                    val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-                    Timber.d("Google sign-in credential received")
-                    onSignup(googleIdTokenCredential.idToken)
-                } else {
-                    Timber.e("Google sign-in returned unsupported credential type: ${credential.type}")
+            when (val result = googleIdTokenReader.readIdToken(context, "onboarding")) {
+                is GoogleIdTokenReadResult.Success -> onSignup(result.idToken)
+                GoogleIdTokenReadResult.NoCredential -> {
+                    Timber.e("Google sign-in failed because no Google credential is available")
+                    googleSignInError = context.getString(R.string.onboarding_signup_google_error_no_credentials)
+                }
+                GoogleIdTokenReadResult.UnsupportedCredential -> {
                     googleSignInError = context.getString(R.string.onboarding_signup_google_error_generic)
                 }
-            } catch (e: NoCredentialException) {
-                Timber.e(e, "Google sign-in failed because no Google credential is available")
-                googleSignInError = context.getString(R.string.onboarding_signup_google_error_no_credentials)
-            } catch (e: Exception) {
-                Timber.e(e, "Google Sign-In failed")
-                googleSignInError = context.getString(R.string.onboarding_signup_google_error_generic)
-            } finally {
-                googleSignInLoading = false
+                is GoogleIdTokenReadResult.Failure -> {
+                    googleSignInError = context.getString(R.string.onboarding_signup_google_error_generic)
+                }
             }
+            googleSignInLoading = false
         }
     }
 
@@ -116,7 +99,7 @@ fun SignupScreen(
                     TextButton(
                         onClick = onSignupAnonymously,
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.textButtonColors(contentColor = MyShareOnSurfaceVariant)
+                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurfaceVariant)
                     ) {
                         Text(
                             stringResource(R.string.onboarding_signup_continue_without_sync),
@@ -142,12 +125,12 @@ fun SignupScreen(
                 stringResource(R.string.onboarding_signup_title), 
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.ExtraBold,
-                color = MyShareOnSurface
+                color = MaterialTheme.colorScheme.onSurface
             )
             
             Text(
                 stringResource(R.string.onboarding_signup_subtitle), 
-                color = MyShareSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyLarge,
                 lineHeight = 24.sp
             )
@@ -157,8 +140,8 @@ fun SignupScreen(
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
-                color = MyShareSurface,
-                border = BorderStroke(1.dp, MyShareOutline.copy(alpha = 0.5f))
+                color = MaterialTheme.colorScheme.surface,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -187,7 +170,7 @@ fun SignupScreen(
             Text(
                 text = stringResource(R.string.onboarding_signup_local_note),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MyShareSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 lineHeight = 20.sp
             )
 
@@ -233,7 +216,7 @@ private fun SecurityFeature(title: String, description: String, icon: androidx.c
             modifier = Modifier
                 .size(42.dp)
                 .background(
-                    color = MySharePrimaryContainer.copy(alpha = 0.5f),
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
                     shape = CircleShape
                 ),
             contentAlignment = Alignment.Center
@@ -242,8 +225,8 @@ private fun SecurityFeature(title: String, description: String, icon: androidx.c
         }
         Spacer(Modifier.width(14.dp))
         Column {
-            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MyShareOnSurface)
-            Text(description, style = MaterialTheme.typography.bodyMedium, color = MyShareSecondary)
+            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+            Text(description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

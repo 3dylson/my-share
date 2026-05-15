@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.remember
@@ -34,17 +35,23 @@ fun LazyListScope.homeMoreTab(
     state: MoreCardState,
     activity: android.app.Activity?,
     onToggleReminder: (Boolean) -> Unit,
+    onConfigureReminder: () -> Unit,
     onToggleAutomation: (Boolean) -> Unit,
     onBillingPlanSelected: (BillingPlan) -> Unit,
     onUnlockPremium: (android.app.Activity, String) -> Unit,
     onManageAdsConsent: () -> Unit,
     onShowAutomationLock: () -> Unit,
     onShowAccountDetails: () -> Unit,
+    isGoogleCredentialRequestInProgress: Boolean,
+    onConnectGoogle: () -> Unit,
     onLogout: () -> Unit
 ) {
     item {
+        val accountLabel = state.userEmail
+            ?.takeIf { it.isNotBlank() }
+            ?: stringResource(R.string.home_more_guest)
         PremiumProfileHeader(
-            email = state.userEmail ?: stringResource(R.string.home_more_guest),
+            email = accountLabel,
             isPremium = state.isPremium,
             modifier = Modifier.padding(bottom = 24.dp),
             onAccountClick = onShowAccountDetails
@@ -72,6 +79,16 @@ fun LazyListScope.homeMoreTab(
                             plan == BillingPlan.ANNUAL -> stringResource(R.string.home_more_annual_badge)
                             plan == state.pricingStrategy?.heroPlan -> stringResource(R.string.paywall_badge_easy_start)
                             else -> null
+                        },
+                        comparisonPrice = if (plan == BillingPlan.ANNUAL) {
+                            state.annualMonthlyEquivalentPrice
+                        } else {
+                            null
+                        },
+                        savingsLabel = if (plan == BillingPlan.ANNUAL) {
+                            state.annualSavingsPrice?.let { stringResource(R.string.paywall_annual_savings_label, it) }
+                        } else {
+                            null
                         },
                         isSelected = state.selectedBillingPlan == plan,
                         onClick = { onBillingPlanSelected(plan) }
@@ -109,7 +126,7 @@ fun LazyListScope.homeMoreTab(
                 Text(
                     text = checkoutTerms,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MyShareSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
                 )
                 Spacer(Modifier.height(10.dp))
@@ -181,16 +198,22 @@ fun LazyListScope.homeMoreTab(
                 trailingContent = {
                     Switch(
                         checked = state.reminderEnabled,
-                        onCheckedChange = { onToggleReminder(!state.reminderEnabled) },
+                        onCheckedChange = { checked ->
+                            if (checked) {
+                                onConfigureReminder()
+                            } else {
+                                onToggleReminder(false)
+                            }
+                        },
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = Color.White,
                             checkedTrackColor = MySharePrimary,
-                            uncheckedThumbColor = MyShareOutline,
-                            uncheckedTrackColor = MyShareOutline.copy(alpha = 0.1f)
+                            uncheckedThumbColor = MaterialTheme.colorScheme.outline,
+                            uncheckedTrackColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)
                         )
                     )
                 },
-                onClick = { onToggleReminder(!state.reminderEnabled) }
+                onClick = onConfigureReminder
             )
             PremiumSettingsRow(
                 title = stringResource(R.string.home_more_pref_automation),
@@ -201,7 +224,7 @@ fun LazyListScope.homeMoreTab(
                 else
                     stringResource(R.string.home_more_pref_automation_locked),
                 icon = Icons.Default.PrecisionManufacturing,
-                iconColor = MyShareSecondary,
+                iconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 showDivider = false,
                 trailingContent = {
                     if (!state.isPremium) {
@@ -272,6 +295,36 @@ fun LazyListScope.homeMoreTab(
     item {
         PremiumSettingsGroup(title = stringResource(R.string.home_more_account_title)) {
             val uriHandler = LocalUriHandler.current
+            GoogleConnectionFeedback(state)
+            if (state.canConnectGoogle) {
+                PremiumSettingsRow(
+                    title = stringResource(R.string.home_more_account_connect_google_title),
+                    subtitle = stringResource(R.string.home_more_account_connect_google_desc),
+                    icon = Icons.Default.Cloud,
+                    iconColor = MySharePrimary,
+                    trailingContent = {
+                        if (state.isGoogleConnectionInProgress || isGoogleCredentialRequestInProgress) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(22.dp),
+                                strokeWidth = 2.dp,
+                                color = MySharePrimary
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.AddCircle,
+                                contentDescription = null,
+                                tint = MySharePrimary,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    },
+                    onClick = {
+                        if (!state.isGoogleConnectionInProgress && !isGoogleCredentialRequestInProgress) {
+                            onConnectGoogle()
+                        }
+                    }
+                )
+            }
             PremiumSettingsRow(
                 title = stringResource(R.string.home_more_account_manage_subscription),
                 subtitle = stringResource(R.string.home_more_account_manage_subscription_desc),
@@ -305,16 +358,66 @@ fun LazyListScope.homeMoreTab(
             Text(
                 text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.titleSmall,
-                color = MyShareOnSurface.copy(alpha = 0.4f),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 1.sp
             )
             Text(
                 text = stringResource(R.string.home_more_version_label, BuildConfig.VERSION_NAME),
                 style = MaterialTheme.typography.labelSmall,
-                color = MyShareOnSurfaceVariant.copy(alpha = 0.4f)
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
             )
             Spacer(modifier = Modifier.height(32.dp))
+        }
+    }
+}
+
+@Composable
+private fun GoogleConnectionFeedback(state: MoreCardState) {
+    val context = LocalContext.current
+    val messageKey = state.googleConnectionError ?: state.googleConnectionMessage ?: return
+    val message = remember(messageKey) {
+        val resId = context.resources.getIdentifier(messageKey, "string", context.packageName)
+        if (resId != 0) context.getString(resId) else messageKey
+    }
+    val isError = state.googleConnectionError != null
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        color = if (isError) {
+            MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.72f)
+        } else {
+            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+        },
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(
+            1.dp,
+            if (isError) {
+                MaterialTheme.colorScheme.error.copy(alpha = 0.35f)
+            } else {
+                MySharePrimary.copy(alpha = 0.35f)
+            }
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Icon(
+                imageVector = if (isError) Icons.Default.ErrorOutline else Icons.Default.CheckCircle,
+                contentDescription = null,
+                tint = if (isError) MaterialTheme.colorScheme.error else MySharePrimary,
+                modifier = Modifier.size(20.dp)
+            )
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodySmall,
+                color = if (isError) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onPrimaryContainer,
+                lineHeight = 18.sp
+            )
         }
     }
 }
@@ -327,16 +430,18 @@ private fun CompactBillingPlanRow(
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    badge: String? = null
+    badge: String? = null,
+    comparisonPrice: String? = null,
+    savingsLabel: String? = null
 ) {
     Surface(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        color = if (isSelected) MySharePrimaryContainer.copy(alpha = 0.42f) else MaterialTheme.colorScheme.surface,
+        color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.42f) else MaterialTheme.colorScheme.surface,
         border = BorderStroke(
             width = if (isSelected) 2.dp else 1.dp,
-            color = if (isSelected) MySharePrimary else MyShareOutline.copy(alpha = 0.45f)
+            color = if (isSelected) MySharePrimary else MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
         )
     ) {
         Row(
@@ -350,7 +455,7 @@ private fun CompactBillingPlanRow(
                         text = title,
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
-                        color = MyShareOnSurface
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     if (badge != null) {
                         Spacer(Modifier.width(8.dp))
@@ -368,13 +473,36 @@ private fun CompactBillingPlanRow(
                         }
                     }
                 }
-                Text(
-                    text = stringResource(R.string.price_per_period, price, period),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Black,
-                    color = MyShareOnSurface,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
+                Row(
+                    modifier = Modifier.padding(top = 4.dp),
+                    verticalAlignment = Alignment.Bottom,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.price_per_period, price, period),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Black,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    if (comparisonPrice != null) {
+                        Text(
+                            text = stringResource(R.string.price_per_period, comparisonPrice, period),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textDecoration = TextDecoration.LineThrough,
+                            modifier = Modifier.padding(bottom = 1.dp)
+                        )
+                    }
+                }
+                if (savingsLabel != null) {
+                    Text(
+                        text = savingsLabel,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
             }
             if (isSelected) {
                 Icon(

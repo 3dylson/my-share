@@ -15,10 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import pt.ms.myshare.R
-import pt.ms.myshare.presentation.ui.theme.MyShareOnSurface
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
-import pt.ms.myshare.presentation.ui.theme.MySharePrimaryContainer
-import pt.ms.myshare.presentation.ui.theme.MyShareSecondary
 
 @Composable
 fun BuildingPlanScreen(onBuilt: () -> Unit) {
@@ -55,7 +52,7 @@ fun BuildingPlanScreen(onBuilt: () -> Unit) {
                     .fillMaxWidth()
                     .height(12.dp),
                 color = MySharePrimary,
-                trackColor = MySharePrimaryContainer,
+                trackColor = MaterialTheme.colorScheme.primaryContainer,
                 strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
             )
             
@@ -65,13 +62,13 @@ fun BuildingPlanScreen(onBuilt: () -> Unit) {
                 stringResource(R.string.onboarding_building_title),
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Black,
-                color = MyShareOnSurface
+                color = MaterialTheme.colorScheme.onSurface
             )
             
             Text(
                 stringResource(R.string.onboarding_building_subtitle),
                 style = MaterialTheme.typography.bodyLarge,
-                color = MyShareSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 lineHeight = 24.sp,
                 modifier = Modifier.padding(top = 8.dp)
             )
@@ -108,7 +105,7 @@ private fun AnimatedStep(visible: Boolean, text: String) {
                 text = text,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = MyShareOnSurface
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }

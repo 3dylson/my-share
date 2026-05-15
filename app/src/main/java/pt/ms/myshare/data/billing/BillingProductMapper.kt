@@ -36,6 +36,8 @@ internal object BillingProductMapper {
             price = price,
             basePlanId = selectedOffer.basePlanId,
             offerToken = offerToken,
+            priceAmountMicros = recurringPhase.priceAmountMicros,
+            priceCurrencyCode = recurringPhase.priceCurrencyCode,
             recurringBillingPeriod = recurringPhase.billingPeriod,
             offerId = selectedOffer.offerId,
             offerTags = selectedOffer.offerTags.orEmpty(),

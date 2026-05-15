@@ -40,7 +40,7 @@ fun WelcomeScreen(
             Surface(
                 modifier = Modifier.size(100.dp),
                 shape = RoundedCornerShape(32.dp),
-                color = MySharePrimaryContainer,
+                color = MaterialTheme.colorScheme.primaryContainer,
                 shadowElevation = 8.dp
             ) {
                 Box(contentAlignment = Alignment.Center) {
@@ -61,7 +61,7 @@ fun WelcomeScreen(
                 fontWeight = FontWeight.ExtraBold,
                 textAlign = TextAlign.Center,
                 lineHeight = 42.sp,
-                color = MyShareOnSurface
+                color = MaterialTheme.colorScheme.onSurface
             )
             
             Spacer(Modifier.height(16.dp))
@@ -70,7 +70,7 @@ fun WelcomeScreen(
                 stringResource(R.string.onboarding_welcome_subtitle),
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
-                color = MyShareSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 8.dp),
                 lineHeight = 26.sp
             )
@@ -92,7 +92,7 @@ fun WelcomeScreen(
                     TextButton(onClick = onSkipDev) {
                         Text(
                             stringResource(R.string.onboarding_welcome_button_skip_dev), 
-                            color = MyShareSecondary.copy(alpha = 0.5f)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                         )
                     }
                 }

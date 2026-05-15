@@ -3,6 +3,7 @@ package pt.ms.myshare.presentation.ui.home
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.PricingStrategy
+import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.domain.model.ReviewInsight
 import pt.ms.myshare.domain.model.SalaryPlan
 import java.math.BigDecimal
@@ -77,10 +78,15 @@ data class MoreCardState(
     val reminderLabel: String = "",
     val reminderLabelKey: String? = null,
     val reminderLabelArgs: List<String> = emptyList(),
+    val reminderHourOfDay: Int = 9,
+    val reminderMinute: Int = 0,
+    val reminderCadence: ReminderCadence = ReminderCadence.PAYDAY,
     val automationEnabled: Boolean = false,
     val pricingStrategy: PricingStrategy? = null,
     val actualMonthlyPrice: String? = null,
     val actualAnnualPrice: String? = null,
+    val annualMonthlyEquivalentPrice: String? = null,
+    val annualSavingsPrice: String? = null,
     val actualMonthlyTrialDays: Int? = null,
     val actualAnnualTrialDays: Int? = null,
     val showAdsConsentOption: Boolean = true,
@@ -89,6 +95,10 @@ data class MoreCardState(
     val billingMessage: String? = null,
     val isPremium: Boolean = false,
     val userEmail: String? = null,
+    val canConnectGoogle: Boolean = false,
+    val isGoogleConnectionInProgress: Boolean = false,
+    val googleConnectionMessage: String? = null,
+    val googleConnectionError: String? = null,
     val error: String? = null
 )
 

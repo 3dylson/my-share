@@ -21,8 +21,6 @@ import androidx.navigation.NavController
 import pt.ms.myshare.R
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
-import pt.ms.myshare.presentation.ui.theme.MyShareBackground
-import pt.ms.myshare.presentation.ui.theme.MyShareSecondary
 
 @Composable
 fun GoalAddRoute(
@@ -62,31 +60,25 @@ fun GoalAddScreen(
     val isEditMode = state.requestedGoalId != null || state.goalId != null
 
     if (showDeleteDialog) {
-        AlertDialog(
+        MyShareAlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text(stringResource(R.string.goal_add_delete_confirm_title)) },
-            text = { Text(stringResource(R.string.goal_add_delete_confirm_msg)) },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showDeleteDialog = false
-                        onDelete()
-                    },
-                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                ) {
-                    Text(stringResource(R.string.goal_add_delete_confirm_btn))
-                }
+            icon = Icons.Default.Warning,
+            iconTint = MaterialTheme.colorScheme.error,
+            title = stringResource(R.string.goal_add_delete_confirm_title),
+            message = stringResource(R.string.goal_add_delete_confirm_msg),
+            confirmText = stringResource(R.string.goal_add_delete_confirm_btn),
+            onConfirm = {
+                showDeleteDialog = false
+                onDelete()
             },
-            dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) {
-                    Text(stringResource(R.string.goal_add_delete_cancel_btn))
-                }
-            }
+            dismissText = stringResource(R.string.goal_add_delete_cancel_btn),
+            onDismiss = { showDeleteDialog = false },
+            actionStyle = MyShareDialogActionStyle.Destructive
         )
     }
 
     Scaffold(
-        containerColor = MyShareBackground,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             CenterAlignedTopAppBar(
                 title = { 
@@ -112,13 +104,13 @@ fun GoalAddScreen(
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MyShareBackground
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         },
         bottomBar = {
             if (!state.isMissingExistingGoal) {
-                Surface(color = MyShareBackground) {
+                Surface(color = MaterialTheme.colorScheme.background) {
                     PremiumButton(
                         text = if (state.isLoading) stringResource(R.string.goal_add_button_loading) else if (isEditMode) stringResource(R.string.goal_add_button_edit) else stringResource(R.string.goal_add_button_new),
                         onClick = onSave,
@@ -175,7 +167,7 @@ fun GoalAddScreen(
                 onValueChange = onAmountChanged,
                 label = stringResource(R.string.goal_add_label_amount),
                 placeholder = stringResource(R.string.goal_add_hint_amount),
-                prefix = { Text(LocalizedAmountFormatter.currencySymbol(), color = MyShareSecondary) }
+                prefix = { Text(LocalizedAmountFormatter.currencySymbol(), color = MaterialTheme.colorScheme.onSurfaceVariant) }
             )
 
             if (state.error != null) {

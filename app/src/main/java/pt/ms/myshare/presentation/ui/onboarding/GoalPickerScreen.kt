@@ -127,7 +127,7 @@ fun GoalPickerScreen(
                 stringResource(R.string.onboarding_customize_goal), 
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = MyShareOnSurface
+                color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(Modifier.height(16.dp))
             
