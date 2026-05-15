@@ -97,16 +97,16 @@ fun BankSyncOptionalScreen(
                 } else {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         PremiumButton(
-                            text = stringResource(R.string.onboarding_banksync_link),
-                            onClick = { isInterestRegistered = true }
+                            text = stringResource(R.string.onboarding_banksync_skip),
+                            onClick = onSkip
                         )
                         
                         TextButton(
-                            onClick = onSkip,
+                            onClick = { isInterestRegistered = true },
                             modifier = Modifier.fillMaxWidth().height(56.dp)
                         ) {
                             Text(
-                                stringResource(R.string.onboarding_banksync_skip), 
+                                stringResource(R.string.onboarding_banksync_link),
                                 style = MaterialTheme.typography.labelLarge, 
                                 color = MyShareSecondary
                             )

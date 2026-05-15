@@ -7,8 +7,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 import pt.ms.myshare.R
+import pt.ms.myshare.presentation.ui.theme.MyShareOnSurface
+import pt.ms.myshare.presentation.ui.theme.MySharePrimary
+import pt.ms.myshare.presentation.ui.theme.MySharePrimaryContainer
+import pt.ms.myshare.presentation.ui.theme.MyShareSecondary
 
 @Composable
 fun BuildingPlanScreen(onBuilt: () -> Unit) {
@@ -40,7 +50,7 @@ fun BuildingPlanScreen(onBuilt: () -> Unit) {
             horizontalAlignment = Alignment.Start
         ) {
             LinearProgressIndicator(
-                progress = progress,
+                progress = { progress },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(12.dp),

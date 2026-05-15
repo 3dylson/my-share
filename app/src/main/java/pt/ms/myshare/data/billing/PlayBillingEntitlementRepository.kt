@@ -2,8 +2,7 @@ package pt.ms.myshare.data.billing
 
 import android.app.Activity
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import pt.ms.myshare.domain.model.StoreProduct
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import kotlinx.coroutines.CoroutineScope
@@ -22,13 +21,8 @@ class PlayBillingEntitlementRepository(
     private val firebaseFunctions: FirebaseFunctions
 ) : EntitlementRepository {
 
-    private val mockProStatus = MutableStateFlow(false)
-
-    override val isPro: Flow<Boolean> = combine(
-        billingClientWrapper.purchases,
-        mockProStatus
-    ) { purchases, mockStatus ->
-        mockStatus || purchases.any { purchase -> 
+    override val isPro: Flow<Boolean> = billingClientWrapper.purchases.map { purchases ->
+        purchases.any { purchase ->
             (purchase.products.contains("myshare_annual") || purchase.products.contains("myshare_monthly")) && 
             purchase.purchaseState == com.android.billingclient.api.Purchase.PurchaseState.PURCHASED
         }
@@ -79,10 +73,6 @@ class PlayBillingEntitlementRepository(
 
     override suspend fun purchasePlan(activity: Activity, product: StoreProduct) {
         billingClientWrapper.launchBillingFlow(activity, product)
-    }
-
-    override suspend fun setPro(value: Boolean) {
-        mockProStatus.value = value
     }
 
     override suspend fun restorePurchases() {

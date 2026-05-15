@@ -46,6 +46,8 @@ data class GoalCardState(
 data class ReviewCardState(
     val actualFlexibleSpend: String = "",
     val actualGoalContribution: String = "",
+    val flexibleSpendMax: Float = 5000f,
+    val goalContributionMax: Float = 5000f,
     val insight: ReviewInsight? = null,
     val coachingInsights: List<ReviewInsightState> = emptyList(),
     val savedReviewDate: String? = null,
@@ -64,19 +66,25 @@ data class RuleCardState(
     val name: String,
     val amountLabel: String,
     val typeLabel: String,
-    val isPercentage: Boolean
+    val isPercentage: Boolean,
+    val typeLabelKey: String? = null
 )
 
 data class MoreCardState(
     val reminderEnabled: Boolean = false,
     val reminderLabel: String = "",
     val reminderLabelKey: String? = null,
+    val reminderLabelArgs: List<String> = emptyList(),
     val automationEnabled: Boolean = false,
     val pricingStrategy: PricingStrategy? = null,
     val actualMonthlyPrice: String? = null,
     val actualAnnualPrice: String? = null,
-    val showAdsConsentOption: Boolean = false,
+    val actualMonthlyTrialDays: Int? = null,
+    val actualAnnualTrialDays: Int? = null,
+    val showAdsConsentOption: Boolean = true,
     val selectedBillingPlan: BillingPlan = BillingPlan.MONTHLY,
+    val isBillingActionInProgress: Boolean = false,
+    val billingMessage: String? = null,
     val isPremium: Boolean = false,
     val userEmail: String? = null,
     val error: String? = null

@@ -6,5 +6,13 @@ data class StoreProduct(
     val description: String,
     val price: String,
     val basePlanId: String?,
-    val offerToken: String?
-)
+    val offerToken: String?,
+    val recurringBillingPeriod: String? = null,
+    val offerId: String? = null,
+    val offerTags: List<String> = emptyList(),
+    val freeTrialPeriod: String? = null,
+    val freeTrialDays: Int? = null
+) {
+    val hasFreeTrial: Boolean
+        get() = freeTrialDays != null && freeTrialDays > 0
+}

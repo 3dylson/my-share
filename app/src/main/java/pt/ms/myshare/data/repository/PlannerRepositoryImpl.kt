@@ -163,6 +163,11 @@ class PlannerRepositoryImpl @Inject constructor(
     private suspend fun syncRulesFromFirestore(uid: String) {
         try {
             val rulesSnapshot = firestore.collection("users").document(uid).collection("rules").get().await()
+            if (rulesSnapshot.isEmpty && ruleState.value.isNotEmpty()) {
+                Timber.tag(TAG).d("Remote rules empty; preserving %d local onboarding rules", ruleState.value.size)
+                ruleState.value.forEach { saveRule(it) }
+                return
+            }
             val rules = rulesSnapshot.documents.mapNotNull { doc ->
                 runCatching {
                     PaydayRule(
@@ -184,6 +189,11 @@ class PlannerRepositoryImpl @Inject constructor(
     private suspend fun syncGoalsFromFirestore(uid: String) {
         try {
             val goalsSnapshot = firestore.collection("users").document(uid).collection("goals").get().await()
+            if (goalsSnapshot.isEmpty && goalState.value.isNotEmpty()) {
+                Timber.tag(TAG).d("Remote goals empty; preserving %d local onboarding goals", goalState.value.size)
+                goalState.value.forEach { saveGoal(it) }
+                return
+            }
             val goals = goalsSnapshot.documents.mapNotNull { doc ->
                 runCatching {
                     Goal(
@@ -230,6 +240,15 @@ class PlannerRepositoryImpl @Inject constructor(
     override fun loadRules(): List<PaydayRule> = ruleState.value
 
     override suspend fun saveRule(rule: PaydayRule) {
+        val currentRules = ruleState.value.toMutableList()
+        val index = currentRules.indexOfFirst { it.id == rule.id }
+        if (index >= 0) {
+            currentRules[index] = rule
+        } else {
+            currentRules.add(rule)
+        }
+        ruleState.value = currentRules
+
         val user = firebaseAuth.currentUser ?: return
         coroutineScope.launch {
             val data = hashMapOf(
@@ -243,16 +262,6 @@ class PlannerRepositoryImpl @Inject constructor(
             try {
                 firestore.collection("users").document(user.uid)
                     .collection("rules").document(rule.id).set(data)
-                
-                // Update local state
-                val currentRules = ruleState.value.toMutableList()
-                val index = currentRules.indexOfFirst { it.id == rule.id }
-                if (index >= 0) {
-                    currentRules[index] = rule
-                } else {
-                    currentRules.add(rule)
-                }
-                ruleState.value = currentRules
             } catch (e: Exception) {
                 Timber.tag(TAG).e(e, "Failed to save rule to Firestore")
             }
@@ -260,14 +269,12 @@ class PlannerRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteRule(ruleId: String) {
+        ruleState.value = ruleState.value.filter { it.id != ruleId }
         val user = firebaseAuth.currentUser ?: return
         coroutineScope.launch {
             try {
                 firestore.collection("users").document(user.uid)
                     .collection("rules").document(ruleId).delete()
-                
-                // Update local state
-                ruleState.value = ruleState.value.filter { it.id != ruleId }
             } catch (e: Exception) {
                 Timber.tag(TAG).e(e, "Failed to delete rule from Firestore")
             }
@@ -279,6 +286,15 @@ class PlannerRepositoryImpl @Inject constructor(
     override fun loadGoals(): List<Goal> = goalState.value
 
     override suspend fun saveGoal(goal: Goal) {
+        val currentGoals = goalState.value.toMutableList()
+        val index = currentGoals.indexOfFirst { it.id == goal.id }
+        if (index >= 0) {
+            currentGoals[index] = goal
+        } else {
+            currentGoals.add(goal)
+        }
+        goalState.value = currentGoals
+
         val user = firebaseAuth.currentUser ?: return
         coroutineScope.launch {
             val data = hashMapOf(
@@ -293,16 +309,6 @@ class PlannerRepositoryImpl @Inject constructor(
             try {
                 firestore.collection("users").document(user.uid)
                     .collection("goals").document(goal.id).set(data)
-                
-                // Update local state
-                val currentGoals = goalState.value.toMutableList()
-                val index = currentGoals.indexOfFirst { it.id == goal.id }
-                if (index >= 0) {
-                    currentGoals[index] = goal
-                } else {
-                    currentGoals.add(goal)
-                }
-                goalState.value = currentGoals
             } catch (e: Exception) {
                 Timber.tag(TAG).e(e, "Failed to save goal to Firestore")
             }
@@ -310,14 +316,12 @@ class PlannerRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteGoal(goalId: String) {
+        goalState.value = goalState.value.filter { it.id != goalId }
         val user = firebaseAuth.currentUser ?: return
         coroutineScope.launch {
             try {
                 firestore.collection("users").document(user.uid)
                     .collection("goals").document(goalId).delete()
-                
-                // Update local state
-                goalState.value = goalState.value.filter { it.id != goalId }
             } catch (e: Exception) {
                 Timber.tag(TAG).e(e, "Failed to delete goal from Firestore")
             }

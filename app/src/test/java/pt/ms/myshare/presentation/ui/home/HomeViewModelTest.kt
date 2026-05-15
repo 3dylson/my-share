@@ -17,6 +17,7 @@ import org.junit.Before
 import org.junit.Test
 import pt.ms.myshare.domain.model.AllocationPreset
 import pt.ms.myshare.domain.model.ManualReview
+import pt.ms.myshare.domain.model.PaydayRule
 import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.domain.model.ReminderCadence
@@ -33,6 +34,8 @@ import java.math.BigDecimal
 import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.use_case.GetReviewHistoryUseCase
 import pt.ms.myshare.domain.use_case.UpdateGoalProgressUseCase
+import pt.ms.myshare.domain.use_case.GetPerformanceStatsUseCase
+import pt.ms.myshare.domain.use_case.GetCoachingInsightsUseCase
 import pt.ms.myshare.domain.model.Goal
 import io.mockk.mockk
 import io.mockk.every
@@ -67,7 +70,9 @@ class HomeViewModelTest {
             createReviewInsightUseCase = CreateReviewInsightUseCase(CalculatePlanPreviewUseCase()),
             resolvePricingStrategyUseCase = ResolvePricingStrategyUseCase(),
             getReviewHistoryUseCase = mockGetReviewHistoryUseCase,
-            updateGoalProgressUseCase = mockUpdateGoalProgressUseCase
+            updateGoalProgressUseCase = mockUpdateGoalProgressUseCase,
+            getPerformanceStatsUseCase = GetPerformanceStatsUseCase(fakePlannerRepository),
+            getCoachingInsightsUseCase = GetCoachingInsightsUseCase(CalculatePlanPreviewUseCase())
         )
     }
 
@@ -129,12 +134,13 @@ class HomeViewModelTest {
         // Then error state is mapped
         val error = viewModel.state.value.reviewCard.error
         assertTrue(error != null)
-        assertEquals("Enter valid amounts for both review fields.", error)
+        assertEquals("home_review_error_invalid_amounts", error)
     }
 }
 
 class FakePlannerRepository : PlannerRepository {
     private val planFlow = MutableStateFlow<SalaryPlan?>(null)
+    private val rulesFlow = MutableStateFlow<List<PaydayRule>>(emptyList())
     private val goalsFlow = MutableStateFlow<List<Goal>>(emptyList())
     private val reviewFlow = MutableStateFlow<ManualReview?>(null)
     private val reviewsFlow = MutableStateFlow<List<ManualReview>>(emptyList())
@@ -144,6 +150,15 @@ class FakePlannerRepository : PlannerRepository {
 
     override fun observePlan(): MutableStateFlow<SalaryPlan?> = planFlow
     override suspend fun savePlan(plan: SalaryPlan) { planFlow.emit(plan) }
+
+    override fun observeRules(): Flow<List<PaydayRule>> = rulesFlow.asStateFlow()
+    override fun loadRules(): List<PaydayRule> = rulesFlow.value
+    override suspend fun saveRule(rule: PaydayRule) {
+        rulesFlow.emit(rulesFlow.value.filterNot { it.id == rule.id } + rule)
+    }
+    override suspend fun deleteRule(ruleId: String) {
+        rulesFlow.emit(rulesFlow.value.filterNot { it.id == ruleId })
+    }
     
     override fun observeGoals(): Flow<List<Goal>> = goalsFlow.asStateFlow()
     override suspend fun saveGoal(goal: Goal) { 
@@ -188,6 +203,6 @@ class TestFakeEntitlementRepository : EntitlementRepository {
 
     override suspend fun checkActiveEntitlement() {}
     override suspend fun purchasePlan(activity: android.app.Activity, product: StoreProduct) {}
-    override suspend fun setPro(value: Boolean) { _isPro.emit(value) }
+    suspend fun setPro(value: Boolean) { _isPro.emit(value) }
     override suspend fun restorePurchases() {}
 }

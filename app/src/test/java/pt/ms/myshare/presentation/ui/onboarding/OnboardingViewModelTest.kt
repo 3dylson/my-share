@@ -123,6 +123,22 @@ class OnboardingViewModelTest {
     }
 
     @Test
+    fun `setFixedCostsAndBuild rejects fixed costs greater than payday income`() = runTest {
+        viewModel.setSalaryDetails(BigDecimal("1000"), PayFrequency.MONTHLY, 1, "")
+
+        val built = viewModel.setFixedCostsAndBuild(BigDecimal("1200"), AllocationPreset.BALANCED)
+        advanceUntilIdle()
+
+        assertFalse(built)
+        assertEquals(BigDecimal("1200"), viewModel.uiState.value.monthlyFixedCosts)
+        assertEquals(
+            OnboardingViewModel.FIXED_COSTS_EXCEED_INCOME_ERROR,
+            viewModel.uiState.value.error
+        )
+        coVerify(exactly = 0) { plannerRepository.savePlan(any()) }
+    }
+
+    @Test
     fun `completeOnboarding fails if guards not met`() = runTest {
         // Initially guards are false
         viewModel.completeOnboarding()
@@ -130,7 +146,7 @@ class OnboardingViewModelTest {
         
         val state = viewModel.uiState.value
         assertFalse(state.onboardingCompleted)
-        assertEquals("Please build your plan first.", state.error)
+        assertEquals("onboarding_error_plan_required", state.error)
     }
 
     @Test
@@ -143,7 +159,7 @@ class OnboardingViewModelTest {
         
         // Reminder not yet handled
         viewModel.completeOnboarding()
-        assertEquals("Please handle the reminder step.", viewModel.uiState.value.error)
+        assertEquals("onboarding_error_reminder_required", viewModel.uiState.value.error)
         
         // Handle reminder
         viewModel.skipReminderConfiguration()
@@ -151,7 +167,7 @@ class OnboardingViewModelTest {
         
         // Bank sync not handled
         viewModel.completeOnboarding()
-        assertEquals("Please complete or skip the bank sync step.", viewModel.uiState.value.error)
+        assertEquals("onboarding_error_bank_sync_required", viewModel.uiState.value.error)
         
         // Handle bank sync
         viewModel.setBankSyncHandled()
@@ -207,15 +223,13 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun `purchasePremium shows error when product not yet loaded`() = runTest {
+    fun `purchasePremium shows billing message when product not yet loaded`() = runTest {
         every { entitlementRepository.availableProducts } returns MutableStateFlow(emptyList())
         val activity = mockk<android.app.Activity>(relaxed = true)
         viewModel.purchasePremium(activity)
         advanceUntilIdle()
-        assertEquals(
-            "Product not available. Please check your connection and try again.",
-            viewModel.uiState.value.error
-        )
+        assertEquals("paywall_billing_products_unavailable", viewModel.uiState.value.billingMessage)
+        assertFalse(viewModel.uiState.value.isBillingActionInProgress)
         coVerify(exactly = 0) { entitlementRepository.purchasePlan(any(), any()) }
     }
 }

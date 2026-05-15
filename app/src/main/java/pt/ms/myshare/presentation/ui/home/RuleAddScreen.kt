@@ -5,13 +5,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -24,6 +25,7 @@ import pt.ms.myshare.presentation.ui.theme.MyShareBackground
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
 import pt.ms.myshare.presentation.ui.theme.MyShareSecondary
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun RuleAddRoute(
     navController: NavController,
@@ -49,7 +51,7 @@ fun RuleAddRoute(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun RuleAddScreen(
     state: RuleAddState,
@@ -61,7 +63,9 @@ fun RuleAddScreen(
     onDelete: () -> Unit,
     onBack: () -> Unit
 ) {
+    val context = LocalContext.current
     var showDeleteDialog by remember { mutableStateOf(false) }
+    val isEditMode = state.requestedRuleId != null || state.ruleId != null
 
     if (showDeleteDialog) {
         AlertDialog(
@@ -93,7 +97,7 @@ fun RuleAddScreen(
             CenterAlignedTopAppBar(
                 title = { 
                     Text(
-                        text = if (state.ruleId != null) stringResource(R.string.rule_add_title_edit) else stringResource(R.string.rule_add_title_new), 
+                        text = if (isEditMode) stringResource(R.string.rule_add_title_edit) else stringResource(R.string.rule_add_title_new), 
                         style = MaterialTheme.typography.titleLarge
                     ) 
                 },
@@ -117,26 +121,50 @@ fun RuleAddScreen(
                     containerColor = MyShareBackground
                 )
             )
+        },
+        bottomBar = {
+            if (!state.isMissingExistingRule) {
+                Surface(color = MyShareBackground) {
+                    PremiumButton(
+                        text = if (state.isLoading) stringResource(R.string.rule_add_button_loading) else if (isEditMode) stringResource(R.string.rule_add_button_edit) else stringResource(R.string.rule_add_button_new),
+                        onClick = onSave,
+                        enabled = !state.isLoading,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .navigationBarsPadding()
+                            .padding(horizontal = 24.dp, vertical = 16.dp)
+                    )
+                }
+            }
         }
     ) { innerPadding ->
+        if (state.isMissingExistingRule) {
+            val resolvedError = state.error?.let {
+                val resId = context.resources.getIdentifier(it, "string", context.packageName)
+                if (resId != 0) context.getString(resId) else it
+            } ?: stringResource(R.string.rule_add_missing_body)
+            MissingRuleContent(
+                error = resolvedError,
+                onBack = onBack,
+                modifier = Modifier.padding(innerPadding)
+            )
+            return@Scaffold
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .navigationBarsPadding()
                 .padding(horizontal = 24.dp)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(8.dp))
             
-            PremiumAppHeader(
-                title = if (state.ruleId != null) stringResource(R.string.rule_add_header_title_edit) else stringResource(R.string.rule_add_header_title_new),
-                subtitle = stringResource(R.string.rule_add_header_subtitle_new)
-            )
-
-            PremiumInfoCard(
-                title = stringResource(R.string.rule_add_info_title),
+            StrategyFormHeaderCard(
+                title = if (isEditMode) stringResource(R.string.rule_add_header_title_edit) else stringResource(R.string.rule_add_header_title_new),
                 body = stringResource(R.string.rule_add_info_body),
                 icon = Icons.Default.Settings
             )
@@ -211,7 +239,7 @@ fun RuleAddScreen(
                         FilterChip(
                             selected = state.type == type,
                             onClick = { onTypeChanged(type) },
-                            label = { Text(type.name.lowercase().replaceFirstChar { it.titlecase() }) },
+                            label = { Text(stringResource(type.labelRes)) },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = MySharePrimary.copy(alpha = 0.1f),
                                 selectedLabelColor = MySharePrimary
@@ -222,23 +250,55 @@ fun RuleAddScreen(
             }
 
             if (state.error != null) {
+                val errorText = remember(state.error) {
+                    val resId = context.resources.getIdentifier(state.error, "string", context.packageName)
+                    if (resId != 0) context.getString(resId) else state.error
+                }
                 Text(
-                    text = state.error,
+                    text = errorText,
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-
-            PremiumButton(
-                text = if (state.isLoading) stringResource(R.string.rule_add_button_loading) else if (state.ruleId != null) stringResource(R.string.rule_add_button_edit) else stringResource(R.string.rule_add_button_new),
-                onClick = onSave,
-                enabled = !state.isLoading,
-                modifier = Modifier.fillMaxWidth()
-            )
-            
-            Spacer(modifier = Modifier.height(32.dp))
         }
+    }
+}
+
+private val PaydayRuleType.labelRes: Int
+    get() = when (this) {
+        PaydayRuleType.SAVINGS -> R.string.rule_type_savings
+        PaydayRuleType.INVESTING -> R.string.rule_type_investing
+        PaydayRuleType.CRYPTO -> R.string.rule_type_crypto
+        PaydayRuleType.DEBT -> R.string.rule_type_debt
+        PaydayRuleType.OTHER -> R.string.rule_type_other
+    }
+
+@Composable
+private fun MissingRuleContent(
+    error: String,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .navigationBarsPadding()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        PremiumInfoCard(
+            title = stringResource(R.string.rule_add_missing_title),
+            body = error,
+            icon = Icons.Default.Warning
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        PremiumButton(
+            text = stringResource(R.string.rule_add_missing_button),
+            onClick = onBack,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }

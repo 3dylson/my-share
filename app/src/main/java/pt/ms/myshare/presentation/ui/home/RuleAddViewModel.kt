@@ -17,8 +17,10 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.UUID
 import javax.inject.Inject
+import timber.log.Timber
 
 data class RuleAddState(
+    val requestedRuleId: String? = null,
     val ruleId: String? = null,
     val name: String = "",
     val amount: String = "",
@@ -27,6 +29,7 @@ data class RuleAddState(
     val createdAt: LocalDate? = null,
     val isLoading: Boolean = false,
     val isSaved: Boolean = false,
+    val isMissingExistingRule: Boolean = false,
     val error: String? = null
 )
 
@@ -43,16 +46,19 @@ class RuleAddViewModel @Inject constructor(
 
     init {
         if (navRuleId != null) {
+            _state.update { it.copy(requestedRuleId = navRuleId) }
             loadExistingRule(navRuleId)
         }
     }
 
     private fun loadExistingRule(id: String) {
         viewModelScope.launch {
+            Timber.tag(TAG).d("Loading rule for edit: %s", id)
             _state.update { it.copy(isLoading = true) }
             val rules = repository.loadRules()
             val rule = rules.find { it.id == id }
             if (rule != null) {
+                Timber.tag(TAG).d("Loaded rule for edit: %s", id)
                 _state.update { 
                     it.copy(
                         ruleId = rule.id,
@@ -65,31 +71,43 @@ class RuleAddViewModel @Inject constructor(
                     )
                 }
             } else {
-                _state.update { it.copy(isLoading = false, error = "Rule not found.") }
+                Timber.tag(TAG).w("Rule requested for edit was not found: %s", id)
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        isMissingExistingRule = true,
+                        error = "rule_add_error_missing"
+                    )
+                }
             }
         }
     }
 
     fun onNameChanged(newName: String) {
-        _state.update { it.copy(name = newName) }
+        _state.update { it.copy(name = newName, error = null) }
     }
 
     fun onAmountChanged(newAmount: String) {
-        _state.update { it.copy(amount = newAmount) }
+        _state.update { it.copy(amount = newAmount, error = null) }
     }
 
     fun onPercentageToggle(isPercentage: Boolean) {
-        _state.update { it.copy(isPercentage = isPercentage) }
+        _state.update { it.copy(isPercentage = isPercentage, error = null) }
     }
 
     fun onTypeChanged(newType: PaydayRuleType) {
-        _state.update { it.copy(type = newType) }
+        _state.update { it.copy(type = newType, error = null) }
     }
 
     fun saveRule() {
+        if (_state.value.isMissingExistingRule) {
+            Timber.tag(TAG).w("Blocked save for missing rule edit route: %s", _state.value.requestedRuleId)
+            return
+        }
+
         val amount = _state.value.amount.toBigDecimalOrNull() ?: BigDecimal.ZERO
         if (_state.value.name.isBlank() || amount <= BigDecimal.ZERO) {
-            _state.update { it.copy(error = "Please enter a valid name and amount.") }
+            _state.update { it.copy(error = "rule_add_error_invalid_name_amount") }
             return
         }
 
@@ -117,5 +135,9 @@ class RuleAddViewModel @Inject constructor(
             repository.deleteRule(id)
             _state.update { it.copy(isLoading = false, isSaved = true) }
         }
+    }
+
+    companion object {
+        private const val TAG = "RuleAddViewModel"
     }
 }

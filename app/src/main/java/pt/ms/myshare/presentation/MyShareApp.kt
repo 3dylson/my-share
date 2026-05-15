@@ -35,10 +35,10 @@ class MyShareApp : Application() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val channel = NotificationChannel(
             CHANNEL_ID,
-            "Payday reminders",
+            getString(pt.ms.myshare.R.string.notification_channel_payday_reminders_name),
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply {
-            description = "Reminds you what to do with your next payday plan."
+            description = getString(pt.ms.myshare.R.string.notification_channel_payday_reminders_description)
         }
         getSystemService(NotificationManager::class.java)?.createNotificationChannel(channel)
     }

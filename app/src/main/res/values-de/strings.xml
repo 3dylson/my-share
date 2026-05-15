@@ -1,118 +1,575 @@
-<?xml version="1.0" encoding="UTF-8"?><resources>
-      
-  <string name="app_name" translatable="false">My Share</string>
-      
-  <!-- Strings used for fragments for navigation -->
-      
-  <string name="dashboard_fragment_label" translatable="false">Dashboard Fragment</string>
-      
-  <!--Settings Screen-->
-      
-  <string name="action_settings">Einstellungen</string>
-      
-  <string name="content_description_settings">App-Einstellungen</string>
-      
-  <string name="title_activity_settings">EinstellungenAktivität</string>
-      
-  <!--Dashboard Screen-->
-      
-  <string name="hello_message">Hallo</string>
-      
-  <string name="dashboard_message">Behalten Sie den Überblick über Ihre Investitionen!</string>
-      
-  <string name="dashboard_label">Armaturenbrett</string>
-      
-  <string name="stocks_label">Aktien</string>
-      
-  <string name="crypto_label">Krypto</string>
-      
-  <string name="savings_label">Ersparnisse</string>
-      
-  <!--Generic labels-->
-      
-  <string name="next">Nächste</string>
-      
-  <string name="previous">Vorherige</string>
-      
-  <string name="empty_string" translatable="false"/>
-      
-  <!-- Preference Titles -->
-      
-  <string name="messages_header">Nachrichten</string>
-      
-  <string name="sync_header">Synchronisieren</string>
-      
-  <!-- Messages Preferences -->
-      
-  <string name="signature_title">Ihre Unterschrift</string>
-      
-  <string name="reply_title">Standardantwortaktion</string>
-      
-  <!-- Sync Preferences -->
-      
-  <string name="sync_title">E-Mails regelmäßig synchronisieren</string>
-      
-  <string name="attachment_title">Herunterladen eingehender Anhänge</string>
-      
-  <string name="attachment_summary_on">Anhänge für eingehende E-Mails automatisch herunterladen</string>
-      
-  <string name="attachment_summary_off">Anhänge nur herunterladen, wenn sie manuell angefordert werden</string>
-      
-  <!--Edit Profile Screen-->
-      
-  <string name="edit_profile_label">Profil bearbeiten</string>
-      
-  <string name="edit_profile_toolbar_title">Profil bearbeiten</string>
-      
-  <string name="your_net_salary_label">Ihr Nettogehalt %1s</string>
-      
-  <string name="username_label">Wie heißen Sie?</string>
-      
-  <string name="salary_net_hint" translatable="false">700.99 €</string>
-      
-  <string name="investments_savings_percentage_label">Prozentsatz des Nettogehalts, den Sie für Investitionen/Ersparnisse berücksichtigen möchten</string>
-      
-  <string name="_20_percent_hint" translatable="false">ex: 20 %</string>
-      
-  <string name="_60_percent_hint" translatable="false">ex: 60 %</string>
-      
-  <string name="percentage_stocks_label">
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">My Share</string>
+    <string name="dashboard_fragment_label" translatable="false">Dashboard Fragment</string>
+    <string name="action_settings">Einstellungen</string>
+    <string name="content_description_settings">App-Einstellungen</string>
+    <string name="title_activity_settings">EinstellungenAktivität</string>
+    <string name="hello_message">Hallo</string>
+    <string name="dashboard_message">Behalten Sie den Überblick über Ihre Investitionen!</string>
+    <string name="dashboard_label">Armaturenbrett</string>
+    <string name="stocks_label">Aktien</string>
+    <string name="crypto_label">Krypto</string>
+    <string name="savings_label">Ersparnisse</string>
+    <string name="next">Nächste</string>
+    <string name="previous">Vorherige</string>
+    <string name="empty_string" translatable="false" />
+    <string name="messages_header">Nachrichten</string>
+    <string name="sync_header">Synchronisieren</string>
+    <string name="signature_title">Ihre Unterschrift</string>
+    <string name="reply_title">Standardantwortaktion</string>
+    <string name="sync_title">E-Mails regelmäßig synchronisieren</string>
+    <string name="attachment_title">Herunterladen eingehender Anhänge</string>
+    <string name="attachment_summary_on">Anhänge für eingehende E-Mails automatisch herunterladen</string>
+    <string name="attachment_summary_off">Anhänge nur herunterladen, wenn sie manuell angefordert werden</string>
+    <string name="edit_profile_label">Profil bearbeiten</string>
+    <string name="edit_profile_toolbar_title">Profil bearbeiten</string>
+    <string name="your_net_salary_label">Ihr Nettogehalt %1s</string>
+    <string name="username_label">Wie heißen Sie?</string>
+    <string name="salary_net_hint" translatable="false">700.99 €</string>
+    <string name="investments_savings_percentage_label">Prozentsatz des Nettogehalts, den Sie für Investitionen/Ersparnisse berücksichtigen möchten</string>
+    <string name="_20_percent_hint" translatable="false">ex: 20 %</string>
+    <string name="_60_percent_hint" translatable="false">ex: 60 %</string>
+    <string name="percentage_stocks_label">
     Zu berücksichtigender Prozentsatz für 
-    <b>Aktien</b>
+    Aktien
   </string>
-      
-  <string name="percentage_crypto_label">
+    <string name="percentage_crypto_label">
     Zu berücksichtigender Prozentsatz für 
-    <b>Krypto</b>
+    Krypto
   </string>
-      
-  <string name="percentage_savings_label">
+    <string name="percentage_savings_label">
     Zu berücksichtigender Prozentsatz für 
-    <b>Einsparungen</b>
+    Einsparungen
   </string>
-      
-  <string name="pref_key_net_salary_value" translatable="false">nsv</string>
-      
-  <string name="pref_key_investments_savings_percentage_value" translatable="false">ispv</string>
-      
-  <string name="pref_key_percentage_stocks_value" translatable="false">psv</string>
-      
-  <string name="pref_key_percentage_crypto_value" translatable="false">pcv</string>
-      
-  <string name="pref_key_percentage_savings_value" translatable="false">psv</string>
-      
-  <string name="btn_ep_confirm_text">Bestätigen</string>
-      
-  <string name="snackbar_saved_text">Erfolgreich gespeichert</string>
-      
-  <string name="id_username" translatable="false">username</string>
-      
-  <string name="id_amount_to_invest" translatable="false">amount_to_invest</string>
-      
-  <string name="id_amount_for_stocks" translatable="false">amount_for_stocks</string>
-      
-  <string name="id_amount_for_crypto" translatable="false">amount_for_crypto</string>
-      
-  <string name="id_amount_for_savings" translatable="false">amount_for_savings</string>
-  
+    <string name="pref_key_net_salary_value" translatable="false">nsv</string>
+    <string name="pref_key_investments_savings_percentage_value" translatable="false">ispv</string>
+    <string name="pref_key_percentage_stocks_value" translatable="false">psv</string>
+    <string name="pref_key_percentage_crypto_value" translatable="false">pcv</string>
+    <string name="pref_key_percentage_savings_value" translatable="false">psv</string>
+    <string name="btn_ep_confirm_text">Bestätigen</string>
+    <string name="snackbar_saved_text">Erfolgreich gespeichert</string>
+    <string name="id_username" translatable="false">username</string>
+    <string name="id_amount_to_invest" translatable="false">amount_to_invest</string>
+    <string name="id_amount_for_stocks" translatable="false">amount_for_stocks</string>
+    <string name="id_amount_for_crypto" translatable="false">amount_for_crypto</string>
+    <string name="id_amount_for_savings" translatable="false">amount_for_savings</string>
+    <string name="onboarding_welcome_title">Your Money,\nBuilt for Intention</string>
+    <string name="onboarding_welcome_subtitle">Stop reactive spending. Start building your blueprint for financial freedom today.</string>
+    <string name="onboarding_welcome_button_get_started">Get Started</string>
+    <string name="onboarding_welcome_button_skip_dev" translatable="false">Skip to Home (Dev)</string>
+    <string name="onboarding_goal_picker_title">What are we building for?</string>
+    <string name="onboarding_goal_picker_subtitle">Pick one primary focus to start. You can add more later.</string>
+    <string name="onboarding_goal_picker_emergency">Emergency Fund</string>
+    <string name="onboarding_goal_picker_debt">Debt Payoff</string>
+    <string name="onboarding_goal_picker_investment">Investment Portfolio</string>
+    <string name="onboarding_goal_picker_purchase">Major Purchase</string>
+    <string name="onboarding_goal_picker_custom">Custom Goal</string>
+    <string name="onboarding_salary_title">The Foundation</string>
+    <string name="onboarding_salary_subtitle">Enter your net income and frequency. We use this to calculate your payday cycles.</string>
+    <string name="onboarding_salary_label">Net Income per Payday</string>
+    <string name="onboarding_salary_placeholder">e.g. 2500</string>
+    <string name="onboarding_salary_frequency_label">Payday Frequency</string>
+    <string name="onboarding_salary_frequency_monthly">Monthly</string>
+    <string name="onboarding_salary_frequency_biweekly">Bi-weekly</string>
+    <string name="onboarding_fixed_costs_title">Your Obligations</string>
+    <string name="onboarding_fixed_costs_subtitle">What must be paid every single month? Rent, bills, and subscriptions.</string>
+    <string name="onboarding_fixed_costs_housing">Housing &amp; Utilities</string>
+    <string name="onboarding_fixed_costs_transport">Transport &amp; Fuel</string>
+    <string name="onboarding_fixed_costs_subs">Subscriptions &amp; Food</string>
+    <string name="onboarding_fixed_costs_loans">Loans &amp; Insurance</string>
+    <string name="onboarding_priorities_title">Wealth Intensity</string>
+    <string name="onboarding_priorities_subtitle">How much of your remaining income goes toward your primary goal?</string>
+    <string name="onboarding_priorities_conservative_title">Conservative (10%)</string>
+    <string name="onboarding_priorities_conservative_desc">Building a steady, safe safety net.</string>
+    <string name="onboarding_priorities_balanced_title">Balanced (20%)</string>
+    <string name="onboarding_priorities_balanced_desc">The standard path to financial growth.</string>
+    <string name="onboarding_priorities_aggressive_title">Aggressive (40%)</string>
+    <string name="onboarding_priorities_aggressive_desc">Fast-tracking your freedom milestones.</string>
+    <string name="onboarding_trajectory_title">Your Blueprint</string>
+    <string name="onboarding_trajectory_subtitle">Based on your numbers, here is how your wealth will grow with discipline.</string>
+    <string name="onboarding_trajectory_allocation_label">Payday Allocation</string>
+    <string name="onboarding_trajectory_allocation_subtitle">This is what stays with you after all obligations are met.</string>
+    <string name="onboarding_trajectory_goal_label">Goal Achievement</string>
+    <string name="onboarding_trajectory_goal_subtitle">Estimated date to reach your \"%1$s\" target.</string>
+    <string name="onboarding_trajectory_intensity_label">Contribution Intensity</string>
+    <string name="onboarding_trajectory_intensity_body">invested into your future every single payday.</string>
+    <string name="onboarding_trajectory_footer">Start free with your first goal. Unlock unlimited tracking to scale your wealth.</string>
+    <string name="onboarding_trajectory_button">See Full Plan</string>
+    <string name="onboarding_banksync_title">Manual planning is ready</string>
+    <string name="onboarding_banksync_subtitle">Bank sync is coming later. Your payday plan works now with manual check-ins, reminders, and clear rules.</string>
+    <string name="onboarding_banksync_registered_title">Interest Registered!</string>
+    <string name="onboarding_banksync_registered_body">Bank sync is coming soon. We\'ll let you know as soon as it\'s ready.</string>
+    <string name="onboarding_banksync_link">Notify Me When It\'s Ready</string>
+    <string name="onboarding_banksync_skip">Continue to Home</string>
+    <string name="onboarding_reminder_title">Stay on track</string>
+    <string name="onboarding_reminder_subtitle">Consistent check-ins are the key to building wealth. We\'ll send a gentle nudge to help you follow your plan.</string>
+    <string name="onboarding_reminder_denied">Notifications stayed off. You can still use the plan and turn reminders on later.</string>
+    <string name="onboarding_reminder_cadence_payday_title">Every Payday</string>
+    <string name="onboarding_reminder_cadence_payday_desc">Stay aligned with your plan at every income event.</string>
+    <string name="onboarding_reminder_cadence_weekly_title">Weekly Review</string>
+    <string name="onboarding_reminder_cadence_weekly_desc">Reflect and adjust your progress every Sunday.</string>
+    <string name="onboarding_reminder_time_label">Reminder Time</string>
+    <string name="onboarding_reminder_enable_button">Enable Reminders</string>
+    <string name="onboarding_reminder_skip_button">I’ll do this later</string>
+    <string name="home_plan_section_metrics">Core Metrics</string>
+    <string name="home_plan_income_label">Income per payday</string>
+    <string name="home_plan_weekly_guide_label">Weekly Guide</string>
+    <string name="home_plan_weekly_guide_subtitle">Safe to spend every week</string>
+    <string name="home_plan_section_allocation">Allocation Preview</string>
+    <string name="home_plan_allocation_fixed">Fixed</string>
+    <string name="home_plan_allocation_flexible">Flexible</string>
+    <string name="home_plan_smart_adjustments_title">Smart Adjustments</string>
+    <string name="home_plan_smart_adjustments_desc">Enable Automation to automatically adjust your weekly guide based on last month\'s review.</string>
+    <string name="home_strategy_section_goals">Financial Goals</string>
+    <string name="home_strategy_no_goals_title">Set Your Sights</string>
+    <string name="home_strategy_no_goals_desc">Define what you\'re saving for. We\'ll track your progress toward your biggest milestones.</string>
+    <string name="home_strategy_add_goal_title">Add Another Goal</string>
+    <string name="home_strategy_add_goal_desc">Got more aspirations? Create another target.</string>
+    <string name="home_strategy_section_rules">Automated Rules</string>
+    <string name="home_strategy_no_rules_title">Create a Rule</string>
+    <string name="home_strategy_no_rules_desc">Automate your savings or investments based on your income.</string>
+    <string name="home_strategy_add_rule_title">Add Another Rule</string>
+    <string name="home_strategy_add_rule_desc">Create an automated transfer rule</string>
+    <string name="home_strategy_add_rule_premium_desc">Upgrade to Premium to add multiple rules</string>
+    <string name="home_review_section_performance">Performance Insights</string>
+    <string name="home_review_trust_score_label">Trust Score</string>
+    <string name="home_review_reviews_count">%1$s reviews</string>
+    <string name="home_review_streak_label">Current Streak</string>
+    <string name="home_review_day_streak">Day streak</string>
+    <string name="home_review_excess_savings_title">Excess Savings: %1$s</string>
+    <string name="home_review_excess_savings_desc">This is how much you\'ve stayed under budget across all your sessions. Great job!</string>
+    <string name="home_review_coach_section">Coach\'s Corner</string>
+    <string name="home_review_habit_loop_section">The Habit Loop</string>
+    <string name="home_review_manual_checkin_title">Manual Check-in</string>
+    <string name="home_review_manual_checkin_body">Log actual spend vs. blueprint. This feedback loop is the key to financial awareness.</string>
+    <string name="home_review_actual_flex_label">Actual Flexible Spend</string>
+    <string name="home_review_actual_goal_label">Actual Goal Contribution</string>
+    <string name="home_review_submit_button">Submit Review</string>
+    <string name="home_review_history_section">Historical Performance</string>
+    <string name="home_review_no_history_title">No History Yet</string>
+    <string name="home_review_no_history_desc">Complete your first review above to start building a timeline of your financial mastery.</string>
+    <string name="home_review_history_flex_value">Flex: %1$s</string>
+    <string name="home_review_history_flex_subtitle">Target: %1$s (%2$s)</string>
+    <string name="home_review_history_goal_label">Goal contribution</string>
+    <string name="home_review_history_goal_subtitle">Plan: %1$s (%2$s)</string>
+    <string name="home_review_trajectory_insights_title">Trajectory Insights</string>
+    <string name="home_review_trajectory_insights_desc">Upgrade to see the full list of past performances and detect spending patterns over time.</string>
+    <string name="more_guest_user">Guest User</string>
+    <string name="more_section_go_unlimited">Go Unlimited</string>
+    <string name="more_annual_membership">Annual Membership</string>
+    <string name="more_monthly_membership">Monthly Membership</string>
+    <string name="more_unlock_everything">Unlock Everything</string>
+    <string name="more_section_preferences">App Preferences</string>
+    <string name="more_notifications_title">Smart Notifications</string>
+    <string name="more_automation_title">Smart Automation</string>
+    <string name="more_automation_active">Adaptive buffers active</string>
+    <string name="more_automation_idle">System idle</string>
+    <string name="more_premium_badge">PREMIUM</string>
+    <string name="more_section_legal">Legal &amp; Support</string>
+    <string name="more_terms_title">Terms of Service</string>
+    <string name="more_terms_subtitle">User agreement</string>
+    <string name="more_privacy_title">Privacy Policy</string>
+    <string name="more_privacy_subtitle">Data handling</string>
+    <string name="more_ads_consent_title">Ad Preferences</string>
+    <string name="more_ads_consent_subtitle">Manage consent</string>
+    <string name="more_section_account">Account Actions</string>
+    <string name="more_sign_out_title">Sign Out</string>
+    <string name="more_sign_out_subtitle">Log out of your account safely</string>
+    <string name="more_app_name" translatable="false">My Share</string>
+    <string name="more_version_label">Version %1$s</string>
+    <string name="goal_add_delete_confirm_title">Delete Goal</string>
+    <string name="goal_add_delete_confirm_msg">Are you sure you want to remove this financial milestone? This action cannot be undone.</string>
+    <string name="goal_add_delete_confirm_btn">Delete</string>
+    <string name="goal_add_delete_cancel_btn">Cancel</string>
+    <string name="goal_add_title_edit">Edit Goal</string>
+    <string name="goal_add_title_new">New Goal</string>
+    <string name="goal_add_header_title_edit">Goal details</string>
+    <string name="goal_add_header_title_new">New goal</string>
+    <string name="goal_add_header_subtitle_edit">Adjust your target without losing progress.</string>
+    <string name="goal_add_header_subtitle_new">Set the outcome your payday plan is funding.</string>
+    <string name="goal_add_info_title_new">Goal Focus</string>
+    <string name="goal_add_info_body_new">Tie each payday contribution to a clear outcome.</string>
+    <string name="goal_add_info_title_edit">Milestone Details</string>
+    <string name="goal_add_info_body_edit">Adjust the name or target while keeping progress intact.</string>
+    <string name="goal_add_label_name">Goal Name</string>
+    <string name="goal_add_hint_name">e.g. New Home Deposit</string>
+    <string name="goal_add_label_amount">Target Amount</string>
+    <string name="goal_add_hint_amount">e.g. 50000</string>
+    <string name="goal_add_button_loading">Processing...</string>
+    <string name="goal_add_button_edit">Update Goal</string>
+    <string name="goal_add_button_new">Save Goal</string>
+    <string name="goal_add_back">Back</string>
+    <string name="goal_add_delete">Delete</string>
+    <string name="goal_add_missing_title">Goal not found</string>
+    <string name="goal_add_missing_body">This goal is no longer available. Return to Strategy and choose another goal.</string>
+    <string name="goal_add_missing_button">Back to Strategy</string>
+    <string name="rule_add_delete_confirm_title">Delete Rule</string>
+    <string name="rule_add_delete_confirm_msg">Are you sure you want to remove this payday rule? Your calculations will be updated immediately.</string>
+    <string name="rule_add_delete_confirm_btn">Delete</string>
+    <string name="rule_add_delete_cancel_btn">Cancel</string>
+    <string name="rule_add_title_edit">Edit Rule</string>
+    <string name="rule_add_title_new">New Rule</string>
+    <string name="rule_add_header_title_edit">Rule details</string>
+    <string name="rule_add_header_title_new">Payday rule</string>
+    <string name="rule_add_header_subtitle_new">Set how your money splits every payday.</string>
+    <string name="rule_add_info_title">Rule precision</string>
+    <string name="rule_add_info_body">Applied after fixed costs, using the income left to allocate.</string>
+    <string name="rule_add_label_name">Rule Name</string>
+    <string name="rule_add_hint_name">e.g. Rainy Day Fund</string>
+    <string name="rule_add_label_type">Allocation Type</string>
+    <string name="rule_add_type_percentage">Percentage (%)</string>
+    <string name="rule_add_type_fixed">Fixed Amount ($)</string>
+    <string name="rule_add_label_rate">Percentage Rate</string>
+    <string name="rule_add_label_amount">Fixed Amount</string>
+    <string name="rule_add_hint_rate">e.g. 10</string>
+    <string name="rule_add_hint_amount">e.g. 100</string>
+    <string name="rule_add_label_category">Category</string>
+    <string name="rule_add_button_loading">Processing...</string>
+    <string name="rule_add_button_edit">Update Rule</string>
+    <string name="rule_add_button_new">Save Rule</string>
+    <string name="rule_add_back">Back</string>
+    <string name="rule_add_delete">Delete</string>
+    <string name="rule_add_missing_title">Rule not found</string>
+    <string name="rule_add_missing_body">This rule is no longer available. Return to Strategy and choose another rule.</string>
+    <string name="rule_add_missing_button">Back to Strategy</string>
+    <string name="percentage_prefix" translatable="false">%</string>
+    <string name="currency_prefix" translatable="false">$</string>
+    <string name="onboarding_building_title">Finalizing Blueprint</string>
+    <string name="onboarding_building_subtitle">Personalizing your logic and safety nets based on your journey.</string>
+    <string name="onboarding_building_step_goals">Aligning with your goals</string>
+    <string name="onboarding_building_step_costs">Structuring fixed costs</string>
+    <string name="onboarding_building_step_savings">Calculating weekly safe-to-spend</string>
+    <string name="onboarding_plan_preview_title">Your Payday Action Plan</string>
+    <string name="onboarding_plan_preview_subtitle">On %1$s, money arrives. Here is your mission:</string>
+    <string name="onboarding_plan_preview_step_fixed_title">1. Secure your bills</string>
+    <string name="onboarding_plan_preview_step_fixed_body">Move %1$s to your fixed costs account immediately.</string>
+    <string name="onboarding_plan_preview_step_goal_title">2. Fuel your vision: %1$s</string>
+    <string name="onboarding_plan_preview_step_goal_body">Contribute %1$s to stay on track for %2$s.</string>
+    <string name="onboarding_plan_preview_step_flex_title">3. Enjoy your life</string>
+    <string name="onboarding_plan_preview_step_flex_body">You have %1$s left for the month (%2$s per week).</string>
+    <string name="onboarding_plan_preview_impact_title">The Big Picture</string>
+    <string name="onboarding_plan_preview_impact_body">Follow this mission and you’ll reach your goal by %1$s %2$s!</string>
+    <string name="onboarding_plan_preview_reminder_callout">We’ll remind you on %1$s to execute this mission.</string>
+    <string name="onboarding_plan_preview_button_secure">Automate My Mission</string>
+    <string name="onboarding_plan_preview_button_basic">I’ll do it manually</string>
+    <string name="paywall_close_content_description">Close</string>
+    <string name="paywall_restore_button">Restore</string>
+    <string name="paywall_title">Secure Your Payday</string>
+    <string name="paywall_subtitle">Don’t just calculate. Automate your mission and never wonder where your money went.</string>
+    <string name="paywall_feature_automation_title">Automation</string>
+    <string name="paywall_feature_automation_desc">Recurring rules for every payday.</string>
+    <string name="paywall_feature_reminders_title">Reminders</string>
+    <string name="paywall_feature_reminders_desc">Log major spends on time.</string>
+    <string name="paywall_feature_goals_title">Unlimited Goals</string>
+    <string name="paywall_feature_goals_desc">Track every milestone.</string>
+    <string name="back">Back</string>
+    <string name="continue_button">Continue</string>
+    <string name="error_invalid_number">Enter a valid number.</string>
+    <string name="period_month">month</string>
+    <string name="period_year">year</string>
+    <string name="premium_badge">Premium</string>
+    <string name="premium_gate_general_title">Unlock Premium</string>
+    <string name="premium_gate_general_body">Upgrade to unlock unlimited goals, automated payday rules, and deeper review insights.</string>
+    <string name="premium_gate_goals_title">Track more goals</string>
+    <string name="premium_gate_goals_body">Premium lets you keep multiple milestones active so each payday can support more than one target.</string>
+    <string name="premium_gate_rules_title">Add more payday rules</string>
+    <string name="premium_gate_rules_body">Premium unlocks multiple recurring allocation rules for savings, investing, debt, and other priorities.</string>
+    <string name="premium_gate_review_title">See full review history</string>
+    <string name="premium_gate_review_body">Premium keeps your full performance timeline visible so you can spot spending patterns over time.</string>
+    <string name="premium_gate_automation_title">Turn on smart automation</string>
+    <string name="premium_gate_automation_body">Premium can apply recurring payday rules and adaptive buffers automatically after each check-in.</string>
+    <string name="onboarding_signup_title">Secure your plan</string>
+    <string name="onboarding_signup_subtitle">Sign in to keep your financial plan synced safely.</string>
+    <string name="onboarding_signup_google">Continue with Google</string>
+    <string name="onboarding_signup_google_error_no_credentials">No Google account is available on this device. Add an account or continue locally.</string>
+    <string name="onboarding_signup_google_error_generic">Google sign-in could not finish. Check your connection, add a Google account, or continue locally.</string>
+    <string name="onboarding_signup_continue_locally">Continue locally</string>
+    <string name="onboarding_signup_continue_without_sync">Continue locally</string>
+    <string name="onboarding_signup_feature_vault_title">Private by design</string>
+    <string name="onboarding_signup_feature_vault_body">No bank credentials are stored.</string>
+    <string name="onboarding_signup_feature_sync_title">Cloud sync</string>
+    <string name="onboarding_signup_feature_sync_body">Keep your plan attached to your Google account.</string>
+    <string name="onboarding_signup_feature_privacy_title">Local fallback</string>
+    <string name="onboarding_signup_feature_privacy_body">Use the app now and sync later.</string>
+    <string name="onboarding_signup_local_note">Google sync is optional. Local mode keeps this plan on your device until you choose to connect an account.</string>
+    <string name="onboarding_goal_picker_label_name">Goal name</string>
+    <string name="onboarding_goal_picker_placeholder_name">Emergency fund</string>
+    <string name="onboarding_goal_picker_label_amount">Target amount</string>
+    <string name="onboarding_goal_picker_error_name">Enter a goal name.</string>
+    <string name="onboarding_goal_picker_error_amount_required">Enter a target amount.</string>
+    <string name="onboarding_goal_picker_error_amount_positive">Target amount must be greater than zero.</string>
+    <string name="onboarding_customize_goal">Customize your goal</string>
+    <string name="onboarding_salary_label_amount">Net income per payday</string>
+    <string name="onboarding_salary_frequency_title">Payday frequency</string>
+    <string name="onboarding_salary_frequency_monthly_desc">Paid once per month.</string>
+    <string name="onboarding_salary_frequency_biweekly_desc">Paid every two weeks.</string>
+    <string name="onboarding_salary_label_payday">Payday day of month</string>
+    <string name="onboarding_salary_label_next_date">Next payday date</string>
+    <string name="onboarding_salary_error_income_required">Enter your net income per payday.</string>
+    <string name="onboarding_salary_error_income_positive">Income must be greater than zero.</string>
+    <string name="onboarding_salary_error_payday_range">Use a payday day from 1 to 28.</string>
+    <string name="onboarding_salary_error_next_date_required">Enter the next payday date.</string>
+    <string name="onboarding_fixed_costs_label_amount">Monthly fixed costs</string>
+    <string name="onboarding_fixed_costs_error_required">Enter monthly fixed costs. Use 0 if none.</string>
+    <string name="onboarding_fixed_costs_error_negative">Fixed costs cannot be negative.</string>
+    <string name="onboarding_fixed_costs_error_exceeds_income">Fixed costs exceed your payday income. Lower fixed costs or increase income.</string>
+    <string name="onboarding_fixed_costs_preset_title">Allocation style</string>
+    <string name="onboarding_fixed_costs_preset_conservative">Lean</string>
+    <string name="onboarding_fixed_costs_preset_conservative_desc">Keep fixed costs tightly controlled.</string>
+    <string name="onboarding_fixed_costs_preset_balanced">Balanced</string>
+    <string name="onboarding_fixed_costs_preset_balanced_desc">A moderate monthly baseline.</string>
+    <string name="onboarding_fixed_costs_preset_growth">Growth</string>
+    <string name="onboarding_fixed_costs_preset_growth_desc">Leave more room for investing.</string>
+    <string name="onboarding_priorities_allocated">Allocated %1$s</string>
+    <string name="onboarding_priorities_remaining">Remaining %1$s</string>
+    <string name="onboarding_priorities_over">Over budget by %1$s</string>
+    <string name="onboarding_priorities_error_no_available_income">There is no income left to allocate. Go back and lower fixed costs or increase income.</string>
+    <string name="onboarding_priorities_error_over_budget">Reduce one or more allocations until remaining reaches zero.</string>
+    <string name="onboarding_priorities_label_flex">Flexible spend</string>
+    <string name="onboarding_priorities_desc_flex">Money available for daily life.</string>
+    <string name="onboarding_priorities_label_sav">Savings</string>
+    <string name="onboarding_priorities_desc_sav">Money reserved for your goal.</string>
+    <string name="onboarding_priorities_label_inv">Investing</string>
+    <string name="onboarding_priorities_desc_inv">Long-term capital allocation.</string>
+    <string name="onboarding_priorities_label_cry">Crypto</string>
+    <string name="onboarding_priorities_desc_cry">Optional higher-risk allocation.</string>
+    <string name="onboarding_priorities_button_ready">Looks good</string>
+    <string name="onboarding_priorities_button_balance">Balance allocation</string>
+    <string name="onboarding_trajectory_label_payday">Payday allocation</string>
+    <string name="onboarding_trajectory_desc_payday">What each payday should do.</string>
+    <string name="onboarding_trajectory_label_goal">Goal path</string>
+    <string name="onboarding_trajectory_goal_pending">Path pending</string>
+    <string name="onboarding_trajectory_desc_goal">Estimated path to your target.</string>
+    <string name="onboarding_trajectory_intensity_title">Contribution intensity</string>
+    <string name="onboarding_trajectory_intensity_desc">How much of each payday goes toward future you.</string>
+    <string name="onboarding_banksync_interest_title">Interest registered</string>
+    <string name="onboarding_banksync_interest_body">We saved your interest on this device and will use app updates to announce bank sync when it is ready.</string>
+    <string name="onboarding_reminder_error_permission">Notification permission is required for reminders.</string>
+    <string name="onboarding_reminder_cadence_payday">Every payday</string>
+    <string name="onboarding_reminder_cadence_weekly">Weekly review</string>
+    <string name="onboarding_reminder_time_title">Reminder time</string>
+    <string name="onboarding_reminder_button">Enable reminders</string>
+    <string name="onboarding_reminder_skip">Skip reminders</string>
+    <string name="home_plan_metrics_title">Core metrics</string>
+    <string name="home_plan_label_income">Income per payday</string>
+    <string name="home_plan_label_weekly">Weekly guide</string>
+    <string name="home_plan_desc_weekly">Safe to spend every week</string>
+    <string name="home_plan_allocation_title">Allocation preview</string>
+    <string name="home_plan_label_fixed">Fixed</string>
+    <string name="home_plan_label_flexible">Flexible</string>
+    <string name="home_plan_label_investing">Investing</string>
+    <string name="home_plan_benefit_title">Smart adjustments</string>
+    <string name="home_plan_benefit_desc">Upgrade to automate recurring rules and adaptive buffers.</string>
+    <string name="home_strategy_goals_title">Financial goals</string>
+    <string name="home_strategy_workspace_title">Strategy workspace</string>
+    <string name="home_strategy_workspace_body">Start with one milestone and one payday rule. You can refine both as your money rhythm becomes clearer.</string>
+    <string name="home_strategy_goal_empty_title">Set your sights</string>
+    <string name="home_strategy_goal_empty_desc">Define what you are saving for.</string>
+    <string name="home_strategy_goal_add_title">Add another goal</string>
+    <string name="home_strategy_goal_add_desc">Create another financial milestone.</string>
+    <string name="home_strategy_goal_add_desc_premium">Upgrade to Premium to track multiple goals.</string>
+    <string name="home_strategy_rules_title">Automated rules</string>
+    <string name="home_strategy_rule_empty_title">Create a rule</string>
+    <string name="home_strategy_rule_empty_desc">Automate a payday allocation.</string>
+    <string name="home_strategy_rule_add_title">Add another rule</string>
+    <string name="home_strategy_rule_add_desc_free">Create an automated transfer rule.</string>
+    <string name="home_strategy_rule_add_desc_premium">Upgrade to Premium to add multiple rules.</string>
+    <string name="home_strategy_rule_card_subtitle">Recurring payday rule</string>
+    <string name="home_review_performance_title">Performance insights</string>
+    <string name="home_review_score_label">Trust score</string>
+    <string name="home_review_score_percent">%1$d%%</string>
+    <string name="home_review_streak_count">%1$d day streak</string>
+    <string name="home_review_score_count">%1$s reviews</string>
+    <string name="home_review_streak_unit">day streak</string>
+    <string name="home_review_savings_title">Excess savings: %1$s</string>
+    <string name="home_review_savings_desc">Total flexible spend saved across reviews.</string>
+    <string name="home_review_coach_title">Coach corner</string>
+    <string name="home_review_habit_title">Payday check-in</string>
+    <string name="home_review_manual_title">Payday check-in</string>
+    <string name="home_review_manual_desc">Enter exact actuals so your next guide stays honest.</string>
+    <string name="home_review_input_flex">Actual flexible spend</string>
+    <string name="home_review_input_flex_exact">Flexible actual</string>
+    <string name="home_review_input_goal">Actual goal contribution</string>
+    <string name="home_review_input_goal_exact">Goal actual</string>
+    <string name="home_review_submit">Submit review</string>
+    <string name="home_review_saved_feedback">Review saved. Performance insights updated.</string>
+    <string name="home_review_history_title">Historical performance</string>
+    <string name="home_review_empty_history_title">No history yet</string>
+    <string name="home_review_empty_history_desc">Complete your first review to build a timeline.</string>
+    <string name="home_review_history_flex">Flex: %1$s</string>
+    <string name="home_review_history_flex_label">Flexible</string>
+    <string name="home_review_history_flex_target">Target: %1$s (%2$s)</string>
+    <string name="home_review_history_goal">Goal contribution</string>
+    <string name="home_review_history_goal_plan">Plan: %1$s (%2$s)</string>
+    <string name="home_review_history_target_delta">%1$s (%2$s)</string>
+    <string name="home_review_history_on_plan">On plan</string>
+    <string name="home_review_history_needs_attention">Needs attention</string>
+    <string name="home_review_history_trajectory_title">Trajectory insights</string>
+    <string name="home_review_history_trajectory_desc">Upgrade to see deeper patterns over time.</string>
+    <string name="home_more_guest">Guest User</string>
+    <string name="home_more_premium_title">Go Unlimited</string>
+    <string name="home_more_annual_title">Annual Membership</string>
+    <string name="home_more_annual_desc">Best value for long-term planning.</string>
+    <string name="home_more_annual_badge">Best value</string>
+    <string name="home_more_monthly_title">Monthly Membership</string>
+    <string name="home_more_monthly_desc">Flexible monthly access.</string>
+    <string name="home_more_premium_button">Upgrade</string>
+    <string name="home_more_pref_title">App preferences</string>
+    <string name="home_more_pref_notifications">Smart notifications</string>
+    <string name="home_more_pref_automation">Smart automation</string>
+    <string name="home_more_pref_automation_active">Adaptive buffers active</string>
+    <string name="home_more_pref_automation_idle">System idle</string>
+    <string name="home_more_pref_automation_locked">Premium: automate recurring rules and adaptive buffers</string>
+    <string name="home_more_automation_locked_title">Smart automation is Premium</string>
+    <string name="home_more_automation_locked_body">Upgrade to let My Share apply recurring payday rules and adaptive buffers automatically.</string>
+    <string name="home_more_automation_locked_action">View Premium</string>
+    <string name="home_more_legal_title">Legal &amp; support</string>
+    <string name="home_more_legal_terms">Terms of Service</string>
+    <string name="home_more_legal_terms_desc">User agreement</string>
+    <string name="home_more_legal_privacy">Privacy Policy</string>
+    <string name="home_more_legal_privacy_desc">Hosted at my-share-finance.web.app</string>
+    <string name="home_more_legal_ads">Ad Preferences</string>
+    <string name="home_more_legal_ads_desc">Manage consent</string>
+    <string name="home_more_account_title">Account actions</string>
+    <string name="home_more_account_profile_label">My Account</string>
+    <string name="home_more_account_basic_member">Basic Member</string>
+    <string name="home_more_account_premium_member">PREMIUM MEMBER</string>
+    <string name="home_more_account_premium_member_display">Premium Member</string>
+    <string name="home_more_account_details_title">Account details</string>
+    <string name="home_more_account_details_email">Signed in as: %1$s</string>
+    <string name="home_more_account_details_membership">Membership: %1$s</string>
+    <string name="home_more_account_details_sync_note">Local guest plans stay on this device until you sign in with Google.</string>
+    <string name="home_more_account_signout">Sign out</string>
+    <string name="home_more_account_signout_desc">Confirm before clearing local session data</string>
+    <string name="home_more_signout_confirm_title">Sign out?</string>
+    <string name="home_more_signout_confirm_body">This returns you to onboarding and clears the local salary plan on this device.</string>
+    <string name="home_more_version_label">Version %1$s</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_close">Close</string>
+    <string name="dialog_not_now">Not now</string>
+    <string name="paywall_feature_tracking_title">Plan fit</string>
+    <string name="paywall_feature_tracking_desc">Compare spending to plan.</string>
+    <string name="paywall_plan_monthly">Monthly</string>
+    <string name="paywall_plan_annual">Annual</string>
+    <string name="paywall_desc_monthly">Flexible commitment</string>
+    <string name="paywall_desc_annual">Best value — save more per year</string>
+    <string name="paywall_badge_best_value">BEST VALUE</string>
+    <string name="paywall_badge_loading">Loading…</string>
+    <string name="paywall_footer_trial">Trial for %1$d days. Cancel anytime.</string>
+    <string name="paywall_footer_trial_terms">%1$d-day free trial, then %2$s / %3$s. Cancel anytime in Google Play.</string>
+    <string name="paywall_footer_no_trial_terms">%1$s / %2$s. Cancel anytime in Google Play.</string>
+    <string name="paywall_footer_store_terms_unavailable">Secure checkout opens in Google Play. Pricing and trial eligibility appear there.</string>
+    <string name="paywall_upgrade_button">Upgrade Now</string>
+    <string name="paywall_start_trial_button">Start Free Trial</string>
+    <string name="paywall_upgrade_loading">Preparing purchase…</string>
+    <string name="paywall_billing_starting">Preparing the secure Play purchase screen…</string>
+    <string name="paywall_billing_handoff">Play purchase screen opened. Finish there to activate Premium.</string>
+    <string name="paywall_billing_products_unavailable">Premium products are not available yet. Check Play Store setup or try again later.</string>
+    <string name="paywall_restore_checking">Checking for previous purchases…</string>
+    <string name="paywall_restore_success">Premium restored.</string>
+    <string name="paywall_restore_none">No Premium purchase was found for this Play account.</string>
+    <string name="paywall_billing_status_body">You can keep using My Share while this is resolved.</string>
+    <string name="paywall_period_month">month</string>
+    <string name="paywall_period_year">year</string>
+    <string name="paywall_headline_emerging">Keep your payday plan running on autopilot</string>
+    <string name="paywall_subhead_emerging">Monthly is the easier starting point here. Annual stays available once the value is clear.</string>
+    <string name="paywall_headline_brazil">Turn your salary plan into a repeatable routine</string>
+    <string name="paywall_subhead_brazil">Monthly is highlighted first. Annual is there for committed users.</string>
+    <string name="paywall_headline_default">Automate your Payday Action Plan</string>
+    <string name="paywall_subhead_default">Secure your mission with recurring rules and payday reminders.</string>
+    <string name="insight_review_save_stress_success_headline">Safety net growing</string>
+    <string name="insight_review_save_stress_failure_headline">Buffer needs priority</string>
+    <string name="insight_review_invest_discipline_success_headline">Discipline paying off</string>
+    <string name="insight_review_invest_discipline_failure_headline">Consistency gap detected</string>
+    <string name="insight_review_stop_overspending_success_headline">Budget mastered</string>
+    <string name="insight_review_stop_overspending_failure_headline">Leakage detected</string>
+    <string name="insight_review_plan_together_success_headline">Harmony achieved</string>
+    <string name="insight_review_plan_together_failure_headline">Plan needs alignment</string>
+    <string name="insight_review_save_stress_success_body">You\'re successfully building your cushion. Even if flexible spending varied, your core safety is intact.</string>
+    <string name="insight_review_save_stress_failure_body">Your savings contribution dipped. Try to protect those first to maintain your peace of mind.</string>
+    <string name="insight_review_invest_discipline_success_body">Market exposure is holding steady. This consistency is exactly what builds long-term wealth.</string>
+    <string name="insight_review_invest_discipline_failure_body">Discipline slipped this cycle. Remember, small gaps today have a large impact on your future compounding.</string>
+    <string name="insight_review_stop_overspending_success_body">You stayed within your flexible budget! This is a major win for your new financial habits.</string>
+    <string name="insight_review_stop_overspending_failure_body">Flexible spending ran %1$s over plan. Scan your transactions to see where the leak happened.</string>
+    <string name="insight_review_plan_together_success_body">You maintained perfect alignment with the shared blueprint. Progress is visible and stable.</string>
+    <string name="insight_review_plan_together_failure_body">There\'s a drift between the plan and reality. A quick check-in can help get the logic back on track.</string>
+    <string name="coaching_consistency_king_headline">Consistency King</string>
+    <string name="coaching_consistency_king_body">You\'ve hit your goal target 3 times in a row. Your discipline is building real wealth. Keep this momentum!</string>
+    <string name="coaching_hidden_opportunity_headline">Hidden Opportunity</string>
+    <string name="coaching_hidden_opportunity_body">You consistently spend less than your flexible budget. Consider moving some of this extra \'buffer\' to your goals.</string>
+    <string name="coaching_hidden_opportunity_action">Optimize Rules</string>
+    <string name="coaching_spending_drift_headline">Spending Drift</string>
+    <string name="coaching_spending_drift_body">Your flexible spending has increased for 3 consecutive periods. A quick check-in on non-essentials might be helpful.</string>
+    <string name="coaching_first_step_headline">First Step Mastery</string>
+    <string name="coaching_first_step_body">Great start with your first review! The more you log, the smarter your habit loop becomes.</string>
+    <string name="notification_payday_title">Your Payday Mission</string>
+    <string name="notification_payday_body">Secure %1$s for bills and save %3$s. You have %2$s for safe spending.</string>
+    <string name="home_plan_next_payday">Next payday: %1$s</string>
+    <string name="home_goal_mission_accomplished">Mission Accomplished!</string>
+    <string name="home_goal_on_pace">On pace for %1$s</string>
+    <string name="home_goal_no_trajectory">Add more goal contribution to see a target date</string>
+    <string name="home_goal_progress_label">%1$s of %2$s</string>
+    <string name="home_goal_note_completed">Goal reached. Start your next vision!</string>
+    <string name="home_goal_note_tracking">Track your trajectory here.</string>
+    <string name="home_more_reminders_on">Reminding you on your payday</string>
+    <string name="home_more_reminders_off">No reminders set</string>
+    <string name="home_review_error_no_plan">Create a plan before saving a review.</string>
+    <string name="home_review_error_invalid_amounts">Enter valid amounts for both review fields.</string>
+    <string name="more_error_products_not_loaded">Products not loaded yet. Please check your internet connection.</string>
+    <string name="notification_channel_payday_reminders_name">Zahltag-Erinnerungen</string>
+    <string name="notification_channel_payday_reminders_description">Erinnert dich daran, was mit deinem nächsten Zahltagsplan zu tun ist.</string>
+    <string name="goal_default_emergency_fund">Notfallfonds</string>
+    <string name="goal_default_investing_base">Investitionsbasis</string>
+    <string name="goal_default_cash_buffer">Bargeldpuffer</string>
+    <string name="goal_default_shared_safety_net">Gemeinsames Sicherheitsnetz</string>
+    <string name="goal_default_name">Ziel</string>
+    <string name="onboarding_goal_picker_emergency_desc">Ein Sicherheitsnetz für Überraschungen im Leben.</string>
+    <string name="onboarding_goal_picker_debt_desc">Sich von alten Verpflichtungen befreien.</string>
+    <string name="onboarding_goal_picker_investment_desc">Dein Kapital für dich arbeiten lassen.</string>
+    <string name="onboarding_goal_picker_purchase_desc">Für einen bestimmten Meilenstein oder Vermögenswert sparen.</string>
+    <string name="onboarding_goal_picker_custom_desc">Definiere dein eigenes Ziel.</string>
+    <string name="amount_placeholder_decimal" translatable="false">0.00</string>
+    <string name="onboarding_salary_placeholder_payday">z. B. 28</string>
+    <string name="onboarding_salary_placeholder_next_date" translatable="false">e.g. 2026-06-01</string>
+    <string name="content_description_premium_feature">Premium-Funktion</string>
+    <string name="content_description_selected">Ausgewählt</string>
+    <string name="content_description_decrease">Verringern</string>
+    <string name="content_description_increase">Erhöhen</string>
+    <string name="progress_label">Fortschritt</string>
+    <string name="price_period_suffix">/ %1$s</string>
+    <string name="price_per_period">%1$s / %2$s</string>
+    <string name="fallback_annual_price" translatable="false">$49.99</string>
+    <string name="fallback_monthly_price" translatable="false">$5.99</string>
+    <string name="advertisement_label">Werbung</string>
+    <string name="google_sign_in_button">Mit Google anmelden</string>
+    <string name="home_tab_plan">Plan</string>
+    <string name="home_tab_strategy">Strategie</string>
+    <string name="home_tab_review">Review</string>
+    <string name="home_tab_more">Mehr</string>
+    <string name="home_empty_build_plan_first">Build a salary plan first to unlock the repeat loop.</string>
+    <string name="home_more_reminder_at_time">%1$s um %2$s</string>
+    <string name="error_authentication_failed">Authentication failed. Check your connection and try again.</string>
+    <string name="error_anonymous_login_failed">Local sign-in failed. Try again in a moment.</string>
+    <string name="onboarding_error_plan_required">Please build your plan first.</string>
+    <string name="onboarding_error_reminder_required">Please handle the reminder step.</string>
+    <string name="onboarding_error_bank_sync_required">Please complete or skip the bank sync step.</string>
+    <string name="onboarding_error_valid_plan_required">Cannot complete onboarding without a valid plan.</string>
+    <string name="onboarding_error_next_payday_format">Use YYYY-MM-DD for the next biweekly payday.</string>
+    <string name="goal_add_error_missing">This goal is no longer available.</string>
+    <string name="goal_add_error_invalid_name_amount">Please enter a valid name and amount.</string>
+    <string name="rule_add_error_missing">This rule is no longer available.</string>
+    <string name="rule_add_error_invalid_name_amount">Please enter a valid name and amount.</string>
+    <string name="rule_type_savings">Sparen</string>
+    <string name="rule_type_investing">Investieren</string>
+    <string name="rule_type_crypto">Krypto</string>
+    <string name="rule_type_debt">Schulden</string>
+    <string name="rule_type_other">Sonstiges</string>
+    <string name="rule_name_savings">Sparen</string>
+    <string name="rule_name_investing">Investieren</string>
+    <string name="rule_name_crypto">Krypto</string>
+    <string name="plan_summary_save_without_stress">A calm split that protects essentials and builds savings.</string>
+    <string name="plan_summary_invest_with_discipline">A disciplined split that keeps investing consistent each payday.</string>
+    <string name="plan_summary_stop_overspending">A tighter plan that protects future money before flexible spending.</string>
+    <string name="plan_summary_plan_together">A shared-friendly split that keeps bills clear and progress visible.</string>
 </resources>

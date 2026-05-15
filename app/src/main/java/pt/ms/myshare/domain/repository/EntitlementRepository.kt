@@ -10,6 +10,5 @@ interface EntitlementRepository {
 
     suspend fun checkActiveEntitlement()
     suspend fun purchasePlan(activity: Activity, product: StoreProduct)
-    suspend fun setPro(value: Boolean)
     suspend fun restorePurchases()
 }

@@ -14,25 +14,18 @@ import pt.ms.myshare.data.billing.BillingClientWrapper
 import pt.ms.myshare.data.billing.PlayBillingEntitlementRepository
 import pt.ms.myshare.data.repository.AuthRepositoryImpl
 import pt.ms.myshare.data.repository.PlannerRepositoryImpl
-import pt.ms.myshare.data.repository.UserDataRepositoryImpl
 import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
-import pt.ms.myshare.domain.repository.UserDataRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.CheckEntitlementLimitUseCase
 import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
-import pt.ms.myshare.domain.use_case.edit_profile.EditProfileUseCase
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
-    @Provides
-    @Singleton
-    fun provideUserDataRepository(@ApplicationContext context: Context): UserDataRepository = UserDataRepositoryImpl(context)
 
     @Provides
     @Singleton
@@ -57,9 +50,6 @@ object AppModule {
         firebaseAuth: FirebaseAuth,
         firestore: FirebaseFirestore
     ): PlannerRepository = PlannerRepositoryImpl(context, firebaseAuth, firestore)
-
-    @Provides
-    fun provideEditProfileUseCase(): EditProfileUseCase = EditProfileUseCase()
 
     @Provides
     @Singleton

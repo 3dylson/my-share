@@ -1,6 +1,7 @@
 package pt.ms.myshare.presentation.ui.home
 
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.remember
+import pt.ms.myshare.BuildConfig
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.presentation.ui.components.*
@@ -36,41 +38,74 @@ fun LazyListScope.homeMoreTab(
     onBillingPlanSelected: (BillingPlan) -> Unit,
     onUnlockPremium: (android.app.Activity) -> Unit,
     onManageAdsConsent: () -> Unit,
+    onShowAutomationLock: () -> Unit,
+    onShowAccountDetails: () -> Unit,
     onLogout: () -> Unit
 ) {
     item {
         PremiumProfileHeader(
             email = state.userEmail ?: stringResource(R.string.home_more_guest),
             isPremium = state.isPremium,
-            modifier = Modifier.padding(bottom = 24.dp)
+            modifier = Modifier.padding(bottom = 24.dp),
+            onAccountClick = onShowAccountDetails
         )
     }
 
     if (!state.isPremium) {
         item {
-            Column(modifier = Modifier.padding(bottom = 24.dp)) {
+            Column(modifier = Modifier.padding(bottom = 20.dp)) {
                 PremiumSectionHeader(title = stringResource(R.string.home_more_premium_title))
-                PremiumPaywallCard(
+                CompactBillingPlanRow(
                     title = stringResource(R.string.home_more_annual_title),
-                    price = state.actualAnnualPrice ?: "$49.99",
+                    price = state.actualAnnualPrice ?: stringResource(R.string.fallback_annual_price),
                     period = stringResource(R.string.period_year),
-                    description = stringResource(R.string.home_more_annual_desc),
                     badge = stringResource(R.string.home_more_annual_badge),
                     isSelected = state.selectedBillingPlan == BillingPlan.ANNUAL,
                     onClick = { onBillingPlanSelected(BillingPlan.ANNUAL) }
                 )
-                Spacer(Modifier.height(12.dp))
-                PremiumPaywallCard(
+                Spacer(Modifier.height(10.dp))
+                CompactBillingPlanRow(
                     title = stringResource(R.string.home_more_monthly_title),
-                    price = state.actualMonthlyPrice ?: "$5.99",
+                    price = state.actualMonthlyPrice ?: stringResource(R.string.fallback_monthly_price),
                     period = stringResource(R.string.period_month),
-                    description = stringResource(R.string.home_more_monthly_desc),
                     isSelected = state.selectedBillingPlan == BillingPlan.MONTHLY,
                     onClick = { onBillingPlanSelected(BillingPlan.MONTHLY) }
                 )
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(12.dp))
+                val selectedPrice = if (state.selectedBillingPlan == BillingPlan.ANNUAL) {
+                    state.actualAnnualPrice
+                } else {
+                    state.actualMonthlyPrice
+                }
+                val selectedPeriod = if (state.selectedBillingPlan == BillingPlan.ANNUAL) {
+                    stringResource(R.string.paywall_period_year)
+                } else {
+                    stringResource(R.string.paywall_period_month)
+                }
+                val selectedTrialDays = if (state.selectedBillingPlan == BillingPlan.ANNUAL) {
+                    state.actualAnnualTrialDays
+                } else {
+                    state.actualMonthlyTrialDays
+                }
+                val checkoutTerms = when {
+                    selectedPrice == null -> stringResource(R.string.paywall_footer_store_terms_unavailable)
+                    selectedTrialDays != null -> stringResource(
+                        R.string.paywall_footer_trial_terms,
+                        selectedTrialDays,
+                        selectedPrice,
+                        selectedPeriod
+                    )
+                    else -> stringResource(R.string.paywall_footer_no_trial_terms, selectedPrice, selectedPeriod)
+                }
+                Text(
+                    text = checkoutTerms,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MyShareSecondary,
+                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                )
+                Spacer(Modifier.height(10.dp))
                 val context = LocalContext.current
-                if (state.error != null) {
+                if (state.error != null && state.billingMessage == null) {
                     val errorMessage = remember(state.error) {
                         val resId = context.resources.getIdentifier(state.error, "string", context.packageName)
                         if (resId != 0) context.getString(resId) else state.error
@@ -82,9 +117,34 @@ fun LazyListScope.homeMoreTab(
                         modifier = Modifier.padding(bottom = 8.dp, start = 4.dp)
                     )
                 }
+                if (state.billingMessage != null) {
+                    val billingMessage = remember(state.billingMessage) {
+                        val resId = context.resources.getIdentifier(state.billingMessage, "string", context.packageName)
+                        if (resId != 0) context.getString(resId) else state.billingMessage
+                    }
+                    PremiumInfoCard(
+                        title = billingMessage,
+                        body = stringResource(R.string.paywall_billing_status_body),
+                        icon = Icons.Default.Info,
+                        backgroundColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 10.dp)
+                    )
+                }
                 PremiumButton(
-                    text = stringResource(R.string.home_more_premium_button),
-                    onClick = { activity?.let(onUnlockPremium) }
+                    text = if (state.isBillingActionInProgress) {
+                        stringResource(R.string.paywall_upgrade_loading)
+                    } else if (selectedTrialDays != null) {
+                        stringResource(R.string.paywall_start_trial_button)
+                    } else {
+                        stringResource(R.string.home_more_premium_button)
+                    },
+                    onClick = {
+                        if (!state.isBillingActionInProgress) {
+                            activity?.let(onUnlockPremium)
+                        }
+                    }
                 )
             }
         }
@@ -95,9 +155,13 @@ fun LazyListScope.homeMoreTab(
             PremiumSettingsRow(
                 title = stringResource(R.string.home_more_pref_notifications),
                 subtitle = if (state.reminderLabelKey != null) {
-                    stringResource(
-                        LocalContext.current.resources.getIdentifier(state.reminderLabelKey, "string", LocalContext.current.packageName)
-                    )
+                    val context = LocalContext.current
+                    val resId = context.resources.getIdentifier(state.reminderLabelKey, "string", context.packageName)
+                    if (resId != 0) {
+                        context.getString(resId, *state.reminderLabelArgs.toTypedArray())
+                    } else {
+                        state.reminderLabel
+                    }
                 } else state.reminderLabel,
                 icon = Icons.Default.Notifications,
                 iconColor = MySharePrimary,
@@ -119,8 +183,10 @@ fun LazyListScope.homeMoreTab(
                 title = stringResource(R.string.home_more_pref_automation),
                 subtitle = if (state.automationEnabled) 
                     stringResource(R.string.home_more_pref_automation_active) 
-                else 
-                    stringResource(R.string.home_more_pref_automation_idle),
+                else if (state.isPremium)
+                    stringResource(R.string.home_more_pref_automation_idle)
+                else
+                    stringResource(R.string.home_more_pref_automation_locked),
                 icon = Icons.Default.PrecisionManufacturing,
                 iconColor = MyShareSecondary,
                 showDivider = false,
@@ -153,7 +219,7 @@ fun LazyListScope.homeMoreTab(
                     if (state.isPremium) {
                         onToggleAutomation(!state.automationEnabled)
                     } else {
-                        // Analytics or show upgrade
+                        onShowAutomationLock()
                     }
                 }
             )
@@ -168,7 +234,7 @@ fun LazyListScope.homeMoreTab(
                 subtitle = stringResource(R.string.home_more_legal_terms_desc),
                 icon = Icons.Default.Description,
                 iconColor = Color(0xFF5C6BC0),
-                onClick = { uriHandler.openUri("https://myshare.pt/terms") }
+                onClick = { uriHandler.openUri("https://my-share-finance.web.app/terms") }
             )
             PremiumSettingsRow(
                 title = stringResource(R.string.home_more_legal_privacy),
@@ -202,6 +268,11 @@ fun LazyListScope.homeMoreTab(
                 onClick = onLogout
             )
         }
+
+        if (!state.isPremium) {
+            Spacer(modifier = Modifier.height(24.dp))
+            PremiumAdBanner()
+        }
         
         Spacer(modifier = Modifier.height(48.dp))
         Column(
@@ -209,18 +280,87 @@ fun LazyListScope.homeMoreTab(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "My Share",
+                text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.titleSmall,
                 color = MyShareOnSurface.copy(alpha = 0.4f),
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 1.sp
             )
             Text(
-                text = stringResource(R.string.home_more_version_label, "1.2.0"),
+                text = stringResource(R.string.home_more_version_label, BuildConfig.VERSION_NAME),
                 style = MaterialTheme.typography.labelSmall,
                 color = MyShareOnSurfaceVariant.copy(alpha = 0.4f)
             )
             Spacer(modifier = Modifier.height(32.dp))
+        }
+    }
+}
+
+@Composable
+private fun CompactBillingPlanRow(
+    title: String,
+    price: String,
+    period: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    badge: String? = null
+) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        color = if (isSelected) MySharePrimaryContainer.copy(alpha = 0.42f) else MaterialTheme.colorScheme.surface,
+        border = BorderStroke(
+            width = if (isSelected) 2.dp else 1.dp,
+            color = if (isSelected) MySharePrimary else MyShareOutline.copy(alpha = 0.45f)
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MyShareOnSurface
+                    )
+                    if (badge != null) {
+                        Spacer(Modifier.width(8.dp))
+                        Surface(
+                            color = MySharePrimary,
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = badge,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                            )
+                        }
+                    }
+                }
+                Text(
+                    text = stringResource(R.string.price_per_period, price, period),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Black,
+                    color = MyShareOnSurface,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+            if (isSelected) {
+                Icon(
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = null,
+                    tint = MySharePrimary,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
     }
 }

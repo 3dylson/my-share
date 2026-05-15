@@ -108,6 +108,24 @@ class OnboardingViewModel @Inject constructor(
     }
 
     fun setFixedCostsAndBuild(monthlyFixedCosts: BigDecimal, preset: AllocationPreset): Boolean {
+        val income = state.value.netIncomePerPayday
+        if (income != null && monthlyFixedCosts > income) {
+            Timber.tag(TAG).d(
+                "Blocked onboarding fixed costs greater than income: fixedCosts=%s income=%s",
+                monthlyFixedCosts,
+                income
+            )
+            state.update {
+                it.copy(
+                    monthlyFixedCosts = monthlyFixedCosts,
+                    preset = preset,
+                    error = FIXED_COSTS_EXCEED_INCOME_ERROR,
+                    planSaved = false
+                )
+            }
+            return false
+        }
+
         state.update {
             it.copy(
                 monthlyFixedCosts = monthlyFixedCosts,
@@ -149,6 +167,7 @@ class OnboardingViewModel @Inject constructor(
             plan.rules.forEach { plannerRepository.saveRule(it) }
             plannerRepository.saveGoal(
                 Goal(
+                    id = current.onboardingGoalId,
                     targetAmount = current.goalAmount,
                     type = when(current.selectedFocus) {
                         PlanningFocus.SAVE_WITHOUT_STRESS -> GoalType.EMERGENCY_FUND
@@ -175,16 +194,23 @@ class OnboardingViewModel @Inject constructor(
     }
 
     fun setSelectedBillingPlan(plan: BillingPlan) {
-        state.update { it.copy(selectedBillingPlan = plan) }
+        state.update { it.copy(selectedBillingPlan = plan, billingMessage = null) }
     }
 
     fun purchasePremium(activity: android.app.Activity) {
         val storeProductId = if (state.value.selectedBillingPlan == BillingPlan.ANNUAL) "myshare_annual" else "myshare_monthly"
         viewModelScope.launch {
+            state.update { it.copy(isBillingActionInProgress = true, billingMessage = "paywall_billing_starting") }
             val products = entitlementRepository.availableProducts.first()
             val product = products.find { it.productId == storeProductId }
             if (product == null) {
-                state.update { it.copy(error = "Product not available. Please check your connection and try again.") }
+                state.update {
+                    it.copy(
+                        isBillingActionInProgress = false,
+                        billingMessage = "paywall_billing_products_unavailable"
+                    )
+                }
+                Timber.tag("OnboardingBilling").e("Cannot purchase: Product %s not found in store", storeProductId)
                 return@launch
             }
             FirebaseUtils.logEvent("purchase_started", Bundle().apply {
@@ -192,6 +218,7 @@ class OnboardingViewModel @Inject constructor(
                 putString("price_cluster", state.value.pricingStrategy?.marketCluster)
             })
             entitlementRepository.purchasePlan(activity, product)
+            state.update { it.copy(isBillingActionInProgress = false, billingMessage = "paywall_billing_handoff") }
         }
     }
 
@@ -205,7 +232,8 @@ class OnboardingViewModel @Inject constructor(
                 onComplete()
             } else {
                 FirebaseUtils.logEvent("login_failed")
-                state.update { it.copy(error = "Authentication failed: ${result.exceptionOrNull()?.message}") }
+                Timber.tag(TAG).e(result.exceptionOrNull(), "Google sign-in failed")
+                state.update { it.copy(error = "error_authentication_failed") }
             }
         }
     }
@@ -219,7 +247,8 @@ class OnboardingViewModel @Inject constructor(
                 onComplete()
             } else {
                 FirebaseUtils.logEvent("login_failed_anonymous")
-                state.update { it.copy(error = "Anonymous login failed: ${result.exceptionOrNull()?.message}") }
+                Timber.tag(TAG).e(result.exceptionOrNull(), "Anonymous sign-in failed")
+                state.update { it.copy(error = "error_anonymous_login_failed") }
             }
         }
     }
@@ -237,7 +266,7 @@ class OnboardingViewModel @Inject constructor(
                 allocatedSavings = BigDecimal("300"),
                 allocatedInvesting = BigDecimal("200"),
                 allocatedCrypto = BigDecimal.ZERO,
-                goalName = "Emergency Fund",
+                goalName = "Emergency fund",
                 goalAmount = BigDecimal("5000"),
                 planSaved = true,
                 reminderSkipped = true,
@@ -254,7 +283,7 @@ class OnboardingViewModel @Inject constructor(
                 preset = AllocationPreset.BALANCED
             )
             plannerRepository.savePlan(plan)
-            plannerRepository.saveGoal(Goal(name = "Emergency Fund", targetAmount = BigDecimal("5000")))
+            plannerRepository.saveGoal(Goal(name = "Emergency fund", targetAmount = BigDecimal("5000")))
             plannerRepository.setOnboardingCompleted(true)
             state.update { it.copy(onboardingCompleted = true) }
         }
@@ -262,9 +291,17 @@ class OnboardingViewModel @Inject constructor(
 
     fun restorePurchases(onRestored: (Boolean) -> Unit) {
         viewModelScope.launch {
+            state.update { it.copy(isBillingActionInProgress = true, billingMessage = "paywall_restore_checking") }
             entitlementRepository.restorePurchases()
             val restored = entitlementRepository.isPro.first()
-            state.update { it.copy(isPremium = restored) }
+            state.update {
+                it.copy(
+                    isPremium = restored,
+                    isBillingActionInProgress = false,
+                    billingMessage = if (restored) "paywall_restore_success" else "paywall_restore_none"
+                )
+            }
+            Timber.tag("OnboardingBilling").d("Restore purchases completed. restored=%s", restored)
             onRestored(restored)
         }
     }
@@ -272,15 +309,15 @@ class OnboardingViewModel @Inject constructor(
     fun completeOnboarding() {
         val current = state.value
         if (!current.planSaved) {
-            state.update { it.copy(error = "Please build your plan first.") }
+            state.update { it.copy(error = "onboarding_error_plan_required") }
             return
         }
         if (!current.reminderSaved && !current.reminderSkipped) {
-            state.update { it.copy(error = "Please handle the reminder step.") }
+            state.update { it.copy(error = "onboarding_error_reminder_required") }
             return
         }
         if (!current.bankSyncHandled) {
-            state.update { it.copy(error = "Please complete or skip the bank sync step.") }
+            state.update { it.copy(error = "onboarding_error_bank_sync_required") }
             return
         }
 
@@ -290,7 +327,7 @@ class OnboardingViewModel @Inject constructor(
                 state.update { it.copy(onboardingCompleted = true) }
                 FirebaseUtils.logEvent("onboarding_completed")
             } else {
-                state.update { it.copy(error = "Cannot complete onboarding without a valid plan.") }
+                state.update { it.copy(error = "onboarding_error_valid_plan_required") }
             }
         }
     }
@@ -349,7 +386,7 @@ class OnboardingViewModel @Inject constructor(
     private fun buildPlan(current: OnboardingState, income: BigDecimal, fixedCosts: BigDecimal): SalaryPlan? {
         val nextBiweeklyPayday = if (current.payFrequency == PayFrequency.BIWEEKLY) {
             runCatching { LocalDate.parse(current.nextBiweeklyPaydayText) }.getOrElse {
-                state.update { it.copy(error = "Use YYYY-MM-DD for the next biweekly payday.") }
+                state.update { it.copy(error = "onboarding_error_next_payday_format") }
                 return null
             }
         } else {
@@ -393,5 +430,6 @@ class OnboardingViewModel @Inject constructor(
 
     companion object {
         private const val TAG = "OnboardingViewModel"
+        const val FIXED_COSTS_EXCEED_INCOME_ERROR = "onboarding_fixed_costs_error_exceeds_income"
     }
 }

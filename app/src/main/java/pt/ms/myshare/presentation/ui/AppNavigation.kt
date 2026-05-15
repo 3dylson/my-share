@@ -16,7 +16,8 @@ import pt.ms.myshare.presentation.ui.onboarding.OnboardingEntryRoute
 fun AppNavigation(
     navController: NavHostController = rememberNavController(),
     onManageAdsConsent: () -> Unit = {},
-    adsConsentManager: pt.ms.myshare.presentation.ui.ads.AdsConsentManager? = null
+    adsConsentManager: pt.ms.myshare.presentation.ui.ads.AdsConsentManager? = null,
+    onFreeHomeReady: () -> Unit = {}
 ) {
     NavHost(navController = navController, startDestination = "onboarding") {
         composable("onboarding") {
@@ -26,7 +27,8 @@ fun AppNavigation(
             HomeRoute(
                 navController = navController,
                 onManageAdsConsent = onManageAdsConsent,
-                adsConsentManager = adsConsentManager
+                adsConsentManager = adsConsentManager,
+                onFreeHomeReady = onFreeHomeReady
             )
         }
         composable(

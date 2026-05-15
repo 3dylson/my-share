@@ -32,7 +32,7 @@ class SharedPreferencesEntitlementRepository @Inject constructor(
         // No-op for shared prefs
     }
 
-    override suspend fun setPro(value: Boolean) {
+    suspend fun setPro(value: Boolean) {
         Timber.tag(TAG).d("setPro value=%s", value)
         prefs.edit().putBoolean(KEY_IS_PRO, value).apply()
         premiumState.value = value

@@ -57,10 +57,10 @@ class CalculatePlanPreviewUseCase @Inject constructor() {
         val nextPayday = nextPayday(plan)
         val goalTargetDate = calculateGoalTargetDate(goalAmount, monthlyGoalContribution)
         val summary = when (plan.focus) {
-            PlanningFocus.SAVE_WITHOUT_STRESS -> "A calm split that protects essentials and builds savings."
-            PlanningFocus.INVEST_WITH_DISCIPLINE -> "A disciplined split that keeps investing consistent each payday."
-            PlanningFocus.STOP_OVERSPENDING -> "A tighter plan that protects future money before flexible spending."
-            PlanningFocus.PLAN_TOGETHER -> "A shared-friendly split that keeps bills clear and progress visible."
+            PlanningFocus.SAVE_WITHOUT_STRESS -> "plan_summary_save_without_stress"
+            PlanningFocus.INVEST_WITH_DISCIPLINE -> "plan_summary_invest_with_discipline"
+            PlanningFocus.STOP_OVERSPENDING -> "plan_summary_stop_overspending"
+            PlanningFocus.PLAN_TOGETHER -> "plan_summary_plan_together"
         }
 
         return PlanPreview(

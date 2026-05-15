@@ -8,6 +8,7 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.appopen.AppOpenAd
+import pt.ms.myshare.R
 import timber.log.Timber
 
 class AppOpenAdManager(private val application: Application) {
@@ -17,7 +18,6 @@ class AppOpenAdManager(private val application: Application) {
     private var loadTime: Long = 0
 
     companion object {
-        private const val AD_UNIT_ID = "ca-app-pub-9538602323287593/1001683294"
         private const val AD_EXPIRATION_HOURS = 4
     }
 
@@ -47,15 +47,25 @@ class AppOpenAdManager(private val application: Application) {
         }
     }
 
+    fun preload(context: Context) {
+        loadAd(context)
+    }
+
     private fun loadAd(context: Context) {
         if (isLoadingAd || isAdAvailable()) return
+
+        val adUnitId = context.getString(R.string.admob_app_open_ad_unit_id)
+        if (adUnitId.isBlank()) {
+            Timber.tag("AdMob").d("App Open Ad disabled because no ad unit is configured")
+            return
+        }
 
         isLoadingAd = true
         val request = AdRequest.Builder().build()
 
         AppOpenAd.load(
             context,
-            AD_UNIT_ID,
+            adUnitId,
             request,
             object : AppOpenAd.AppOpenAdLoadCallback() {
                 override fun onAdLoaded(ad: AppOpenAd) {

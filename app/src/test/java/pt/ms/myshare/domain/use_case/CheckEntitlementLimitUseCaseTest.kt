@@ -97,9 +97,5 @@ class FakeEntitlementRepository : EntitlementRepository {
 
     override suspend fun purchasePlan(activity: android.app.Activity, product: StoreProduct) {}
 
-    override suspend fun setPro(value: Boolean) {
-        _isPro.emit(value)
-    }
-
     override suspend fun restorePurchases() {}
 }

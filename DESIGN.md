@@ -917,23 +917,24 @@ Good examples:
 - trial language must be explicit and low-anxiety
 
 ### 12.6 Ads policy for design
-Default assumption: **no ads in core money flows**.
+Default assumption: **no ads in core money decision flows**.
 
 Hard rule:
 - no third-party ads in onboarding
 - no ads on paywall
-- no ads on dashboard / plan / goals / review money surfaces
-- no interstitials or app-open ads
+- no ads on plan, goals, review, salary setup, allocation, or reminder permission screens
+- no ads immediately before or after saving a plan, saving a review, buying premium, restoring purchases, or enabling reminders
 
-If ads are ever tested, they may only appear in:
-- educational content
-- empty states
-- low-sensitivity, clearly labeled placements
+Allowed free-user placements:
+- clearly labeled banner ads on low-sensitivity utility surfaces such as More
+- capped interstitials only when leaving a low-sensitivity utility surface such as More, never as a reward gate and never during a financial decision
+- app-open ads only after consent, only for returning free users after Home has loaded, and only when they do not interrupt onboarding, checkout, restore, or reminder flows
 
 Even then:
 - never near critical CTAs
 - never disguised as product UI
 - never in premium trial or subscriber experiences
+- always respect UMP consent and regional privacy requirements
 
 ---
 
@@ -1104,7 +1105,7 @@ Even custom components must still inherit My Share tokens and M3 interaction pat
 - Ask for subscription before the user has seen a useful plan
 - Use trading-style visuals, hype copy, or alarmist alerts
 - Hide costs, trial conditions, or cancellation logic
-- Put ads on money-sensitive screens
+- Put ads on money-sensitive screens or around financial decision CTAs
 - Create custom UI that breaks Android familiarity without a strong reason
 
 ---

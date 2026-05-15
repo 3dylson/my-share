@@ -5,7 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.TrendingDown
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
@@ -14,13 +17,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import pt.ms.myshare.R
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.theme.*
 import java.math.BigDecimal
-import java.text.NumberFormat
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 
 /**
  * Responsibility: Renders the Manual Review form and historical performance records.
@@ -71,7 +76,7 @@ fun LazyListScope.homeReviewTab(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = stringResource(R.string.home_review_streak_count, performanceStats.healthScore) + "%",
+                            text = stringResource(R.string.home_review_score_percent, performanceStats.healthScore),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Black,
                             color = MyShareOnSurface
@@ -98,25 +103,11 @@ fun LazyListScope.homeReviewTab(
                             color = MyShareSecondary,
                             fontWeight = FontWeight.Bold
                         )
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = stringResource(R.string.home_review_streak_count, performanceStats.currentStreak),
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Black,
-                                color = MyShareOnSurface
-                            )
-                            Spacer(Modifier.width(4.dp))
-                            Icon(
-                                imageVector = Icons.Default.Whatshot,
-                                contentDescription = null,
-                                tint = pt.ms.myshare.presentation.ui.theme.MyShareSecondary,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
                         Text(
-                            text = stringResource(R.string.home_review_streak_unit),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MyShareOnSurfaceVariant
+                            text = stringResource(R.string.home_review_streak_count, performanceStats.currentStreak),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Black,
+                            color = MyShareOnSurface
                         )
                     }
                 }
@@ -137,9 +128,9 @@ fun LazyListScope.homeReviewTab(
         }
     }
 
-    val context = LocalContext.current
     if (coachingInsights.isNotEmpty() && isPremium) {
         item {
+            val context = LocalContext.current
             PremiumSectionHeader(title = stringResource(R.string.home_review_coach_title))
             Column(
                 modifier = Modifier
@@ -175,54 +166,21 @@ fun LazyListScope.homeReviewTab(
     }
 
     item {
-        PremiumSectionHeader(title = stringResource(R.string.home_review_habit_title))
-        PremiumInfoCard(
-            title = stringResource(R.string.home_review_manual_title),
-            body = stringResource(R.string.home_review_manual_desc),
-            icon = Icons.Default.HistoryEdu,
-            backgroundColor = pt.ms.myshare.presentation.ui.theme.MySharePrimary.copy(alpha = 0.05f)
-        )
-    }
-    item {
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            val currencyFormat = remember { NumberFormat.getCurrencyInstance(Locale.getDefault()) }
-            
-            PremiumSliderCard(
-                title = stringResource(R.string.home_review_input_flex),
-                value = state.actualFlexibleSpend.toFloatOrNull() ?: 0f,
-                onValueChange = { onFlexibleSpendChanged(it.toInt().toString()) },
-                valueRange = 0f..5000f,
-                icon = Icons.Default.ShoppingCart,
-                formatValue = { currencyFormat.format(it) }
-            )
-            PremiumSliderCard(
-                title = stringResource(R.string.home_review_input_goal),
-                value = state.actualGoalContribution.toFloatOrNull() ?: 0f,
-                onValueChange = { onGoalContributionChanged(it.toInt().toString()) },
-                valueRange = 0f..5000f,
-                icon = Icons.Default.Flag,
-                formatValue = { currencyFormat.format(it) }
-            )
-
-            if (state.error != null) {
-                val errorMessage = remember(state.error) {
-                    val resId = context.resources.getIdentifier(state.error, "string", context.packageName)
-                    if (resId != 0) context.getString(resId) else state.error
-                }
-                Text(
-                    text = errorMessage,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 4.dp, start = 4.dp)
-                )
+        val context = LocalContext.current
+        val errorMessage = remember(state.error) {
+            state.error?.let {
+                val resId = context.resources.getIdentifier(it, "string", context.packageName)
+                if (resId != 0) context.getString(resId) else it
             }
-
-            PremiumButton(
-                text = stringResource(R.string.home_review_submit),
-                onClick = onSaveReview,
-                modifier = Modifier.padding(top = 8.dp)
-            )
         }
+        CompactReviewEntryCard(
+            flexibleSpend = state.actualFlexibleSpend,
+            goalContribution = state.actualGoalContribution,
+            errorMessage = errorMessage,
+            onFlexibleSpendChanged = onFlexibleSpendChanged,
+            onGoalContributionChanged = onGoalContributionChanged,
+            onSaveReview = onSaveReview
+        )
     }
 
     item {
@@ -243,28 +201,8 @@ fun LazyListScope.homeReviewTab(
         val visibleHistory = if (isPremium) history else history.take(1)
         visibleHistory.forEach { item ->
             item(key = item.id) {
-                Column(modifier = Modifier.animateItemPlacement()) {
-                    PremiumMetricCard(
-                        label = item.dateLabel,
-                        value = stringResource(R.string.home_review_history_flex, item.flexibleSpendLabel),
-                        subtitle = stringResource(R.string.home_review_history_flex_target, item.plannedFlexibleLabel, item.flexibleDeltaLabel),
-                        icon = if (item.isPositive) Icons.Default.TrendingDown else Icons.Default.TrendingUp,
-                        color = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error,
-                        indicatorColor = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error,
-                        onClick = {}
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    PremiumMetricCard(
-                        label = stringResource(R.string.home_review_history_goal),
-                        value = item.goalContributionLabel,
-                        subtitle = stringResource(R.string.home_review_history_goal_plan, item.plannedGoalLabel, item.goalDeltaLabel),
-                        icon = if (item.isPositive) Icons.Default.Flag else Icons.Default.OutlinedFlag,
-                        color = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error,
-                        indicatorColor = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error,
-                        onClick = {}
-                    )
-                    Spacer(Modifier.height(20.dp))
-                }
+                CompactReviewHistoryCard(item = item)
+                Spacer(Modifier.height(12.dp))
             }
         }
         if (!isPremium && history.size > 1) {
@@ -277,6 +215,217 @@ fun LazyListScope.homeReviewTab(
                 )
                 Spacer(Modifier.height(8.dp))
             }
+        }
+    }
+}
+
+@Composable
+private fun CompactReviewHistoryCard(
+    item: ReviewHistoryItemState,
+    modifier: Modifier = Modifier
+) {
+    val accentColor = if (item.isPositive) MyShareSecondary else MaterialTheme.colorScheme.error
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MyShareOutline.copy(alpha = 0.14f)),
+        shadowElevation = 2.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = item.dateLabel,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MyShareSecondary,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = if (item.isPositive) {
+                            stringResource(R.string.home_review_history_on_plan)
+                        } else {
+                            stringResource(R.string.home_review_history_needs_attention)
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MyShareOnSurfaceVariant
+                    )
+                }
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = accentColor.copy(alpha = 0.1f)
+                ) {
+                    Icon(
+                        imageVector = if (item.isPositive) {
+                            Icons.AutoMirrored.Filled.TrendingDown
+                        } else {
+                            Icons.AutoMirrored.Filled.TrendingUp
+                        },
+                        contentDescription = null,
+                        tint = accentColor,
+                        modifier = Modifier.padding(10.dp).size(20.dp)
+                    )
+                }
+            }
+
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                CompactHistoryMetric(
+                    label = stringResource(R.string.home_review_history_flex_label),
+                    value = item.flexibleSpendLabel,
+                    support = stringResource(R.string.home_review_history_target_delta, item.plannedFlexibleLabel, item.flexibleDeltaLabel),
+                    modifier = Modifier.weight(1f)
+                )
+                CompactHistoryMetric(
+                    label = stringResource(R.string.home_review_history_goal),
+                    value = item.goalContributionLabel,
+                    support = stringResource(R.string.home_review_history_target_delta, item.plannedGoalLabel, item.goalDeltaLabel),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CompactHistoryMetric(
+    label: String,
+    value: String,
+    support: String,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.heightIn(min = 86.dp),
+        shape = RoundedCornerShape(14.dp),
+        color = MySharePrimaryContainer.copy(alpha = 0.22f)
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = label.uppercase(),
+                style = MaterialTheme.typography.labelSmall,
+                color = MyShareSecondary,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleMedium,
+                color = MyShareOnSurface,
+                fontWeight = FontWeight.Black,
+                modifier = Modifier.padding(top = 2.dp)
+            )
+            Text(
+                text = support,
+                style = MaterialTheme.typography.labelSmall,
+                color = MyShareOnSurfaceVariant,
+                maxLines = 1
+            )
+        }
+    }
+}
+
+@Composable
+private fun ReviewAmountField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        prefix = { Text("$") },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp)
+    )
+}
+
+@Composable
+private fun CompactReviewEntryCard(
+    flexibleSpend: String,
+    goalContribution: String,
+    errorMessage: String?,
+    onFlexibleSpendChanged: (String) -> Unit,
+    onGoalContributionChanged: (String) -> Unit,
+    onSaveReview: () -> Unit
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MyShareOutline.copy(alpha = 0.16f)),
+        shadowElevation = 2.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = MySharePrimary.copy(alpha = 0.1f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.HistoryEdu,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.padding(10.dp).size(22.dp)
+                    )
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.home_review_manual_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MyShareOnSurface,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = stringResource(R.string.home_review_manual_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MyShareSecondary,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                ReviewAmountField(
+                    label = stringResource(R.string.home_review_input_flex_exact),
+                    value = flexibleSpend,
+                    onValueChange = onFlexibleSpendChanged,
+                    modifier = Modifier.weight(1f)
+                )
+                ReviewAmountField(
+                    label = stringResource(R.string.home_review_input_goal_exact),
+                    value = goalContribution,
+                    onValueChange = onGoalContributionChanged,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+
+            PremiumButton(
+                text = stringResource(R.string.home_review_submit),
+                onClick = onSaveReview
+            )
         }
     }
 }

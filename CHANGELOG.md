@@ -12,7 +12,7 @@ The official **Release Candidate 1** for the V1 launch of My Share.
 ### Added
 - **Google Play Subscriptions**: Implemented live Android billing hooks (`BillingClient 8.3.0`) for active entitlement mapping, plan management, and error recovery.
 - **Paywall Experience**: A full-screen Compose Paywall detailing limits on the free tier (1 plan, 1 goal) vs. the premium suite structure.
-- **Privacy-Compliant Free Tier**: Added `SafeAdBanner` injected strictly on the `MoreTab`. Enforced UMP (User Messaging Platform) consent verification before triggering ad loads.
+- **Privacy-Compliant Free Tier**: Added AdMob surfaces for free users with UMP consent verification. Ads are restricted away from onboarding, paywall, plan, goal, review, reminder permission, and purchase/restore flows.
 - **Security Check**: Patched plain-text version control credentials out of `build.gradle`, delegating signing tasks to encrypted environment variables.
 - **Background Integrity**: Integrated `ReminderWorker` for scheduled local notifications.
 - **V1 Documentation**: Initialized `README.md` and finalized V1 UI contracts.

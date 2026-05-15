@@ -118,22 +118,22 @@ describe("Authenticated user — own document", () => {
     );
   });
 
-  test("can read own reminders sub-collection", async () => {
+  test("can read own reminder settings document", async () => {
     await testEnv.withSecurityRulesDisabled(async (ctx) => {
       await ctx
         .firestore()
         .collection("users")
         .doc(USER_A)
-        .collection("reminders")
-        .doc("r1")
+        .collection("settings")
+        .doc("reminders")
         .set({ enabled: true });
     });
     await assertSucceeds(
       authedDb(USER_A)
         .collection("users")
         .doc(USER_A)
-        .collection("reminders")
-        .doc("r1")
+        .collection("settings")
+        .doc("reminders")
         .get()
     );
   });

@@ -14,6 +14,7 @@ import timber.log.Timber
 object InterstitialAdManager {
     private var interstitialAd: InterstitialAd? = null
     private var isLoading = false
+    private var hasShownThisSession = false
 
     fun loadAd(context: Context) {
         if (interstitialAd != null || isLoading) return
@@ -43,8 +44,14 @@ object InterstitialAdManager {
     }
 
     fun showAd(activity: Activity, onAdDismissed: () -> Unit) {
+        if (hasShownThisSession) {
+            onAdDismissed()
+            return
+        }
+
         val ad = interstitialAd
         if (ad != null) {
+            hasShownThisSession = true
             ad.fullScreenContentCallback = object : FullScreenContentCallback() {
                 override fun onAdDismissedFullScreenContent() {
                     Timber.tag("InterstitialAd").d("Ad dismissed")

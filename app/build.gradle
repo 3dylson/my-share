@@ -12,6 +12,7 @@ plugins {
 }
 
 android {
+    def hasReleaseSigning = project.findProperty("MYSHARE_RELEASE_STORE_FILE") != null
     signingConfigs {
         release {
             def storeFilePath = project.findProperty("MYSHARE_RELEASE_STORE_FILE")
@@ -30,10 +31,13 @@ android {
         applicationId appId
         minSdk 23
         targetSdk 36
-        testInstrumentationRunner "com.google.dagger.hilt.android.testing.HiltTestRunner"
+        versionCode 1
+        versionName "1.0.0"
+        testInstrumentationRunner "pt.ms.myshare.HiltTestRunner"
         manifestPlaceholders = [admobAppId: "ca-app-pub-3940256099942544~3347511713"]
         resValue "string", "admob_banner_ad_unit_id", '"ca-app-pub-3940256099942544/6300978111"'
         resValue "string", "admob_interstitial_ad_unit_id", '"ca-app-pub-3940256099942544/1033173712"'
+        resValue "string", "admob_app_open_ad_unit_id", '"ca-app-pub-3940256099942544/9257395921"'
     }
 
     buildTypes {
@@ -41,16 +45,28 @@ android {
             shrinkResources true
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+            if (hasReleaseSigning) {
+                signingConfig signingConfigs.release
+            }
             manifestPlaceholders = [admobAppId: "ca-app-pub-9538602323287593~1471105513"] // Production AdMob App ID
             resValue "string", "admob_banner_ad_unit_id", '"ca-app-pub-9538602323287593/2154982867"' // Production Banner Ad Unit ID
             resValue "string", "admob_interstitial_ad_unit_id", '"ca-app-pub-9538602323287593/1001683294"' // Production Interstitial Ad Unit ID
+            resValue "string", "admob_app_open_ad_unit_id", "\"${project.findProperty('MYSHARE_ADMOB_APP_OPEN_AD_UNIT_ID') ?: ''}\""
 
         }
     }
     
     testOptions {
         unitTests.returnDefaultValues = true
+    }
+
+    packaging {
+        resources {
+            excludes += [
+                    "META-INF/LICENSE.md",
+                    "META-INF/LICENSE-notice.md"
+            ]
+        }
     }
 
     compileOptions {
@@ -168,5 +184,5 @@ dependencies {
     implementation "androidx.work:work-runtime-ktx:2.10.0"
 
     // Google Play Billing
-    implementation "com.android.billingclient:billing-ktx:7.1.1"
+    implementation "com.android.billingclient:billing-ktx:8.3.0"
 }

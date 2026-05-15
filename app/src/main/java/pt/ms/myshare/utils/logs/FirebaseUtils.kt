@@ -5,9 +5,6 @@ import android.os.Bundle
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.appcheck.FirebaseAppCheck
-import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
-import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
-import pt.ms.myshare.BuildConfig
 import timber.log.Timber
 
 object FirebaseUtils {
@@ -22,17 +19,7 @@ object FirebaseUtils {
 
         // Initialize App Check
         val firebaseAppCheck = FirebaseAppCheck.getInstance()
-        if (BuildConfig.DEBUG) {
-            firebaseAppCheck.installAppCheckProviderFactory(
-                DebugAppCheckProviderFactory.getInstance()
-            )
-            Timber.d("Firebase App Check initialized with Debug provider")
-        } else {
-            firebaseAppCheck.installAppCheckProviderFactory(
-                PlayIntegrityAppCheckProviderFactory.getInstance()
-            )
-            Timber.d("Firebase App Check initialized with Play Integrity provider")
-        }
+        AppCheckProviderInstaller.install(firebaseAppCheck)
     }
 
     fun setUserProperty(propertyName: String, propertyValue: String?) {

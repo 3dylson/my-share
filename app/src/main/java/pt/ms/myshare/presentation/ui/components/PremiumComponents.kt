@@ -12,6 +12,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -45,6 +47,22 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.foundation.Canvas
+
+@Composable
+fun PremiumCard(
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MyShareOutline.copy(alpha = 0.15f)),
+        shadowElevation = 2.dp
+    ) {
+        Column(content = content)
+    }
+}
 
 @Composable
 fun PremiumChoiceCard(
@@ -116,7 +134,7 @@ fun PremiumChoiceCard(
                 if (isSelected) {
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
-                        contentDescription = "Selected",
+                        contentDescription = stringResource(R.string.content_description_selected),
                         tint = MySharePrimary,
                         modifier = Modifier.size(24.dp)
                     )
@@ -286,7 +304,7 @@ fun PremiumGoalCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Progress",
+                        text = stringResource(R.string.progress_label),
                         style = MaterialTheme.typography.labelSmall,
                         color = MyShareSecondary,
                         fontWeight = FontWeight.Bold
@@ -403,6 +421,25 @@ fun PremiumButton(
     }
 }
 
+@Composable
+fun PremiumPrimaryButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    isLoading: Boolean = false,
+    icon: ImageVector? = null
+) {
+    PremiumButton(
+        text = text,
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        isLoading = isLoading,
+        icon = icon
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PremiumTextField(
@@ -500,7 +537,7 @@ fun PremiumPaywallCard(
                 if (isSelected) {
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
-                        contentDescription = "Selected",
+                        contentDescription = stringResource(R.string.content_description_selected),
                         tint = MySharePrimary,
                         modifier = Modifier.size(24.dp)
                     )
@@ -518,7 +555,7 @@ fun PremiumPaywallCard(
                 )
                 if (!price.contains(period, ignoreCase = true)) {
                     Text(
-                        text = "/ $period",
+                        text = stringResource(R.string.price_period_suffix, period),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MyShareSecondary,
                         modifier = Modifier.padding(bottom = 2.dp, start = 4.dp)
@@ -740,7 +777,7 @@ fun PremiumAdBanner(
         
         // Overlay for debugging/identifying ad space if ads don't load in emulator
         Text(
-            text = "ADVERTISEMENT",
+            text = stringResource(R.string.advertisement_label),
             style = MaterialTheme.typography.labelSmall,
             color = MyShareSecondary.copy(alpha = 0.5f),
             modifier = Modifier.align(Alignment.TopStart).padding(4.dp)
@@ -798,6 +835,23 @@ fun PremiumBenefitCard(
             }
         }
     }
+}
+
+@Composable
+fun PremiumRuleCard(
+    ruleName: String,
+    amountLabel: String,
+    typeLabel: String,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null
+) {
+    PremiumMetricCard(
+        label = ruleName,
+        value = amountLabel,
+        subtitle = typeLabel,
+        modifier = modifier,
+        onClick = onClick
+    )
 }
 
 @Composable
@@ -1055,9 +1109,10 @@ fun AllocationPreviewMetric(
 fun GoogleSignInButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    text: String = "Sign in with Google",
+    text: String? = null,
     isLoading: Boolean = false
 ) {
+    val buttonText = text ?: stringResource(R.string.google_sign_in_button)
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -1136,7 +1191,7 @@ fun GoogleSignInButton(
                 Spacer(Modifier.width(24.dp))
                 
                 Text(
-                    text = text,
+                    text = buttonText,
                     style = MaterialTheme.typography.labelLarge.copy(
                         color = Color.Black.copy(alpha = 0.54f),
                         fontWeight = FontWeight.Medium,
@@ -1289,6 +1344,9 @@ fun PremiumProfileHeader(
     email: String,
     isPremium: Boolean,
     modifier: Modifier = Modifier,
+    accountLabel: String = stringResource(R.string.home_more_account_profile_label),
+    membershipLabel: String = stringResource(R.string.home_more_account_basic_member),
+    premiumMembershipLabel: String = stringResource(R.string.home_more_account_premium_member),
     onAccountClick: () -> Unit = {}
 ) {
     Surface(
@@ -1328,7 +1386,7 @@ fun PremiumProfileHeader(
             
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "My Account",
+                    text = accountLabel,
                     style = MaterialTheme.typography.labelMedium,
                     color = MyShareSecondary,
                     fontWeight = FontWeight.Bold
@@ -1359,7 +1417,7 @@ fun PremiumProfileHeader(
                             )
                             Spacer(Modifier.width(4.dp))
                             Text(
-                                text = "PREMIUM MEMBER",
+                                text = premiumMembershipLabel,
                                 style = MaterialTheme.typography.labelSmall,
                                 color = Color(0xFFDAA520),
                                 fontWeight = FontWeight.Black
@@ -1368,7 +1426,7 @@ fun PremiumProfileHeader(
                     }
                 } else {
                     Text(
-                        text = "Basic Member",
+                        text = membershipLabel,
                         style = MaterialTheme.typography.bodySmall,
                         color = MyShareOnSurfaceVariant
                     )
@@ -1444,7 +1502,7 @@ fun PremiumSliderCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Remove, 
-                        contentDescription = "Decrease",
+                        contentDescription = stringResource(R.string.content_description_decrease),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -1470,7 +1528,7 @@ fun PremiumSliderCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add, 
-                        contentDescription = "Increase",
+                        contentDescription = stringResource(R.string.content_description_increase),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }

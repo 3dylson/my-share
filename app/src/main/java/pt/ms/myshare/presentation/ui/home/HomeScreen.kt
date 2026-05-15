@@ -13,15 +13,19 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.compose.ui.res.stringResource
+import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.theme.*
+import timber.log.Timber
 
 /**
  * Responsibility: Orchestrates the Home screen by coordinating sub-composables for each tab.
@@ -33,13 +37,20 @@ fun HomeRoute(
     navController: NavController,
     onManageAdsConsent: () -> Unit = {},
     adsConsentManager: pt.ms.myshare.presentation.ui.ads.AdsConsentManager? = null,
+    onFreeHomeReady: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(adsConsentManager) {
         adsConsentManager?.let {
-            viewModel.updateAdsConsentRequirement(it.isPrivacyOptionsRequired)
+            viewModel.updateAdsConsentRequirement(true)
+        }
+    }
+
+    LaunchedEffect(uiState.isLoading, uiState.moreCard.isPremium) {
+        if (!uiState.isLoading && !uiState.moreCard.isPremium) {
+            onFreeHomeReady()
         }
     }
 
@@ -91,14 +102,155 @@ fun HomeScreen(
 ) {
     val activity = androidx.activity.compose.LocalActivity.current
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    val reviewSavedMessage = stringResource(R.string.home_review_saved_feedback)
     var showPaywallSheet by remember { mutableStateOf(false) }
+    var premiumGate by remember { mutableStateOf(HomePremiumGate.General) }
+    var showAutomationLockDialog by remember { mutableStateOf(false) }
+    var showSignOutDialog by remember { mutableStateOf(false) }
+    var showAccountDetailsDialog by remember { mutableStateOf(false) }
+    var previousReviewCount by remember { mutableStateOf<Int?>(null) }
+
+    LaunchedEffect(state.reviewHistory.size) {
+        val previousCount = previousReviewCount
+        if (previousCount != null && state.reviewHistory.size > previousCount) {
+            snackbarHostState.showSnackbar(
+                message = reviewSavedMessage,
+                duration = SnackbarDuration.Short
+            )
+        }
+        previousReviewCount = state.reviewHistory.size
+    }
 
     if (showPaywallSheet) {
         PremiumPaywallBottomSheet(
             onDismissRequest = { showPaywallSheet = false },
+            title = stringResource(premiumGate.titleRes),
+            body = stringResource(premiumGate.bodyRes),
+            isBillingActionInProgress = state.moreCard.isBillingActionInProgress,
+            billingMessage = state.moreCard.billingMessage,
             onUpgradeClick = { 
-                showPaywallSheet = false
                 activity?.let { onUnlockPremium(it) } 
+            }
+        )
+    }
+
+    if (showAutomationLockDialog) {
+        AlertDialog(
+            onDismissRequest = { showAutomationLockDialog = false },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.PrecisionManufacturing,
+                    contentDescription = null,
+                    tint = MySharePrimary
+                )
+            },
+            title = { Text(text = stringResource(R.string.home_more_automation_locked_title)) },
+            text = {
+                Text(
+                    text = stringResource(R.string.home_more_automation_locked_body)
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        Timber.tag("HomeScreen").d("Premium gate opened from Smart automation lock")
+                        showAutomationLockDialog = false
+                        premiumGate = HomePremiumGate.SmartAutomation
+                        showPaywallSheet = true
+                    }
+                ) {
+                    Text(text = stringResource(R.string.home_more_automation_locked_action))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showAutomationLockDialog = false }) {
+                    Text(text = stringResource(R.string.dialog_not_now))
+                }
+            }
+        )
+    }
+
+    if (showAccountDetailsDialog) {
+        AlertDialog(
+            onDismissRequest = { showAccountDetailsDialog = false },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = null,
+                    tint = MySharePrimary
+                )
+            },
+            title = { Text(text = stringResource(R.string.home_more_account_details_title)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = stringResource(
+                            R.string.home_more_account_details_email,
+                            state.moreCard.userEmail ?: stringResource(R.string.home_more_guest)
+                        )
+                    )
+                    Text(
+                        text = stringResource(
+                            R.string.home_more_account_details_membership,
+                            if (state.moreCard.isPremium) {
+                                stringResource(R.string.home_more_account_premium_member_display)
+                            } else {
+                                stringResource(R.string.home_more_account_basic_member)
+                            }
+                        )
+                    )
+                    if (!state.moreCard.isPremium) {
+                        Text(
+                            text = stringResource(R.string.home_more_account_details_sync_note),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MyShareSecondary
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showAccountDetailsDialog = false }) {
+                    Text(text = stringResource(R.string.dialog_close))
+                }
+            }
+        )
+    }
+
+    if (showSignOutDialog) {
+        AlertDialog(
+            onDismissRequest = { showSignOutDialog = false },
+            icon = {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Logout,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error
+                )
+            },
+            title = { Text(text = stringResource(R.string.home_more_signout_confirm_title)) },
+            text = {
+                Text(
+                    text = stringResource(R.string.home_more_signout_confirm_body)
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        Timber.tag("HomeScreen").d("Sign out confirmed from More tab")
+                        showSignOutDialog = false
+                        onLogout()
+                    }
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_more_account_signout),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showSignOutDialog = false }) {
+                    Text(text = stringResource(R.string.dialog_cancel))
+                }
             }
         )
     }
@@ -106,28 +258,56 @@ fun HomeScreen(
     Scaffold(
         modifier = modifier,
         containerColor = MyShareBackground,
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            Column(modifier = Modifier
-                .statusBarsPadding()
-                .padding(horizontal = 24.dp, vertical = 20.dp)
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MyShareBackground)
+                    .zIndex(1f),
+                color = MyShareBackground,
+                tonalElevation = 2.dp
             ) {
-                PremiumAppHeader(
-                    title = "My Share",
-                    subtitle = "Financial clarity, simplified."
-                )
+                Row(
+                    modifier = Modifier
+                        .statusBarsPadding()
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.app_name),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MyShareOnSurface,
+                            fontWeight = FontWeight.Black
+                        )
+                        Text(
+                            text = stringResource(state.selectedDestination.labelRes),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MyShareSecondary,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                    if (state.moreCard.isPremium) {
+                        AssistChip(
+                            onClick = {},
+                            enabled = false,
+                            label = { Text(text = stringResource(R.string.premium_badge)) },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.WorkspacePremium,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        )
+                    }
+                }
             }
         },
         bottomBar = {
-            Column {
-                // Ads are restricted to low-sensitivity informational surfaces only.
-                // Never shown on REVIEW (financial data entry) or MORE (settings/billing).
-                val isLowSensitivityTab = state.selectedDestination == HomeDestination.PLAN ||
-                        state.selectedDestination == HomeDestination.STRATEGY
-                if (!state.moreCard.isPremium && isLowSensitivityTab) {
-                    PremiumAdBanner(
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                    )
-                }
+            Column(modifier = Modifier.navigationBarsPadding()) {
                 NavigationBar(
                     containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
                     tonalElevation = 8.dp,
@@ -137,9 +317,10 @@ fun HomeScreen(
                         val isSelected = state.selectedDestination == destination
                         NavigationBarItem(
                             selected = isSelected,
-                            onClick = { 
+                            onClick = {
                                 if (!isSelected) haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
-                                onDestinationSelected(destination) 
+                                Timber.tag("HomeScreen").d("Home tab selected: %s", destination.name)
+                                onDestinationSelected(destination)
                             },
                             icon = {
                                 val icon = when (destination) {
@@ -152,7 +333,7 @@ fun HomeScreen(
                             },
                             label = { 
                                 Text(
-                                    destination.name.lowercase().replaceFirstChar(Char::titlecase),
+                                    stringResource(destination.labelRes),
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                                 ) 
                             },
@@ -192,7 +373,7 @@ fun HomeScreen(
                     start = 24.dp,
                     end = 24.dp,
                     top = innerPadding.calculateTopPadding() + 24.dp,
-                    bottom = innerPadding.calculateBottomPadding() + 48.dp
+                    bottom = innerPadding.calculateBottomPadding() + 104.dp
                 ),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
@@ -213,7 +394,10 @@ fun HomeScreen(
                             onEditGoal = onEditGoal,
                             onAddNewRule = onAddNewRule,
                             onEditRule = onEditRule,
-                            onShowPaywall = { showPaywallSheet = true }
+                            onShowPaywall = { gate ->
+                                premiumGate = gate
+                                showPaywallSheet = true
+                            }
                         )
                     }
                     HomeDestination.REVIEW -> {
@@ -226,14 +410,13 @@ fun HomeScreen(
                             onGoalContributionChanged = onGoalContributionChanged,
                             onSaveReview = {
                                 haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                                Timber.tag("HomeScreen").d("Manual review save requested")
                                 onSaveReview()
-                                if (!state.moreCard.isPremium) {
-                                    activity?.let {
-                                        pt.ms.myshare.presentation.ui.ads.InterstitialAdManager.showAd(it) {}
-                                    }
-                                }
                             },
-                            onShowPaywall = { showPaywallSheet = true }
+                            onShowPaywall = {
+                                premiumGate = HomePremiumGate.ReviewHistory
+                                showPaywallSheet = true
+                            }
                         )
                     }
                     HomeDestination.MORE -> {
@@ -245,7 +428,18 @@ fun HomeScreen(
                             onBillingPlanSelected = onBillingPlanSelected,
                             onUnlockPremium = onUnlockPremium,
                             onManageAdsConsent = onManageAdsConsent,
-                            onLogout = onLogout
+                            onShowAutomationLock = {
+                                Timber.tag("HomeScreen").d("Locked Smart automation row tapped")
+                                showAutomationLockDialog = true
+                            },
+                            onShowAccountDetails = {
+                                Timber.tag("HomeScreen").d("Account details opened from More tab")
+                                showAccountDetailsDialog = true
+                            },
+                            onLogout = {
+                                Timber.tag("HomeScreen").d("Sign out confirmation requested")
+                                showSignOutDialog = true
+                            }
                         )
                     }
                 }
@@ -253,6 +447,14 @@ fun HomeScreen(
         }
     }
 }
+
+private val HomeDestination.labelRes: Int
+    get() = when (this) {
+        HomeDestination.PLAN -> R.string.home_tab_plan
+        HomeDestination.STRATEGY -> R.string.home_tab_strategy
+        HomeDestination.REVIEW -> R.string.home_tab_review
+        HomeDestination.MORE -> R.string.home_tab_more
+    }
 
 @Preview(showBackground = true)
 @Composable

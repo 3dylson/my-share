@@ -52,6 +52,7 @@ class HomeViewModel @Inject constructor(
     val state: StateFlow<HomeState> = uiState.asStateFlow()
 
     private var availableStoreProducts: List<pt.ms.myshare.domain.model.StoreProduct> = emptyList()
+    private var currentPlan: SalaryPlan? = null
 
     private val locale: Locale = Locale.getDefault()
     private val currencyFormat = NumberFormat.getCurrencyInstance(locale)
@@ -165,8 +166,9 @@ class HomeViewModel @Inject constructor(
                 val combined = planner.combined
                 
                 val updatedPlan = plan?.copy(rules = currentRules)
+                currentPlan = updatedPlan
 
-                val emptyMessage = if (updatedPlan == null) "Build a salary plan first to unlock the repeat loop." else null
+                val emptyMessage = if (updatedPlan == null) "home_empty_build_plan_first" else null
                 val primaryGoal = goals.firstOrNull()
                 val planCard = updatedPlan?.let { buildPlanCard(it, primaryGoal?.targetAmount ?: BigDecimal.ZERO) }
                 val goalCards = goals.map { buildGoalCard(it, updatedPlan) }
@@ -178,14 +180,22 @@ class HomeViewModel @Inject constructor(
 
                 val moreCard = MoreCardState(
                     reminderEnabled = reminder.enabled,
-                    reminderLabel = if (reminder.enabled) {
-                        "${reminder.cadence.name.replace('_', ' ')} at ${reminder.hourOfDay.toString().padStart(2, '0')}:${reminder.minute.toString().padStart(2, '0')}"
+                    reminderLabelKey = if (reminder.enabled) "home_more_reminder_at_time" else "home_more_reminders_off",
+                    reminderLabelArgs = if (reminder.enabled) {
+                        listOf(
+                            reminder.cadence.name.replace('_', ' ')
+                                .lowercase(Locale.getDefault())
+                                .replaceFirstChar { it.titlecase(Locale.getDefault()) },
+                            "${reminder.hourOfDay.toString().padStart(2, '0')}:${reminder.minute.toString().padStart(2, '0')}"
+                        )
                     } else {
-                        "Reminders are off"
+                        emptyList()
                     },
                     pricingStrategy = pricingStrategy,
                     actualMonthlyPrice = monthlyProduct?.price ?: pricingStrategy.monthlyLabel,
                     actualAnnualPrice = annualProduct?.price ?: pricingStrategy.annualLabel,
+                    actualMonthlyTrialDays = monthlyProduct?.freeTrialDays?.takeIf { it > 0 },
+                    actualAnnualTrialDays = annualProduct?.freeTrialDays?.takeIf { it > 0 },
                     showAdsConsentOption = uiState.value.moreCard.showAdsConsentOption,
                     selectedBillingPlan = pricingStrategy.heroPlan,
                     isPremium = isPremium,
@@ -241,6 +251,10 @@ class HomeViewModel @Inject constructor(
     private fun buildPlanCard(plan: pt.ms.myshare.domain.model.SalaryPlan, goalAmount: BigDecimal): HomePlanCardState {
         val preview = calculatePlanPreviewUseCase.execute(plan, goalAmount)
         return HomePlanCardState(
+            incomeLabel = currencyFormat.format(plan.netIncomePerPayday),
+            fixedCostsLabel = currencyFormat.format(preview.fixedCostsPerPayday),
+            flexibleSpendLabel = currencyFormat.format(preview.flexibleSpendPerPayday),
+            savingsLabel = currencyFormat.format(preview.savingsPerPayday),
             investingLabel = currencyFormat.format(preview.investingPerPayday.add(preview.cryptoPerPayday)),
             weeklySpendLabel = currencyFormat.format(preview.weeklyFlexibleSpend),
             summary = preview.summary,
@@ -287,6 +301,7 @@ class HomeViewModel @Inject constructor(
             name = rule.name,
             amountLabel = amountLabel,
             typeLabel = rule.type.name.lowercase().replaceFirstChar { it.titlecase() },
+            typeLabelKey = rule.type.labelKey,
             isPercentage = rule.isPercentage
         )
     }
@@ -297,9 +312,17 @@ class HomeViewModel @Inject constructor(
         } else {
             null
         }
+        val preview = plan?.let { calculatePlanPreviewUseCase.execute(it, BigDecimal.ZERO) }
+        val defaultFlexibleSpend = review?.actualFlexibleSpend ?: preview?.flexibleSpendPerPayday
+        val defaultGoalContribution = review?.actualGoalContribution ?: preview?.savingsPerPayday
+        val flexibleMax = reviewRangeMax(defaultFlexibleSpend ?: BigDecimal.ZERO)
+        val goalMax = reviewRangeMax(defaultGoalContribution ?: BigDecimal.ZERO)
+
         return ReviewCardState(
-            actualFlexibleSpend = review?.actualFlexibleSpend?.stripTrailingZeros()?.toPlainString().orEmpty(),
-            actualGoalContribution = review?.actualGoalContribution?.stripTrailingZeros()?.toPlainString().orEmpty(),
+            actualFlexibleSpend = defaultFlexibleSpend?.stripTrailingZeros()?.toPlainString().orEmpty(),
+            actualGoalContribution = defaultGoalContribution?.stripTrailingZeros()?.toPlainString().orEmpty(),
+            flexibleSpendMax = flexibleMax,
+            goalContributionMax = goalMax,
             insight = insight,
             savedReviewDate = review?.createdAt?.format(dateFormatter)
         )
@@ -321,7 +344,8 @@ class HomeViewModel @Inject constructor(
     }
 
     fun saveReview() {
-        if (currentPlan == null) {
+        val plan = currentPlan
+        if (plan == null) {
             uiState.update { it.copy(reviewCard = it.reviewCard.copy(error = "home_review_error_no_plan")) }
             return
         }
@@ -336,7 +360,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val goals = plannerRepository.loadGoals()
             val targetAmount = goals.firstOrNull()?.targetAmount ?: BigDecimal.ZERO
-            val preview = calculatePlanPreviewUseCase.execute(currentPlan, targetAmount)
+            val preview = calculatePlanPreviewUseCase.execute(plan, targetAmount)
 
             val review = ManualReview(
                 actualFlexibleSpend = actualFlexible,
@@ -362,11 +386,11 @@ class HomeViewModel @Inject constructor(
 
     private fun updateReminderState(enabled: Boolean) {
         val labelKey = if (enabled) "home_more_reminders_on" else "home_more_reminders_off"
-        _uiState.update { it.copy(moreCard = it.moreCard.copy(reminderEnabled = enabled, reminderLabelKey = labelKey)) }
+        uiState.update { it.copy(moreCard = it.moreCard.copy(reminderEnabled = enabled, reminderLabelKey = labelKey)) }
     }
 
     fun chooseBillingPlan(plan: BillingPlan) {
-        uiState.update { it.copy(moreCard = it.moreCard.copy(selectedBillingPlan = plan)) }
+        uiState.update { it.copy(moreCard = it.moreCard.copy(selectedBillingPlan = plan, billingMessage = null)) }
     }
 
     fun unlockPremium(activity: android.app.Activity) {
@@ -375,12 +399,25 @@ class HomeViewModel @Inject constructor(
         val realProduct = availableStoreProducts.find { it.productId == storeProductId }
         
         viewModelScope.launch {
+            uiState.update {
+                it.copy(moreCard = it.moreCard.copy(isBillingActionInProgress = true, billingMessage = "paywall_billing_starting", error = null))
+            }
             if (realProduct != null) {
                 entitlementRepository.purchasePlan(activity, realProduct)
                 FirebaseUtils.logEvent("purchase_started")
+                uiState.update {
+                    it.copy(moreCard = it.moreCard.copy(isBillingActionInProgress = false, billingMessage = "paywall_billing_handoff"))
+                }
             } else {
-                // If products are not loaded, show error
-                uiState.update { it.copy(moreCard = it.moreCard.copy(error = "more_error_products_not_loaded")) }
+                uiState.update {
+                    it.copy(
+                        moreCard = it.moreCard.copy(
+                            isBillingActionInProgress = false,
+                            billingMessage = "paywall_billing_products_unavailable",
+                            error = "more_error_products_not_loaded"
+                        )
+                    )
+                }
                 Timber.tag(TAG).e("Cannot purchase: Product %s not found in store", storeProductId)
             }
         }
@@ -442,7 +479,21 @@ class HomeViewModel @Inject constructor(
 
     private fun sanitizeNumber(value: String): String = value.filter { it.isDigit() || it == '.' }
 
+    private fun reviewRangeMax(value: BigDecimal): Float {
+        val doubled = value.multiply(BigDecimal("2")).toFloat()
+        return doubled.coerceAtLeast(100f)
+    }
+
     private companion object {
         const val TAG = "HomeViewModel"
     }
 }
+
+private val pt.ms.myshare.domain.model.PaydayRuleType.labelKey: String
+    get() = when (this) {
+        pt.ms.myshare.domain.model.PaydayRuleType.SAVINGS -> "rule_type_savings"
+        pt.ms.myshare.domain.model.PaydayRuleType.INVESTING -> "rule_type_investing"
+        pt.ms.myshare.domain.model.PaydayRuleType.CRYPTO -> "rule_type_crypto"
+        pt.ms.myshare.domain.model.PaydayRuleType.DEBT -> "rule_type_debt"
+        pt.ms.myshare.domain.model.PaydayRuleType.OTHER -> "rule_type_other"
+    }

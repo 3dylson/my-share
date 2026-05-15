@@ -58,24 +58,12 @@ class BillingClientWrapper(context: Context) : PurchasesUpdatedListener {
             )
             .build()
         
-        billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsList ->
+        billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsResult ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                val storeProducts = productDetailsList.mapNotNull { details ->
-                    val offerToken = details.subscriptionOfferDetails?.firstOrNull()?.offerToken
-                    val basePlanId = details.subscriptionOfferDetails?.firstOrNull()?.basePlanId
-                    val price = details.subscriptionOfferDetails?.firstOrNull()?.pricingPhases?.pricingPhaseList?.firstOrNull()?.formattedPrice
-                    
-                    if (offerToken != null && price != null) {
-                        StoreProduct(
-                            productId = details.productId,
-                            name = details.name,
-                            description = details.description,
-                            price = price,
-                            basePlanId = basePlanId,
-                            offerToken = offerToken
-                        )
-                    } else null
+                val storeProducts = productDetailsResult.productDetailsList.mapNotNull { details ->
+                    BillingProductMapper.map(details)
                 }
+                Timber.d("Billing products mapped: %d", storeProducts.size)
                 _availableProducts.value = storeProducts
             }
         }
@@ -118,8 +106,8 @@ class BillingClientWrapper(context: Context) : PurchasesUpdatedListener {
                     .build())
             ).build()
 
-        billingClient.queryProductDetailsAsync(params) { _, productDetailsList ->
-            val productDetails = productDetailsList.find { it.productId == product.productId }
+        billingClient.queryProductDetailsAsync(params) { _, productDetailsResult ->
+            val productDetails = productDetailsResult.productDetailsList.find { it.productId == product.productId }
             if (productDetails != null) {
                 val offerToken = product.offerToken ?: return@queryProductDetailsAsync
                 val billingFlowParams = BillingFlowParams.newBuilder()

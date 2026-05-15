@@ -10,8 +10,9 @@ import pt.ms.myshare.domain.model.StoreProduct
 import java.math.BigDecimal
 
 data class OnboardingState(
+    val onboardingGoalId: String = java.util.UUID.randomUUID().toString(),
     val selectedFocus: PlanningFocus = PlanningFocus.SAVE_WITHOUT_STRESS,
-    val goalName: String = "Emergency fund",
+    val goalName: String = "",
     val goalAmount: BigDecimal = BigDecimal("3000"),
     val netIncomePerPayday: BigDecimal? = null,
     val monthlyFixedCosts: BigDecimal? = null,
@@ -28,6 +29,8 @@ data class OnboardingState(
     // Live prices fetched from Google Play Billing; empty until billing client connects
     val availableProducts: List<StoreProduct> = emptyList(),
     val selectedBillingPlan: BillingPlan = BillingPlan.MONTHLY,
+    val isBillingActionInProgress: Boolean = false,
+    val billingMessage: String? = null,
     val planSaved: Boolean = false,
     val reminderSaved: Boolean = false,
     val reminderSkipped: Boolean = false,

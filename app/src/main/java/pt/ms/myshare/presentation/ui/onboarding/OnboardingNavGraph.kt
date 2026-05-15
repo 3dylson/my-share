@@ -70,6 +70,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
         composable(OnboardingRoute.FixedCosts.route) {
             FixedCostsScreen(
                 initialFixedCosts = state.monthlyFixedCosts,
+                incomePerPayday = state.netIncomePerPayday,
                 initialPreset = state.preset,
                 error = state.error,
                 onBack = { navController.popBackStack() },
@@ -166,6 +167,8 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                     pricingStrategy = pricing,
                     availableProducts = state.availableProducts,
                     selectedPlan = state.selectedBillingPlan,
+                    isBillingActionInProgress = state.isBillingActionInProgress,
+                    billingMessage = state.billingMessage,
                     onPlanSelected = viewModel::setSelectedBillingPlan,
                     onClose = { navController.navigate(OnboardingRoute.ReminderSetup.route) },
                     onRestore = {

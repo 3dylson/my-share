@@ -30,7 +30,7 @@ class CreateReviewInsightUseCaseTest {
 
         val insight = reviewInsightUseCase.execute(plan, review)
 
-        assertEquals("Safety net growing", insight.headline)
+        assertEquals("insight_review_save_stress_success_headline", insight.headline)
         assertEquals(BigDecimal("-50.00"), insight.flexibleSpendDelta)
         assertEquals(BigDecimal("30.00"), insight.goalContributionDelta)
     }

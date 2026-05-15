@@ -20,7 +20,8 @@ local.properties
 skills-lock.json
 /.gstack
 /.kotlin
-/docs
+/docs/*
+!/docs/ui-ux-qa-notes-2026-05-15.md
 /firebase/tests/node_modules/
 /firebase/functions/node_modules/
 /.venv/
