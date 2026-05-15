@@ -65,6 +65,8 @@ fun HomeRoute(
         onToggleAutomation = viewModel::onToggleAutomation,
         onBillingPlanSelected = viewModel::chooseBillingPlan,
         onUnlockPremium = viewModel::unlockPremium,
+        onPremiumGateViewed = viewModel::logPremiumGateViewed,
+        onPremiumGateUpgradeClicked = viewModel::logPremiumGateUpgradeClicked,
         onLogout = {
             viewModel.onLogout {
                 navController.navigate("onboarding") {
@@ -92,7 +94,9 @@ fun HomeScreen(
     onToggleReminder: (Boolean) -> Unit,
     onToggleAutomation: (Boolean) -> Unit,
     onBillingPlanSelected: (BillingPlan) -> Unit,
-    onUnlockPremium: (android.app.Activity) -> Unit,
+    onUnlockPremium: (android.app.Activity, String) -> Unit,
+    onPremiumGateViewed: (HomePremiumGate) -> Unit,
+    onPremiumGateUpgradeClicked: (HomePremiumGate) -> Unit,
     onLogout: () -> Unit,
     onManageAdsConsent: () -> Unit,
     onAddNewGoal: () -> Unit,
@@ -110,6 +114,11 @@ fun HomeScreen(
     var showSignOutDialog by remember { mutableStateOf(false) }
     var showAccountDetailsDialog by remember { mutableStateOf(false) }
     var previousReviewCount by remember { mutableStateOf<Int?>(null) }
+    val openPremiumGate: (HomePremiumGate) -> Unit = { gate ->
+        premiumGate = gate
+        showPaywallSheet = true
+        onPremiumGateViewed(gate)
+    }
 
     LaunchedEffect(state.reviewHistory.size) {
         val previousCount = previousReviewCount
@@ -130,7 +139,8 @@ fun HomeScreen(
             isBillingActionInProgress = state.moreCard.isBillingActionInProgress,
             billingMessage = state.moreCard.billingMessage,
             onUpgradeClick = { 
-                activity?.let { onUnlockPremium(it) } 
+                onPremiumGateUpgradeClicked(premiumGate)
+                activity?.let { onUnlockPremium(it, premiumGate.analyticsName) }
             }
         )
     }
@@ -156,8 +166,7 @@ fun HomeScreen(
                     onClick = {
                         Timber.tag("HomeScreen").d("Premium gate opened from Smart automation lock")
                         showAutomationLockDialog = false
-                        premiumGate = HomePremiumGate.SmartAutomation
-                        showPaywallSheet = true
+                        openPremiumGate(HomePremiumGate.SmartAutomation)
                     }
                 ) {
                     Text(text = stringResource(R.string.home_more_automation_locked_action))
@@ -395,8 +404,7 @@ fun HomeScreen(
                             onAddNewRule = onAddNewRule,
                             onEditRule = onEditRule,
                             onShowPaywall = { gate ->
-                                premiumGate = gate
-                                showPaywallSheet = true
+                                openPremiumGate(gate)
                             }
                         )
                     }
@@ -414,8 +422,7 @@ fun HomeScreen(
                                 onSaveReview()
                             },
                             onShowPaywall = {
-                                premiumGate = HomePremiumGate.ReviewHistory
-                                showPaywallSheet = true
+                                openPremiumGate(HomePremiumGate.ReviewHistory)
                             }
                         )
                     }
@@ -492,7 +499,9 @@ private fun HomeScreenPreview() {
             onToggleReminder = { _ -> },
             onToggleAutomation = { _ -> },
             onBillingPlanSelected = { _ -> },
-            onUnlockPremium = {},
+            onUnlockPremium = { _, _ -> },
+            onPremiumGateViewed = { _ -> },
+            onPremiumGateUpgradeClicked = { _ -> },
             onLogout = {},
             onManageAdsConsent = {},
             onAddNewGoal = {},

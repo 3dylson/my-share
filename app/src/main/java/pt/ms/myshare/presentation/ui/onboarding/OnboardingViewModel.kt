@@ -205,6 +205,7 @@ class OnboardingViewModel @Inject constructor(
         FirebaseUtils.logEvent("paywall_plan_selected", Bundle().apply {
             putString("billing_plan", plan.name.lowercase(Locale.US))
             putString("price_cluster", state.value.pricingStrategy?.marketCluster)
+            putString("source", "onboarding_paywall")
         })
     }
 
@@ -221,12 +222,21 @@ class OnboardingViewModel @Inject constructor(
                         billingMessage = "paywall_billing_products_unavailable"
                     )
                 }
+                FirebaseUtils.logEvent("purchase_unavailable", Bundle().apply {
+                    putString("billing_plan", state.value.selectedBillingPlan.name.lowercase(Locale.US))
+                    putString("price_cluster", state.value.pricingStrategy?.marketCluster)
+                    putString("product_id", storeProductId)
+                    putString("source", "onboarding_paywall")
+                })
                 Timber.tag("OnboardingBilling").e("Cannot purchase: Product %s not found in store", storeProductId)
                 return@launch
             }
             FirebaseUtils.logEvent("purchase_started", Bundle().apply {
                 putString("billing_plan", state.value.selectedBillingPlan.name.lowercase(Locale.US))
                 putString("price_cluster", state.value.pricingStrategy?.marketCluster)
+                putString("product_id", product.productId)
+                putBoolean("has_trial", product.hasFreeTrial)
+                putString("source", "onboarding_paywall")
             })
             entitlementRepository.purchasePlan(activity, product)
             state.update { it.copy(isBillingActionInProgress = false, billingMessage = "paywall_billing_handoff") }
@@ -309,6 +319,9 @@ class OnboardingViewModel @Inject constructor(
     fun restorePurchases(onRestored: (Boolean) -> Unit) {
         viewModelScope.launch {
             state.update { it.copy(isBillingActionInProgress = true, billingMessage = "paywall_restore_checking") }
+            FirebaseUtils.logEvent("purchase_restore_started", Bundle().apply {
+                putString("source", "onboarding_paywall")
+            })
             entitlementRepository.restorePurchases()
             val restored = entitlementRepository.isPro.first()
             state.update {
@@ -318,6 +331,10 @@ class OnboardingViewModel @Inject constructor(
                     billingMessage = if (restored) "paywall_restore_success" else "paywall_restore_none"
                 )
             }
+            FirebaseUtils.logEvent("purchase_restore_completed", Bundle().apply {
+                putString("source", "onboarding_paywall")
+                putBoolean("restored", restored)
+            })
             Timber.tag("OnboardingBilling").d("Restore purchases completed. restored=%s", restored)
             onRestored(restored)
         }

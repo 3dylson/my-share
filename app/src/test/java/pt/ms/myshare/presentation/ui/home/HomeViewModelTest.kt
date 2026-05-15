@@ -16,10 +16,12 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import pt.ms.myshare.domain.model.AllocationPreset
+import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.PaydayRule
 import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.domain.model.PlanningFocus
+import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
 import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.domain.model.ReminderConfiguration
 import pt.ms.myshare.domain.model.SalaryPlan
@@ -136,6 +138,54 @@ class HomeViewModelTest {
         assertTrue(error != null)
         assertEquals("home_review_error_invalid_amounts", error)
     }
+
+    @Test
+    fun `billing unavailable feedback survives planner refresh`() = runTest {
+        advanceUntilIdle()
+
+        viewModel.chooseBillingPlan(BillingPlan.MONTHLY)
+        viewModel.unlockPremium(mockk(relaxed = true), "test_gate")
+        advanceUntilIdle()
+
+        assertEquals(
+            "paywall_billing_products_unavailable",
+            viewModel.state.value.moreCard.billingMessage
+        )
+        assertEquals("more_error_products_not_loaded", viewModel.state.value.moreCard.error)
+
+        fakePlannerRepository.saveReminderConfiguration(
+            ReminderConfiguration(
+                enabled = true,
+                hourOfDay = 10,
+                minute = 30,
+                cadence = ReminderCadence.WEEKLY_REVIEW
+            )
+        )
+        advanceUntilIdle()
+
+        assertEquals(
+            "paywall_billing_products_unavailable",
+            viewModel.state.value.moreCard.billingMessage
+        )
+        assertEquals("more_error_products_not_loaded", viewModel.state.value.moreCard.error)
+
+        fakeEntitlementRepository.setProducts(
+            listOf(
+                StoreProduct(
+                    productId = PremiumSubscriptionProducts.MONTHLY_ID,
+                    name = "Monthly",
+                    description = "Monthly premium",
+                    price = "€4.99",
+                    basePlanId = "monthly",
+                    offerToken = "monthly-token"
+                )
+            )
+        )
+        advanceUntilIdle()
+
+        assertEquals(null, viewModel.state.value.moreCard.billingMessage)
+        assertEquals(null, viewModel.state.value.moreCard.error)
+    }
 }
 
 class FakePlannerRepository : PlannerRepository {
@@ -203,6 +253,7 @@ class TestFakeEntitlementRepository : EntitlementRepository {
 
     override suspend fun checkActiveEntitlement() {}
     override suspend fun purchasePlan(activity: android.app.Activity, product: StoreProduct) {}
+    suspend fun setProducts(products: List<StoreProduct>) { _availableProducts.emit(products) }
     suspend fun setPro(value: Boolean) { _isPro.emit(value) }
     override suspend fun restorePurchases() {}
 }

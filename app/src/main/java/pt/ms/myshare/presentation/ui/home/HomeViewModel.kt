@@ -11,11 +11,14 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pt.ms.myshare.domain.model.BillingPlan
+import pt.ms.myshare.domain.model.PaydayRule
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.ReviewInsight
 import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
+import pt.ms.myshare.domain.model.ReminderConfiguration
 import pt.ms.myshare.domain.model.SalaryPlan
+import pt.ms.myshare.domain.model.StoreProduct
 import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
@@ -98,34 +101,44 @@ class HomeViewModel @Inject constructor(
 
     private fun observePlannerData() {
         viewModelScope.launch {
-            val plannerFlow = combine(
+            val plannerCoreFlow = combine(
                 plannerRepository.observePlan(),
                 plannerRepository.observeRules(),
                 plannerRepository.observeGoals(),
-                plannerRepository.observeLatestReview(),
+                plannerRepository.observeLatestReview()
+            ) { plan, rules, goals, latestReview ->
+                PlannerCore(
+                    plan = plan,
+                    rules = rules,
+                    goals = goals,
+                    latestReview = latestReview
+                )
+            }
+
+            val plannerSignalsFlow = combine(
                 plannerRepository.observeReminderConfiguration(),
                 plannerRepository.observeAutomationEnabled(),
                 plannerRepository.observeReviews(),
                 getPerformanceStatsUseCase.execute()
-            ) { args: Array<Any?> ->
-                val plan = args[0] as pt.ms.myshare.domain.model.SalaryPlan?
-                val rules = args[1] as List<pt.ms.myshare.domain.model.PaydayRule>
-                val goals = args[2] as List<Goal>
-                val lr = args[3] as ManualReview?
-                val rc = args[4] as pt.ms.myshare.domain.model.ReminderConfiguration
-                val ae = args[5] as Boolean
-                val history = args[6] as List<ManualReview>
-                val stats = args[7] as PerformanceStats
+            ) { reminder, automation, history, stats ->
+                PlannerSignals(
+                    reminder = reminder,
+                    automation = automation,
+                    history = history,
+                    stats = stats
+                )
+            }
 
-                val coaching = if (plan != null) {
-                    getCoachingInsightsUseCase.execute(plan, history)
+            val plannerFlow = combine(plannerCoreFlow, plannerSignalsFlow) { core, signals ->
+                val coaching = if (core.plan != null) {
+                    getCoachingInsightsUseCase.execute(core.plan, signals.history)
                 } else {
                     emptyList()
                 }
                 
-                val trend = if (plan != null) {
-                    history.reversed().takeLast(5).map { review ->
-                        val preview = calculatePlanPreviewUseCase.execute(plan, BigDecimal.ZERO)
+                val trend = if (core.plan != null) {
+                    signals.history.reversed().takeLast(5).map { review ->
+                        val preview = calculatePlanPreviewUseCase.execute(core.plan, BigDecimal.ZERO)
                         val flexTarget = review.plannedFlexibleSpend ?: preview.flexibleSpendPerPayday
                         val goalTarget = review.plannedGoalContribution ?: preview.savingsPerPayday
                         
@@ -142,14 +155,16 @@ class HomeViewModel @Inject constructor(
                 }
                 
                 PlannerGroup(
-                    plan = plan,
-                    rules = rules,
-                    goals = goals,
-                    latestReview = lr,
-                    reminder = rc,
-                    automation = ae,
-                    stats = stats,
-                    combined = Triple(history, stats, coaching to trend)
+                    plan = core.plan,
+                    rules = core.rules,
+                    goals = core.goals,
+                    latestReview = core.latestReview,
+                    reminder = signals.reminder,
+                    automation = signals.automation,
+                    reviewHistory = signals.history,
+                    performanceStats = signals.stats,
+                    coachingInsights = coaching,
+                    performanceTrend = trend
                 )
             }
 
@@ -165,7 +180,6 @@ class HomeViewModel @Inject constructor(
                 val latestReview = planner.latestReview
                 val reminder = planner.reminder
                 val automation = planner.automation
-                val combined = planner.combined
                 
                 val updatedPlan = plan?.copy(rules = currentRules)
                 currentPlan = updatedPlan
@@ -185,6 +199,12 @@ class HomeViewModel @Inject constructor(
                 } else {
                     currentMore.selectedBillingPlan
                 }
+                val selectedProductAvailable = when (selectedBillingPlan) {
+                    BillingPlan.MONTHLY -> monthlyProduct != null
+                    BillingPlan.ANNUAL -> annualProduct != null
+                }
+                val shouldClearUnavailableMessage =
+                    currentMore.billingMessage == "paywall_billing_products_unavailable" && selectedProductAvailable
 
                 val moreCard = MoreCardState(
                     reminderEnabled = reminder.enabled,
@@ -207,9 +227,12 @@ class HomeViewModel @Inject constructor(
                     actualAnnualTrialDays = annualProduct?.freeTrialDays?.takeIf { it > 0 },
                     showAdsConsentOption = uiState.value.moreCard.showAdsConsentOption,
                     selectedBillingPlan = selectedBillingPlan,
+                    isBillingActionInProgress = currentMore.isBillingActionInProgress,
+                    billingMessage = currentMore.billingMessage.takeUnless { shouldClearUnavailableMessage },
                     isPremium = isPremium,
                     automationEnabled = automation,
-                    userEmail = user?.email
+                    userEmail = user?.email,
+                    error = currentMore.error.takeUnless { shouldClearUnavailableMessage }
                 )
                 HomeState(
                     selectedDestination = uiState.value.selectedDestination,
@@ -217,9 +240,9 @@ class HomeViewModel @Inject constructor(
                     planCard = planCard,
                     goals = goalCards,
                     rules = ruleCards,
-                    performanceStats = combined.second.toState(combined.third.second),
-                    reviewCard = reviewCard.copy(coachingInsights = combined.third.first.map { it.toState() }),
-                    reviewHistory = combined.first.map { it.toState() },
+                    performanceStats = planner.performanceStats.toState(planner.performanceTrend),
+                    reviewCard = reviewCard.copy(coachingInsights = planner.coachingInsights.map { it.toState() }),
+                    reviewHistory = planner.reviewHistory.map { it.toState() },
                     moreCard = moreCard,
                     isLoading = false,
                     emptyMessage = emptyMessage,
@@ -232,29 +255,30 @@ class HomeViewModel @Inject constructor(
     }
 
     private data class PlannerGroup(
-        val plan: pt.ms.myshare.domain.model.SalaryPlan?,
-        val rules: List<pt.ms.myshare.domain.model.PaydayRule>,
+        val plan: SalaryPlan?,
+        val rules: List<PaydayRule>,
         val goals: List<Goal>,
         val latestReview: ManualReview?,
-        val reminder: pt.ms.myshare.domain.model.ReminderConfiguration,
+        val reminder: ReminderConfiguration,
         val automation: Boolean,
-        val stats: PerformanceStats,
-        val combined: Triple<List<ManualReview>, PerformanceStats, Pair<List<ReviewInsight>, List<Float>>>
+        val reviewHistory: List<ManualReview>,
+        val performanceStats: PerformanceStats,
+        val coachingInsights: List<ReviewInsight>,
+        val performanceTrend: List<Float>
     )
 
-    private data class Quadruple<A, B, C, D>(
-        val first: A,
-        val second: B,
-        val third: C,
-        val fourth: D
+    private data class PlannerCore(
+        val plan: SalaryPlan?,
+        val rules: List<PaydayRule>,
+        val goals: List<Goal>,
+        val latestReview: ManualReview?
     )
 
-    private data class Quintuple<A, B, C, D, E>(
-        val first: A,
-        val second: B,
-        val third: C,
-        val fourth: D,
-        val fifth: E
+    private data class PlannerSignals(
+        val reminder: ReminderConfiguration,
+        val automation: Boolean,
+        val history: List<ManualReview>,
+        val stats: PerformanceStats
     )
 
     private fun buildPlanCard(plan: pt.ms.myshare.domain.model.SalaryPlan, goalAmount: BigDecimal): HomePlanCardState {
@@ -404,18 +428,26 @@ class HomeViewModel @Inject constructor(
     }
 
     fun chooseBillingPlan(plan: BillingPlan) {
-        uiState.update { it.copy(moreCard = it.moreCard.copy(selectedBillingPlan = plan, billingMessage = null)) }
+        uiState.update { it.copy(moreCard = it.moreCard.copy(selectedBillingPlan = plan, billingMessage = null, error = null)) }
         FirebaseUtils.logEvent("paywall_plan_selected", android.os.Bundle().apply {
             putString("billing_plan", plan.name.lowercase(Locale.US))
             putString("price_cluster", pricingStrategy.marketCluster)
+            putString("source", "home_more")
         })
     }
 
-    fun unlockPremium(activity: android.app.Activity) {
-        val storeProductId = PremiumSubscriptionProducts.productIdFor(uiState.value.moreCard.selectedBillingPlan)
-        
-        val realProduct = availableStoreProducts.find { it.productId == storeProductId }
-        
+    fun logPremiumGateViewed(gate: HomePremiumGate) {
+        logPremiumGateEvent("premium_gate_viewed", gate)
+    }
+
+    fun logPremiumGateUpgradeClicked(gate: HomePremiumGate) {
+        logPremiumGateEvent("premium_gate_upgrade_clicked", gate)
+    }
+
+    fun unlockPremium(activity: android.app.Activity, source: String = "more_inline") {
+        val storeProductId = selectedStoreProductId()
+        val realProduct = selectedStoreProduct()
+
         viewModelScope.launch {
             uiState.update {
                 it.copy(moreCard = it.moreCard.copy(isBillingActionInProgress = true, billingMessage = "paywall_billing_starting", error = null))
@@ -427,11 +459,18 @@ class HomeViewModel @Inject constructor(
                     putString("price_cluster", pricingStrategy.marketCluster)
                     putString("product_id", realProduct.productId)
                     putBoolean("has_trial", realProduct.hasFreeTrial)
+                    putString("source", source)
                 })
                 uiState.update {
                     it.copy(moreCard = it.moreCard.copy(isBillingActionInProgress = false, billingMessage = "paywall_billing_handoff"))
                 }
             } else {
+                FirebaseUtils.logEvent("purchase_unavailable", android.os.Bundle().apply {
+                    putString("billing_plan", uiState.value.moreCard.selectedBillingPlan.name.lowercase(Locale.US))
+                    putString("price_cluster", pricingStrategy.marketCluster)
+                    putString("product_id", storeProductId)
+                    putString("source", source)
+                })
                 uiState.update {
                     it.copy(
                         moreCard = it.moreCard.copy(
@@ -444,6 +483,28 @@ class HomeViewModel @Inject constructor(
                 Timber.tag(TAG).e("Cannot purchase: Product %s not found in store", storeProductId)
             }
         }
+    }
+
+    private fun logPremiumGateEvent(eventName: String, gate: HomePremiumGate) {
+        val selectedProduct = selectedStoreProduct()
+        FirebaseUtils.logEvent(eventName, android.os.Bundle().apply {
+            putString("premium_gate", gate.analyticsName)
+            putString("billing_plan", uiState.value.moreCard.selectedBillingPlan.name.lowercase(Locale.US))
+            putString("price_cluster", pricingStrategy.marketCluster)
+            putString("product_id", selectedStoreProductId())
+            putBoolean("selected_product_available", selectedProduct != null)
+            putBoolean("has_trial", selectedProduct?.hasFreeTrial == true)
+        })
+        Timber.tag(TAG).d("Premium gate event logged: %s gate=%s", eventName, gate.analyticsName)
+    }
+
+    private fun selectedStoreProductId(): String {
+        return PremiumSubscriptionProducts.productIdFor(uiState.value.moreCard.selectedBillingPlan)
+    }
+
+    private fun selectedStoreProduct(): StoreProduct? {
+        val storeProductId = selectedStoreProductId()
+        return availableStoreProducts.find { it.productId == storeProductId }
     }
 
     fun updateAdsConsentRequirement(isRequired: Boolean) {

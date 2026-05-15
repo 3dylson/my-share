@@ -10,6 +10,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import android.view.Window
 
 private val LightColorScheme = lightColorScheme(
     primary = MySharePrimary,
@@ -55,7 +56,7 @@ fun MyShareTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.background.toArgb()
+            setStatusBarColor(window, colorScheme.background.toArgb())
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
@@ -66,4 +67,9 @@ fun MyShareTheme(
         shapes = Shapes,
         content = content
     )
+}
+
+@Suppress("DEPRECATION")
+private fun setStatusBarColor(window: Window, color: Int) {
+    window.statusBarColor = color
 }

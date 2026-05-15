@@ -36,7 +36,7 @@ fun LazyListScope.homeMoreTab(
     onToggleReminder: (Boolean) -> Unit,
     onToggleAutomation: (Boolean) -> Unit,
     onBillingPlanSelected: (BillingPlan) -> Unit,
-    onUnlockPremium: (android.app.Activity) -> Unit,
+    onUnlockPremium: (android.app.Activity, String) -> Unit,
     onManageAdsConsent: () -> Unit,
     onShowAutomationLock: () -> Unit,
     onShowAccountDetails: () -> Unit,
@@ -153,7 +153,7 @@ fun LazyListScope.homeMoreTab(
                     },
                     onClick = {
                         if (!state.isBillingActionInProgress) {
-                            activity?.let(onUnlockPremium)
+                            activity?.let { onUnlockPremium(it, "more_inline") }
                         }
                     },
                     enabled = selectedPrice != null && !state.isBillingActionInProgress,

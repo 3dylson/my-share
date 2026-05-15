@@ -12,7 +12,7 @@ class ResolvePricingStrategyUseCaseTest {
 
     @Test
     fun `emerging markets default to monthly hero`() {
-        val strategy = useCase.execute(Locale("en", "NG"))
+        val strategy = useCase.execute(Locale.forLanguageTag("en-NG"))
 
         assertEquals(BillingPlan.MONTHLY, strategy.heroPlan)
         assertEquals("emerging_monthly_first", strategy.marketCluster)
@@ -22,7 +22,7 @@ class ResolvePricingStrategyUseCaseTest {
 
     @Test
     fun `brazil uses corrected local entry price`() {
-        val strategy = useCase.execute(Locale("pt", "BR"))
+        val strategy = useCase.execute(Locale.forLanguageTag("pt-BR"))
 
         assertEquals(BillingPlan.MONTHLY, strategy.heroPlan)
         assertEquals("brazil_monthly_first", strategy.marketCluster)
@@ -32,7 +32,7 @@ class ResolvePricingStrategyUseCaseTest {
 
     @Test
     fun `portugal uses medium europe fallback price`() {
-        val strategy = useCase.execute(Locale("pt", "PT"))
+        val strategy = useCase.execute(Locale.forLanguageTag("pt-PT"))
 
         assertEquals(BillingPlan.ANNUAL, strategy.heroPlan)
         assertEquals("rest_of_world_annual_first", strategy.marketCluster)
@@ -42,7 +42,7 @@ class ResolvePricingStrategyUseCaseTest {
 
     @Test
     fun `bangladesh uses play console local currency price`() {
-        val strategy = useCase.execute(Locale("en", "BD"))
+        val strategy = useCase.execute(Locale.forLanguageTag("en-BD"))
 
         assertEquals(BillingPlan.MONTHLY, strategy.heroPlan)
         assertEquals("accessible_monthly_first", strategy.marketCluster)
@@ -52,7 +52,7 @@ class ResolvePricingStrategyUseCaseTest {
 
     @Test
     fun `rest of world defaults to annual hero`() {
-        val strategy = useCase.execute(Locale("en", "US"))
+        val strategy = useCase.execute(Locale.forLanguageTag("en-US"))
 
         assertEquals(BillingPlan.ANNUAL, strategy.heroPlan)
         assertEquals("rest_of_world_annual_first", strategy.marketCluster)
