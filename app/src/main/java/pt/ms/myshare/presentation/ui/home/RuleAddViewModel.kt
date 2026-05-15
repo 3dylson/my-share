@@ -13,8 +13,10 @@ import kotlinx.coroutines.launch
 import pt.ms.myshare.domain.model.PaydayRule
 import pt.ms.myshare.domain.model.PaydayRuleType
 import pt.ms.myshare.domain.repository.PlannerRepository
+import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
 import timber.log.Timber
@@ -63,7 +65,7 @@ class RuleAddViewModel @Inject constructor(
                     it.copy(
                         ruleId = rule.id,
                         name = rule.name,
-                        amount = rule.amount.stripTrailingZeros().toPlainString(),
+                        amount = LocalizedAmountFormatter.formatEditableAmount(rule.amount.stripTrailingZeros(), Locale.getDefault()),
                         isPercentage = rule.isPercentage,
                         type = rule.type,
                         createdAt = rule.createdAt,
@@ -88,7 +90,7 @@ class RuleAddViewModel @Inject constructor(
     }
 
     fun onAmountChanged(newAmount: String) {
-        _state.update { it.copy(amount = newAmount, error = null) }
+        _state.update { it.copy(amount = LocalizedAmountFormatter.sanitizeAmountInput(newAmount), error = null) }
     }
 
     fun onPercentageToggle(isPercentage: Boolean) {
@@ -105,7 +107,7 @@ class RuleAddViewModel @Inject constructor(
             return
         }
 
-        val amount = _state.value.amount.toBigDecimalOrNull() ?: BigDecimal.ZERO
+        val amount = LocalizedAmountFormatter.parseAmount(_state.value.amount) ?: BigDecimal.ZERO
         if (_state.value.name.isBlank() || amount <= BigDecimal.ZERO) {
             _state.update { it.copy(error = "rule_add_error_invalid_name_amount") }
             return

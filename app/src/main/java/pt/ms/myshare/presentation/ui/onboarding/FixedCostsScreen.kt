@@ -14,9 +14,9 @@ import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.AllocationPreset
 import pt.ms.myshare.presentation.ui.components.PremiumChoiceCard
 import pt.ms.myshare.presentation.ui.components.PremiumTextField
+import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.presentation.ui.theme.*
 import java.math.BigDecimal
-import java.text.NumberFormat
 import java.util.Locale
 
 @Composable
@@ -29,14 +29,13 @@ fun FixedCostsScreen(
     onNext: (BigDecimal, AllocationPreset) -> Unit
 ) {
     val context = LocalContext.current
-    var fixedCostsText by remember { mutableStateOf(initialFixedCosts?.toPlainString() ?: "") }
+    val locale = Locale.getDefault()
+    var fixedCostsText by remember { mutableStateOf(initialFixedCosts?.let { LocalizedAmountFormatter.formatEditableAmount(it, locale) } ?: "") }
     var preset by remember { mutableStateOf(initialPreset) }
     var validationRequested by remember { mutableStateOf(false) }
 
-    val currencySymbol = remember {
-        NumberFormat.getCurrencyInstance(Locale.getDefault()).currency?.symbol ?: ""
-    }
-    val fixedCosts = fixedCostsText.toBigDecimalOrNull()
+    val currencySymbol = remember(locale) { LocalizedAmountFormatter.currencySymbol(locale) }
+    val fixedCosts = LocalizedAmountFormatter.parseAmount(fixedCostsText, locale)
     val invalidNumber = fixedCostsText.isNotBlank() && fixedCosts == null
     val requiredError = validationRequested && fixedCostsText.isBlank()
     val negativeError = validationRequested && fixedCosts != null && fixedCosts < BigDecimal.ZERO
@@ -63,7 +62,7 @@ fun FixedCostsScreen(
 
             PremiumTextField(
                 value = fixedCostsText,
-                onValueChange = { fixedCostsText = it.replace(',', '.') },
+                onValueChange = { fixedCostsText = LocalizedAmountFormatter.sanitizeAmountInput(it, locale) },
                 label = stringResource(R.string.onboarding_fixed_costs_label_amount),
                 placeholder = stringResource(R.string.amount_placeholder_decimal),
                 prefix = { if (currencySymbol.isNotEmpty()) Text("$currencySymbol ") },

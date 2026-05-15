@@ -57,7 +57,7 @@ fun LazyListScope.homeMoreTab(
                 PremiumSectionHeader(title = stringResource(R.string.home_more_premium_title))
                 CompactBillingPlanRow(
                     title = stringResource(R.string.home_more_annual_title),
-                    price = state.actualAnnualPrice ?: stringResource(R.string.fallback_annual_price),
+                    price = state.actualAnnualPrice ?: state.pricingStrategy?.annualLabel.orEmpty(),
                     period = stringResource(R.string.period_year),
                     badge = stringResource(R.string.home_more_annual_badge),
                     isSelected = state.selectedBillingPlan == BillingPlan.ANNUAL,
@@ -66,7 +66,7 @@ fun LazyListScope.homeMoreTab(
                 Spacer(Modifier.height(10.dp))
                 CompactBillingPlanRow(
                     title = stringResource(R.string.home_more_monthly_title),
-                    price = state.actualMonthlyPrice ?: stringResource(R.string.fallback_monthly_price),
+                    price = state.actualMonthlyPrice ?: state.pricingStrategy?.monthlyLabel.orEmpty(),
                     period = stringResource(R.string.period_month),
                     isSelected = state.selectedBillingPlan == BillingPlan.MONTHLY,
                     onClick = { onBillingPlanSelected(BillingPlan.MONTHLY) }

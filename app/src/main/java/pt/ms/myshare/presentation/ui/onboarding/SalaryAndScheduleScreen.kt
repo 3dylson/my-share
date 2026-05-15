@@ -16,9 +16,9 @@ import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.presentation.ui.components.PremiumChoiceCard
 import pt.ms.myshare.presentation.ui.components.PremiumTextField
+import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.presentation.ui.theme.*
 import java.math.BigDecimal
-import java.text.NumberFormat
 import java.util.Locale
 
 @Composable
@@ -30,16 +30,15 @@ fun SalaryAndScheduleScreen(
     onBack: () -> Unit,
     onNext: (BigDecimal, PayFrequency, Int, String) -> Unit
 ) {
-    var incomeText by remember { mutableStateOf(initialIncome?.toPlainString() ?: "") }
+    val locale = Locale.getDefault()
+    var incomeText by remember { mutableStateOf(initialIncome?.let { LocalizedAmountFormatter.formatEditableAmount(it, locale) } ?: "") }
     var frequency by remember { mutableStateOf(initialFrequency) }
     var paydayText by remember { mutableStateOf(initialMonthlyPayday.toString()) }
     var biweeklyPaydayText by remember { mutableStateOf(initialNextBiweeklyPaydayText) }
     var validationRequested by remember { mutableStateOf(false) }
 
-    val currencySymbol = remember {
-        NumberFormat.getCurrencyInstance(Locale.getDefault()).currency?.symbol ?: ""
-    }
-    val income = incomeText.toBigDecimalOrNull()
+    val currencySymbol = remember(locale) { LocalizedAmountFormatter.currencySymbol(locale) }
+    val income = LocalizedAmountFormatter.parseAmount(incomeText, locale)
     val payday = paydayText.toIntOrNull()
     val incomeError = validationRequested && (income == null || income <= BigDecimal.ZERO)
     val paydayError = validationRequested && frequency == PayFrequency.MONTHLY && (payday == null || payday !in 1..28)
@@ -68,7 +67,7 @@ fun SalaryAndScheduleScreen(
 
             PremiumTextField(
                 value = incomeText,
-                onValueChange = { incomeText = it.replace(',', '.') },
+                onValueChange = { incomeText = LocalizedAmountFormatter.sanitizeAmountInput(it, locale) },
                 label = stringResource(R.string.onboarding_salary_label_amount),
                 placeholder = stringResource(R.string.amount_placeholder_decimal),
                 prefix = { if (currencySymbol.isNotEmpty()) Text("$currencySymbol ") },

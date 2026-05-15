@@ -13,9 +13,9 @@ import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.presentation.ui.components.PremiumChoiceCard
 import pt.ms.myshare.presentation.ui.components.PremiumTextField
+import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.presentation.ui.theme.*
 import java.math.BigDecimal
-import java.text.NumberFormat
 import java.util.Locale
 
 @Composable
@@ -32,14 +32,13 @@ fun GoalPickerScreen(
     val defaultCashBufferGoalName = stringResource(R.string.goal_default_cash_buffer)
     val defaultSharedGoalName = stringResource(R.string.goal_default_shared_safety_net)
     var goalName by remember { mutableStateOf(initialGoalName.ifBlank { defaultEmergencyGoalName }) }
-    var goalAmountText by remember { mutableStateOf(initialGoalAmount.toPlainString()) }
+    val locale = Locale.getDefault()
+    var goalAmountText by remember { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialGoalAmount, locale)) }
     var isCustomGoalSelected by remember { mutableStateOf(false) }
     var validationRequested by remember { mutableStateOf(false) }
 
-    val currencySymbol = remember {
-        NumberFormat.getCurrencyInstance(Locale.getDefault()).currency?.symbol ?: ""
-    }
-    val goalAmount = goalAmountText.toBigDecimalOrNull()
+    val currencySymbol = remember(locale) { LocalizedAmountFormatter.currencySymbol(locale) }
+    val goalAmount = LocalizedAmountFormatter.parseAmount(goalAmountText, locale)
     val goalNameError = validationRequested && goalName.isBlank()
     val goalAmountError = validationRequested && (goalAmount == null || goalAmount <= BigDecimal.ZERO)
     val isGoalValid = goalName.isNotBlank() && goalAmount != null && goalAmount > BigDecimal.ZERO
@@ -50,19 +49,19 @@ fun GoalPickerScreen(
         when (focus) {
             PlanningFocus.SAVE_WITHOUT_STRESS -> {
                 goalName = defaultEmergencyGoalName
-                goalAmountText = "3000"
+                goalAmountText = LocalizedAmountFormatter.formatEditableAmount(BigDecimal("3000"), locale)
             }
             PlanningFocus.INVEST_WITH_DISCIPLINE -> {
                 goalName = defaultInvestingGoalName
-                goalAmountText = "10000"
+                goalAmountText = LocalizedAmountFormatter.formatEditableAmount(BigDecimal("10000"), locale)
             }
             PlanningFocus.STOP_OVERSPENDING -> {
                 goalName = defaultCashBufferGoalName
-                goalAmountText = "2000"
+                goalAmountText = LocalizedAmountFormatter.formatEditableAmount(BigDecimal("2000"), locale)
             }
             PlanningFocus.PLAN_TOGETHER -> {
                 goalName = defaultSharedGoalName
-                goalAmountText = "5000"
+                goalAmountText = LocalizedAmountFormatter.formatEditableAmount(BigDecimal("5000"), locale)
             }
         }
     }
@@ -148,7 +147,7 @@ fun GoalPickerScreen(
             PremiumTextField(
                 value = goalAmountText,
                 onValueChange = {
-                    goalAmountText = it.replace(',', '.')
+                    goalAmountText = LocalizedAmountFormatter.sanitizeAmountInput(it, locale)
                     isCustomGoalSelected = true
                 },
                 label = stringResource(R.string.onboarding_goal_picker_label_amount),

@@ -26,6 +26,7 @@ import pt.ms.myshare.domain.use_case.UpdateGoalProgressUseCase
 import pt.ms.myshare.domain.use_case.GetPerformanceStatsUseCase
 import pt.ms.myshare.domain.use_case.GetCoachingInsightsUseCase
 import pt.ms.myshare.domain.use_case.PerformanceStats
+import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.utils.logs.FirebaseUtils
 import timber.log.Timber
 import java.math.BigDecimal
@@ -295,7 +296,11 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun buildRuleCard(rule: pt.ms.myshare.domain.model.PaydayRule): RuleCardState {
-        val amountLabel = if (rule.isPercentage) "${rule.amount.stripTrailingZeros().toPlainString()}%" else currencyFormat.format(rule.amount)
+        val amountLabel = if (rule.isPercentage) {
+            LocalizedAmountFormatter.formatPercentage(rule.amount, locale)
+        } else {
+            currencyFormat.format(rule.amount)
+        }
         return RuleCardState(
             id = rule.id,
             name = rule.name,
@@ -319,8 +324,8 @@ class HomeViewModel @Inject constructor(
         val goalMax = reviewRangeMax(defaultGoalContribution ?: BigDecimal.ZERO)
 
         return ReviewCardState(
-            actualFlexibleSpend = defaultFlexibleSpend?.stripTrailingZeros()?.toPlainString().orEmpty(),
-            actualGoalContribution = defaultGoalContribution?.stripTrailingZeros()?.toPlainString().orEmpty(),
+            actualFlexibleSpend = defaultFlexibleSpend?.let { LocalizedAmountFormatter.formatEditableAmount(it, locale) }.orEmpty(),
+            actualGoalContribution = defaultGoalContribution?.let { LocalizedAmountFormatter.formatEditableAmount(it, locale) }.orEmpty(),
             flexibleSpendMax = flexibleMax,
             goalContributionMax = goalMax,
             insight = insight,
@@ -350,8 +355,8 @@ class HomeViewModel @Inject constructor(
             return
         }
 
-        val actualFlexible = uiState.value.reviewCard.actualFlexibleSpend.toBigDecimalOrNull()
-        val actualGoal = uiState.value.reviewCard.actualGoalContribution.toBigDecimalOrNull()
+        val actualFlexible = LocalizedAmountFormatter.parseAmount(uiState.value.reviewCard.actualFlexibleSpend, locale)
+        val actualGoal = LocalizedAmountFormatter.parseAmount(uiState.value.reviewCard.actualGoalContribution, locale)
         if (actualFlexible == null || actualGoal == null) {
             uiState.update { it.copy(reviewCard = it.reviewCard.copy(error = "home_review_error_invalid_amounts")) }
             return
@@ -477,7 +482,7 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    private fun sanitizeNumber(value: String): String = value.filter { it.isDigit() || it == '.' }
+    private fun sanitizeNumber(value: String): String = LocalizedAmountFormatter.sanitizeAmountInput(value, locale)
 
     private fun reviewRangeMax(value: BigDecimal): Float {
         val doubled = value.multiply(BigDecimal("2")).toFloat()

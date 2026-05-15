@@ -234,7 +234,6 @@
     <string name="rule_add_missing_body">This rule is no longer available. Return to Strategy and choose another rule.</string>
     <string name="rule_add_missing_button">Back to Strategy</string>
     <string name="percentage_prefix" translatable="false">%</string>
-    <string name="currency_prefix" translatable="false">$</string>
     <string name="onboarding_building_title">Finalizing Blueprint</string>
     <string name="onboarding_building_subtitle">Personalizing your logic and safety nets based on your journey.</string>
     <string name="onboarding_building_step_goals">Aligning with your goals</string>
@@ -539,8 +538,6 @@
     <string name="progress_label">Progression</string>
     <string name="price_period_suffix">/ %1$s</string>
     <string name="price_per_period">%1$s / %2$s</string>
-    <string name="fallback_annual_price" translatable="false">$49.99</string>
-    <string name="fallback_monthly_price" translatable="false">$5.99</string>
     <string name="advertisement_label">Publicité</string>
     <string name="google_sign_in_button">Se connecter avec Google</string>
     <string name="home_tab_plan">Plan</string>

@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.ms.myshare.R
 import pt.ms.myshare.presentation.ui.components.*
+import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.presentation.ui.theme.*
 import java.math.BigDecimal
 import androidx.compose.runtime.Composable
@@ -339,7 +340,7 @@ private fun ReviewAmountField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
-        prefix = { Text("$") },
+        prefix = { Text(LocalizedAmountFormatter.currencySymbol()) },
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
         modifier = modifier,

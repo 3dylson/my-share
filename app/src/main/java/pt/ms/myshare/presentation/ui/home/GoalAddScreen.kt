@@ -20,6 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import pt.ms.myshare.R
 import pt.ms.myshare.presentation.ui.components.*
+import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.presentation.ui.theme.MyShareBackground
 import pt.ms.myshare.presentation.ui.theme.MyShareSecondary
 
@@ -174,7 +175,7 @@ fun GoalAddScreen(
                 onValueChange = onAmountChanged,
                 label = stringResource(R.string.goal_add_label_amount),
                 placeholder = stringResource(R.string.goal_add_hint_amount),
-                prefix = { Text(stringResource(R.string.currency_prefix), color = MyShareSecondary) }
+                prefix = { Text(LocalizedAmountFormatter.currencySymbol(), color = MyShareSecondary) }
             )
 
             if (state.error != null) {

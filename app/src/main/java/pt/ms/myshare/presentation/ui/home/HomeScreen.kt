@@ -459,6 +459,7 @@ private val HomeDestination.labelRes: Int
 @Preview(showBackground = true)
 @Composable
 private fun HomeScreenPreview() {
+    val currencyFormat = java.text.NumberFormat.getCurrencyInstance(java.util.Locale.getDefault())
     MyShareTheme {
         HomeScreen(
             state = HomeState(
@@ -466,19 +467,19 @@ private fun HomeScreenPreview() {
                 selectedDestination = HomeDestination.PLAN,
                 planCard = HomePlanCardState(
                     nextPaydayLabel = "Payday: 2 April",
-                    incomeLabel = "$1,500.00",
-                    fixedCostsLabel = "$620.00",
-                    flexibleSpendLabel = "$380.00",
-                    savingsLabel = "$300.00",
-                    investingLabel = "$120.00",
-                    weeklySpendLabel = "$87.00",
+                    incomeLabel = currencyFormat.format(1500),
+                    fixedCostsLabel = currencyFormat.format(620),
+                    flexibleSpendLabel = currencyFormat.format(380),
+                    savingsLabel = currencyFormat.format(300),
+                    investingLabel = currencyFormat.format(120),
+                    weeklySpendLabel = currencyFormat.format(87),
                     summary = "A calm split that protects essentials and builds savings."
                 ),
                 goals = listOf(
                     GoalCardState(
                         id = "1",
                         goalName = "Emergency Fund",
-                        goalAmountLabel = "$3,000.00",
+                        goalAmountLabel = currencyFormat.format(3000),
                         targetDateLabel = "On pace for November 2026",
                         progressNote = "Consistency is your greatest asset."
                     )

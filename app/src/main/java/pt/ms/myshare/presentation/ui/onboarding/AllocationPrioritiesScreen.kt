@@ -11,6 +11,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import pt.ms.myshare.R
 import pt.ms.myshare.presentation.ui.components.PremiumTextField
+import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.presentation.ui.theme.*
 import java.math.BigDecimal
 import java.text.NumberFormat
@@ -26,24 +27,24 @@ fun AllocationPrioritiesScreen(
     onBack: () -> Unit,
     onNext: (BigDecimal, BigDecimal, BigDecimal, BigDecimal) -> Unit
 ) {
-    var flex by remember { mutableStateOf(initialFlexibleSpend.toPlainString()) }
-    var sav by remember { mutableStateOf(initialSavings.toPlainString()) }
-    var inv by remember { mutableStateOf(initialInvesting.toPlainString()) }
-    var cry by remember { mutableStateOf(initialCrypto.toPlainString()) }
+    val locale = Locale.getDefault()
+    var flex by remember { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialFlexibleSpend, locale)) }
+    var sav by remember { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialSavings, locale)) }
+    var inv by remember { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialInvesting, locale)) }
+    var cry by remember { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialCrypto, locale)) }
 
-    val parsedFlex = flex.toBigDecimalOrNull() ?: BigDecimal.ZERO
-    val parsedSav = sav.toBigDecimalOrNull() ?: BigDecimal.ZERO
-    val parsedInv = inv.toBigDecimalOrNull() ?: BigDecimal.ZERO
-    val parsedCry = cry.toBigDecimalOrNull() ?: BigDecimal.ZERO
+    val parsedFlex = LocalizedAmountFormatter.parseAmount(flex, locale) ?: BigDecimal.ZERO
+    val parsedSav = LocalizedAmountFormatter.parseAmount(sav, locale) ?: BigDecimal.ZERO
+    val parsedInv = LocalizedAmountFormatter.parseAmount(inv, locale) ?: BigDecimal.ZERO
+    val parsedCry = LocalizedAmountFormatter.parseAmount(cry, locale) ?: BigDecimal.ZERO
 
     val allocated = parsedFlex + parsedSav + parsedInv + parsedCry
     val remaining = totalAvailable - allocated
     val hasAvailableIncome = totalAvailable > BigDecimal.ZERO
     val isValid = hasAvailableIncome && remaining.compareTo(BigDecimal.ZERO) == 0
 
-    val locale = Locale.getDefault()
     val currency = NumberFormat.getCurrencyInstance(locale)
-    val symbol = currency.currency?.symbol ?: ""
+    val symbol = LocalizedAmountFormatter.currencySymbol(locale)
 
     OnboardingStepScaffold(
         title = stringResource(R.string.onboarding_priorities_title),
@@ -106,7 +107,7 @@ fun AllocationPrioritiesScreen(
             Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
                 PremiumTextField(
                     value = flex,
-                    onValueChange = { flex = it.replace(',', '.') },
+                    onValueChange = { flex = LocalizedAmountFormatter.sanitizeAmountInput(it, locale) },
                     label = stringResource(R.string.onboarding_priorities_label_flex),
                     prefix = { Text("$symbol ") },
                     placeholder = stringResource(R.string.amount_placeholder_decimal),
@@ -115,7 +116,7 @@ fun AllocationPrioritiesScreen(
                 )
                 PremiumTextField(
                     value = sav,
-                    onValueChange = { sav = it.replace(',', '.') },
+                    onValueChange = { sav = LocalizedAmountFormatter.sanitizeAmountInput(it, locale) },
                     label = stringResource(R.string.onboarding_priorities_label_sav),
                     prefix = { Text("$symbol ") },
                     placeholder = stringResource(R.string.amount_placeholder_decimal),
@@ -124,7 +125,7 @@ fun AllocationPrioritiesScreen(
                 )
                 PremiumTextField(
                     value = inv,
-                    onValueChange = { inv = it.replace(',', '.') },
+                    onValueChange = { inv = LocalizedAmountFormatter.sanitizeAmountInput(it, locale) },
                     label = stringResource(R.string.onboarding_priorities_label_inv),
                     prefix = { Text("$symbol ") },
                     placeholder = stringResource(R.string.amount_placeholder_decimal),
@@ -133,7 +134,7 @@ fun AllocationPrioritiesScreen(
                 )
                 PremiumTextField(
                     value = cry,
-                    onValueChange = { cry = it.replace(',', '.') },
+                    onValueChange = { cry = LocalizedAmountFormatter.sanitizeAmountInput(it, locale) },
                     label = stringResource(R.string.onboarding_priorities_label_cry),
                     prefix = { Text("$symbol ") },
                     placeholder = stringResource(R.string.amount_placeholder_decimal),

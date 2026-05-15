@@ -310,7 +310,7 @@ fun PremiumGoalCard(
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "${(progress * 100).toInt()}%",
+                        text = java.text.NumberFormat.getPercentInstance(java.util.Locale.getDefault()).format(progress),
                         style = MaterialTheme.typography.labelSmall,
                         color = color,
                         fontWeight = FontWeight.Black
@@ -1450,7 +1450,12 @@ fun PremiumSliderCard(
     valueRange: ClosedFloatingPointRange<Float>,
     modifier: Modifier = Modifier,
     icon: androidx.compose.ui.graphics.vector.ImageVector? = null,
-    formatValue: (Float) -> String = { "%.2f".format(it) }
+    formatValue: (Float) -> String = {
+        java.text.NumberFormat.getNumberInstance(java.util.Locale.getDefault()).apply {
+            minimumFractionDigits = 2
+            maximumFractionDigits = 2
+        }.format(it)
+    }
 ) {
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     

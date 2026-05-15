@@ -12,8 +12,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.repository.PlannerRepository
+import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
 import timber.log.Timber
@@ -59,7 +61,7 @@ class GoalAddViewModel @Inject constructor(
                     it.copy(
                         goalId = goal.id,
                         name = goal.name,
-                        amount = goal.targetAmount.toPlainString(),
+                        amount = LocalizedAmountFormatter.formatEditableAmount(goal.targetAmount, Locale.getDefault()),
                         createdAt = goal.createdAt,
                         isLoading = false
                     )
@@ -82,7 +84,7 @@ class GoalAddViewModel @Inject constructor(
     }
 
     fun onAmountChanged(newAmount: String) {
-        _state.update { it.copy(amount = newAmount, error = null) }
+        _state.update { it.copy(amount = LocalizedAmountFormatter.sanitizeAmountInput(newAmount), error = null) }
     }
 
     fun saveGoal() {
@@ -91,7 +93,7 @@ class GoalAddViewModel @Inject constructor(
             return
         }
 
-        val amount = _state.value.amount.toBigDecimalOrNull() ?: BigDecimal.ZERO
+        val amount = LocalizedAmountFormatter.parseAmount(_state.value.amount) ?: BigDecimal.ZERO
         if (_state.value.name.isBlank() || amount <= BigDecimal.ZERO) {
             _state.update { it.copy(error = "goal_add_error_invalid_name_amount") }
             return

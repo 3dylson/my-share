@@ -35,6 +35,8 @@ import pt.ms.myshare.presentation.ui.theme.MyShareOutline
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
 import pt.ms.myshare.presentation.ui.theme.MySharePrimaryContainer
 import pt.ms.myshare.presentation.ui.theme.MyShareSecondary
+import java.text.NumberFormat
+import java.util.Locale
 
 @OptIn(ExperimentalFoundationApi::class)
 fun LazyListScope.homeStrategyTab(
@@ -237,7 +239,7 @@ private fun CompactStrategyGoalCard(
                     )
                 }
                 Text(
-                    text = "${(progress * 100).toInt()}%",
+                    text = NumberFormat.getPercentInstance(Locale.getDefault()).format(progress),
                     style = MaterialTheme.typography.titleMedium,
                     color = MySharePrimary,
                     fontWeight = FontWeight.Black

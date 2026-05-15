@@ -21,6 +21,7 @@ import androidx.navigation.NavController
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.PaydayRuleType
 import pt.ms.myshare.presentation.ui.components.*
+import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.presentation.ui.theme.MyShareBackground
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
 import pt.ms.myshare.presentation.ui.theme.MyShareSecondary
@@ -217,7 +218,7 @@ fun RuleAddScreen(
                 placeholder = if (state.isPercentage) stringResource(R.string.rule_add_hint_rate) else stringResource(R.string.rule_add_hint_amount),
                 prefix = { 
                     Text(
-                        text = if (state.isPercentage) stringResource(R.string.percentage_prefix) else stringResource(R.string.currency_prefix), 
+                        text = if (state.isPercentage) stringResource(R.string.percentage_prefix) else LocalizedAmountFormatter.currencySymbol(),
                         color = MyShareSecondary
                     ) 
                 }
