@@ -361,45 +361,43 @@ fun HomeScreen(
             }
         },
         bottomBar = {
-            Column(modifier = Modifier.navigationBarsPadding()) {
-                NavigationBar(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
-                    tonalElevation = 8.dp,
-                    modifier = Modifier.background(MaterialTheme.colorScheme.surface.copy(alpha = 0.95f))
-                ) {
-                    HomeDestination.entries.forEach { destination ->
-                        val isSelected = state.selectedDestination == destination
-                        NavigationBarItem(
-                            selected = isSelected,
-                            onClick = {
-                                if (!isSelected) haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
-                                Timber.tag("HomeScreen").d("Home tab selected: %s", destination.name)
-                                onDestinationSelected(destination)
-                            },
-                            icon = {
-                                val icon = when (destination) {
-                                    HomeDestination.PLAN -> if (isSelected) Icons.Filled.CalendarToday else Icons.Outlined.CalendarToday
-                                    HomeDestination.STRATEGY -> if (isSelected) Icons.Filled.Lightbulb else Icons.Outlined.Lightbulb
-                                    HomeDestination.REVIEW -> if (isSelected) Icons.Filled.AutoGraph else Icons.Outlined.AutoGraph
-                                    HomeDestination.MORE -> if (isSelected) Icons.Filled.MoreHoriz else Icons.Outlined.MoreHoriz
-                                }
-                                Icon(icon, contentDescription = null)
-                            },
-                            label = { 
-                                Text(
-                                    stringResource(destination.labelRes),
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                                ) 
-                            },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = MySharePrimary,
-                                selectedTextColor = MySharePrimary,
-                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                indicatorColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f)
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
+                tonalElevation = 8.dp,
+                modifier = Modifier.background(MaterialTheme.colorScheme.surface.copy(alpha = 0.95f))
+            ) {
+                HomeDestination.entries.forEach { destination ->
+                    val isSelected = state.selectedDestination == destination
+                    NavigationBarItem(
+                        selected = isSelected,
+                        onClick = {
+                            if (!isSelected) haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                            Timber.tag("HomeScreen").d("Home tab selected: %s", destination.name)
+                            onDestinationSelected(destination)
+                        },
+                        icon = {
+                            val icon = when (destination) {
+                                HomeDestination.PLAN -> if (isSelected) Icons.Filled.CalendarToday else Icons.Outlined.CalendarToday
+                                HomeDestination.STRATEGY -> if (isSelected) Icons.Filled.Lightbulb else Icons.Outlined.Lightbulb
+                                HomeDestination.REVIEW -> if (isSelected) Icons.Filled.AutoGraph else Icons.Outlined.AutoGraph
+                                HomeDestination.MORE -> if (isSelected) Icons.Filled.MoreHoriz else Icons.Outlined.MoreHoriz
+                            }
+                            Icon(icon, contentDescription = null)
+                        },
+                        label = {
+                            Text(
+                                stringResource(destination.labelRes),
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                             )
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MySharePrimary,
+                            selectedTextColor = MySharePrimary,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            indicatorColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f)
                         )
-                    }
+                    )
                 }
             }
         }
@@ -429,7 +427,7 @@ fun HomeScreen(
                     start = 24.dp,
                     end = 24.dp,
                     top = innerPadding.calculateTopPadding() + 24.dp,
-                    bottom = innerPadding.calculateBottomPadding() + 104.dp
+                    bottom = innerPadding.calculateBottomPadding() + 24.dp
                 ),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
