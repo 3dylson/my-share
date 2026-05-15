@@ -81,6 +81,10 @@ fun LazyListScope.homeStrategyTab(
             key = { it.id }
         ) { goal ->
             val context = LocalContext.current
+            val localizedGoalName = goal.goalNameKey?.let {
+                val resId = context.resources.getIdentifier(it, "string", context.packageName)
+                if (resId != 0) context.getString(resId) else null
+            } ?: goal.goalName
             val progressLabel = if (goal.progressLabelKey != null) {
                 stringResource(
                     context.resources.getIdentifier(goal.progressLabelKey, "string", context.packageName),
@@ -96,7 +100,7 @@ fun LazyListScope.homeStrategyTab(
             } else goal.targetDateLabel
 
             CompactStrategyGoalCard(
-                goalName = goal.goalName,
+                goalName = localizedGoalName,
                 targetAmountLabel = goal.goalAmountLabel,
                 progress = goal.progress,
                 progressLabel = progressLabel,
@@ -152,8 +156,12 @@ fun LazyListScope.homeStrategyTab(
                 val resId = context.resources.getIdentifier(it, "string", context.packageName)
                 if (resId != 0) context.getString(resId) else null
             } ?: rule.typeLabel
+            val localizedRuleName = rule.nameKey?.let {
+                val resId = context.resources.getIdentifier(it, "string", context.packageName)
+                if (resId != 0) context.getString(resId) else null
+            } ?: rule.name
             CompactStrategyRuleCard(
-                ruleName = rule.name,
+                ruleName = localizedRuleName,
                 amountLabel = rule.amountLabel,
                 typeLabel = if (rule.name.equals(rule.typeLabel, ignoreCase = true)) {
                     stringResource(R.string.home_strategy_rule_card_subtitle)

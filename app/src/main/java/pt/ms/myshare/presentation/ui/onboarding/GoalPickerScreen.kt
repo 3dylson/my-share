@@ -38,6 +38,7 @@ fun GoalPickerScreen(
     var validationRequested by remember { mutableStateOf(false) }
 
     val currencySymbol = remember(locale) { LocalizedAmountFormatter.currencySymbol(locale) }
+    val amountPlaceholder = remember(locale) { LocalizedAmountFormatter.amountPlaceholder(locale) }
     val goalAmount = LocalizedAmountFormatter.parseAmount(goalAmountText, locale)
     val goalNameError = validationRequested && goalName.isBlank()
     val goalAmountError = validationRequested && (goalAmount == null || goalAmount <= BigDecimal.ZERO)
@@ -152,7 +153,7 @@ fun GoalPickerScreen(
                 },
                 label = stringResource(R.string.onboarding_goal_picker_label_amount),
                 prefix = { if (currencySymbol.isNotEmpty()) Text("$currencySymbol ") },
-                placeholder = stringResource(R.string.amount_placeholder_decimal),
+                placeholder = amountPlaceholder,
                 isError = goalAmountError,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )

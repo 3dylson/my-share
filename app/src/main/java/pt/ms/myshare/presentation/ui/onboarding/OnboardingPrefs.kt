@@ -2,6 +2,7 @@ package pt.ms.myshare.presentation.ui.onboarding
 
 import android.content.Context
 import androidx.preference.PreferenceManager
+import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.AllocationPreset
 import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.model.GoalType
@@ -94,7 +95,11 @@ object OnboardingPrefs {
             netSalary = netSalary,
             schedule = schedule,
             preset = preset,
-            goal = Goal(targetAmount = goalAmount, type = goalType, name = goalLabel ?: "Emergency Fund")
+            goal = Goal(
+                targetAmount = goalAmount,
+                type = goalType,
+                name = goalLabel ?: context.getString(goalType.defaultNameRes)
+            )
         )
     }
 
@@ -109,4 +114,11 @@ object OnboardingPrefs {
     }
 
     private fun prefs(context: Context) = PreferenceManager.getDefaultSharedPreferences(context)
+
+    private val GoalType.defaultNameRes: Int
+        get() = when (this) {
+            GoalType.EMERGENCY_FUND -> R.string.goal_default_emergency_fund
+            GoalType.INVEST_TARGET -> R.string.goal_default_investing_base
+            GoalType.CUSTOM -> R.string.goal_default_name
+        }
 }

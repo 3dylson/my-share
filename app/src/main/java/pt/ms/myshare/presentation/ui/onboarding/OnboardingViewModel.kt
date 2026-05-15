@@ -62,6 +62,12 @@ class OnboardingViewModel @Inject constructor(
                 selectedBillingPlan = pricing.heroPlan
             )
         }
+        if (!completed) {
+            FirebaseUtils.logEvent("onboarding_started", Bundle().apply {
+                putString("price_cluster", pricing.marketCluster)
+                putString("language", Locale.getDefault().language)
+            })
+        }
         viewModelScope.launch {
             val isPremium = entitlementRepository.isPro.first()
             state.update { current -> current.copy(isPremium = isPremium) }
@@ -196,6 +202,10 @@ class OnboardingViewModel @Inject constructor(
 
     fun setSelectedBillingPlan(plan: BillingPlan) {
         state.update { it.copy(selectedBillingPlan = plan, billingMessage = null) }
+        FirebaseUtils.logEvent("paywall_plan_selected", Bundle().apply {
+            putString("billing_plan", plan.name.lowercase(Locale.US))
+            putString("price_cluster", state.value.pricingStrategy?.marketCluster)
+        })
     }
 
     fun purchasePremium(activity: android.app.Activity) {
@@ -267,7 +277,7 @@ class OnboardingViewModel @Inject constructor(
                 allocatedSavings = BigDecimal("300"),
                 allocatedInvesting = BigDecimal("200"),
                 allocatedCrypto = BigDecimal.ZERO,
-                goalName = "Emergency fund",
+                goalName = "",
                 goalAmount = BigDecimal("5000"),
                 planSaved = true,
                 reminderSkipped = true,
@@ -284,7 +294,13 @@ class OnboardingViewModel @Inject constructor(
                 preset = AllocationPreset.BALANCED
             )
             plannerRepository.savePlan(plan)
-            plannerRepository.saveGoal(Goal(name = "Emergency fund", targetAmount = BigDecimal("5000")))
+            plannerRepository.saveGoal(
+                Goal(
+                    name = "",
+                    targetAmount = BigDecimal("5000"),
+                    type = GoalType.EMERGENCY_FUND
+                )
+            )
             plannerRepository.setOnboardingCompleted(true)
             state.update { it.copy(onboardingCompleted = true) }
         }

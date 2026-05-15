@@ -201,7 +201,7 @@ class PlannerRepositoryImpl @Inject constructor(
                         targetAmount = doc.getString("targetAmount")?.toBigDecimalOrNull() ?: BigDecimal.ZERO,
                         currentProgress = doc.getString("currentProgress")?.toBigDecimalOrNull() ?: BigDecimal.ZERO,
                         type = doc.getString("type")?.let { GoalType.valueOf(it) } ?: GoalType.CUSTOM,
-                        name = doc.getString("name") ?: "Goal",
+                        name = doc.getString("name").orEmpty(),
                         createdAt = doc.getString("createdAtDate")?.let { LocalDate.parse(it) } ?: LocalDate.now(),
                         isCompleted = doc.getBoolean("isCompleted") ?: false
                     )
@@ -457,7 +457,6 @@ class PlannerRepositoryImpl @Inject constructor(
 
         val fixedCosts = prefs.getString(KEY_MONTHLY_FIXED_COSTS, null)?.toBigDecimalOrNull() ?: BigDecimal.ZERO
         val payFrequency = prefs.getString(KEY_PAY_FREQUENCY, null)?.let { runCatching { PayFrequency.valueOf(it) }.getOrNull() } ?: PayFrequency.MONTHLY
-        val goalName = prefs.getString(KEY_GOAL_NAME, null).orEmpty().ifBlank { "Emergency fund" }
         val createdAtEpoch = prefs.getLong(KEY_PLAN_CREATED_AT_EPOCH, LocalDate.now().toEpochDay())
         val monthlyPayday = prefs.getInt(KEY_MONTHLY_PAYDAY, 1).coerceIn(1, 31)
         val biweeklyEpoch = prefs.getLong(KEY_BIWEEKLY_PAYDAY_EPOCH, NO_EPOCH)

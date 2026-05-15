@@ -23,6 +23,14 @@ object LocalizedAmountFormatter {
         return formatter.format(amount)
     }
 
+    fun amountPlaceholder(locale: Locale = Locale.getDefault()): String {
+        val formatter = NumberFormat.getNumberInstance(locale) as DecimalFormat
+        formatter.isGroupingUsed = false
+        formatter.minimumFractionDigits = 2
+        formatter.maximumFractionDigits = 2
+        return formatter.format(BigDecimal.ZERO)
+    }
+
     fun formatPercentage(percentValue: BigDecimal, locale: Locale = Locale.getDefault()): String {
         val formatter = NumberFormat.getPercentInstance(locale)
         formatter.minimumFractionDigits = 0
@@ -41,7 +49,16 @@ object LocalizedAmountFormatter {
         val decimalSeparator = symbols.decimalSeparator
         val groupingSeparator = symbols.groupingSeparator
         val normalized = normalizeSeparators(compact, decimalSeparator, groupingSeparator)
-            .filter { it.isDigit() || it == '.' || it == '-' }
+            .mapNotNull { char ->
+                when {
+                    char.isDigit() -> Character.getNumericValue(char)
+                        .takeIf { it in 0..9 }
+                        ?.let { ('0'.code + it).toChar() }
+                    char == '.' || char == '-' -> char
+                    else -> null
+                }
+            }
+            .joinToString("")
 
         return normalized.toBigDecimalOrNull()
     }

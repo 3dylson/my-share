@@ -38,6 +38,7 @@ fun SalaryAndScheduleScreen(
     var validationRequested by remember { mutableStateOf(false) }
 
     val currencySymbol = remember(locale) { LocalizedAmountFormatter.currencySymbol(locale) }
+    val amountPlaceholder = remember(locale) { LocalizedAmountFormatter.amountPlaceholder(locale) }
     val income = LocalizedAmountFormatter.parseAmount(incomeText, locale)
     val payday = paydayText.toIntOrNull()
     val incomeError = validationRequested && (income == null || income <= BigDecimal.ZERO)
@@ -69,7 +70,7 @@ fun SalaryAndScheduleScreen(
                 value = incomeText,
                 onValueChange = { incomeText = LocalizedAmountFormatter.sanitizeAmountInput(it, locale) },
                 label = stringResource(R.string.onboarding_salary_label_amount),
-                placeholder = stringResource(R.string.amount_placeholder_decimal),
+                placeholder = amountPlaceholder,
                 prefix = { if (currencySymbol.isNotEmpty()) Text("$currencySymbol ") },
                 isError = incomeError,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)

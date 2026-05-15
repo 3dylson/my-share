@@ -22,10 +22,24 @@ class LocalizedAmountFormatterTest {
     }
 
     @Test
+    fun `parseAmount accepts Arabic Indic digits`() {
+        val result = LocalizedAmountFormatter.parseAmount("١٢٣٤٫٥٦", Locale.forLanguageTag("ar"))
+
+        assertEquals(BigDecimal("1234.56"), result)
+    }
+
+    @Test
     fun `formatEditableAmount uses locale decimal separator without grouping`() {
         val result = LocalizedAmountFormatter.formatEditableAmount(BigDecimal("1234.56"), Locale.forLanguageTag("pt-PT"))
 
         assertEquals("1234,56", result)
+    }
+
+    @Test
+    fun `amountPlaceholder uses locale decimal separator`() {
+        val result = LocalizedAmountFormatter.amountPlaceholder(Locale.forLanguageTag("pt-PT"))
+
+        assertEquals("0,00", result)
     }
 
     @Test

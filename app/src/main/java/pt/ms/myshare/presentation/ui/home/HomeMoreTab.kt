@@ -55,22 +55,31 @@ fun LazyListScope.homeMoreTab(
         item {
             Column(modifier = Modifier.padding(bottom = 20.dp)) {
                 PremiumSectionHeader(title = stringResource(R.string.home_more_premium_title))
-                CompactBillingPlanRow(
-                    title = stringResource(R.string.home_more_annual_title),
-                    price = state.actualAnnualPrice ?: state.pricingStrategy?.annualLabel.orEmpty(),
-                    period = stringResource(R.string.period_year),
-                    badge = stringResource(R.string.home_more_annual_badge),
-                    isSelected = state.selectedBillingPlan == BillingPlan.ANNUAL,
-                    onClick = { onBillingPlanSelected(BillingPlan.ANNUAL) }
-                )
-                Spacer(Modifier.height(10.dp))
-                CompactBillingPlanRow(
-                    title = stringResource(R.string.home_more_monthly_title),
-                    price = state.actualMonthlyPrice ?: state.pricingStrategy?.monthlyLabel.orEmpty(),
-                    period = stringResource(R.string.period_month),
-                    isSelected = state.selectedBillingPlan == BillingPlan.MONTHLY,
-                    onClick = { onBillingPlanSelected(BillingPlan.MONTHLY) }
-                )
+                val planOrder = if (state.pricingStrategy?.heroPlan == BillingPlan.ANNUAL) {
+                    listOf(BillingPlan.ANNUAL, BillingPlan.MONTHLY)
+                } else {
+                    listOf(BillingPlan.MONTHLY, BillingPlan.ANNUAL)
+                }
+                planOrder.forEachIndexed { index, plan ->
+                    CompactBillingPlanRow(
+                        title = stringResource(plan.moreTitleRes),
+                        price = when (plan) {
+                            BillingPlan.MONTHLY -> state.actualMonthlyPrice
+                            BillingPlan.ANNUAL -> state.actualAnnualPrice
+                        } ?: stringResource(R.string.paywall_price_loading),
+                        period = stringResource(plan.morePeriodRes),
+                        badge = when {
+                            plan == BillingPlan.ANNUAL -> stringResource(R.string.home_more_annual_badge)
+                            plan == state.pricingStrategy?.heroPlan -> stringResource(R.string.paywall_badge_easy_start)
+                            else -> null
+                        },
+                        isSelected = state.selectedBillingPlan == plan,
+                        onClick = { onBillingPlanSelected(plan) }
+                    )
+                    if (index != planOrder.lastIndex) {
+                        Spacer(Modifier.height(10.dp))
+                    }
+                }
                 Spacer(Modifier.height(12.dp))
                 val selectedPrice = if (state.selectedBillingPlan == BillingPlan.ANNUAL) {
                     state.actualAnnualPrice
@@ -135,6 +144,8 @@ fun LazyListScope.homeMoreTab(
                 PremiumButton(
                     text = if (state.isBillingActionInProgress) {
                         stringResource(R.string.paywall_upgrade_loading)
+                    } else if (selectedPrice == null) {
+                        stringResource(R.string.paywall_price_loading)
                     } else if (selectedTrialDays != null) {
                         stringResource(R.string.paywall_start_trial_button)
                     } else {
@@ -144,7 +155,9 @@ fun LazyListScope.homeMoreTab(
                         if (!state.isBillingActionInProgress) {
                             activity?.let(onUnlockPremium)
                         }
-                    }
+                    },
+                    enabled = selectedPrice != null && !state.isBillingActionInProgress,
+                    isLoading = state.isBillingActionInProgress
                 )
             }
         }
@@ -258,6 +271,16 @@ fun LazyListScope.homeMoreTab(
 
     item {
         PremiumSettingsGroup(title = stringResource(R.string.home_more_account_title)) {
+            val uriHandler = LocalUriHandler.current
+            PremiumSettingsRow(
+                title = stringResource(R.string.home_more_account_manage_subscription),
+                subtitle = stringResource(R.string.home_more_account_manage_subscription_desc),
+                icon = Icons.Default.Payment,
+                iconColor = MySharePrimary,
+                onClick = {
+                    uriHandler.openUri("https://play.google.com/store/account/subscriptions?package=pt.ms.myshare")
+                }
+            )
             PremiumSettingsRow(
                 title = stringResource(R.string.home_more_account_signout),
                 subtitle = stringResource(R.string.home_more_account_signout_desc),
@@ -364,3 +387,15 @@ private fun CompactBillingPlanRow(
         }
     }
 }
+
+private val BillingPlan.moreTitleRes: Int
+    get() = when (this) {
+        BillingPlan.MONTHLY -> R.string.home_more_monthly_title
+        BillingPlan.ANNUAL -> R.string.home_more_annual_title
+    }
+
+private val BillingPlan.morePeriodRes: Int
+    get() = when (this) {
+        BillingPlan.MONTHLY -> R.string.period_month
+        BillingPlan.ANNUAL -> R.string.period_year
+    }

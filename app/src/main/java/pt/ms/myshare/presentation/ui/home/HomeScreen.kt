@@ -478,7 +478,7 @@ private fun HomeScreenPreview() {
                 goals = listOf(
                     GoalCardState(
                         id = "1",
-                        goalName = "Emergency Fund",
+                        goalNameKey = "goal_default_emergency_fund",
                         goalAmountLabel = currencyFormat.format(3000),
                         targetDateLabel = "On pace for November 2026",
                         progressNote = "Consistency is your greatest asset."

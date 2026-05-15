@@ -31,6 +31,7 @@ data class HomePlanCardState(
 data class GoalCardState(
     val id: String,
     val goalName: String = "",
+    val goalNameKey: String? = null,
     val goalAmountLabel: String = "",
     val progress: Float = 0f,
     val progressLabel: String = "",
@@ -67,7 +68,8 @@ data class RuleCardState(
     val amountLabel: String,
     val typeLabel: String,
     val isPercentage: Boolean,
-    val typeLabelKey: String? = null
+    val typeLabelKey: String? = null,
+    val nameKey: String? = null
 )
 
 data class MoreCardState(

@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.sp
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.PlanPreview
+import pt.ms.myshare.domain.model.PricingStrategy
+import pt.ms.myshare.domain.model.StoreProduct
 import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.components.PremiumInfoCard
 import pt.ms.myshare.presentation.ui.components.PremiumPaywallCard
@@ -161,8 +163,8 @@ fun PlanPreviewScreen(
 
 @Composable
 fun PaywallScreen(
-    pricingStrategy: pt.ms.myshare.domain.model.PricingStrategy,
-    availableProducts: List<pt.ms.myshare.domain.model.StoreProduct> = emptyList(),
+    pricingStrategy: PricingStrategy,
+    availableProducts: List<StoreProduct> = emptyList(),
     selectedPlan: BillingPlan,
     isBillingActionInProgress: Boolean = false,
     billingMessage: String? = null,
@@ -190,6 +192,7 @@ fun PaywallScreen(
                     BillingPlan.ANNUAL -> it.productId.contains("annual", ignoreCase = true)
                 }
             }
+            val isPurchaseReady = selectedProduct != null && !isBillingActionInProgress
             val selectedPeriod = when (selectedPlan) {
                 BillingPlan.MONTHLY -> stringResource(R.string.paywall_period_month)
                 BillingPlan.ANNUAL -> stringResource(R.string.paywall_period_year)
@@ -211,15 +214,16 @@ fun PaywallScreen(
             }
             PaywallPurchaseFooter(
                 checkoutTerms = checkoutTerms,
-                ctaText = if (selectedTrialDays != null) {
-                    stringResource(R.string.paywall_start_trial_button)
-                } else {
-                    stringResource(R.string.paywall_upgrade_button)
+                ctaText = when {
+                    selectedProduct == null -> stringResource(R.string.paywall_price_loading)
+                    selectedTrialDays != null -> stringResource(R.string.paywall_start_trial_button)
+                    else -> stringResource(R.string.paywall_upgrade_button)
                 },
                 billingMessage = resolvedBillingMessage,
                 isBillingActionInProgress = isBillingActionInProgress,
+                isPurchaseEnabled = isPurchaseReady,
                 onPurchaseClick = {
-                    if (!isBillingActionInProgress) {
+                    if (isPurchaseReady) {
                         activity?.let(onPurchaseSelected)
                     }
                 }
@@ -292,31 +296,49 @@ fun PaywallScreen(
 
             PaywallFeatureGrid()
 
+            Spacer(Modifier.height(16.dp))
+
+            PaywallTrustList()
+
             Spacer(Modifier.height(22.dp))
 
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 val monthlyProduct = availableProducts.find { it.productId.contains("monthly", ignoreCase = true) }
                 val annualProduct = availableProducts.find { it.productId.contains("annual", ignoreCase = true) }
                 val hasLivePrices = monthlyProduct != null || annualProduct != null
+                val planCards = remember(pricingStrategy.heroPlan, monthlyProduct, annualProduct, selectedPlan, hasLivePrices) {
+                    val monthlyCard = PaywallPlanCardState(
+                        plan = BillingPlan.MONTHLY,
+                        product = monthlyProduct,
+                        badgeKey = if (pricingStrategy.heroPlan == BillingPlan.MONTHLY) {
+                            R.string.paywall_badge_easy_start
+                        } else {
+                            null
+                        }
+                    )
+                    val annualCard = PaywallPlanCardState(
+                        plan = BillingPlan.ANNUAL,
+                        product = annualProduct,
+                        badgeKey = if (hasLivePrices) R.string.paywall_badge_best_value else null
+                    )
+                    if (pricingStrategy.heroPlan == BillingPlan.ANNUAL) {
+                        listOf(annualCard, monthlyCard)
+                    } else {
+                        listOf(monthlyCard, annualCard)
+                    }
+                }
 
-                PremiumPaywallCard(
-                    title = stringResource(R.string.paywall_plan_monthly),
-                    price = monthlyProduct?.price ?: pricingStrategy.monthlyLabel,
-                    period = stringResource(R.string.paywall_period_month),
-                    description = stringResource(R.string.paywall_desc_monthly),
-                    badge = null,
-                    isSelected = selectedPlan == BillingPlan.MONTHLY,
-                    onClick = { onPlanSelected(BillingPlan.MONTHLY) }
-                )
-                PremiumPaywallCard(
-                    title = stringResource(R.string.paywall_plan_annual),
-                    price = annualProduct?.price ?: pricingStrategy.annualLabel,
-                    period = stringResource(R.string.paywall_period_year),
-                    description = stringResource(R.string.paywall_desc_annual),
-                    badge = if (hasLivePrices) stringResource(R.string.paywall_badge_best_value) else null,
-                    isSelected = selectedPlan == BillingPlan.ANNUAL,
-                    onClick = { onPlanSelected(BillingPlan.ANNUAL) }
-                )
+                planCards.forEach { card ->
+                    PremiumPaywallCard(
+                        title = stringResource(card.plan.titleRes),
+                        price = card.product?.price ?: stringResource(R.string.paywall_price_loading),
+                        period = stringResource(card.plan.periodRes),
+                        description = stringResource(card.plan.descriptionRes),
+                        badge = card.badgeKey?.let { stringResource(it) },
+                        isSelected = selectedPlan == card.plan,
+                        onClick = { onPlanSelected(card.plan) }
+                    )
+                }
             }
 
             Spacer(Modifier.height(24.dp))
@@ -330,6 +352,7 @@ private fun PaywallPurchaseFooter(
     ctaText: String,
     billingMessage: String?,
     isBillingActionInProgress: Boolean,
+    isPurchaseEnabled: Boolean,
     onPurchaseClick: () -> Unit
 ) {
     Surface(
@@ -363,7 +386,9 @@ private fun PaywallPurchaseFooter(
                 } else {
                     ctaText
                 },
-                onClick = onPurchaseClick
+                onClick = onPurchaseClick,
+                enabled = isPurchaseEnabled,
+                isLoading = isBillingActionInProgress
             )
         }
     }
@@ -396,6 +421,67 @@ private fun PaywallFooterBillingNotice(
                 color = MyShareSecondary,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+private fun PaywallTrustList() {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        PaywallTrustRow(
+            icon = Icons.Default.Payments,
+            title = stringResource(R.string.paywall_trust_play_title),
+            body = stringResource(R.string.paywall_trust_play_body)
+        )
+        PaywallTrustRow(
+            icon = Icons.Default.Lock,
+            title = stringResource(R.string.paywall_trust_manual_title),
+            body = stringResource(R.string.paywall_trust_manual_body)
+        )
+        PaywallTrustRow(
+            icon = Icons.Default.Cancel,
+            title = stringResource(R.string.paywall_trust_cancel_title),
+            body = stringResource(R.string.paywall_trust_cancel_body)
+        )
+    }
+}
+
+@Composable
+private fun PaywallTrustRow(
+    icon: ImageVector,
+    title: String,
+    body: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Surface(
+            shape = RoundedCornerShape(8.dp),
+            color = MySharePrimaryContainer.copy(alpha = 0.42f)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MySharePrimary,
+                modifier = Modifier.padding(7.dp).size(18.dp)
+            )
+        }
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelLarge,
+                color = MyShareOnSurface,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = body,
+                style = MaterialTheme.typography.bodySmall,
+                color = MyShareSecondary,
+                lineHeight = 17.sp
             )
         }
     }
@@ -477,6 +563,30 @@ private fun CompactPaywallFeature(
         }
     }
 }
+
+private data class PaywallPlanCardState(
+    val plan: BillingPlan,
+    val product: StoreProduct?,
+    val badgeKey: Int?
+)
+
+private val BillingPlan.titleRes: Int
+    get() = when (this) {
+        BillingPlan.MONTHLY -> R.string.paywall_plan_monthly
+        BillingPlan.ANNUAL -> R.string.paywall_plan_annual
+    }
+
+private val BillingPlan.periodRes: Int
+    get() = when (this) {
+        BillingPlan.MONTHLY -> R.string.paywall_period_month
+        BillingPlan.ANNUAL -> R.string.paywall_period_year
+    }
+
+private val BillingPlan.descriptionRes: Int
+    get() = when (this) {
+        BillingPlan.MONTHLY -> R.string.paywall_desc_monthly
+        BillingPlan.ANNUAL -> R.string.paywall_desc_annual
+    }
 
 @Composable
 fun MissionStepCard(

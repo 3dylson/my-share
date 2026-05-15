@@ -179,27 +179,34 @@ class HomeViewModel @Inject constructor(
                 
                 val monthlyProduct = products.find { it.productId == PremiumSubscriptionProducts.MONTHLY_ID }
                 val annualProduct = products.find { it.productId == PremiumSubscriptionProducts.ANNUAL_ID }
+                val currentMore = uiState.value.moreCard
+                val selectedBillingPlan = if (currentMore.pricingStrategy == null) {
+                    pricingStrategy.heroPlan
+                } else {
+                    currentMore.selectedBillingPlan
+                }
 
                 val moreCard = MoreCardState(
                     reminderEnabled = reminder.enabled,
-                    reminderLabelKey = if (reminder.enabled) "home_more_reminder_at_time" else "home_more_reminders_off",
+                    reminderLabelKey = if (reminder.enabled) {
+                        reminder.cadence.labelAtTimeKey
+                    } else {
+                        "home_more_reminders_off"
+                    },
                     reminderLabelArgs = if (reminder.enabled) {
                         listOf(
-                            reminder.cadence.name.replace('_', ' ')
-                                .lowercase(Locale.getDefault())
-                                .replaceFirstChar { it.titlecase(Locale.getDefault()) },
                             "${reminder.hourOfDay.toString().padStart(2, '0')}:${reminder.minute.toString().padStart(2, '0')}"
                         )
                     } else {
                         emptyList()
                     },
                     pricingStrategy = pricingStrategy,
-                    actualMonthlyPrice = monthlyProduct?.price ?: pricingStrategy.monthlyLabel,
-                    actualAnnualPrice = annualProduct?.price ?: pricingStrategy.annualLabel,
+                    actualMonthlyPrice = monthlyProduct?.price,
+                    actualAnnualPrice = annualProduct?.price,
                     actualMonthlyTrialDays = monthlyProduct?.freeTrialDays?.takeIf { it > 0 },
                     actualAnnualTrialDays = annualProduct?.freeTrialDays?.takeIf { it > 0 },
                     showAdsConsentOption = uiState.value.moreCard.showAdsConsentOption,
-                    selectedBillingPlan = pricingStrategy.heroPlan,
+                    selectedBillingPlan = selectedBillingPlan,
                     isPremium = isPremium,
                     automationEnabled = automation,
                     userEmail = user?.email
@@ -273,9 +280,8 @@ class HomeViewModel @Inject constructor(
         val (targetDateKey, targetDateArgs) = if (goal.isCompleted) {
             "home_goal_mission_accomplished" to emptyList()
         } else {
-            preview?.goalTargetDate?.let { 
-                val monthStr = it.month.name.lowercase().replaceFirstChar(Char::titlecase)
-                "home_goal_on_pace" to listOf("$monthStr ${it.year}")
+            preview?.goalTargetDate?.let {
+                "home_goal_on_pace" to listOf(it.format(DateTimeFormatter.ofPattern("MMMM yyyy", locale)))
             } ?: ("home_goal_no_trajectory" to emptyList())
         }
         
@@ -286,6 +292,7 @@ class HomeViewModel @Inject constructor(
         return GoalCardState(
             id = goal.id,
             goalName = goal.name,
+            goalNameKey = goal.defaultNameKey,
             goalAmountLabel = currencyFormat.format(goal.targetAmount),
             progress = progressPercent,
             progressLabelKey = "home_goal_progress_label",
@@ -308,7 +315,8 @@ class HomeViewModel @Inject constructor(
             amountLabel = amountLabel,
             typeLabel = rule.type.name.lowercase().replaceFirstChar { it.titlecase() },
             typeLabelKey = rule.type.labelKey,
-            isPercentage = rule.isPercentage
+            isPercentage = rule.isPercentage,
+            nameKey = rule.defaultNameKey
         )
     }
 
@@ -397,6 +405,10 @@ class HomeViewModel @Inject constructor(
 
     fun chooseBillingPlan(plan: BillingPlan) {
         uiState.update { it.copy(moreCard = it.moreCard.copy(selectedBillingPlan = plan, billingMessage = null)) }
+        FirebaseUtils.logEvent("paywall_plan_selected", android.os.Bundle().apply {
+            putString("billing_plan", plan.name.lowercase(Locale.US))
+            putString("price_cluster", pricingStrategy.marketCluster)
+        })
     }
 
     fun unlockPremium(activity: android.app.Activity) {
@@ -410,7 +422,12 @@ class HomeViewModel @Inject constructor(
             }
             if (realProduct != null) {
                 entitlementRepository.purchasePlan(activity, realProduct)
-                FirebaseUtils.logEvent("purchase_started")
+                FirebaseUtils.logEvent("purchase_started", android.os.Bundle().apply {
+                    putString("billing_plan", uiState.value.moreCard.selectedBillingPlan.name.lowercase(Locale.US))
+                    putString("price_cluster", pricingStrategy.marketCluster)
+                    putString("product_id", realProduct.productId)
+                    putBoolean("has_trial", realProduct.hasFreeTrial)
+                })
                 uiState.update {
                     it.copy(moreCard = it.moreCard.copy(isBillingActionInProgress = false, billingMessage = "paywall_billing_handoff"))
                 }
@@ -493,7 +510,21 @@ class HomeViewModel @Inject constructor(
     private companion object {
         const val TAG = "HomeViewModel"
     }
-}
+    }
+
+private val Goal.defaultNameKey: String?
+    get() = when {
+        name.isBlank() -> when (type) {
+            pt.ms.myshare.domain.model.GoalType.EMERGENCY_FUND -> "goal_default_emergency_fund"
+            pt.ms.myshare.domain.model.GoalType.INVEST_TARGET -> "goal_default_investing_base"
+            pt.ms.myshare.domain.model.GoalType.CUSTOM -> "goal_default_name"
+        }
+        name.equals("Emergency fund", ignoreCase = true) -> "goal_default_emergency_fund"
+        name.equals("Investing base", ignoreCase = true) -> "goal_default_investing_base"
+        name.equals("Cash buffer", ignoreCase = true) -> "goal_default_cash_buffer"
+        name.equals("Shared safety net", ignoreCase = true) -> "goal_default_shared_safety_net"
+        else -> null
+    }
 
 private val pt.ms.myshare.domain.model.PaydayRuleType.labelKey: String
     get() = when (this) {
@@ -502,4 +533,18 @@ private val pt.ms.myshare.domain.model.PaydayRuleType.labelKey: String
         pt.ms.myshare.domain.model.PaydayRuleType.CRYPTO -> "rule_type_crypto"
         pt.ms.myshare.domain.model.PaydayRuleType.DEBT -> "rule_type_debt"
         pt.ms.myshare.domain.model.PaydayRuleType.OTHER -> "rule_type_other"
+    }
+
+private val pt.ms.myshare.domain.model.PaydayRule.defaultNameKey: String?
+    get() = when {
+        name.equals("Savings", ignoreCase = true) && type == pt.ms.myshare.domain.model.PaydayRuleType.SAVINGS -> "rule_name_savings"
+        name.equals("Investing", ignoreCase = true) && type == pt.ms.myshare.domain.model.PaydayRuleType.INVESTING -> "rule_name_investing"
+        name.equals("Crypto", ignoreCase = true) && type == pt.ms.myshare.domain.model.PaydayRuleType.CRYPTO -> "rule_name_crypto"
+        else -> null
+    }
+
+private val pt.ms.myshare.domain.model.ReminderCadence.labelAtTimeKey: String
+    get() = when (this) {
+        pt.ms.myshare.domain.model.ReminderCadence.PAYDAY -> "home_more_reminder_payday_at_time"
+        pt.ms.myshare.domain.model.ReminderCadence.WEEKLY_REVIEW -> "home_more_reminder_weekly_at_time"
     }

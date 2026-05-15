@@ -35,6 +35,7 @@ fun FixedCostsScreen(
     var validationRequested by remember { mutableStateOf(false) }
 
     val currencySymbol = remember(locale) { LocalizedAmountFormatter.currencySymbol(locale) }
+    val amountPlaceholder = remember(locale) { LocalizedAmountFormatter.amountPlaceholder(locale) }
     val fixedCosts = LocalizedAmountFormatter.parseAmount(fixedCostsText, locale)
     val invalidNumber = fixedCostsText.isNotBlank() && fixedCosts == null
     val requiredError = validationRequested && fixedCostsText.isBlank()
@@ -64,7 +65,7 @@ fun FixedCostsScreen(
                 value = fixedCostsText,
                 onValueChange = { fixedCostsText = LocalizedAmountFormatter.sanitizeAmountInput(it, locale) },
                 label = stringResource(R.string.onboarding_fixed_costs_label_amount),
-                placeholder = stringResource(R.string.amount_placeholder_decimal),
+                placeholder = amountPlaceholder,
                 prefix = { if (currencySymbol.isNotEmpty()) Text("$currencySymbol ") },
                 isError = fixedCostsError,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)

@@ -45,6 +45,7 @@ fun AllocationPrioritiesScreen(
 
     val currency = NumberFormat.getCurrencyInstance(locale)
     val symbol = LocalizedAmountFormatter.currencySymbol(locale)
+    val amountPlaceholder = remember(locale) { LocalizedAmountFormatter.amountPlaceholder(locale) }
 
     OnboardingStepScaffold(
         title = stringResource(R.string.onboarding_priorities_title),
@@ -110,7 +111,7 @@ fun AllocationPrioritiesScreen(
                     onValueChange = { flex = LocalizedAmountFormatter.sanitizeAmountInput(it, locale) },
                     label = stringResource(R.string.onboarding_priorities_label_flex),
                     prefix = { Text("$symbol ") },
-                    placeholder = stringResource(R.string.amount_placeholder_decimal),
+                    placeholder = amountPlaceholder,
                     description = stringResource(R.string.onboarding_priorities_desc_flex),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                 )
@@ -119,7 +120,7 @@ fun AllocationPrioritiesScreen(
                     onValueChange = { sav = LocalizedAmountFormatter.sanitizeAmountInput(it, locale) },
                     label = stringResource(R.string.onboarding_priorities_label_sav),
                     prefix = { Text("$symbol ") },
-                    placeholder = stringResource(R.string.amount_placeholder_decimal),
+                    placeholder = amountPlaceholder,
                     description = stringResource(R.string.onboarding_priorities_desc_sav),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                 )
@@ -128,7 +129,7 @@ fun AllocationPrioritiesScreen(
                     onValueChange = { inv = LocalizedAmountFormatter.sanitizeAmountInput(it, locale) },
                     label = stringResource(R.string.onboarding_priorities_label_inv),
                     prefix = { Text("$symbol ") },
-                    placeholder = stringResource(R.string.amount_placeholder_decimal),
+                    placeholder = amountPlaceholder,
                     description = stringResource(R.string.onboarding_priorities_desc_inv),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                 )
@@ -137,7 +138,7 @@ fun AllocationPrioritiesScreen(
                     onValueChange = { cry = LocalizedAmountFormatter.sanitizeAmountInput(it, locale) },
                     label = stringResource(R.string.onboarding_priorities_label_cry),
                     prefix = { Text("$symbol ") },
-                    placeholder = stringResource(R.string.amount_placeholder_decimal),
+                    placeholder = amountPlaceholder,
                     description = stringResource(R.string.onboarding_priorities_desc_cry),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                 )
