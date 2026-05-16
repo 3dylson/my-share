@@ -280,6 +280,9 @@ Creado con intención</string>
     <string name="home_more_monthly_title">Plan mensual</string>
     <string name="home_more_premium_button">Actualizar a Premium</string>
     <string name="home_more_pref_title">Ajustes del plan</string>
+    <string name="preferences_language_title">Idioma</string>
+    <string name="preferences_currency_title">Moneda</string>
+    <string name="preferences_currency_search_hint">Buscar moneda o código</string>
     <string name="home_more_pref_notifications">Recordatorios de día de pago</string>
     <string name="home_more_pref_automation">Reglas automáticas</string>
     <string name="home_more_pref_automation_active">Las reglas automáticas están activas</string>
@@ -455,4 +458,8 @@ Creado con intención</string>
     <string name="plan_summary_invest_with_discipline">Una división disciplinada que mantiene la inversión constante cada día de pago.</string>
     <string name="plan_summary_stop_overspending">Un plan más estricto que proteja el dinero futuro antes que el gasto flexible.</string>
     <string name="plan_summary_plan_together">Una división amigable para todos que mantiene los proyectos de ley claros y el progreso visible.</string>
+    <string name="required_update_title">Actualización obligatoria</string>
+    <string name="required_update_message">Esta versión de My Share ya no es compatible. Actualice para seguir usando su plan.</string>
+    <string name="required_update_primary_action">Actualizar desde Play Store</string>
+    <string name="required_update_fallback_action">Abrir Play Store en el navegador</string>
 </resources>

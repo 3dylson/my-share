@@ -12,6 +12,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.AllocationPreset
+import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.presentation.ui.components.PremiumChoiceCard
 import pt.ms.myshare.presentation.ui.components.PremiumTextField
 import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
@@ -24,17 +25,20 @@ fun FixedCostsScreen(
     initialFixedCosts: BigDecimal?,
     incomePerPayday: BigDecimal?,
     initialPreset: AllocationPreset,
+    userPreferences: UserPreferences,
     error: String? = null,
     onBack: () -> Unit,
     onNext: (BigDecimal, AllocationPreset) -> Unit
 ) {
     val context = LocalContext.current
-    val locale = Locale.getDefault()
-    var fixedCostsText by remember { mutableStateOf(initialFixedCosts?.let { LocalizedAmountFormatter.formatEditableAmount(it, locale) } ?: "") }
+    val locale = userPreferences.locale
+    var fixedCostsText by remember(userPreferences.languageTag) { mutableStateOf(initialFixedCosts?.let { LocalizedAmountFormatter.formatEditableAmount(it, locale) } ?: "") }
     var preset by remember { mutableStateOf(initialPreset) }
     var validationRequested by remember { mutableStateOf(false) }
 
-    val currencySymbol = remember(locale) { LocalizedAmountFormatter.currencySymbol(locale) }
+    val currencySymbol = remember(locale, userPreferences.currencyCode) {
+        LocalizedAmountFormatter.currencySymbol(locale, userPreferences.currencyCode)
+    }
     val amountPlaceholder = remember(locale) { LocalizedAmountFormatter.amountPlaceholder(locale) }
     val fixedCosts = LocalizedAmountFormatter.parseAmount(fixedCostsText, locale)
     val invalidNumber = fixedCostsText.isNotBlank() && fixedCosts == null

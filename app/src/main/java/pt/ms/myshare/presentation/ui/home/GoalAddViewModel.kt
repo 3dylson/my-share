@@ -11,7 +11,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pt.ms.myshare.domain.model.Goal
+import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.domain.repository.PlannerRepository
+import pt.ms.myshare.domain.repository.UserPreferencesRepository
 import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -26,6 +28,7 @@ data class GoalAddState(
     val name: String = "",
     val amount: String = "",
     val createdAt: LocalDate? = null,
+    val userPreferences: UserPreferences = UserPreferences.defaults(),
     val isLoading: Boolean = false,
     val isSaved: Boolean = false,
     val isMissingExistingGoal: Boolean = false,
@@ -35,6 +38,7 @@ data class GoalAddState(
 @HiltViewModel
 class GoalAddViewModel @Inject constructor(
     private val repository: PlannerRepository,
+    private val userPreferencesRepository: UserPreferencesRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -44,6 +48,12 @@ class GoalAddViewModel @Inject constructor(
     private val navGoalId: String? = savedStateHandle.get<String>("goalId")
 
     init {
+        _state.update { it.copy(userPreferences = userPreferencesRepository.loadPreferences()) }
+        viewModelScope.launch {
+            userPreferencesRepository.observePreferences().collect { preferences ->
+                _state.update { it.copy(userPreferences = preferences) }
+            }
+        }
         if (navGoalId != null) {
             _state.update { it.copy(requestedGoalId = navGoalId) }
             loadExistingGoal(navGoalId)
@@ -61,7 +71,7 @@ class GoalAddViewModel @Inject constructor(
                     it.copy(
                         goalId = goal.id,
                         name = goal.name,
-                        amount = LocalizedAmountFormatter.formatEditableAmount(goal.targetAmount, Locale.getDefault()),
+                        amount = LocalizedAmountFormatter.formatEditableAmount(goal.targetAmount, _state.value.userPreferences.locale),
                         createdAt = goal.createdAt,
                         isLoading = false
                     )
@@ -84,7 +94,7 @@ class GoalAddViewModel @Inject constructor(
     }
 
     fun onAmountChanged(newAmount: String) {
-        _state.update { it.copy(amount = LocalizedAmountFormatter.sanitizeAmountInput(newAmount), error = null) }
+        _state.update { it.copy(amount = LocalizedAmountFormatter.sanitizeAmountInput(newAmount, it.userPreferences.locale), error = null) }
     }
 
     fun saveGoal() {
@@ -93,7 +103,7 @@ class GoalAddViewModel @Inject constructor(
             return
         }
 
-        val amount = LocalizedAmountFormatter.parseAmount(_state.value.amount) ?: BigDecimal.ZERO
+        val amount = LocalizedAmountFormatter.parseAmount(_state.value.amount, _state.value.userPreferences.locale) ?: BigDecimal.ZERO
         if (_state.value.name.isBlank() || amount <= BigDecimal.ZERO) {
             _state.update { it.copy(error = "goal_add_error_invalid_name_amount") }
             return

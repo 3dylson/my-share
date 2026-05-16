@@ -280,6 +280,9 @@ Conçu pour l\'intention</string>
     <string name="home_more_monthly_title">Plan mensuel</string>
     <string name="home_more_premium_button">Passer à Premium</string>
     <string name="home_more_pref_title">Réglages du plan</string>
+    <string name="preferences_language_title">Langue</string>
+    <string name="preferences_currency_title">Devise</string>
+    <string name="preferences_currency_search_hint">Rechercher une devise ou un code</string>
     <string name="home_more_pref_notifications">Rappels du jour de paie</string>
     <string name="home_more_pref_automation">Règles automatiques</string>
     <string name="home_more_pref_automation_active">Les règles automatiques sont actives</string>
@@ -455,4 +458,8 @@ Conçu pour l\'intention</string>
     <string name="plan_summary_invest_with_discipline">Une répartition disciplinée qui permet d’investir de manière cohérente chaque jour de paie.</string>
     <string name="plan_summary_stop_overspending">Un plan plus strict qui protège l’argent futur avant des dépenses flexibles.</string>
     <string name="plan_summary_plan_together">Une répartition conviviale qui permet de garder les factures claires et les progrès visibles.</string>
+    <string name="required_update_title">Mise à jour obligatoire</string>
+    <string name="required_update_message">Cette version de My Share n’est plus prise en charge. Mettez l’application à jour pour continuer à utiliser votre plan.</string>
+    <string name="required_update_primary_action">Mettre à jour via Play Store</string>
+    <string name="required_update_fallback_action">Ouvrir Play Store dans le navigateur</string>
 </resources>

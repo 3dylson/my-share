@@ -6,12 +6,18 @@ import android.app.NotificationManager
 import android.os.Build
 import dagger.hilt.android.HiltAndroidApp
 import pt.ms.myshare.BuildConfig
+import pt.ms.myshare.domain.repository.UserPreferencesRepository
+import pt.ms.myshare.presentation.ui.localization.UserLocaleManager
 import pt.ms.myshare.utils.logs.CrashlyticsTree
 import pt.ms.myshare.utils.logs.FirebaseUtils
 import timber.log.Timber
+import javax.inject.Inject
 
 @HiltAndroidApp
 class MyShareApp : Application() {
+
+    @Inject lateinit var userPreferencesRepository: UserPreferencesRepository
+    @Inject lateinit var userLocaleManager: UserLocaleManager
 
     override fun onCreate() {
         super.onCreate()
@@ -24,7 +30,8 @@ class MyShareApp : Application() {
         Timber.plant(CrashlyticsTree())
 
         FirebaseUtils.init(this)
-        
+
+        userLocaleManager.apply(userPreferencesRepository.loadPreferences())
 
 
         createNotificationChannel()

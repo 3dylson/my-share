@@ -10,6 +10,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import pt.ms.myshare.R
+import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.presentation.ui.components.PremiumTextField
 import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.presentation.ui.theme.*
@@ -24,14 +25,15 @@ fun AllocationPrioritiesScreen(
     initialInvesting: BigDecimal,
     initialCrypto: BigDecimal,
     totalAvailable: BigDecimal,
+    userPreferences: UserPreferences,
     onBack: () -> Unit,
     onNext: (BigDecimal, BigDecimal, BigDecimal, BigDecimal) -> Unit
 ) {
-    val locale = Locale.getDefault()
-    var flex by remember { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialFlexibleSpend, locale)) }
-    var sav by remember { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialSavings, locale)) }
-    var inv by remember { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialInvesting, locale)) }
-    var cry by remember { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialCrypto, locale)) }
+    val locale = userPreferences.locale
+    var flex by remember(userPreferences.languageTag) { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialFlexibleSpend, locale)) }
+    var sav by remember(userPreferences.languageTag) { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialSavings, locale)) }
+    var inv by remember(userPreferences.languageTag) { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialInvesting, locale)) }
+    var cry by remember(userPreferences.languageTag) { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialCrypto, locale)) }
 
     val parsedFlex = LocalizedAmountFormatter.parseAmount(flex, locale) ?: BigDecimal.ZERO
     val parsedSav = LocalizedAmountFormatter.parseAmount(sav, locale) ?: BigDecimal.ZERO
@@ -43,8 +45,8 @@ fun AllocationPrioritiesScreen(
     val hasAvailableIncome = totalAvailable > BigDecimal.ZERO
     val isValid = hasAvailableIncome && remaining.compareTo(BigDecimal.ZERO) == 0
 
-    val currency = NumberFormat.getCurrencyInstance(locale)
-    val symbol = LocalizedAmountFormatter.currencySymbol(locale)
+    val currency = NumberFormat.getCurrencyInstance(locale).apply { currency = userPreferences.currency }
+    val symbol = LocalizedAmountFormatter.currencySymbol(locale, userPreferences.currencyCode)
     val amountPlaceholder = remember(locale) { LocalizedAmountFormatter.amountPlaceholder(locale) }
 
     OnboardingStepScaffold(

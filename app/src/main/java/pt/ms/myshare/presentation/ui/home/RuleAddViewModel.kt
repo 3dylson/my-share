@@ -12,7 +12,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pt.ms.myshare.domain.model.PaydayRule
 import pt.ms.myshare.domain.model.PaydayRuleType
+import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.domain.repository.PlannerRepository
+import pt.ms.myshare.domain.repository.UserPreferencesRepository
 import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -29,6 +31,7 @@ data class RuleAddState(
     val isPercentage: Boolean = true,
     val type: PaydayRuleType = PaydayRuleType.OTHER,
     val createdAt: LocalDate? = null,
+    val userPreferences: UserPreferences = UserPreferences.defaults(),
     val isLoading: Boolean = false,
     val isSaved: Boolean = false,
     val isMissingExistingRule: Boolean = false,
@@ -38,6 +41,7 @@ data class RuleAddState(
 @HiltViewModel
 class RuleAddViewModel @Inject constructor(
     private val repository: PlannerRepository,
+    private val userPreferencesRepository: UserPreferencesRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -47,6 +51,12 @@ class RuleAddViewModel @Inject constructor(
     private val navRuleId: String? = savedStateHandle.get<String>("ruleId")
 
     init {
+        _state.update { it.copy(userPreferences = userPreferencesRepository.loadPreferences()) }
+        viewModelScope.launch {
+            userPreferencesRepository.observePreferences().collect { preferences ->
+                _state.update { it.copy(userPreferences = preferences) }
+            }
+        }
         if (navRuleId != null) {
             _state.update { it.copy(requestedRuleId = navRuleId) }
             loadExistingRule(navRuleId)
@@ -65,7 +75,7 @@ class RuleAddViewModel @Inject constructor(
                     it.copy(
                         ruleId = rule.id,
                         name = rule.name,
-                        amount = LocalizedAmountFormatter.formatEditableAmount(rule.amount.stripTrailingZeros(), Locale.getDefault()),
+                        amount = LocalizedAmountFormatter.formatEditableAmount(rule.amount.stripTrailingZeros(), _state.value.userPreferences.locale),
                         isPercentage = rule.isPercentage,
                         type = rule.type,
                         createdAt = rule.createdAt,
@@ -90,7 +100,7 @@ class RuleAddViewModel @Inject constructor(
     }
 
     fun onAmountChanged(newAmount: String) {
-        _state.update { it.copy(amount = LocalizedAmountFormatter.sanitizeAmountInput(newAmount), error = null) }
+        _state.update { it.copy(amount = LocalizedAmountFormatter.sanitizeAmountInput(newAmount, it.userPreferences.locale), error = null) }
     }
 
     fun onPercentageToggle(isPercentage: Boolean) {
@@ -107,7 +117,7 @@ class RuleAddViewModel @Inject constructor(
             return
         }
 
-        val amount = LocalizedAmountFormatter.parseAmount(_state.value.amount) ?: BigDecimal.ZERO
+        val amount = LocalizedAmountFormatter.parseAmount(_state.value.amount, _state.value.userPreferences.locale) ?: BigDecimal.ZERO
         if (_state.value.name.isBlank() || amount <= BigDecimal.ZERO) {
             _state.update { it.copy(error = "rule_add_error_invalid_name_amount") }
             return

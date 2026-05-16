@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.ms.myshare.R
 import pt.ms.myshare.presentation.ui.components.*
-import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.presentation.ui.theme.*
 import java.math.BigDecimal
 import androidx.compose.runtime.Composable
@@ -177,6 +176,7 @@ fun LazyListScope.homeReviewTab(
         CompactReviewEntryCard(
             flexibleSpend = state.actualFlexibleSpend,
             goalContribution = state.actualGoalContribution,
+            currencySymbol = state.currencySymbol,
             errorMessage = errorMessage,
             onFlexibleSpendChanged = onFlexibleSpendChanged,
             onGoalContributionChanged = onGoalContributionChanged,
@@ -333,6 +333,7 @@ private fun CompactHistoryMetric(
 private fun ReviewAmountField(
     label: String,
     value: String,
+    currencySymbol: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -340,7 +341,7 @@ private fun ReviewAmountField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
-        prefix = { Text(LocalizedAmountFormatter.currencySymbol()) },
+        prefix = { Text(currencySymbol) },
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
         modifier = modifier,
@@ -352,6 +353,7 @@ private fun ReviewAmountField(
 private fun CompactReviewEntryCard(
     flexibleSpend: String,
     goalContribution: String,
+    currencySymbol: String,
     errorMessage: String?,
     onFlexibleSpendChanged: (String) -> Unit,
     onGoalContributionChanged: (String) -> Unit,
@@ -403,12 +405,14 @@ private fun CompactReviewEntryCard(
                 ReviewAmountField(
                     label = stringResource(R.string.home_review_input_flex_exact),
                     value = flexibleSpend,
+                    currencySymbol = currencySymbol,
                     onValueChange = onFlexibleSpendChanged,
                     modifier = Modifier.weight(1f)
                 )
                 ReviewAmountField(
                     label = stringResource(R.string.home_review_input_goal_exact),
                     value = goalContribution,
+                    currencySymbol = currencySymbol,
                     onValueChange = onGoalContributionChanged,
                     modifier = Modifier.weight(1f)
                 )

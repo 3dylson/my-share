@@ -11,8 +11,17 @@ import java.util.Locale
  */
 object LocalizedAmountFormatter {
 
-    fun currencySymbol(locale: Locale = Locale.getDefault()): String {
-        return DecimalFormatSymbols.getInstance(locale).currencySymbol
+    fun currencySymbol(locale: Locale = Locale.getDefault(), currencyCode: String? = null): String {
+        val currency = currencyCode?.let { code -> runCatching { java.util.Currency.getInstance(code) }.getOrNull() }
+        return currency?.getSymbol(locale) ?: DecimalFormatSymbols.getInstance(locale).currencySymbol
+    }
+
+    fun formatCurrency(amount: BigDecimal, locale: Locale = Locale.getDefault(), currencyCode: String? = null): String {
+        return NumberFormat.getCurrencyInstance(locale).apply {
+            currencyCode?.let { code ->
+                runCatching { currency = java.util.Currency.getInstance(code) }
+            }
+        }.format(amount)
     }
 
     fun formatEditableAmount(amount: BigDecimal, locale: Locale = Locale.getDefault()): String {

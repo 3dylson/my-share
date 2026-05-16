@@ -37,6 +37,8 @@ import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReadResult
 import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReader
 import pt.ms.myshare.presentation.ui.components.*
+import pt.ms.myshare.presentation.ui.preferences.CurrencyPickerDialog
+import pt.ms.myshare.presentation.ui.preferences.LanguagePickerDialog
 import pt.ms.myshare.presentation.ui.theme.*
 import timber.log.Timber
 
@@ -83,6 +85,8 @@ fun HomeRoute(
         onPremiumGateUpgradeClicked = viewModel::logPremiumGateUpgradeClicked,
         onConnectGoogleAccount = viewModel::connectGoogleAccount,
         onGoogleConnectionCredentialError = viewModel::setGoogleConnectionCredentialError,
+        onLanguageSelected = viewModel::updateLanguage,
+        onCurrencySelected = viewModel::updateCurrency,
         onLogout = {
             viewModel.onLogout {
                 navController.navigate("onboarding") {
@@ -116,6 +120,8 @@ fun HomeScreen(
     onPremiumGateUpgradeClicked: (HomePremiumGate) -> Unit,
     onConnectGoogleAccount: (String) -> Unit,
     onGoogleConnectionCredentialError: (String) -> Unit,
+    onLanguageSelected: (String) -> Unit,
+    onCurrencySelected: (String) -> Unit,
     onLogout: () -> Unit,
     onManageAdsConsent: () -> Unit,
     onAddNewGoal: () -> Unit,
@@ -141,6 +147,8 @@ fun HomeScreen(
     var showReminderSettingsDialog by remember { mutableStateOf(false) }
     var showSignOutDialog by remember { mutableStateOf(false) }
     var showAccountDetailsDialog by remember { mutableStateOf(false) }
+    var showLanguagePicker by remember { mutableStateOf(false) }
+    var showCurrencyPicker by remember { mutableStateOf(false) }
     var previousReviewCount by remember { mutableStateOf<Int?>(null) }
     var isGoogleCredentialRequestInProgress by remember { mutableStateOf(false) }
     var pendingReminderSelection by remember { mutableStateOf<ReminderSettingsSelection?>(null) }
@@ -286,6 +294,29 @@ fun HomeScreen(
                 )
             }
         }
+    }
+
+    if (showLanguagePicker) {
+        LanguagePickerDialog(
+            selectedLanguageTag = state.moreCard.userPreferences.languageTag,
+            onDismissRequest = { showLanguagePicker = false },
+            onLanguageSelected = {
+                showLanguagePicker = false
+                onLanguageSelected(it)
+            }
+        )
+    }
+
+    if (showCurrencyPicker) {
+        CurrencyPickerDialog(
+            selectedCurrencyCode = state.moreCard.userPreferences.currencyCode,
+            locale = state.moreCard.userPreferences.locale,
+            onDismissRequest = { showCurrencyPicker = false },
+            onCurrencySelected = {
+                showCurrencyPicker = false
+                onCurrencySelected(it)
+            }
+        )
     }
 
     if (showSignOutDialog) {
@@ -490,6 +521,8 @@ fun HomeScreen(
                             onBillingPlanSelected = onBillingPlanSelected,
                             onUnlockPremium = onUnlockPremium,
                             onManageAdsConsent = onManageAdsConsent,
+                            onShowLanguagePicker = { showLanguagePicker = true },
+                            onShowCurrencyPicker = { showCurrencyPicker = true },
                             onShowAutomationLock = {
                                 Timber.tag("HomeScreen").d("Locked Smart automation row tapped")
                                 showAutomationLockDialog = true
@@ -568,6 +601,8 @@ private fun HomeScreenPreview() {
             onPremiumGateUpgradeClicked = { _ -> },
             onConnectGoogleAccount = { _ -> },
             onGoogleConnectionCredentialError = { _ -> },
+            onLanguageSelected = { _ -> },
+            onCurrencySelected = { _ -> },
             onLogout = {},
             onManageAdsConsent = {},
             onAddNewGoal = {},

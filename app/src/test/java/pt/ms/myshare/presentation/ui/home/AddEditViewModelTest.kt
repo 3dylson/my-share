@@ -21,6 +21,7 @@ import org.junit.Test
 import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.model.PaydayRule
 import pt.ms.myshare.domain.repository.PlannerRepository
+import pt.ms.myshare.TestUserPreferencesRepository
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AddEditViewModelTest {
@@ -44,6 +45,7 @@ class AddEditViewModelTest {
 
         val viewModel = GoalAddViewModel(
             repository = repository,
+            userPreferencesRepository = TestUserPreferencesRepository(),
             savedStateHandle = SavedStateHandle(mapOf("goalId" to "missing-goal"))
         )
         advanceUntilIdle()
@@ -64,6 +66,7 @@ class AddEditViewModelTest {
 
         val viewModel = RuleAddViewModel(
             repository = repository,
+            userPreferencesRepository = TestUserPreferencesRepository(),
             savedStateHandle = SavedStateHandle(mapOf("ruleId" to "missing-rule"))
         )
         advanceUntilIdle()
@@ -81,6 +84,7 @@ class AddEditViewModelTest {
     fun `goal validation error clears when user edits an input`() = runTest {
         val viewModel = GoalAddViewModel(
             repository = mockk(relaxed = true),
+            userPreferencesRepository = TestUserPreferencesRepository(),
             savedStateHandle = SavedStateHandle()
         )
 
@@ -98,6 +102,7 @@ class AddEditViewModelTest {
     fun `rule validation error clears when user edits an input`() = runTest {
         val viewModel = RuleAddViewModel(
             repository = mockk(relaxed = true),
+            userPreferencesRepository = TestUserPreferencesRepository(),
             savedStateHandle = SavedStateHandle()
         )
 

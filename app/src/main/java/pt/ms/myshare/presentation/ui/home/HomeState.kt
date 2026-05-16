@@ -6,6 +6,7 @@ import pt.ms.myshare.domain.model.PricingStrategy
 import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.domain.model.ReviewInsight
 import pt.ms.myshare.domain.model.SalaryPlan
+import pt.ms.myshare.domain.model.UserPreferences
 import java.math.BigDecimal
 import java.time.YearMonth
 
@@ -48,6 +49,7 @@ data class GoalCardState(
 data class ReviewCardState(
     val actualFlexibleSpend: String = "",
     val actualGoalContribution: String = "",
+    val currencySymbol: String = "",
     val flexibleSpendMax: Float = 5000f,
     val goalContributionMax: Float = 5000f,
     val insight: ReviewInsight? = null,
@@ -99,6 +101,7 @@ data class MoreCardState(
     val isGoogleConnectionInProgress: Boolean = false,
     val googleConnectionMessage: String? = null,
     val googleConnectionError: String? = null,
+    val userPreferences: UserPreferences = UserPreferences.defaults(),
     val error: String? = null
 )
 

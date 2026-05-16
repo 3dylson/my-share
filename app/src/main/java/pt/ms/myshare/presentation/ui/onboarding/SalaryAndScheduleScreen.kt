@@ -13,6 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import pt.ms.myshare.R
+import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.presentation.ui.components.PremiumChoiceCard
 import pt.ms.myshare.presentation.ui.components.PremiumTextField
@@ -27,17 +28,20 @@ fun SalaryAndScheduleScreen(
     initialFrequency: PayFrequency,
     initialMonthlyPayday: Int,
     initialNextBiweeklyPaydayText: String,
+    userPreferences: UserPreferences,
     onBack: () -> Unit,
     onNext: (BigDecimal, PayFrequency, Int, String) -> Unit
 ) {
-    val locale = Locale.getDefault()
-    var incomeText by remember { mutableStateOf(initialIncome?.let { LocalizedAmountFormatter.formatEditableAmount(it, locale) } ?: "") }
+    val locale = userPreferences.locale
+    var incomeText by remember(userPreferences.languageTag) { mutableStateOf(initialIncome?.let { LocalizedAmountFormatter.formatEditableAmount(it, locale) } ?: "") }
     var frequency by remember { mutableStateOf(initialFrequency) }
     var paydayText by remember { mutableStateOf(initialMonthlyPayday.toString()) }
     var biweeklyPaydayText by remember { mutableStateOf(initialNextBiweeklyPaydayText) }
     var validationRequested by remember { mutableStateOf(false) }
 
-    val currencySymbol = remember(locale) { LocalizedAmountFormatter.currencySymbol(locale) }
+    val currencySymbol = remember(locale, userPreferences.currencyCode) {
+        LocalizedAmountFormatter.currencySymbol(locale, userPreferences.currencyCode)
+    }
     val amountPlaceholder = remember(locale) { LocalizedAmountFormatter.amountPlaceholder(locale) }
     val income = LocalizedAmountFormatter.parseAmount(incomeText, locale)
     val payday = paydayText.toIntOrNull()

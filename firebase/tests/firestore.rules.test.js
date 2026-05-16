@@ -77,6 +77,39 @@ describe("Unauthenticated access", () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Public app config
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("Public app config", () => {
+  test("any client can read Android update policy", async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx
+        .firestore()
+        .collection("app_config")
+        .doc("android_update_policy")
+        .set({
+          minimumSupportedVersionCode: 8,
+          immediateUpdateRequired: true,
+          playStorePackageName: "pt.ms.myshare",
+        });
+    });
+
+    await assertSucceeds(
+      anonDb().collection("app_config").doc("android_update_policy").get()
+    );
+  });
+
+  test("clients cannot write Android update policy", async () => {
+    await assertFails(
+      authedDb(USER_A)
+        .collection("app_config")
+        .doc("android_update_policy")
+        .set({ minimumSupportedVersionCode: 8 })
+    );
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Own user document
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -89,6 +122,25 @@ describe("Authenticated user — own document", () => {
   test("can write own user document", async () => {
     await assertSucceeds(
       authedDb(USER_A).collection("users").doc(USER_A).set({ name: "Alice" })
+    );
+  });
+
+  test("can update own language and currency profile fields", async () => {
+    await assertSucceeds(
+      authedDb(USER_A)
+        .collection("users")
+        .doc(USER_A)
+        .set({ languageTag: "pt-PT", currencyCode: "EUR" }, { merge: true })
+    );
+  });
+
+  test("cannot update protected billing fields with profile preferences", async () => {
+    await seedUserDoc(USER_A);
+    await assertFails(
+      authedDb(USER_A)
+        .collection("users")
+        .doc(USER_A)
+        .set({ languageTag: "pt-PT", currencyCode: "EUR", isPro: true }, { merge: true })
     );
   });
 

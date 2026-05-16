@@ -48,4 +48,16 @@ class LocalizedAmountFormatterTest {
 
         assertEquals("12.5%", result)
     }
+
+    @Test
+    fun `formatCurrency supports independent locale and currency`() {
+        val result = LocalizedAmountFormatter.formatCurrency(
+            amount = BigDecimal("1234.56"),
+            locale = Locale.forLanguageTag("pt-PT"),
+            currencyCode = "USD"
+        )
+
+        assert(result.contains("US$") || result.contains("$"))
+        assert(result.contains("1 234,56") || result.contains("1 234,56") || result.contains("1234,56"))
+    }
 }

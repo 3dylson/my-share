@@ -31,6 +31,9 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
     NavHost(navController = navController, startDestination = OnboardingRoute.Welcome.route) {
         composable(OnboardingRoute.Welcome.route) {
             WelcomeScreen(
+                userPreferences = state.userPreferences,
+                onLanguageSelected = viewModel::updateLanguage,
+                onCurrencySelected = viewModel::updateCurrency,
                 onContinue = { navController.navigate(OnboardingRoute.GoalPicker.route) },
                 // Only wire the dev skip in debug builds; null means the button is hidden
                 onSkipDev = if (BuildConfig.DEBUG) viewModel::skipToHomeWithDefaultPlan else null
@@ -41,6 +44,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                 initialFocus = state.selectedFocus,
                 initialGoalName = state.goalName,
                 initialGoalAmount = state.goalAmount,
+                userPreferences = state.userPreferences,
                 onBack = { navController.popBackStack() },
                 onNext = { focus, goalName, goalAmount ->
                     viewModel.setFocus(focus, goalName, goalAmount)
@@ -55,6 +59,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                 initialFrequency = state.payFrequency,
                 initialMonthlyPayday = state.monthlyPayday,
                 initialNextBiweeklyPaydayText = state.nextBiweeklyPaydayText,
+                userPreferences = state.userPreferences,
                 onBack = { navController.popBackStack() },
                 onNext = { income, frequency, monthlyPayday, biweeklyPayday ->
                     viewModel.setSalaryDetails(
@@ -72,6 +77,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                 initialFixedCosts = state.monthlyFixedCosts,
                 incomePerPayday = state.netIncomePerPayday,
                 initialPreset = state.preset,
+                userPreferences = state.userPreferences,
                 error = state.error,
                 onBack = { navController.popBackStack() },
                 onNext = { fixedCosts, preset ->
@@ -91,6 +97,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                     initialInvesting = preview.investingPerPayday,
                     initialCrypto = preview.cryptoPerPayday,
                     totalAvailable = totalAvailable,
+                    userPreferences = state.userPreferences,
                     onBack = { navController.popBackStack() },
                     onNext = { flex, sav, inv, cry ->
                         if (viewModel.setAllocationsAndBuild(flex, sav, inv, cry)) {
@@ -119,6 +126,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                     preview = preview,
                     goalName = state.goalName,
                     goalAmount = state.goalAmount,
+                    userPreferences = state.userPreferences,
                     onAutopilot = {
                         navController.navigate(OnboardingRoute.Signup.route)
                     },
@@ -146,6 +154,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
             TrajectoryScreen(
                 preview = state.planPreview,
                 goalName = state.goalName,
+                userPreferences = state.userPreferences,
                 onNext = {
                     viewModel.logPaywallViewed()
                     navController.navigate(OnboardingRoute.Paywall.route)

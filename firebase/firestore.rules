@@ -2,6 +2,11 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    match /app_config/android_update_policy {
+      allow read: if true;
+      allow write: if false;
+    }
+
     // A user can only read/write their own document
     match /users/{userId} {
       allow read: if request.auth != null && request.auth.uid == userId;

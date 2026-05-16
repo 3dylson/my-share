@@ -12,15 +12,20 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import pt.ms.myshare.data.billing.BillingClientWrapper
 import pt.ms.myshare.data.billing.PlayBillingEntitlementRepository
+import pt.ms.myshare.data.repository.FirestoreAppUpdatePolicyRepository
 import pt.ms.myshare.data.repository.AuthRepositoryImpl
 import pt.ms.myshare.data.repository.PlannerRepositoryImpl
+import pt.ms.myshare.data.repository.SharedUserPreferencesRepository
+import pt.ms.myshare.domain.repository.AppUpdatePolicyRepository
 import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
+import pt.ms.myshare.domain.repository.UserPreferencesRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.CheckEntitlementLimitUseCase
 import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
+import pt.ms.myshare.domain.use_case.ResolveAppUpdateDecisionUseCase
 import javax.inject.Singleton
 
 @Module
@@ -45,11 +50,26 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideAppUpdatePolicyRepository(
+        @ApplicationContext context: Context,
+        firestore: FirebaseFirestore
+    ): AppUpdatePolicyRepository = FirestoreAppUpdatePolicyRepository(context, firestore)
+
+    @Provides
+    @Singleton
     fun providePlannerRepository(
         @ApplicationContext context: Context,
         firebaseAuth: FirebaseAuth,
         firestore: FirebaseFirestore
     ): PlannerRepository = PlannerRepositoryImpl(context, firebaseAuth, firestore)
+
+    @Provides
+    @Singleton
+    fun provideUserPreferencesRepository(
+        @ApplicationContext context: Context,
+        firebaseAuth: FirebaseAuth,
+        firestore: FirebaseFirestore
+    ): UserPreferencesRepository = SharedUserPreferencesRepository(context, firebaseAuth, firestore)
 
     @Provides
     @Singleton
@@ -75,6 +95,11 @@ object AppModule {
 
     @Provides
     fun provideResolvePricingStrategyUseCase(): ResolvePricingStrategyUseCase = ResolvePricingStrategyUseCase()
+
+    @Provides
+    fun provideResolveAppUpdateDecisionUseCase(
+        appUpdatePolicyRepository: AppUpdatePolicyRepository
+    ): ResolveAppUpdateDecisionUseCase = ResolveAppUpdateDecisionUseCase(appUpdatePolicyRepository)
 
     @Provides
     fun provideCheckEntitlementLimitUseCase(entitlementRepository: EntitlementRepository): CheckEntitlementLimitUseCase = 

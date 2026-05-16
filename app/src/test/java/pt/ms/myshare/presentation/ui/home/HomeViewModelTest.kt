@@ -40,6 +40,8 @@ import pt.ms.myshare.domain.use_case.GetPerformanceStatsUseCase
 import pt.ms.myshare.domain.use_case.GetCoachingInsightsUseCase
 import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.model.User
+import pt.ms.myshare.TestUserPreferencesRepository
+import pt.ms.myshare.presentation.ui.localization.UserLocaleManager
 import pt.ms.myshare.presentation.ui.onboarding.ReminderWorkScheduler
 import io.mockk.mockk
 import io.mockk.every
@@ -58,6 +60,7 @@ class HomeViewModelTest {
     private val mockGetReviewHistoryUseCase = mockk<GetReviewHistoryUseCase>(relaxed = true)
     private val mockUpdateGoalProgressUseCase = mockk<UpdateGoalProgressUseCase>(relaxed = true)
     private val mockReminderWorkScheduler = mockk<ReminderWorkScheduler>(relaxed = true)
+    private val mockUserLocaleManager = mockk<UserLocaleManager>(relaxed = true)
 
     @Before
     fun setup() {
@@ -72,6 +75,7 @@ class HomeViewModelTest {
             plannerRepository = fakePlannerRepository,
             authRepository = mockAuthRepository,
             entitlementRepository = fakeEntitlementRepository,
+            userPreferencesRepository = TestUserPreferencesRepository(),
             calculatePlanPreviewUseCase = CalculatePlanPreviewUseCase(),
             createReviewInsightUseCase = CreateReviewInsightUseCase(CalculatePlanPreviewUseCase()),
             resolvePricingStrategyUseCase = ResolvePricingStrategyUseCase(),
@@ -79,7 +83,8 @@ class HomeViewModelTest {
             updateGoalProgressUseCase = mockUpdateGoalProgressUseCase,
             getPerformanceStatsUseCase = GetPerformanceStatsUseCase(fakePlannerRepository),
             getCoachingInsightsUseCase = GetCoachingInsightsUseCase(CalculatePlanPreviewUseCase()),
-            reminderWorkScheduler = mockReminderWorkScheduler
+            reminderWorkScheduler = mockReminderWorkScheduler,
+            userLocaleManager = mockUserLocaleManager
         )
     }
 

@@ -20,9 +20,11 @@ import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.domain.model.ReminderConfiguration
 import pt.ms.myshare.domain.model.SalaryPlan
 import pt.ms.myshare.domain.model.StoreProduct
+import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
+import pt.ms.myshare.domain.repository.UserPreferencesRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
@@ -33,6 +35,7 @@ import pt.ms.myshare.domain.use_case.GetCoachingInsightsUseCase
 import pt.ms.myshare.domain.use_case.PerformanceStats
 import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.presentation.ui.formatting.SubscriptionSavingsFormatter
+import pt.ms.myshare.presentation.ui.localization.UserLocaleManager
 import pt.ms.myshare.presentation.ui.onboarding.ReminderWorkScheduler
 import pt.ms.myshare.utils.logs.FirebaseUtils
 import timber.log.Timber
@@ -47,6 +50,7 @@ class HomeViewModel @Inject constructor(
     private val plannerRepository: PlannerRepository,
     private val authRepository: AuthRepository,
     private val entitlementRepository: EntitlementRepository,
+    private val userPreferencesRepository: UserPreferencesRepository,
     private val calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase,
     private val createReviewInsightUseCase: CreateReviewInsightUseCase,
     private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase,
@@ -54,7 +58,8 @@ class HomeViewModel @Inject constructor(
     private val updateGoalProgressUseCase: UpdateGoalProgressUseCase,
     private val getPerformanceStatsUseCase: GetPerformanceStatsUseCase,
     private val getCoachingInsightsUseCase: GetCoachingInsightsUseCase,
-    private val reminderWorkScheduler: ReminderWorkScheduler
+    private val reminderWorkScheduler: ReminderWorkScheduler,
+    private val userLocaleManager: UserLocaleManager
 ) : ViewModel() {
 
     private val uiState = MutableStateFlow(HomeState())
@@ -63,10 +68,7 @@ class HomeViewModel @Inject constructor(
     private var availableStoreProducts: List<pt.ms.myshare.domain.model.StoreProduct> = emptyList()
     private var currentPlan: SalaryPlan? = null
 
-    private val locale: Locale = Locale.getDefault()
-    private val currencyFormat = NumberFormat.getCurrencyInstance(locale)
-    private val dateFormatter = DateTimeFormatter.ofPattern("d MMM", locale)
-    private val pricingStrategy = resolvePricingStrategyUseCase.execute(locale)
+    private var currentPreferences = userPreferencesRepository.loadPreferences()
 
     fun onToggleAutomation(enabled: Boolean) {
         viewModelScope.launch {
@@ -79,7 +81,9 @@ class HomeViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             plannerRepository.syncFromFirestore()
+            userPreferencesRepository.syncFromFirestore()
         }
+        userLocaleManager.apply(currentPreferences)
         observeProducts()
         observePlannerData()
         observeReviewHistory()
@@ -176,8 +180,13 @@ class HomeViewModel @Inject constructor(
                 plannerFlow,
                 entitlementRepository.isPro,
                 entitlementRepository.availableProducts,
-                authRepository.currentUser
-            ) { planner, isPremium, products, user ->
+                authRepository.currentUser,
+                userPreferencesRepository.observePreferences()
+            ) { planner, isPremium, products, user, preferences ->
+                currentPreferences = preferences
+                userLocaleManager.apply(preferences)
+                val locale = preferences.locale
+                val pricingStrategy = resolvePricingStrategyUseCase.execute(locale)
                 val plan = planner.plan
                 val currentRules = planner.rules
                 val goals = planner.goals
@@ -190,10 +199,10 @@ class HomeViewModel @Inject constructor(
 
                 val emptyMessage = if (updatedPlan == null) "home_empty_build_plan_first" else null
                 val primaryGoal = goals.firstOrNull()
-                val planCard = updatedPlan?.let { buildPlanCard(it, primaryGoal?.targetAmount ?: BigDecimal.ZERO) }
-                val goalCards = goals.map { buildGoalCard(it, updatedPlan) }
-                val ruleCards = currentRules.map { buildRuleCard(it) }
-                val reviewCard = buildReviewCard(updatedPlan, latestReview)
+                val planCard = updatedPlan?.let { buildPlanCard(it, primaryGoal?.targetAmount ?: BigDecimal.ZERO, preferences) }
+                val goalCards = goals.map { buildGoalCard(it, updatedPlan, preferences) }
+                val ruleCards = currentRules.map { buildRuleCard(it, preferences) }
+                val reviewCard = buildReviewCard(updatedPlan, latestReview, preferences)
                 
                 val monthlyProduct = products.find { it.productId == PremiumSubscriptionProducts.MONTHLY_ID }
                 val annualProduct = products.find { it.productId == PremiumSubscriptionProducts.ANNUAL_ID }
@@ -250,6 +259,7 @@ class HomeViewModel @Inject constructor(
                     isGoogleConnectionInProgress = currentMore.isGoogleConnectionInProgress,
                     googleConnectionMessage = currentMore.googleConnectionMessage,
                     googleConnectionError = currentMore.googleConnectionError,
+                    userPreferences = preferences,
                     error = currentMore.error.takeUnless { shouldClearUnavailableMessage }
                 )
                 HomeState(
@@ -299,8 +309,14 @@ class HomeViewModel @Inject constructor(
         val stats: PerformanceStats
     )
 
-    private fun buildPlanCard(plan: pt.ms.myshare.domain.model.SalaryPlan, goalAmount: BigDecimal): HomePlanCardState {
+    private fun buildPlanCard(
+        plan: pt.ms.myshare.domain.model.SalaryPlan,
+        goalAmount: BigDecimal,
+        preferences: UserPreferences
+    ): HomePlanCardState {
         val preview = calculatePlanPreviewUseCase.execute(plan, goalAmount)
+        val currencyFormat = currencyFormat(preferences)
+        val dateFormatter = DateTimeFormatter.ofPattern("d MMM", preferences.locale)
         return HomePlanCardState(
             incomeLabel = currencyFormat.format(plan.netIncomePerPayday),
             fixedCostsLabel = currencyFormat.format(preview.fixedCostsPerPayday),
@@ -314,16 +330,17 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    private fun buildGoalCard(goal: Goal, plan: SalaryPlan?): GoalCardState {
+    private fun buildGoalCard(goal: Goal, plan: SalaryPlan?, preferences: UserPreferences): GoalCardState {
         val preview = if (plan != null) {
             calculatePlanPreviewUseCase.execute(plan, goal.targetAmount)
         } else null
+        val currencyFormat = currencyFormat(preferences)
 
         val (targetDateKey, targetDateArgs) = if (goal.isCompleted) {
             "home_goal_mission_accomplished" to emptyList()
         } else {
             preview?.goalTargetDate?.let {
-                "home_goal_on_pace" to listOf(it.format(DateTimeFormatter.ofPattern("MMMM yyyy", locale)))
+                "home_goal_on_pace" to listOf(it.format(DateTimeFormatter.ofPattern("MMMM yyyy", preferences.locale)))
             } ?: ("home_goal_no_trajectory" to emptyList())
         }
         
@@ -345,11 +362,11 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    private fun buildRuleCard(rule: pt.ms.myshare.domain.model.PaydayRule): RuleCardState {
+    private fun buildRuleCard(rule: pt.ms.myshare.domain.model.PaydayRule, preferences: UserPreferences): RuleCardState {
         val amountLabel = if (rule.isPercentage) {
-            LocalizedAmountFormatter.formatPercentage(rule.amount, locale)
+            LocalizedAmountFormatter.formatPercentage(rule.amount, preferences.locale)
         } else {
-            currencyFormat.format(rule.amount)
+            currencyFormat(preferences).format(rule.amount)
         }
         return RuleCardState(
             id = rule.id,
@@ -362,7 +379,11 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    private fun buildReviewCard(plan: pt.ms.myshare.domain.model.SalaryPlan?, review: ManualReview?): ReviewCardState {
+    private fun buildReviewCard(
+        plan: pt.ms.myshare.domain.model.SalaryPlan?,
+        review: ManualReview?,
+        preferences: UserPreferences
+    ): ReviewCardState {
         val insight = if (plan != null && review != null) {
             createReviewInsightUseCase.execute(plan, review)
         } else {
@@ -375,12 +396,13 @@ class HomeViewModel @Inject constructor(
         val goalMax = reviewRangeMax(defaultGoalContribution ?: BigDecimal.ZERO)
 
         return ReviewCardState(
-            actualFlexibleSpend = defaultFlexibleSpend?.let { LocalizedAmountFormatter.formatEditableAmount(it, locale) }.orEmpty(),
-            actualGoalContribution = defaultGoalContribution?.let { LocalizedAmountFormatter.formatEditableAmount(it, locale) }.orEmpty(),
+            actualFlexibleSpend = defaultFlexibleSpend?.let { LocalizedAmountFormatter.formatEditableAmount(it, preferences.locale) }.orEmpty(),
+            actualGoalContribution = defaultGoalContribution?.let { LocalizedAmountFormatter.formatEditableAmount(it, preferences.locale) }.orEmpty(),
+            currencySymbol = LocalizedAmountFormatter.currencySymbol(preferences.locale, preferences.currencyCode),
             flexibleSpendMax = flexibleMax,
             goalContributionMax = goalMax,
             insight = insight,
-            savedReviewDate = review?.createdAt?.format(dateFormatter)
+            savedReviewDate = review?.createdAt?.format(DateTimeFormatter.ofPattern("d MMM", preferences.locale))
         )
     }
 
@@ -406,8 +428,8 @@ class HomeViewModel @Inject constructor(
             return
         }
 
-        val actualFlexible = LocalizedAmountFormatter.parseAmount(uiState.value.reviewCard.actualFlexibleSpend, locale)
-        val actualGoal = LocalizedAmountFormatter.parseAmount(uiState.value.reviewCard.actualGoalContribution, locale)
+        val actualFlexible = LocalizedAmountFormatter.parseAmount(uiState.value.reviewCard.actualFlexibleSpend, currentPreferences.locale)
+        val actualGoal = LocalizedAmountFormatter.parseAmount(uiState.value.reviewCard.actualGoalContribution, currentPreferences.locale)
         if (actualFlexible == null || actualGoal == null) {
             uiState.update { it.copy(reviewCard = it.reviewCard.copy(error = "home_review_error_invalid_amounts")) }
             return
@@ -467,9 +489,23 @@ class HomeViewModel @Inject constructor(
         uiState.update { it.copy(moreCard = it.moreCard.copy(selectedBillingPlan = plan, billingMessage = null, error = null)) }
         FirebaseUtils.logEvent("paywall_plan_selected", android.os.Bundle().apply {
             putString("billing_plan", plan.name.lowercase(Locale.US))
-            putString("price_cluster", pricingStrategy.marketCluster)
+            putString("price_cluster", currentPricingStrategy().marketCluster)
             putString("source", "home_more")
         })
+    }
+
+    fun updateLanguage(languageTag: String) {
+        val current = currentPreferences
+        viewModelScope.launch {
+            userPreferencesRepository.savePreferences(current.copy(languageTag = languageTag))
+        }
+    }
+
+    fun updateCurrency(currencyCode: String) {
+        val current = currentPreferences
+        viewModelScope.launch {
+            userPreferencesRepository.savePreferences(current.copy(currencyCode = currencyCode))
+        }
     }
 
     fun connectGoogleAccount(idToken: String) {
@@ -487,6 +523,7 @@ class HomeViewModel @Inject constructor(
             val result = authRepository.connectGoogleAccount(idToken)
             result.fold(
                 onSuccess = { user ->
+                    viewModelScope.launch { userPreferencesRepository.syncToFirestoreIfAuthenticated() }
                     uiState.update {
                         it.copy(
                             moreCard = it.moreCard.copy(
@@ -550,7 +587,7 @@ class HomeViewModel @Inject constructor(
                 entitlementRepository.purchasePlan(activity, realProduct)
                 FirebaseUtils.logEvent("purchase_started", android.os.Bundle().apply {
                     putString("billing_plan", uiState.value.moreCard.selectedBillingPlan.name.lowercase(Locale.US))
-                    putString("price_cluster", pricingStrategy.marketCluster)
+                    putString("price_cluster", currentPricingStrategy().marketCluster)
                     putString("product_id", realProduct.productId)
                     putBoolean("has_trial", realProduct.hasFreeTrial)
                     putString("source", source)
@@ -561,7 +598,7 @@ class HomeViewModel @Inject constructor(
             } else {
                 FirebaseUtils.logEvent("purchase_unavailable", android.os.Bundle().apply {
                     putString("billing_plan", uiState.value.moreCard.selectedBillingPlan.name.lowercase(Locale.US))
-                    putString("price_cluster", pricingStrategy.marketCluster)
+                    putString("price_cluster", currentPricingStrategy().marketCluster)
                     putString("product_id", storeProductId)
                     putString("source", source)
                 })
@@ -584,7 +621,7 @@ class HomeViewModel @Inject constructor(
         FirebaseUtils.logEvent(eventName, android.os.Bundle().apply {
             putString("premium_gate", gate.analyticsName)
             putString("billing_plan", uiState.value.moreCard.selectedBillingPlan.name.lowercase(Locale.US))
-            putString("price_cluster", pricingStrategy.marketCluster)
+            putString("price_cluster", currentPricingStrategy().marketCluster)
             putString("product_id", selectedStoreProductId())
             putBoolean("selected_product_available", selectedProduct != null)
             putBoolean("has_trial", selectedProduct?.hasFreeTrial == true)
@@ -620,7 +657,7 @@ class HomeViewModel @Inject constructor(
         return PerformanceStatsState(
             healthScore = healthScore,
             currentStreak = currentStreak,
-            totalFlexSavingsLabel = currencyFormat.format(totalSavingsBeyondGoal),
+            totalFlexSavingsLabel = currencyFormat(currentPreferences).format(totalSavingsBeyondGoal),
             totalSavings = totalSavingsBeyondGoal,
             totalReviews = totalReviews,
             performanceTrend = trend
@@ -637,6 +674,8 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun ManualReview.toState(): ReviewHistoryItemState {
+        val currencyFormat = currencyFormat(currentPreferences)
+        val dateFormatter = DateTimeFormatter.ofPattern("d MMM", currentPreferences.locale)
         val flexTarget = plannedFlexibleSpend ?: BigDecimal.ZERO
         val flexDelta = actualFlexibleSpend.subtract(flexTarget)
         val goalTarget = plannedGoalContribution ?: BigDecimal.ZERO
@@ -655,7 +694,16 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    private fun sanitizeNumber(value: String): String = LocalizedAmountFormatter.sanitizeAmountInput(value, locale)
+    private fun sanitizeNumber(value: String): String =
+        LocalizedAmountFormatter.sanitizeAmountInput(value, currentPreferences.locale)
+
+    private fun currencyFormat(preferences: UserPreferences): NumberFormat {
+        return NumberFormat.getCurrencyInstance(preferences.locale).apply {
+            currency = preferences.currency
+        }
+    }
+
+    private fun currentPricingStrategy() = resolvePricingStrategyUseCase.execute(currentPreferences.locale)
 
     private fun reviewRangeMax(value: BigDecimal): Float {
         val doubled = value.multiply(BigDecimal("2")).toFloat()

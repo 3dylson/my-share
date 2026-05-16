@@ -25,8 +25,10 @@ import pt.ms.myshare.domain.model.PaydayRuleType
 import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
+import pt.ms.myshare.domain.repository.UserPreferencesRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
+import pt.ms.myshare.presentation.ui.localization.UserLocaleManager
 import pt.ms.myshare.utils.logs.FirebaseUtils
 import timber.log.Timber
 import java.math.BigDecimal
@@ -40,9 +42,11 @@ class OnboardingViewModel @Inject constructor(
     private val plannerRepository: PlannerRepository,
     private val entitlementRepository: EntitlementRepository,
     private val authRepository: AuthRepository,
+    private val userPreferencesRepository: UserPreferencesRepository,
     private val calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase,
     private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase,
-    private val reminderWorkScheduler: ReminderWorkScheduler
+    private val reminderWorkScheduler: ReminderWorkScheduler,
+    private val userLocaleManager: UserLocaleManager
 ) : ViewModel() {
 
     private val state = MutableStateFlow(OnboardingState())
@@ -50,10 +54,13 @@ class OnboardingViewModel @Inject constructor(
 
     init {
         val completed = plannerRepository.isOnboardingCompleted()
-        val pricing = resolvePricingStrategyUseCase.execute(Locale.getDefault())
+        val preferences = userPreferencesRepository.loadPreferences()
+        userLocaleManager.apply(preferences)
+        val pricing = resolvePricingStrategyUseCase.execute(preferences.locale)
         state.update {
             it.copy(
                 onboardingCompleted = completed,
+                userPreferences = preferences,
                 pricingStrategy = pricing,
                 selectedBillingPlan = pricing.heroPlan
             )
@@ -61,8 +68,28 @@ class OnboardingViewModel @Inject constructor(
         if (!completed) {
             FirebaseUtils.logEvent("onboarding_started", Bundle().apply {
                 putString("price_cluster", pricing.marketCluster)
-                putString("language", Locale.getDefault().language)
+                putString("language", preferences.locale.language)
             })
+        }
+        viewModelScope.launch {
+            userPreferencesRepository.observePreferences().collect { updatedPreferences ->
+                userLocaleManager.apply(updatedPreferences)
+                val updatedPricing = resolvePricingStrategyUseCase.execute(updatedPreferences.locale)
+                state.update { current ->
+                    current.copy(
+                        userPreferences = updatedPreferences,
+                        pricingStrategy = updatedPricing,
+                        selectedBillingPlan = current.pricingStrategy?.let { oldPricing ->
+                            if (current.selectedBillingPlan == oldPricing.heroPlan) updatedPricing.heroPlan else current.selectedBillingPlan
+                        } ?: updatedPricing.heroPlan
+                    )
+                }
+                Timber.tag(TAG).d(
+                    "Onboarding preferences updated language=%s currency=%s",
+                    updatedPreferences.languageTag,
+                    updatedPreferences.currencyCode
+                )
+            }
         }
         viewModelScope.launch {
             val isPremium = entitlementRepository.isPro.first()
@@ -182,7 +209,7 @@ class OnboardingViewModel @Inject constructor(
             )
             FirebaseUtils.logEvent("create_plan_completed", Bundle().apply {
                 putString("country_cluster", current.pricingStrategy?.marketCluster)
-                putString("language", Locale.getDefault().language)
+                putString("language", current.userPreferences.locale.language)
             })
         }
         return true
@@ -203,6 +230,20 @@ class OnboardingViewModel @Inject constructor(
             putString("price_cluster", state.value.pricingStrategy?.marketCluster)
             putString("source", "onboarding_paywall")
         })
+    }
+
+    fun updateLanguage(languageTag: String) {
+        val current = state.value.userPreferences
+        viewModelScope.launch {
+            userPreferencesRepository.savePreferences(current.copy(languageTag = languageTag))
+        }
+    }
+
+    fun updateCurrency(currencyCode: String) {
+        val current = state.value.userPreferences
+        viewModelScope.launch {
+            userPreferencesRepository.savePreferences(current.copy(currencyCode = currencyCode))
+        }
     }
 
     fun purchasePremium(activity: android.app.Activity) {
@@ -245,6 +286,7 @@ class OnboardingViewModel @Inject constructor(
             val result = authRepository.signInWithGoogle(idToken)
             
             if (result.isSuccess) {
+                userPreferencesRepository.syncToFirestoreIfAuthenticated()
                 FirebaseUtils.logEvent("login_success")
                 onComplete()
             } else {
@@ -260,6 +302,7 @@ class OnboardingViewModel @Inject constructor(
             val result = authRepository.signInAnonymously()
             
             if (result.isSuccess) {
+                userPreferencesRepository.syncToFirestoreIfAuthenticated()
                 FirebaseUtils.logEvent("login_success_anonymous")
                 onComplete()
             } else {

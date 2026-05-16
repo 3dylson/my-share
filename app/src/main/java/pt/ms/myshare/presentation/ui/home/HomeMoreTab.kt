@@ -25,6 +25,8 @@ import pt.ms.myshare.BuildConfig
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.presentation.ui.components.*
+import pt.ms.myshare.presentation.ui.preferences.currencyLabel
+import pt.ms.myshare.presentation.ui.preferences.languageLabel
 import pt.ms.myshare.presentation.ui.theme.*
 
 /**
@@ -40,6 +42,8 @@ fun LazyListScope.homeMoreTab(
     onBillingPlanSelected: (BillingPlan) -> Unit,
     onUnlockPremium: (android.app.Activity, String) -> Unit,
     onManageAdsConsent: () -> Unit,
+    onShowLanguagePicker: () -> Unit,
+    onShowCurrencyPicker: () -> Unit,
     onShowAutomationLock: () -> Unit,
     onShowAccountDetails: () -> Unit,
     isGoogleCredentialRequestInProgress: Boolean,
@@ -214,6 +218,20 @@ fun LazyListScope.homeMoreTab(
                     )
                 },
                 onClick = onConfigureReminder
+            )
+            PremiumSettingsRow(
+                title = stringResource(R.string.preferences_language_title),
+                subtitle = languageLabel(state.userPreferences.languageTag),
+                icon = Icons.Default.Language,
+                iconColor = MySharePrimary,
+                onClick = onShowLanguagePicker
+            )
+            PremiumSettingsRow(
+                title = stringResource(R.string.preferences_currency_title),
+                subtitle = currencyLabel(state.userPreferences.currencyCode, state.userPreferences.locale),
+                icon = Icons.Default.Payments,
+                iconColor = MySharePrimary,
+                onClick = onShowCurrencyPicker
             )
             PremiumSettingsRow(
                 title = stringResource(R.string.home_more_pref_automation),

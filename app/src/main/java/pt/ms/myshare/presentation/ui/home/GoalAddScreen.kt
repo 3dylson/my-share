@@ -167,7 +167,15 @@ fun GoalAddScreen(
                 onValueChange = onAmountChanged,
                 label = stringResource(R.string.goal_add_label_amount),
                 placeholder = stringResource(R.string.goal_add_hint_amount),
-                prefix = { Text(LocalizedAmountFormatter.currencySymbol(), color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                prefix = {
+                    Text(
+                        LocalizedAmountFormatter.currencySymbol(
+                            state.userPreferences.locale,
+                            state.userPreferences.currencyCode
+                        ),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             )
 
             if (state.error != null) {

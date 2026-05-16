@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.PlanPreview
+import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.theme.MySharePositive
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
@@ -54,9 +55,12 @@ import java.util.Locale
 fun TrajectoryScreen(
     preview: PlanPreview?,
     goalName: String,
+    userPreferences: UserPreferences,
     onNext: () -> Unit
 ) {
-    val currencyFormat = NumberFormat.getCurrencyInstance(Locale.getDefault())
+    val currencyFormat = NumberFormat.getCurrencyInstance(userPreferences.locale).apply {
+        currency = userPreferences.currency
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,

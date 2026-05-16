@@ -29,6 +29,7 @@ import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.PlanPreview
 import pt.ms.myshare.domain.model.PricingStrategy
 import pt.ms.myshare.domain.model.StoreProduct
+import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.components.PremiumInfoCard
 import pt.ms.myshare.presentation.ui.components.PremiumPaywallCard
@@ -44,11 +45,12 @@ fun PlanPreviewScreen(
     preview: PlanPreview,
     goalName: String,
     goalAmount: BigDecimal,
+    userPreferences: UserPreferences,
     onAutopilot: () -> Unit,
     onNotNow: () -> Unit
 ) {
-    val locale = Locale.getDefault()
-    val currency = NumberFormat.getCurrencyInstance(locale)
+    val locale = userPreferences.locale
+    val currency = NumberFormat.getCurrencyInstance(locale).apply { currency = userPreferences.currency }
     val dateFormatter = DateTimeFormatter.ofPattern("d MMM", locale)
 
     Scaffold(

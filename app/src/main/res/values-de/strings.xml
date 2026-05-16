@@ -280,6 +280,9 @@ Für Absicht gebaut</string>
     <string name="home_more_monthly_title">Monatsplan</string>
     <string name="home_more_premium_button">Auf Premium upgraden</string>
     <string name="home_more_pref_title">Planeinstellungen</string>
+    <string name="preferences_language_title">Sprache</string>
+    <string name="preferences_currency_title">Währung</string>
+    <string name="preferences_currency_search_hint">Währung oder Code suchen</string>
     <string name="home_more_pref_notifications">Zahltag-Erinnerungen</string>
     <string name="home_more_pref_automation">Automatische Regeln</string>
     <string name="home_more_pref_automation_active">Automatische Regeln sind aktiv</string>
@@ -455,4 +458,8 @@ Für Absicht gebaut</string>
     <string name="plan_summary_invest_with_discipline">Eine disziplinierte Aufteilung, die dafür sorgt, dass die Investitionen an jedem Zahltag konstant bleiben.</string>
     <string name="plan_summary_stop_overspending">Ein strengerer Plan, der zukünftiges Geld vor flexiblen Ausgaben schützt.</string>
     <string name="plan_summary_plan_together">Eine gemeinschaftsfreundliche Aufteilung, die für klare Rechnungen und sichtbare Fortschritte sorgt.</string>
+    <string name="required_update_title">Aktualisierung erforderlich</string>
+    <string name="required_update_message">Diese Version von My Share wird nicht mehr unterstützt. Bitte aktualisieren Sie, um Ihren Plan weiter zu verwenden.</string>
+    <string name="required_update_primary_action">Im Play Store aktualisieren</string>
+    <string name="required_update_fallback_action">Play Store im Browser öffnen</string>
 </resources>

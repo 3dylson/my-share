@@ -29,8 +29,10 @@ import pt.ms.myshare.domain.model.PlanPreview
 import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
+import pt.ms.myshare.TestUserPreferencesRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
+import pt.ms.myshare.presentation.ui.localization.UserLocaleManager
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -45,6 +47,7 @@ class OnboardingViewModelTest {
     private val calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase = mockk()
     private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase = mockk()
     private val reminderWorkScheduler: ReminderWorkScheduler = mockk(relaxed = true)
+    private val userLocaleManager: UserLocaleManager = mockk(relaxed = true)
 
     private lateinit var viewModel: OnboardingViewModel
 
@@ -69,9 +72,11 @@ class OnboardingViewModelTest {
             plannerRepository,
             entitlementRepository,
             authRepository,
+            TestUserPreferencesRepository(),
             calculatePlanPreviewUseCase,
             resolvePricingStrategyUseCase,
-            reminderWorkScheduler
+            reminderWorkScheduler,
+            userLocaleManager
         )
     }
 

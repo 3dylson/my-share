@@ -315,6 +315,9 @@
     <string name="home_more_monthly_title">Monthly plan</string>
     <string name="home_more_premium_button">Upgrade to Premium</string>
     <string name="home_more_pref_title">Plan settings</string>
+    <string name="preferences_language_title">Language</string>
+    <string name="preferences_currency_title">Currency</string>
+    <string name="preferences_currency_search_hint">Search currency or code</string>
     <string name="home_more_pref_notifications">Payday reminders</string>
     <string name="home_more_pref_automation">Auto rules</string>
     <string name="home_more_pref_automation_active">Auto rules are on</string>
@@ -501,4 +504,8 @@
     <string name="plan_summary_invest_with_discipline">A disciplined split that keeps investing consistent each payday.</string>
     <string name="plan_summary_stop_overspending">A tighter plan that protects future money before flexible spending.</string>
     <string name="plan_summary_plan_together">A shared-friendly split that keeps bills clear and progress visible.</string>
+    <string name="required_update_title">Update required</string>
+    <string name="required_update_message">This version of My Share is no longer supported. Please update to continue using your plan.</string>
+    <string name="required_update_primary_action">Update from Play Store</string>
+    <string name="required_update_fallback_action">Open Play Store in browser</string>
 </resources>

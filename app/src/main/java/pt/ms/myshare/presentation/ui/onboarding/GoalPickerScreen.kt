@@ -10,6 +10,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import pt.ms.myshare.R
+import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.presentation.ui.components.PremiumChoiceCard
 import pt.ms.myshare.presentation.ui.components.PremiumTextField
@@ -23,6 +24,7 @@ fun GoalPickerScreen(
     initialFocus: PlanningFocus,
     initialGoalName: String,
     initialGoalAmount: BigDecimal,
+    userPreferences: UserPreferences,
     onBack: () -> Unit,
     onNext: (PlanningFocus, String, BigDecimal) -> Unit
 ) {
@@ -32,12 +34,14 @@ fun GoalPickerScreen(
     val defaultCashBufferGoalName = stringResource(R.string.goal_default_cash_buffer)
     val defaultSharedGoalName = stringResource(R.string.goal_default_shared_safety_net)
     var goalName by remember { mutableStateOf(initialGoalName.ifBlank { defaultEmergencyGoalName }) }
-    val locale = Locale.getDefault()
-    var goalAmountText by remember { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialGoalAmount, locale)) }
+    val locale = userPreferences.locale
+    var goalAmountText by remember(userPreferences.languageTag) { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialGoalAmount, locale)) }
     var isCustomGoalSelected by remember { mutableStateOf(false) }
     var validationRequested by remember { mutableStateOf(false) }
 
-    val currencySymbol = remember(locale) { LocalizedAmountFormatter.currencySymbol(locale) }
+    val currencySymbol = remember(locale, userPreferences.currencyCode) {
+        LocalizedAmountFormatter.currencySymbol(locale, userPreferences.currencyCode)
+    }
     val amountPlaceholder = remember(locale) { LocalizedAmountFormatter.amountPlaceholder(locale) }
     val goalAmount = LocalizedAmountFormatter.parseAmount(goalAmountText, locale)
     val goalNameError = validationRequested && goalName.isBlank()

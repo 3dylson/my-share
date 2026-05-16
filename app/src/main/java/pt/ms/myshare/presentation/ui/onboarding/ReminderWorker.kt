@@ -9,6 +9,7 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import pt.ms.myshare.R
 import pt.ms.myshare.data.repository.PlannerRepositoryImpl
+import pt.ms.myshare.data.repository.SharedUserPreferencesRepository
 import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.domain.use_case.BuildPaydayNotificationMessageUseCase
@@ -28,6 +29,11 @@ class ReminderWorker(
         com.google.firebase.auth.FirebaseAuth.getInstance(),
         com.google.firebase.firestore.FirebaseFirestore.getInstance()
     )
+    private val userPreferencesRepository = SharedUserPreferencesRepository(
+        context,
+        com.google.firebase.auth.FirebaseAuth.getInstance(),
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+    )
     private val calculatePlanPreviewUseCase = CalculatePlanPreviewUseCase()
     private val buildPaydayNotificationMessageUseCase = BuildPaydayNotificationMessageUseCase(calculatePlanPreviewUseCase)
 
@@ -42,7 +48,12 @@ class ReminderWorker(
         }
         if (!shouldNotify) return Result.success()
 
-        val content = buildPaydayNotificationMessageUseCase.execute(plan)
+        val preferences = userPreferencesRepository.loadPreferences()
+        val content = buildPaydayNotificationMessageUseCase.execute(
+            plan = plan,
+            locale = preferences.locale,
+            currencyCode = preferences.currencyCode
+        )
         showNotification(content)
         Timber.tag(TAG).d("Reminder delivered cadence=%s", reminderConfiguration.cadence)
         return Result.success()

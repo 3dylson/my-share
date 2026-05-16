@@ -210,7 +210,14 @@ fun RuleAddScreen(
                 placeholder = if (state.isPercentage) stringResource(R.string.rule_add_hint_rate) else stringResource(R.string.rule_add_hint_amount),
                 prefix = { 
                     Text(
-                        text = if (state.isPercentage) stringResource(R.string.percentage_prefix) else LocalizedAmountFormatter.currencySymbol(),
+                        text = if (state.isPercentage) {
+                            stringResource(R.string.percentage_prefix)
+                        } else {
+                            LocalizedAmountFormatter.currencySymbol(
+                                state.userPreferences.locale,
+                                state.userPreferences.currencyCode
+                            )
+                        },
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     ) 
                 }

@@ -280,6 +280,9 @@
     <string name="home_more_monthly_title">الخطة الشهرية</string>
     <string name="home_more_premium_button">الترقية إلى Premium</string>
     <string name="home_more_pref_title">إعدادات الخطة</string>
+    <string name="preferences_language_title">اللغة</string>
+    <string name="preferences_currency_title">العملة</string>
+    <string name="preferences_currency_search_hint">ابحث عن عملة أو رمز</string>
     <string name="home_more_pref_notifications">تذكيرات يوم الدفع</string>
     <string name="home_more_pref_automation">قواعد تلقائية</string>
     <string name="home_more_pref_automation_active">القواعد التلقائية مفعّلة</string>
@@ -455,4 +458,8 @@
     <string name="plan_summary_invest_with_discipline">تقسيم منضبط يحافظ على ثبات الاستثمار في كل يوم دفع.</string>
     <string name="plan_summary_stop_overspending">خطة أكثر صرامة تحمي الأموال المستقبلية قبل الإنفاق المرن.</string>
     <string name="plan_summary_plan_together">تقسيم سهل الاستخدام يحافظ على الفواتير واضحة ويظهر التقدم.</string>
+    <string name="required_update_title">التحديث مطلوب</string>
+    <string name="required_update_message">لم يعد هذا الإصدار من My Share مدعوما. يرجى التحديث لمتابعة استخدام خطتك.</string>
+    <string name="required_update_primary_action">التحديث من Play Store</string>
+    <string name="required_update_fallback_action">فتح Play Store في المتصفح</string>
 </resources>

@@ -280,6 +280,9 @@
     <string name="home_more_monthly_title">Plano mensal</string>
     <string name="home_more_premium_button">Passar para Premium</string>
     <string name="home_more_pref_title">Definições do plano</string>
+    <string name="preferences_language_title">Idioma</string>
+    <string name="preferences_currency_title">Moeda</string>
+    <string name="preferences_currency_search_hint">Pesquisar moeda ou código</string>
     <string name="home_more_pref_notifications">Lembretes do dia de pagamento</string>
     <string name="home_more_pref_automation">Regras automáticas</string>
     <string name="home_more_pref_automation_active">Regras automáticas ativas</string>
@@ -455,4 +458,8 @@
     <string name="plan_summary_invest_with_discipline">Uma divisão disciplinada que mantém o investimento consistente em cada pagamento.</string>
     <string name="plan_summary_stop_overspending">Um plano mais rigoroso que protege o dinheiro futuro antes dos gastos flexíveis.</string>
     <string name="plan_summary_plan_together">Uma divisão pensada para partilhar, mantendo contas claras e progresso visível.</string>
+    <string name="required_update_title">Atualização obrigatória</string>
+    <string name="required_update_message">Esta versão do My Share já não é suportada. Atualize para continuar a usar o seu plano.</string>
+    <string name="required_update_primary_action">Atualizar na Play Store</string>
+    <string name="required_update_fallback_action">Abrir a Play Store no navegador</string>
 </resources>
