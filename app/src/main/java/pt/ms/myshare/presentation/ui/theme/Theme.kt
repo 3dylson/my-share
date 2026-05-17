@@ -1,59 +1,47 @@
 package pt.ms.myshare.presentation.ui.theme
 
 import android.app.Activity
+import android.os.Build
+import android.view.Window
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-import android.view.Window
-
-private val LightColorScheme = lightColorScheme(
-    primary = MySharePrimary,
-    onPrimary = MyShareOnPrimary,
-    primaryContainer = MySharePrimaryContainer,
-    onPrimaryContainer = MyShareOnPrimaryContainer,
-    secondary = MyShareSecondary,
-    onSecondary = MyShareOnSecondary,
-    background = MyShareBackground,
-    onBackground = MyShareOnBackground,
-    surface = MyShareSurface,
-    onSurface = MyShareOnSurface,
-    surfaceVariant = MyShareSurfaceVariant,
-    onSurfaceVariant = MyShareOnSurfaceVariant,
-    outline = MyShareOutline,
-    error = MyShareError,
-    onError = MyShareOnPrimary
-)
-
-private val DarkColorScheme = darkColorScheme(
-    primary = androidx.compose.ui.graphics.Color(0xFFA5B4FC),
-    onPrimary = androidx.compose.ui.graphics.Color(0xFF111827),
-    primaryContainer = androidx.compose.ui.graphics.Color(0xFF3730A3),
-    onPrimaryContainer = androidx.compose.ui.graphics.Color(0xFFE0E7FF),
-    secondary = MyShareSecondary,
-    onSecondary = MyShareOnSecondary,
-    background = androidx.compose.ui.graphics.Color(0xFF0B1120),
-    onBackground = androidx.compose.ui.graphics.Color(0xFFF8FAFC),
-    surface = androidx.compose.ui.graphics.Color(0xFF111827),
-    onSurface = androidx.compose.ui.graphics.Color(0xFFF8FAFC),
-    surfaceVariant = androidx.compose.ui.graphics.Color(0xFF1F2937),
-    onSurfaceVariant = androidx.compose.ui.graphics.Color(0xFFD1D5DB),
-    outline = androidx.compose.ui.graphics.Color(0xFF4B5563),
-    error = androidx.compose.ui.graphics.Color(0xFFFCA5A5),
-    onError = androidx.compose.ui.graphics.Color(0xFF7F1D1D)
-)
+import timber.log.Timber
 
 @Composable
 fun MyShareTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+    val context = LocalContext.current
+    val useDynamicColor = DynamicThemeSupport.shouldUseDynamicColor(
+        enabled = dynamicColor,
+        sdkInt = Build.VERSION.SDK_INT
+    )
+    val colorScheme = when {
+        useDynamicColor && darkTheme -> dynamicDarkColorScheme(context)
+        useDynamicColor -> dynamicLightColorScheme(context)
+        darkTheme -> DarkColorScheme
+        else -> LightColorScheme
+    }
+
+    LaunchedEffect(useDynamicColor, darkTheme) {
+        Timber.tag(TAG).d(
+            "Applied %s %s color scheme",
+            if (useDynamicColor) "dynamic" else "brand",
+            if (darkTheme) "dark" else "light"
+        )
+    }
+
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
@@ -75,3 +63,5 @@ fun MyShareTheme(
 private fun setStatusBarColor(window: Window, color: Int) {
     window.statusBarColor = color
 }
+
+private const val TAG = "MyShareTheme"
