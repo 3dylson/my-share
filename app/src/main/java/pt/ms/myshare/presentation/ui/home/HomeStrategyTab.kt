@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -231,7 +232,7 @@ private fun CompactStrategyGoalCard(
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Black,
-                        maxLines = 1,
+                        maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
@@ -251,20 +252,36 @@ private fun CompactStrategyGoalCard(
 
             PremiumProgressBar(progress = progress, color = MySharePrimary)
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                StrategyStatusChip(
-                    text = progressLabel,
-                    icon = Icons.Default.Flag,
-                    modifier = Modifier.weight(1f)
-                )
-                StrategyStatusChip(
-                    text = targetDateLabel,
-                    icon = Icons.Default.AutoGraph,
-                    modifier = Modifier.weight(1f)
-                )
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 340.dp || LocalDensity.current.fontScale >= 1.3f
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        StrategyStatusChip(
+                            text = progressLabel,
+                            icon = Icons.Default.Flag
+                        )
+                        StrategyStatusChip(
+                            text = targetDateLabel,
+                            icon = Icons.Default.AutoGraph
+                        )
+                    }
+                } else {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        StrategyStatusChip(
+                            text = progressLabel,
+                            icon = Icons.Default.Flag,
+                            modifier = Modifier.weight(1f)
+                        )
+                        StrategyStatusChip(
+                            text = targetDateLabel,
+                            icon = Icons.Default.AutoGraph,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
             }
         }
     }
@@ -287,43 +304,57 @@ private fun CompactStrategyRuleCard(
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.22f)),
         shadowElevation = 1.dp
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = MySharePrimary.copy(alpha = 0.1f)
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            val shouldStack = maxWidth < 340.dp || LocalDensity.current.fontScale >= 1.3f
+            Row(
+                modifier = Modifier.padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.SettingsSuggest,
-                    contentDescription = null,
-                    tint = MySharePrimary,
-                    modifier = Modifier.padding(9.dp).size(20.dp)
-                )
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MySharePrimary.copy(alpha = 0.1f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.SettingsSuggest,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.padding(9.dp).size(20.dp)
+                    )
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = ruleName,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = typeLabel,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    if (shouldStack) {
+                        Text(
+                            text = amountLabel,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontWeight = FontWeight.Black,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                }
+                if (!shouldStack) {
+                    Text(
+                        text = amountLabel,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Black
+                    )
+                }
             }
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = ruleName,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = typeLabel,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Text(
-                text = amountLabel,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Black
-            )
         }
     }
 }
@@ -355,7 +386,7 @@ private fun StrategyStatusChip(
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.SemiBold,
-                maxLines = 1,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
         }

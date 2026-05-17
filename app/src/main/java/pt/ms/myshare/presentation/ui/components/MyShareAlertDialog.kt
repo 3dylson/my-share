@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -33,8 +35,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -156,43 +160,109 @@ private fun DialogActions(
     onDismiss: () -> Unit,
     actionStyle: MyShareDialogActionStyle
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        if (dismissText != null) {
-            TextButton(
-                onClick = onDismiss,
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val shouldStack = maxWidth < 360.dp || LocalDensity.current.fontScale >= 1.3f
+        if (shouldStack) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(text = dismissText)
-            }
-        }
-        when (actionStyle) {
-            MyShareDialogActionStyle.Primary -> Button(
-                onClick = onConfirm,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ConfirmDialogAction(
+                    text = confirmText,
+                    onClick = onConfirm,
+                    actionStyle = actionStyle,
+                    modifier = Modifier.fillMaxWidth()
                 )
-            ) {
-                Text(text = confirmText)
+                if (dismissText != null) {
+                    DismissDialogAction(
+                        text = dismissText,
+                        onClick = onDismiss,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
-            MyShareDialogActionStyle.Destructive -> Button(
-                onClick = onConfirm,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error,
-                    contentColor = MaterialTheme.colorScheme.onError
+        } else {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (dismissText != null) {
+                    DismissDialogAction(
+                        text = dismissText,
+                        onClick = onDismiss
+                    )
+                }
+                ConfirmDialogAction(
+                    text = confirmText,
+                    onClick = onConfirm,
+                    actionStyle = actionStyle
                 )
-            ) {
-                Text(text = confirmText)
-            }
-            MyShareDialogActionStyle.Text -> TextButton(onClick = onConfirm) {
-                Text(text = confirmText)
             }
         }
     }
+}
+
+@Composable
+private fun ConfirmDialogAction(
+    text: String,
+    onClick: () -> Unit,
+    actionStyle: MyShareDialogActionStyle,
+    modifier: Modifier = Modifier
+) {
+    when (actionStyle) {
+        MyShareDialogActionStyle.Primary -> Button(
+            onClick = onClick,
+            modifier = modifier.heightIn(min = 48.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
+        ) {
+            DialogActionText(text = text)
+        }
+        MyShareDialogActionStyle.Destructive -> Button(
+            onClick = onClick,
+            modifier = modifier.heightIn(min = 48.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.error,
+                contentColor = MaterialTheme.colorScheme.onError
+            )
+        ) {
+            DialogActionText(text = text)
+        }
+        MyShareDialogActionStyle.Text -> TextButton(
+            onClick = onClick,
+            modifier = modifier.heightIn(min = 48.dp)
+        ) {
+            DialogActionText(text = text)
+        }
+    }
+}
+
+@Composable
+private fun DismissDialogAction(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TextButton(
+        onClick = onClick,
+        modifier = modifier.heightIn(min = 48.dp),
+        colors = ButtonDefaults.textButtonColors(
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    ) {
+        DialogActionText(text = text)
+    }
+}
+
+@Composable
+private fun DialogActionText(text: String) {
+    Text(
+        text = text,
+        textAlign = TextAlign.Center,
+        maxLines = 2,
+        overflow = TextOverflow.Ellipsis
+    )
 }

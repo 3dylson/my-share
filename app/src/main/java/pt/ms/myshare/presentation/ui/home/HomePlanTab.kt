@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -62,20 +63,39 @@ fun LazyListScope.homePlanTab(
         }
         item {
             PremiumSectionHeader(title = stringResource(R.string.home_plan_metrics_title))
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                CompactPlanMetric(
-                    label = stringResource(R.string.home_plan_label_income),
-                    value = card.incomeLabel,
-                    icon = Icons.Default.Payments,
-                    modifier = Modifier.weight(1f)
-                )
-                CompactPlanMetric(
-                    label = stringResource(R.string.home_plan_label_weekly),
-                    value = card.weeklySpendLabel,
-                    icon = Icons.Default.AccountBalanceWallet,
-                    accentColor = MySharePositive,
-                    modifier = Modifier.weight(1f)
-                )
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 360.dp || LocalDensity.current.fontScale >= 1.3f
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        CompactPlanMetric(
+                            label = stringResource(R.string.home_plan_label_income),
+                            value = card.incomeLabel,
+                            icon = Icons.Default.Payments
+                        )
+                        CompactPlanMetric(
+                            label = stringResource(R.string.home_plan_label_weekly),
+                            value = card.weeklySpendLabel,
+                            icon = Icons.Default.AccountBalanceWallet,
+                            accentColor = MySharePositive
+                        )
+                    }
+                } else {
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        CompactPlanMetric(
+                            label = stringResource(R.string.home_plan_label_income),
+                            value = card.incomeLabel,
+                            icon = Icons.Default.Payments,
+                            modifier = Modifier.weight(1f)
+                        )
+                        CompactPlanMetric(
+                            label = stringResource(R.string.home_plan_label_weekly),
+                            value = card.weeklySpendLabel,
+                            icon = Icons.Default.AccountBalanceWallet,
+                            accentColor = MySharePositive,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
             }
         }
         item {
@@ -235,16 +255,29 @@ private fun CompactAllocationGrid(
         shadowElevation = 1.dp
     ) {
         Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            items.chunked(2).forEach { rowItems ->
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    rowItems.forEach { item ->
-                        AllocationGridCell(
-                            item = item,
-                            modifier = Modifier.weight(1f)
-                        )
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 360.dp || LocalDensity.current.fontScale >= 1.3f
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        items.forEach { item ->
+                            AllocationGridCell(item = item)
+                        }
                     }
-                    if (rowItems.size == 1) {
-                        Spacer(modifier = Modifier.weight(1f))
+                } else {
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        items.chunked(2).forEach { rowItems ->
+                            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                rowItems.forEach { item ->
+                                    AllocationGridCell(
+                                        item = item,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                }
+                                if (rowItems.size == 1) {
+                                    Spacer(modifier = Modifier.weight(1f))
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -273,7 +306,7 @@ private fun AllocationGridCell(
                 tint = item.accentColor,
                 modifier = Modifier.size(20.dp)
             )
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = item.label.uppercase(),
                     style = MaterialTheme.typography.labelSmall,

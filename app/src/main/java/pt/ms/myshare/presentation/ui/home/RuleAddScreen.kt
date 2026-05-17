@@ -181,9 +181,10 @@ fun RuleAddScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
                 )
-                Row(
+                FlowRow(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     FilterChip(
                         selected = state.isPercentage,
@@ -239,6 +240,7 @@ fun RuleAddScreen(
                 FlowRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                     maxItemsInEachRow = 3
                 ) {
                     PaydayRuleType.values().forEach { type ->

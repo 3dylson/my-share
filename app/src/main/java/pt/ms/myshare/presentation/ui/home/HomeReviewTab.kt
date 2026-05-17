@@ -25,6 +25,7 @@ import java.math.BigDecimal
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.KeyboardType
 
 /**
@@ -272,19 +273,37 @@ private fun CompactReviewHistoryCard(
                 }
             }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                CompactHistoryMetric(
-                    label = stringResource(R.string.home_review_history_flex_label),
-                    value = item.flexibleSpendLabel,
-                    support = stringResource(R.string.home_review_history_target_delta, item.plannedFlexibleLabel, item.flexibleDeltaLabel),
-                    modifier = Modifier.weight(1f)
-                )
-                CompactHistoryMetric(
-                    label = stringResource(R.string.home_review_history_goal),
-                    value = item.goalContributionLabel,
-                    support = stringResource(R.string.home_review_history_target_delta, item.plannedGoalLabel, item.goalDeltaLabel),
-                    modifier = Modifier.weight(1f)
-                )
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 360.dp || LocalDensity.current.fontScale >= 1.3f
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        CompactHistoryMetric(
+                            label = stringResource(R.string.home_review_history_flex_label),
+                            value = item.flexibleSpendLabel,
+                            support = stringResource(R.string.home_review_history_target_delta, item.plannedFlexibleLabel, item.flexibleDeltaLabel)
+                        )
+                        CompactHistoryMetric(
+                            label = stringResource(R.string.home_review_history_goal),
+                            value = item.goalContributionLabel,
+                            support = stringResource(R.string.home_review_history_target_delta, item.plannedGoalLabel, item.goalDeltaLabel)
+                        )
+                    }
+                } else {
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        CompactHistoryMetric(
+                            label = stringResource(R.string.home_review_history_flex_label),
+                            value = item.flexibleSpendLabel,
+                            support = stringResource(R.string.home_review_history_target_delta, item.plannedFlexibleLabel, item.flexibleDeltaLabel),
+                            modifier = Modifier.weight(1f)
+                        )
+                        CompactHistoryMetric(
+                            label = stringResource(R.string.home_review_history_goal),
+                            value = item.goalContributionLabel,
+                            support = stringResource(R.string.home_review_history_target_delta, item.plannedGoalLabel, item.goalDeltaLabel),
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
             }
         }
     }
@@ -323,7 +342,7 @@ private fun CompactHistoryMetric(
                 text = support,
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1
+                maxLines = 2
             )
         }
     }
@@ -401,21 +420,43 @@ private fun CompactReviewEntryCard(
                 }
             }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                ReviewAmountField(
-                    label = stringResource(R.string.home_review_input_flex_exact),
-                    value = flexibleSpend,
-                    currencySymbol = currencySymbol,
-                    onValueChange = onFlexibleSpendChanged,
-                    modifier = Modifier.weight(1f)
-                )
-                ReviewAmountField(
-                    label = stringResource(R.string.home_review_input_goal_exact),
-                    value = goalContribution,
-                    currencySymbol = currencySymbol,
-                    onValueChange = onGoalContributionChanged,
-                    modifier = Modifier.weight(1f)
-                )
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 360.dp || LocalDensity.current.fontScale >= 1.3f
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        ReviewAmountField(
+                            label = stringResource(R.string.home_review_input_flex_exact),
+                            value = flexibleSpend,
+                            currencySymbol = currencySymbol,
+                            onValueChange = onFlexibleSpendChanged,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        ReviewAmountField(
+                            label = stringResource(R.string.home_review_input_goal_exact),
+                            value = goalContribution,
+                            currencySymbol = currencySymbol,
+                            onValueChange = onGoalContributionChanged,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                } else {
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        ReviewAmountField(
+                            label = stringResource(R.string.home_review_input_flex_exact),
+                            value = flexibleSpend,
+                            currencySymbol = currencySymbol,
+                            onValueChange = onFlexibleSpendChanged,
+                            modifier = Modifier.weight(1f)
+                        )
+                        ReviewAmountField(
+                            label = stringResource(R.string.home_review_input_goal_exact),
+                            value = goalContribution,
+                            currencySymbol = currencySymbol,
+                            onValueChange = onGoalContributionChanged,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
             }
 
             if (errorMessage != null) {

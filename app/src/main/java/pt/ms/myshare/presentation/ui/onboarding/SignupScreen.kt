@@ -21,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.credentials.CredentialManager
@@ -106,7 +108,10 @@ fun SignupScreen(
                         Text(
                             stringResource(R.string.onboarding_signup_continue_without_sync),
                             style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
+                            textAlign = TextAlign.Center,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
@@ -228,7 +233,7 @@ private fun SecurityFeature(title: String, description: String, icon: androidx.c
             Icon(icon, contentDescription = null, tint = MySharePrimary, modifier = Modifier.size(21.dp))
         }
         Spacer(Modifier.width(14.dp))
-        Column {
+        Column(modifier = Modifier.weight(1f)) {
             Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
             Text(description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }

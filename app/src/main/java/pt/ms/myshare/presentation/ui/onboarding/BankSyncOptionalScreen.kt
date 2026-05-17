@@ -4,7 +4,9 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Lock
@@ -42,10 +44,12 @@ fun BankSyncOptionalScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .navigationBarsPadding()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(64.dp))
+            Spacer(Modifier.height(48.dp))
             
             Box(
                 modifier = Modifier
@@ -64,7 +68,7 @@ fun BankSyncOptionalScreen(
                 )
             }
 
-            Spacer(Modifier.height(40.dp))
+            Spacer(Modifier.height(32.dp))
 
             Text(
                 stringResource(R.string.onboarding_banksync_title), 
@@ -83,7 +87,7 @@ fun BankSyncOptionalScreen(
                 modifier = Modifier.padding(top = 16.dp)
             )
             
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.height(32.dp))
             
             AnimatedContent(targetState = isInterestRegistered, label = "interestState") { registered ->
                 if (registered) {
@@ -103,12 +107,14 @@ fun BankSyncOptionalScreen(
                         
                         TextButton(
                             onClick = { isInterestRegistered = true },
-                            modifier = Modifier.fillMaxWidth().height(56.dp)
+                            modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)
                         ) {
                             Text(
                                 stringResource(R.string.onboarding_banksync_link),
                                 style = MaterialTheme.typography.labelLarge, 
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                                maxLines = 2
                             )
                         }
                         

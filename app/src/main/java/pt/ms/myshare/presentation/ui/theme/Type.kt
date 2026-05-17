@@ -21,14 +21,14 @@ val Typography = Typography(
         fontWeight = FontWeight.Bold,
         fontSize = 32.sp,
         lineHeight = 40.sp,
-        letterSpacing = (-0.5).sp
+        letterSpacing = 0.sp
     ),
     headlineMedium = TextStyle(
         fontFamily = InterFontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = 24.sp,
         lineHeight = 32.sp,
-        letterSpacing = (-0.25).sp
+        letterSpacing = 0.sp
     ),
     titleLarge = TextStyle(
         fontFamily = InterFontFamily,

@@ -26,13 +26,16 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
-import pt.ms.myshare.presentation.ui.theme.*
+import pt.ms.myshare.presentation.ui.theme.MyShareOnPrimary
+import pt.ms.myshare.presentation.ui.theme.MySharePrimary
 import androidx.compose.ui.viewinterop.AndroidView
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
@@ -211,7 +214,7 @@ fun PremiumMetricCard(
                         style = MaterialTheme.typography.headlineMedium,
                         color = color,
                         fontWeight = FontWeight.ExtraBold,
-                        letterSpacing = (-0.5).sp
+                        letterSpacing = 0.sp
                     )
                     if (subtitle != null) {
                         Text(
@@ -378,7 +381,7 @@ fun PremiumButton(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp),
+            .heightIn(min = 56.dp),
         enabled = enabled && !isLoading,
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(
@@ -400,6 +403,7 @@ fun PremiumButton(
             )
         } else {
             Row(
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
@@ -415,7 +419,10 @@ fun PremiumButton(
                     text = text.uppercase(),
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp
+                    letterSpacing = 0.sp,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
@@ -486,6 +493,7 @@ fun PremiumTextField(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PremiumPaywallCard(
     title: String,
@@ -524,7 +532,7 @@ fun PremiumPaywallCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleMedium,
@@ -551,7 +559,12 @@ fun PremiumPaywallCard(
             
             Spacer(modifier = Modifier.height(12.dp))
             
-            Row(verticalAlignment = Alignment.Bottom) {
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                itemVerticalAlignment = Alignment.Bottom
+            ) {
                 Text(
                     text = price,
                     style = MaterialTheme.typography.headlineSmall,
@@ -563,7 +576,7 @@ fun PremiumPaywallCard(
                         text = stringResource(R.string.price_period_suffix, period),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(bottom = 2.dp, start = 4.dp)
+                        modifier = Modifier.padding(bottom = 2.dp)
                     )
                 }
                 if (comparisonPrice != null) {
@@ -572,7 +585,7 @@ fun PremiumPaywallCard(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textDecoration = TextDecoration.LineThrough,
-                        modifier = Modifier.padding(bottom = 2.dp, start = 10.dp)
+                        modifier = Modifier.padding(bottom = 2.dp)
                     )
                 }
             }
@@ -625,7 +638,10 @@ fun PremiumSectionHeader(
             text = title,
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Black,
-            color = MaterialTheme.colorScheme.onBackground
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.weight(1f),
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
         )
         if (actionText != null && onActionClick != null) {
             TextButton(onClick = onActionClick) {
@@ -667,7 +683,7 @@ fun PremiumInfoCard(
                 )
                 Spacer(modifier = Modifier.width(16.dp))
             }
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
@@ -718,7 +734,7 @@ fun PremiumPlanSummary(
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Black,
                 color = Color.White,
-                letterSpacing = (-0.5).sp
+                letterSpacing = 0.sp
             )
             Spacer(modifier = Modifier.height(10.dp))
             Text(
@@ -748,7 +764,7 @@ fun PremiumAppHeader(
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Black,
             color = MaterialTheme.colorScheme.onBackground,
-            letterSpacing = (-1.5).sp
+            letterSpacing = 0.sp
         )
         if (subtitle != null) {
             Text(
@@ -1018,7 +1034,7 @@ fun HeroMetricCard(
                         style = MaterialTheme.typography.headlineLarge,
                         color = contentColor,
                         fontWeight = FontWeight.Black,
-                        letterSpacing = (-1.5).sp
+                        letterSpacing = 0.sp
                     )
                     if (subtitle != null) {
                         Spacer(modifier = Modifier.height(6.dp))
@@ -1089,7 +1105,8 @@ fun AllocationPreviewMetric(
                     style = MaterialTheme.typography.titleLarge, 
                     fontWeight = FontWeight.Black, 
                     color = MaterialTheme.colorScheme.onSurface,
-                    letterSpacing = (-0.5).sp
+                    letterSpacing = 0.sp,
+                    textAlign = TextAlign.Center
                 )
             }
             
@@ -1121,7 +1138,8 @@ fun AllocationPreviewMetric(
                     style = MaterialTheme.typography.titleLarge, 
                     fontWeight = FontWeight.Black, 
                     color = MaterialTheme.colorScheme.onSurface,
-                    letterSpacing = (-0.5).sp
+                    letterSpacing = 0.sp,
+                    textAlign = TextAlign.Center
                 )
             }
         }
@@ -1139,34 +1157,32 @@ fun GoogleSignInButton(
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .height(54.dp)
+            .heightIn(min = 54.dp)
             .clickable(enabled = !isLoading) { onClick() },
         shape = RoundedCornerShape(14.dp),
         color = Color.White,
         border = BorderStroke(1.dp, Color(0xFFDADCE0)),
         shadowElevation = 2.dp
     ) {
-        Box(
+        Row(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(horizontal = 18.dp),
-            contentAlignment = Alignment.Center
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
             if (isLoading) {
                 CircularProgressIndicator(
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .size(20.dp),
+                    modifier = Modifier.size(20.dp),
                     color = Color(0xFF4285F4),
                     strokeWidth = 2.dp
                 )
             } else {
                 GoogleLogo(
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .size(22.dp)
+                    modifier = Modifier.size(22.dp)
                 )
             }
+            Spacer(modifier = Modifier.width(12.dp))
 
             Text(
                 text = buttonText,
@@ -1174,7 +1190,9 @@ fun GoogleSignInButton(
                 color = Color(0xFF3C4043),
                 fontWeight = FontWeight.SemiBold,
                 letterSpacing = 0.sp,
-                maxLines = 1
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }
@@ -1333,11 +1351,13 @@ fun PremiumSettingsRow(
                         text = subtitle,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 2,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis,
                         lineHeight = 17.sp
                     )
                 }
             }
+            Spacer(modifier = Modifier.width(12.dp))
             if (trailingContent != null) {
                 this.trailingContent()
             } else {
@@ -1418,7 +1438,8 @@ fun PremiumProfileHeader(
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Black,
                     color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 if (isPremium) {
@@ -1442,7 +1463,9 @@ fun PremiumProfileHeader(
                                 text = premiumMembershipLabel,
                                 style = MaterialTheme.typography.labelSmall,
                                 color = Color(0xFFDAA520),
-                                fontWeight = FontWeight.Black
+                                fontWeight = FontWeight.Black,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                     }
@@ -1505,14 +1528,19 @@ fun PremiumSliderCard(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
-                Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = formatValue(value),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.End,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
             

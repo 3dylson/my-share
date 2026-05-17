@@ -1,7 +1,9 @@
 package pt.ms.myshare.presentation.ui.onboarding
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoGraph
 import androidx.compose.material.icons.filled.Language
@@ -71,10 +73,12 @@ fun WelcomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .statusBarsPadding()
+                .navigationBarsPadding()
+                .verticalScroll(rememberScrollState())
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(80.dp))
+            Spacer(Modifier.height(48.dp))
 
             // Premium Visual Anchor - Glow effect
             Surface(
@@ -93,7 +97,7 @@ fun WelcomeScreen(
                 }
             }
             
-            Spacer(Modifier.height(48.dp))
+            Spacer(Modifier.height(32.dp))
 
             Text(
                 stringResource(R.string.onboarding_welcome_title), 
@@ -135,7 +139,7 @@ fun WelcomeScreen(
                 )
             }
 
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.height(32.dp))
 
             Column(
                 modifier = Modifier.fillMaxWidth(),

@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -468,7 +469,11 @@ private fun CompactBillingPlanRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    itemVerticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleSmall,
@@ -476,7 +481,6 @@ private fun CompactBillingPlanRow(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     if (badge != null) {
-                        Spacer(Modifier.width(8.dp))
                         Surface(
                             color = MySharePrimary,
                             shape = RoundedCornerShape(8.dp)
@@ -496,20 +500,30 @@ private fun CompactBillingPlanRow(
                     verticalAlignment = Alignment.Bottom,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        text = stringResource(R.string.price_per_period, price, period),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Black,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    if (comparisonPrice != null) {
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        itemVerticalAlignment = Alignment.Bottom
+                    ) {
                         Text(
-                            text = stringResource(R.string.price_per_period, comparisonPrice, period),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textDecoration = TextDecoration.LineThrough,
-                            modifier = Modifier.padding(bottom = 1.dp)
+                            text = stringResource(R.string.price_per_period, price, period),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Black,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
                         )
+                        if (comparisonPrice != null) {
+                            Text(
+                                text = stringResource(R.string.price_per_period, comparisonPrice, period),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textDecoration = TextDecoration.LineThrough,
+                                modifier = Modifier.padding(bottom = 1.dp),
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
                 }
                 if (savingsLabel != null) {

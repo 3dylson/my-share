@@ -7,12 +7,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.SystemUpdate
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import pt.ms.myshare.R
+import pt.ms.myshare.presentation.ui.components.PremiumButton
 
 @Composable
 fun RequiredUpdateScreen(
@@ -65,20 +66,25 @@ fun RequiredUpdateScreen(
             modifier = Modifier.widthIn(max = 480.dp)
         )
         Spacer(modifier = Modifier.height(28.dp))
-        Button(
+        PremiumButton(
+            text = stringResource(R.string.required_update_primary_action),
             onClick = onOpenPlayStore,
             modifier = Modifier
                 .widthIn(max = 360.dp)
                 .fillMaxWidth()
-                .testTag(REQUIRED_UPDATE_PLAY_STORE_BUTTON_TAG)
-        ) {
-            Text(text = stringResource(R.string.required_update_primary_action))
-        }
+            .testTag(REQUIRED_UPDATE_PLAY_STORE_BUTTON_TAG)
+        )
         TextButton(
             onClick = onOpenPlayStoreWeb,
-            modifier = Modifier.testTag(REQUIRED_UPDATE_WEB_BUTTON_TAG)
+            modifier = Modifier
+                .heightIn(min = 48.dp)
+                .testTag(REQUIRED_UPDATE_WEB_BUTTON_TAG)
         ) {
-            Text(text = stringResource(R.string.required_update_fallback_action))
+            Text(
+                text = stringResource(R.string.required_update_fallback_action),
+                textAlign = TextAlign.Center,
+                maxLines = 2
+            )
         }
     }
 }

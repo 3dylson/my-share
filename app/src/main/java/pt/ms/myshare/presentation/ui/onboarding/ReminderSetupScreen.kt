@@ -86,7 +86,7 @@ fun ReminderSetupScreen(
 
                     TextButton(
                         onClick = onSkip,
-                        modifier = Modifier.fillMaxWidth().height(52.dp)
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)
                     ) {
                         Text(
                             stringResource(R.string.onboarding_reminder_skip),

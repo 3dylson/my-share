@@ -3,6 +3,8 @@ package pt.ms.myshare.presentation.ui.onboarding
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
@@ -42,6 +44,8 @@ fun BuildingPlanScreen(onBuilt: () -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .navigationBarsPadding()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 32.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start
@@ -56,7 +60,7 @@ fun BuildingPlanScreen(onBuilt: () -> Unit) {
                 strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
             )
             
-            Spacer(modifier = Modifier.height(56.dp))
+            Spacer(modifier = Modifier.height(40.dp))
             
             Text(
                 stringResource(R.string.onboarding_building_title),
@@ -73,7 +77,7 @@ fun BuildingPlanScreen(onBuilt: () -> Unit) {
                 modifier = Modifier.padding(top = 8.dp)
             )
             
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(32.dp))
             
             Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
                 AnimatedStep(visible = step1Visible, text = stringResource(R.string.onboarding_building_step_goals))
@@ -105,7 +109,8 @@ private fun AnimatedStep(visible: Boolean, text: String) {
                 text = text,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f)
             )
         }
     }

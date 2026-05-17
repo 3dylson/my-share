@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -39,7 +40,8 @@ import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReader
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.preferences.CurrencyPickerDialog
 import pt.ms.myshare.presentation.ui.preferences.LanguagePickerDialog
-import pt.ms.myshare.presentation.ui.theme.*
+import pt.ms.myshare.presentation.ui.theme.MySharePrimary
+import pt.ms.myshare.presentation.ui.theme.MyShareTheme
 import timber.log.Timber
 
 /**
@@ -353,40 +355,44 @@ fun HomeScreen(
                 color = MaterialTheme.colorScheme.background,
                 tonalElevation = 2.dp
             ) {
-                Row(
+                BoxWithConstraints(
                     modifier = Modifier
                         .statusBarsPadding()
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(horizontal = 24.dp, vertical = 10.dp)
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.app_name),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            fontWeight = FontWeight.Black
-                        )
-                        Text(
-                            text = stringResource(state.selectedDestination.labelRes),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontWeight = FontWeight.SemiBold
-                        )
+                    val shouldStackHeader = maxWidth < 360.dp || LocalDensity.current.fontScale >= 1.3f
+                    val premiumBadge: @Composable (() -> Unit) = {
+                        if (state.moreCard.isPremium) {
+                            AssistChip(
+                                onClick = {},
+                                enabled = false,
+                                label = { Text(text = stringResource(R.string.premium_badge), maxLines = 1) },
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = Icons.Default.WorkspacePremium,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                            )
+                        }
                     }
-                    if (state.moreCard.isPremium) {
-                        AssistChip(
-                            onClick = {},
-                            enabled = false,
-                            label = { Text(text = stringResource(R.string.premium_badge)) },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Default.WorkspacePremium,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            }
-                        )
+                    if (shouldStackHeader) {
+                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            HomeTopBarTitle(selectedDestination = state.selectedDestination)
+                            premiumBadge()
+                        }
+                    } else {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            HomeTopBarTitle(
+                                selectedDestination = state.selectedDestination,
+                                modifier = Modifier.weight(1f)
+                            )
+                            premiumBadge()
+                        }
                     }
                 }
             }
@@ -546,6 +552,29 @@ fun HomeScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun HomeTopBarTitle(
+    selectedDestination: HomeDestination,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        Text(
+            text = stringResource(R.string.app_name),
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+            fontWeight = FontWeight.Black,
+            maxLines = 2
+        )
+        Text(
+            text = stringResource(selectedDestination.labelRes),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 2
+        )
     }
 }
 

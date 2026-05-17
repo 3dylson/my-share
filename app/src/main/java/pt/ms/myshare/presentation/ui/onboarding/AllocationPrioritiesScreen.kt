@@ -5,6 +5,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -20,6 +21,7 @@ import java.math.RoundingMode
 import java.text.NumberFormat
 import java.util.*
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AllocationPrioritiesScreen(
     initialFlexibleSpend: BigDecimal,
@@ -105,28 +107,47 @@ fun AllocationPrioritiesScreen(
                     strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
                 )
                 Spacer(Modifier.height(12.dp))
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(
-                        stringResource(R.string.onboarding_priorities_allocated, allocatedLabel), 
-                        style = MaterialTheme.typography.labelLarge,
-                        color = if (remaining < BigDecimal.ZERO) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        if (remaining >= BigDecimal.ZERO) 
-                            stringResource(R.string.onboarding_priorities_remaining, remainingLabel)
-                        else 
-                            stringResource(
-                                R.string.onboarding_priorities_over,
-                                if (allocationIsPercentage) {
-                                    LocalizedAmountFormatter.formatPercentage(remaining.abs(), locale)
-                                } else {
-                                    currency.format(remaining.abs())
-                                }
-                            ), 
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = if (remaining < BigDecimal.ZERO) MaterialTheme.colorScheme.error else MySharePrimary
-                    )
+                BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                    val remainingText = if (remaining >= BigDecimal.ZERO) {
+                        stringResource(R.string.onboarding_priorities_remaining, remainingLabel)
+                    } else {
+                        stringResource(
+                            R.string.onboarding_priorities_over,
+                            if (allocationIsPercentage) {
+                                LocalizedAmountFormatter.formatPercentage(remaining.abs(), locale)
+                            } else {
+                                currency.format(remaining.abs())
+                            }
+                        )
+                    }
+                    val shouldStack = maxWidth < 340.dp || LocalDensity.current.fontScale >= 1.3f
+                    if (shouldStack) {
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            AllocationProgressLabel(
+                                text = stringResource(R.string.onboarding_priorities_allocated, allocatedLabel),
+                                color = if (remaining < BigDecimal.ZERO) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            AllocationProgressLabel(
+                                text = remainingText,
+                                color = if (remaining < BigDecimal.ZERO) MaterialTheme.colorScheme.error else MySharePrimary,
+                                emphasized = true
+                            )
+                        }
+                    } else {
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            AllocationProgressLabel(
+                                text = stringResource(R.string.onboarding_priorities_allocated, allocatedLabel),
+                                color = if (remaining < BigDecimal.ZERO) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.weight(1f)
+                            )
+                            AllocationProgressLabel(
+                                text = remainingText,
+                                color = if (remaining < BigDecimal.ZERO) MaterialTheme.colorScheme.error else MySharePrimary,
+                                emphasized = true,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
                 }
             }
 
@@ -152,9 +173,10 @@ fun AllocationPrioritiesScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
                     )
-                    Row(
+                    FlowRow(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         FilterChip(
                             selected = allocationIsPercentage,
@@ -257,6 +279,22 @@ fun AllocationPrioritiesScreen(
                 )
             }
     }
+}
+
+@Composable
+private fun AllocationProgressLabel(
+    text: String,
+    color: androidx.compose.ui.graphics.Color,
+    modifier: Modifier = Modifier,
+    emphasized: Boolean = false
+) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelLarge,
+        fontWeight = if (emphasized) FontWeight.Bold else FontWeight.Normal,
+        color = color,
+        modifier = modifier
+    )
 }
 
 private fun BigDecimal.formatPercentOf(total: BigDecimal, locale: Locale): String {

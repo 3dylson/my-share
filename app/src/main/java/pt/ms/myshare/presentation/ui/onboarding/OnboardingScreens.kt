@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -665,7 +666,7 @@ private fun PaywallFooterBillingNotice(
                 text = message,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 2,
+                maxLines = 3,
                 overflow = TextOverflow.Ellipsis
             )
         }
@@ -735,36 +736,37 @@ private fun PaywallTrustRow(
 
 @Composable
 private fun PaywallFeatureGrid() {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            CompactPaywallFeature(
-                title = stringResource(R.string.paywall_feature_automation_title),
-                body = stringResource(R.string.paywall_feature_automation_desc),
-                modifier = Modifier.weight(1f)
-            )
-            CompactPaywallFeature(
-                title = stringResource(R.string.paywall_feature_reminders_title),
-                body = stringResource(R.string.paywall_feature_reminders_desc),
-                modifier = Modifier.weight(1f)
-            )
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            CompactPaywallFeature(
-                title = stringResource(R.string.paywall_feature_goals_title),
-                body = stringResource(R.string.paywall_feature_goals_desc),
-                modifier = Modifier.weight(1f)
-            )
-            CompactPaywallFeature(
-                title = stringResource(R.string.paywall_feature_tracking_title),
-                body = stringResource(R.string.paywall_feature_tracking_desc),
-                modifier = Modifier.weight(1f)
-            )
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val shouldStack = maxWidth < 360.dp || LocalDensity.current.fontScale >= 1.3f
+        val features = listOf(
+            stringResource(R.string.paywall_feature_automation_title) to stringResource(R.string.paywall_feature_automation_desc),
+            stringResource(R.string.paywall_feature_reminders_title) to stringResource(R.string.paywall_feature_reminders_desc),
+            stringResource(R.string.paywall_feature_goals_title) to stringResource(R.string.paywall_feature_goals_desc),
+            stringResource(R.string.paywall_feature_tracking_title) to stringResource(R.string.paywall_feature_tracking_desc)
+        )
+        if (shouldStack) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                features.forEach { (title, body) ->
+                    CompactPaywallFeature(title = title, body = body)
+                }
+            }
+        } else {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                features.chunked(2).forEach { rowItems ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        rowItems.forEach { (title, body) ->
+                            CompactPaywallFeature(
+                                title = title,
+                                body = body,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -848,50 +850,96 @@ fun MissionStepCard(
         shape = RoundedCornerShape(24.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f))
     ) {
-        Row(
-            modifier = Modifier.padding(20.dp),
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            val shouldStackAmount = maxWidth < 340.dp || LocalDensity.current.fontScale >= 1.3f
+            if (shouldStackAmount) {
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    MissionStepBody(title = title, body = body, icon = icon, iconColor = iconColor)
+                    MissionStepAmount(amount = amount, modifier = Modifier.fillMaxWidth())
+                }
+            } else {
+                Row(
+                    modifier = Modifier.padding(20.dp),
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    MissionStepBody(
+                        title = title,
+                        body = body,
+                        icon = icon,
+                        iconColor = iconColor,
+                        modifier = Modifier.weight(1f)
+                    )
+                    MissionStepAmount(amount = amount)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MissionStepBody(
+    title: String,
+    body: String,
+    icon: ImageVector,
+    iconColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(iconColor.copy(alpha = 0.1f)),
+            contentAlignment = Alignment.Center
         ) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(iconColor.copy(alpha = 0.1f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = iconColor,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = iconColor,
+                modifier = Modifier.size(24.dp)
+            )
+        }
 
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    body,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    lineHeight = 20.sp
-                )
-            }
-
+        Column(modifier = Modifier.weight(1f)) {
             Text(
-                amount,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.ExtraBold,
+                title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                body,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                lineHeight = 20.sp
             )
         }
     }
+}
+
+@Composable
+private fun MissionStepAmount(
+    amount: String,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        amount,
+        style = MaterialTheme.typography.titleLarge,
+        fontWeight = FontWeight.ExtraBold,
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = modifier,
+        maxLines = 2,
+        overflow = TextOverflow.Ellipsis
+    )
 }
 
 @Composable
@@ -934,7 +982,8 @@ fun ImpactSummaryCard(
                     reminderText,
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f)
                 )
             }
         }
