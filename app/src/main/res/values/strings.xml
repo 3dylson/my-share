@@ -496,6 +496,7 @@
     <string name="goal_add_error_invalid_name_amount">Please enter a valid name and amount.</string>
     <string name="rule_add_error_missing">This rule is no longer available.</string>
     <string name="rule_add_error_invalid_name_amount">Please enter a valid name and amount.</string>
+    <string name="rule_add_error_exceeds_available">This rule exceeds the income available after fixed costs. Lower the amount or adjust another rule.</string>
     <string name="rule_type_savings">Savings</string>
     <string name="rule_type_investing">Investing</string>
     <string name="rule_type_crypto">Crypto</string>

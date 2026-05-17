@@ -25,6 +25,7 @@ data class OnboardingState(
     val allocatedSavings: BigDecimal? = null,
     val allocatedInvesting: BigDecimal? = null,
     val allocatedCrypto: BigDecimal? = null,
+    val allocationIsPercentage: Boolean = true,
     val planPreview: PlanPreview? = null,
     val userPreferences: UserPreferences = UserPreferences.defaults(),
     val pricingStrategy: PricingStrategy? = null,

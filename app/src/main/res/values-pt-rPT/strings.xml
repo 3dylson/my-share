@@ -450,6 +450,7 @@
     <string name="goal_add_error_invalid_name_amount">Introduza um nome e um valor válidos.</string>
     <string name="rule_add_error_missing">Esta regra já não está disponível.</string>
     <string name="rule_add_error_invalid_name_amount">Introduza um nome e um valor válidos.</string>
+    <string name="rule_add_error_exceeds_available">Esta regra excede o rendimento disponível depois dos custos fixos. Reduza o valor ou ajuste outra regra.</string>
     <string name="rule_type_savings">Poupança</string>
     <string name="rule_type_investing">Investimento</string>
     <string name="rule_type_crypto">Cripto</string>

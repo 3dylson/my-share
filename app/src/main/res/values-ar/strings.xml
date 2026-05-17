@@ -450,6 +450,7 @@
     <string name="goal_add_error_invalid_name_amount">الرجاء إدخال اسم صالح والمبلغ.</string>
     <string name="rule_add_error_missing">هذه القاعدة لم تعد متوفرة.</string>
     <string name="rule_add_error_invalid_name_amount">الرجاء إدخال اسم صالح والمبلغ.</string>
+    <string name="rule_add_error_exceeds_available">تتجاوز هذه القاعدة الدخل المتاح بعد التكاليف الثابتة. خفّض المبلغ أو عدّل قاعدة أخرى.</string>
     <string name="rule_type_savings">الادخار</string>
     <string name="rule_type_investing">الاستثمار</string>
     <string name="rule_type_crypto">العملات المشفرة</string>

@@ -12,9 +12,11 @@ import androidx.compose.ui.unit.dp
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.presentation.ui.components.PremiumTextField
+import pt.ms.myshare.presentation.ui.formatting.AllocationAmountConverter
 import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.presentation.ui.theme.*
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.text.NumberFormat
 import java.util.*
 
@@ -25,29 +27,58 @@ fun AllocationPrioritiesScreen(
     initialInvesting: BigDecimal,
     initialCrypto: BigDecimal,
     totalAvailable: BigDecimal,
+    initialAllocationIsPercentage: Boolean,
     userPreferences: UserPreferences,
     onBack: () -> Unit,
-    onNext: (BigDecimal, BigDecimal, BigDecimal, BigDecimal) -> Unit
+    onNext: (BigDecimal, BigDecimal, BigDecimal, BigDecimal, Boolean) -> Unit
 ) {
     val locale = userPreferences.locale
-    var flex by remember(userPreferences.languageTag) { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialFlexibleSpend, locale)) }
-    var sav by remember(userPreferences.languageTag) { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialSavings, locale)) }
-    var inv by remember(userPreferences.languageTag) { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialInvesting, locale)) }
-    var cry by remember(userPreferences.languageTag) { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialCrypto, locale)) }
+    fun fixedAmountTextToPercentageText(amountText: String): String {
+        val amount = LocalizedAmountFormatter.parseAmount(amountText, locale) ?: BigDecimal.ZERO
+        val percentage = AllocationAmountConverter.fixedAmountToPercentage(amount, totalAvailable) ?: amount
+        return LocalizedAmountFormatter.formatEditableAmount(percentage, locale)
+    }
 
-    val parsedFlex = LocalizedAmountFormatter.parseAmount(flex, locale) ?: BigDecimal.ZERO
-    val parsedSav = LocalizedAmountFormatter.parseAmount(sav, locale) ?: BigDecimal.ZERO
-    val parsedInv = LocalizedAmountFormatter.parseAmount(inv, locale) ?: BigDecimal.ZERO
-    val parsedCry = LocalizedAmountFormatter.parseAmount(cry, locale) ?: BigDecimal.ZERO
+    fun percentageTextToFixedAmountText(percentageText: String): String {
+        val percentage = LocalizedAmountFormatter.parseAmount(percentageText, locale) ?: BigDecimal.ZERO
+        val amount = AllocationAmountConverter.percentageToFixedAmount(percentage, totalAvailable) ?: percentage
+        return LocalizedAmountFormatter.formatEditableAmount(amount, locale)
+    }
+
+    var allocationIsPercentage by remember(initialAllocationIsPercentage) { mutableStateOf(initialAllocationIsPercentage) }
+    var flexAmount by remember(userPreferences.languageTag) { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialFlexibleSpend, locale)) }
+    var savAmount by remember(userPreferences.languageTag) { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialSavings, locale)) }
+    var invAmount by remember(userPreferences.languageTag) { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialInvesting, locale)) }
+    var cryAmount by remember(userPreferences.languageTag) { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialCrypto, locale)) }
+    var flexPercent by remember(userPreferences.languageTag, totalAvailable) { mutableStateOf(initialFlexibleSpend.formatPercentOf(totalAvailable, locale)) }
+    var savPercent by remember(userPreferences.languageTag, totalAvailable) { mutableStateOf(initialSavings.formatPercentOf(totalAvailable, locale)) }
+    var invPercent by remember(userPreferences.languageTag, totalAvailable) { mutableStateOf(initialInvesting.formatPercentOf(totalAvailable, locale)) }
+    var cryPercent by remember(userPreferences.languageTag, totalAvailable) { mutableStateOf(initialCrypto.formatPercentOf(totalAvailable, locale)) }
+
+    val parsedFlex = LocalizedAmountFormatter.parseAmount(if (allocationIsPercentage) flexPercent else flexAmount, locale) ?: BigDecimal.ZERO
+    val parsedSav = LocalizedAmountFormatter.parseAmount(if (allocationIsPercentage) savPercent else savAmount, locale) ?: BigDecimal.ZERO
+    val parsedInv = LocalizedAmountFormatter.parseAmount(if (allocationIsPercentage) invPercent else invAmount, locale) ?: BigDecimal.ZERO
+    val parsedCry = LocalizedAmountFormatter.parseAmount(if (allocationIsPercentage) cryPercent else cryAmount, locale) ?: BigDecimal.ZERO
 
     val allocated = parsedFlex + parsedSav + parsedInv + parsedCry
-    val remaining = totalAvailable - allocated
+    val targetAllocation = if (allocationIsPercentage) BigDecimal("100") else totalAvailable
+    val remaining = targetAllocation - allocated
     val hasAvailableIncome = totalAvailable > BigDecimal.ZERO
     val isValid = hasAvailableIncome && remaining.compareTo(BigDecimal.ZERO) == 0
 
     val currency = NumberFormat.getCurrencyInstance(locale).apply { currency = userPreferences.currency }
     val symbol = LocalizedAmountFormatter.currencySymbol(locale, userPreferences.currencyCode)
     val amountPlaceholder = remember(locale) { LocalizedAmountFormatter.amountPlaceholder(locale) }
+    val allocatedLabel = if (allocationIsPercentage) {
+        LocalizedAmountFormatter.formatPercentage(allocated, locale)
+    } else {
+        currency.format(allocated)
+    }
+    val remainingLabel = if (allocationIsPercentage) {
+        LocalizedAmountFormatter.formatPercentage(remaining, locale)
+    } else {
+        currency.format(remaining)
+    }
 
     OnboardingStepScaffold(
         title = stringResource(R.string.onboarding_priorities_title),
@@ -59,11 +90,10 @@ fun AllocationPrioritiesScreen(
         },
         actionEnabled = isValid,
         onBack = onBack,
-        onAction = { onNext(parsedFlex, parsedSav, parsedInv, parsedCry) }
+        onAction = { onNext(parsedFlex, parsedSav, parsedInv, parsedCry, allocationIsPercentage) }
     ) {
-            // Progress Section
-            val progress = if (totalAvailable > BigDecimal.ZERO) {
-                (allocated.toDouble() / totalAvailable.toDouble()).coerceIn(0.0, 1.1).toFloat()
+            val progress = if (targetAllocation > BigDecimal.ZERO) {
+                (allocated.toDouble() / targetAllocation.toDouble()).coerceIn(0.0, 1.1).toFloat()
             } else 0f
             
             Column {
@@ -77,15 +107,22 @@ fun AllocationPrioritiesScreen(
                 Spacer(Modifier.height(12.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(
-                        stringResource(R.string.onboarding_priorities_allocated, currency.format(allocated)), 
+                        stringResource(R.string.onboarding_priorities_allocated, allocatedLabel), 
                         style = MaterialTheme.typography.labelLarge,
                         color = if (remaining < BigDecimal.ZERO) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
                         if (remaining >= BigDecimal.ZERO) 
-                            stringResource(R.string.onboarding_priorities_remaining, currency.format(remaining))
+                            stringResource(R.string.onboarding_priorities_remaining, remainingLabel)
                         else 
-                            stringResource(R.string.onboarding_priorities_over, currency.format(remaining.abs())), 
+                            stringResource(
+                                R.string.onboarding_priorities_over,
+                                if (allocationIsPercentage) {
+                                    LocalizedAmountFormatter.formatPercentage(remaining.abs(), locale)
+                                } else {
+                                    currency.format(remaining.abs())
+                                }
+                            ), 
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
                         color = if (remaining < BigDecimal.ZERO) MaterialTheme.colorScheme.error else MySharePrimary
@@ -108,42 +145,122 @@ fun AllocationPrioritiesScreen(
             Spacer(Modifier.height(28.dp))
 
             Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = stringResource(R.string.rule_add_label_type),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        FilterChip(
+                            selected = allocationIsPercentage,
+                            onClick = {
+                                if (!allocationIsPercentage) {
+                                    flexPercent = fixedAmountTextToPercentageText(flexAmount)
+                                    savPercent = fixedAmountTextToPercentageText(savAmount)
+                                    invPercent = fixedAmountTextToPercentageText(invAmount)
+                                    cryPercent = fixedAmountTextToPercentageText(cryAmount)
+                                }
+                                allocationIsPercentage = true
+                            },
+                            label = { Text(stringResource(R.string.rule_add_type_percentage)) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MySharePrimary.copy(alpha = 0.1f),
+                                selectedLabelColor = MySharePrimary,
+                                selectedLeadingIconColor = MySharePrimary
+                            )
+                        )
+                        FilterChip(
+                            selected = !allocationIsPercentage,
+                            onClick = {
+                                if (allocationIsPercentage) {
+                                    flexAmount = percentageTextToFixedAmountText(flexPercent)
+                                    savAmount = percentageTextToFixedAmountText(savPercent)
+                                    invAmount = percentageTextToFixedAmountText(invPercent)
+                                    cryAmount = percentageTextToFixedAmountText(cryPercent)
+                                }
+                                allocationIsPercentage = false
+                            },
+                            label = { Text(stringResource(R.string.rule_add_type_fixed)) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MySharePrimary.copy(alpha = 0.1f),
+                                selectedLabelColor = MySharePrimary,
+                                selectedLeadingIconColor = MySharePrimary
+                            )
+                        )
+                    }
+                }
+
                 PremiumTextField(
-                    value = flex,
-                    onValueChange = { flex = LocalizedAmountFormatter.sanitizeAmountInput(it, locale) },
+                    value = if (allocationIsPercentage) flexPercent else flexAmount,
+                    onValueChange = {
+                        if (allocationIsPercentage) {
+                            flexPercent = LocalizedAmountFormatter.sanitizeAmountInput(it, locale)
+                        } else {
+                            flexAmount = LocalizedAmountFormatter.sanitizeAmountInput(it, locale)
+                        }
+                    },
                     label = stringResource(R.string.onboarding_priorities_label_flex),
-                    prefix = { Text("$symbol ") },
-                    placeholder = amountPlaceholder,
+                    prefix = { Text(if (allocationIsPercentage) stringResource(R.string.percentage_prefix) else "$symbol ") },
+                    placeholder = if (allocationIsPercentage) stringResource(R.string.rule_add_hint_rate) else amountPlaceholder,
                     description = stringResource(R.string.onboarding_priorities_desc_flex),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                 )
                 PremiumTextField(
-                    value = sav,
-                    onValueChange = { sav = LocalizedAmountFormatter.sanitizeAmountInput(it, locale) },
+                    value = if (allocationIsPercentage) savPercent else savAmount,
+                    onValueChange = {
+                        if (allocationIsPercentage) {
+                            savPercent = LocalizedAmountFormatter.sanitizeAmountInput(it, locale)
+                        } else {
+                            savAmount = LocalizedAmountFormatter.sanitizeAmountInput(it, locale)
+                        }
+                    },
                     label = stringResource(R.string.onboarding_priorities_label_sav),
-                    prefix = { Text("$symbol ") },
-                    placeholder = amountPlaceholder,
+                    prefix = { Text(if (allocationIsPercentage) stringResource(R.string.percentage_prefix) else "$symbol ") },
+                    placeholder = if (allocationIsPercentage) stringResource(R.string.rule_add_hint_rate) else amountPlaceholder,
                     description = stringResource(R.string.onboarding_priorities_desc_sav),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                 )
                 PremiumTextField(
-                    value = inv,
-                    onValueChange = { inv = LocalizedAmountFormatter.sanitizeAmountInput(it, locale) },
+                    value = if (allocationIsPercentage) invPercent else invAmount,
+                    onValueChange = {
+                        if (allocationIsPercentage) {
+                            invPercent = LocalizedAmountFormatter.sanitizeAmountInput(it, locale)
+                        } else {
+                            invAmount = LocalizedAmountFormatter.sanitizeAmountInput(it, locale)
+                        }
+                    },
                     label = stringResource(R.string.onboarding_priorities_label_inv),
-                    prefix = { Text("$symbol ") },
-                    placeholder = amountPlaceholder,
+                    prefix = { Text(if (allocationIsPercentage) stringResource(R.string.percentage_prefix) else "$symbol ") },
+                    placeholder = if (allocationIsPercentage) stringResource(R.string.rule_add_hint_rate) else amountPlaceholder,
                     description = stringResource(R.string.onboarding_priorities_desc_inv),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                 )
                 PremiumTextField(
-                    value = cry,
-                    onValueChange = { cry = LocalizedAmountFormatter.sanitizeAmountInput(it, locale) },
+                    value = if (allocationIsPercentage) cryPercent else cryAmount,
+                    onValueChange = {
+                        if (allocationIsPercentage) {
+                            cryPercent = LocalizedAmountFormatter.sanitizeAmountInput(it, locale)
+                        } else {
+                            cryAmount = LocalizedAmountFormatter.sanitizeAmountInput(it, locale)
+                        }
+                    },
                     label = stringResource(R.string.onboarding_priorities_label_cry),
-                    prefix = { Text("$symbol ") },
-                    placeholder = amountPlaceholder,
+                    prefix = { Text(if (allocationIsPercentage) stringResource(R.string.percentage_prefix) else "$symbol ") },
+                    placeholder = if (allocationIsPercentage) stringResource(R.string.rule_add_hint_rate) else amountPlaceholder,
                     description = stringResource(R.string.onboarding_priorities_desc_cry),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                 )
             }
     }
+}
+
+private fun BigDecimal.formatPercentOf(total: BigDecimal, locale: Locale): String {
+    if (total <= BigDecimal.ZERO) return LocalizedAmountFormatter.formatEditableAmount(BigDecimal.ZERO, locale)
+    val percent = divide(total, 6, RoundingMode.HALF_UP).multiply(BigDecimal("100"))
+    return LocalizedAmountFormatter.formatEditableAmount(percent, locale)
 }

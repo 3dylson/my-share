@@ -450,6 +450,7 @@ Conçu pour l\'intention</string>
     <string name="goal_add_error_invalid_name_amount">Veuillez saisir un nom et un montant valides.</string>
     <string name="rule_add_error_missing">Cette règle n\'est plus disponible.</string>
     <string name="rule_add_error_invalid_name_amount">Veuillez saisir un nom et un montant valides.</string>
+    <string name="rule_add_error_exceeds_available">Cette règle dépasse le revenu disponible après les coûts fixes. Réduisez le montant ou ajustez une autre règle.</string>
     <string name="rule_type_savings">Épargne</string>
     <string name="rule_type_investing">Investissement</string>
     <string name="rule_type_crypto">Cryptomonnaie</string>

@@ -97,10 +97,11 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                     initialInvesting = preview.investingPerPayday,
                     initialCrypto = preview.cryptoPerPayday,
                     totalAvailable = totalAvailable,
+                    initialAllocationIsPercentage = state.allocationIsPercentage,
                     userPreferences = state.userPreferences,
                     onBack = { navController.popBackStack() },
-                    onNext = { flex, sav, inv, cry ->
-                        if (viewModel.setAllocationsAndBuild(flex, sav, inv, cry)) {
+                    onNext = { flex, sav, inv, cry, isPercentage ->
+                        if (viewModel.setAllocationsAndBuild(flex, sav, inv, cry, isPercentage)) {
                             navController.navigate(OnboardingRoute.BuildingPlan.route)
                         }
                     }

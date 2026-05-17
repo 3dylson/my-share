@@ -10,13 +10,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.domain.model.PaydayRule
 import pt.ms.myshare.domain.model.PaydayRuleType
 import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.repository.UserPreferencesRepository
+import pt.ms.myshare.presentation.ui.formatting.AllocationAmountConverter
 import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.LocalDate
 import java.util.Locale
 import java.util.UUID
@@ -104,7 +107,23 @@ class RuleAddViewModel @Inject constructor(
     }
 
     fun onPercentageToggle(isPercentage: Boolean) {
-        _state.update { it.copy(isPercentage = isPercentage, error = null) }
+        val current = _state.value
+        if (current.isPercentage == isPercentage) return
+
+        val convertedAmount = convertAmountForType(
+            amountText = current.amount,
+            fromPercentage = current.isPercentage,
+            toPercentage = isPercentage,
+            locale = current.userPreferences.locale
+        )
+
+        _state.update {
+            it.copy(
+                amount = convertedAmount ?: it.amount,
+                isPercentage = isPercentage,
+                error = null
+            )
+        }
     }
 
     fun onTypeChanged(newType: PaydayRuleType) {
@@ -120,6 +139,16 @@ class RuleAddViewModel @Inject constructor(
         val amount = LocalizedAmountFormatter.parseAmount(_state.value.amount, _state.value.userPreferences.locale) ?: BigDecimal.ZERO
         if (_state.value.name.isBlank() || amount <= BigDecimal.ZERO) {
             _state.update { it.copy(error = "rule_add_error_invalid_name_amount") }
+            return
+        }
+        if (allocationWouldExceedAvailableAmount(amount, _state.value.isPercentage)) {
+            _state.update { it.copy(error = "rule_add_error_exceeds_available") }
+            Timber.tag(TAG).d(
+                "Blocked rule save because allocations exceed available amount: ruleId=%s isPercentage=%s amount=%s",
+                _state.value.ruleId,
+                _state.value.isPercentage,
+                amount
+            )
             return
         }
 
@@ -149,7 +178,69 @@ class RuleAddViewModel @Inject constructor(
         }
     }
 
-    companion object {
+    private fun convertAmountForType(
+        amountText: String,
+        fromPercentage: Boolean,
+        toPercentage: Boolean,
+        locale: Locale
+    ): String? {
+        val amount = LocalizedAmountFormatter.parseAmount(amountText, locale) ?: return null
+        val availableAmount = ruleConversionBaseAmount() ?: return null
+        val converted = if (fromPercentage && !toPercentage) {
+            AllocationAmountConverter.percentageToFixedAmount(amount, availableAmount)
+        } else {
+            AllocationAmountConverter.fixedAmountToPercentage(amount, availableAmount)
+        } ?: return null
+
+        Timber.tag(TAG).d(
+            "Converted rule allocation amount: fromPercentage=%s toPercentage=%s base=%s original=%s converted=%s",
+            fromPercentage,
+            toPercentage,
+            availableAmount,
+            amount,
+            converted
+        )
+        return LocalizedAmountFormatter.formatEditableAmount(converted, locale)
+    }
+
+    private fun allocationWouldExceedAvailableAmount(amount: BigDecimal, isPercentage: Boolean): Boolean {
+        val availableAmount = ruleConversionBaseAmount() ?: return false
+        val currentRuleId = _state.value.ruleId
+        val existingAllocation = repository.loadRules()
+            .asSequence()
+            .filterNot { it.id == currentRuleId }
+            .map { rule -> rule.toFixedAmount(availableAmount) }
+            .fold(BigDecimal.ZERO, BigDecimal::add)
+        val candidateAllocation = if (isPercentage) {
+            AllocationAmountConverter.percentageToFixedAmount(amount, availableAmount)
+        } else {
+            amount
+        } ?: return amount > BigDecimal.ZERO
+        val totalAllocation = existingAllocation.add(candidateAllocation)
+        return totalAllocation > availableAmount
+    }
+
+    private fun PaydayRule.toFixedAmount(availableAmount: BigDecimal): BigDecimal {
+        return if (isPercentage) {
+            AllocationAmountConverter.percentageToFixedAmount(amount, availableAmount) ?: BigDecimal.ZERO
+        } else {
+            amount
+        }
+    }
+
+    private fun ruleConversionBaseAmount(): BigDecimal? {
+        val plan = repository.loadPlan() ?: return null
+        val fixedCostsPerPayday = when (plan.payFrequency) {
+            PayFrequency.MONTHLY -> plan.monthlyFixedCosts
+            PayFrequency.BIWEEKLY -> plan.monthlyFixedCosts
+                .multiply(BigDecimal("12"))
+                .divide(BigDecimal("26"), CONVERSION_SCALE, RoundingMode.HALF_UP)
+        }
+        return plan.netIncomePerPayday.subtract(fixedCostsPerPayday).max(BigDecimal.ZERO)
+    }
+
+    private companion object {
         private const val TAG = "RuleAddViewModel"
+        private const val CONVERSION_SCALE = 6
     }
 }

@@ -187,14 +187,24 @@ class OnboardingViewModel @Inject constructor(
         flexibleSpend: BigDecimal,
         savings: BigDecimal,
         investing: BigDecimal,
-        crypto: BigDecimal
+        crypto: BigDecimal,
+        isPercentage: Boolean
     ): Boolean {
+        Timber.tag(TAG).d(
+            "Set onboarding allocations: isPercentage=%s flexible=%s savings=%s investing=%s crypto=%s",
+            isPercentage,
+            flexibleSpend,
+            savings,
+            investing,
+            crypto
+        )
         state.update {
             it.copy(
                 allocatedFlexibleSpend = flexibleSpend,
                 allocatedSavings = savings,
                 allocatedInvesting = investing,
-                allocatedCrypto = crypto
+                allocatedCrypto = crypto,
+                allocationIsPercentage = isPercentage
             )
         }
         return buildPreview()
@@ -406,6 +416,7 @@ class OnboardingViewModel @Inject constructor(
                 allocatedSavings = BigDecimal("300"),
                 allocatedInvesting = BigDecimal("200"),
                 allocatedCrypto = BigDecimal.ZERO,
+                allocationIsPercentage = false,
                 goalName = "",
                 goalAmount = BigDecimal("5000"),
                 planSaved = true,
@@ -549,13 +560,13 @@ class OnboardingViewModel @Inject constructor(
 
         val rules = mutableListOf<PaydayRule>()
         current.allocatedSavings?.let { 
-            if (it > BigDecimal.ZERO) rules.add(PaydayRule(name = "Savings", amount = it, type = PaydayRuleType.SAVINGS, isPercentage = false)) 
+            if (it > BigDecimal.ZERO) rules.add(PaydayRule(name = "Savings", amount = it, type = PaydayRuleType.SAVINGS, isPercentage = current.allocationIsPercentage)) 
         }
         current.allocatedInvesting?.let { 
-            if (it > BigDecimal.ZERO) rules.add(PaydayRule(name = "Investing", amount = it, type = PaydayRuleType.INVESTING, isPercentage = false)) 
+            if (it > BigDecimal.ZERO) rules.add(PaydayRule(name = "Investing", amount = it, type = PaydayRuleType.INVESTING, isPercentage = current.allocationIsPercentage)) 
         }
         current.allocatedCrypto?.let { 
-            if (it > BigDecimal.ZERO) rules.add(PaydayRule(name = "Crypto", amount = it, type = PaydayRuleType.CRYPTO, isPercentage = false)) 
+            if (it > BigDecimal.ZERO) rules.add(PaydayRule(name = "Crypto", amount = it, type = PaydayRuleType.CRYPTO, isPercentage = current.allocationIsPercentage)) 
         }
 
         return SalaryPlan(

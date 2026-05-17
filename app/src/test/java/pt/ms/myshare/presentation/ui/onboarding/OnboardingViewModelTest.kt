@@ -125,15 +125,65 @@ class OnboardingViewModelTest {
             flexibleSpend = BigDecimal("300"),
             savings = BigDecimal("200"),
             investing = BigDecimal("100"),
-            crypto = BigDecimal("0")
+            crypto = BigDecimal("0"),
+            isPercentage = false
         )
         advanceUntilIdle()
 
         // Verify state is populated
         val state = viewModel.uiState.value
         assertEquals(BigDecimal("300"), state.allocatedFlexibleSpend)
+        assertFalse(state.allocationIsPercentage)
         assertNotNull(state.planPreview)
         coVerify { plannerRepository.savePlan(any()) }
+    }
+
+    @Test
+    fun `setAllocationsAndBuild saves percentage onboarding rules when percentage selected`() = runTest {
+        val savedPlans = mutableListOf<SalaryPlan>()
+        every { calculatePlanPreviewUseCase.execute(any(), any()) } returns previewResult()
+        viewModel.setSalaryDetails(BigDecimal("1000"), PayFrequency.MONTHLY, 1, "")
+        viewModel.setFixedCostsAndBuild(BigDecimal("400"), AllocationPreset.BALANCED)
+
+        viewModel.setAllocationsAndBuild(
+            flexibleSpend = BigDecimal("50"),
+            savings = BigDecimal("30"),
+            investing = BigDecimal("20"),
+            crypto = BigDecimal.ZERO,
+            isPercentage = true
+        )
+        advanceUntilIdle()
+
+        coVerify(atLeast = 1) { plannerRepository.savePlan(capture(savedPlans)) }
+        val rules = savedPlans.last().rules
+        assertEquals(BigDecimal("30"), rules.first { it.name == "Savings" }.amount)
+        assertTrue(rules.first { it.name == "Savings" }.isPercentage)
+        assertEquals(BigDecimal("20"), rules.first { it.name == "Investing" }.amount)
+        assertTrue(rules.first { it.name == "Investing" }.isPercentage)
+    }
+
+    @Test
+    fun `setAllocationsAndBuild saves fixed onboarding rules when fixed amount selected`() = runTest {
+        val savedPlans = mutableListOf<SalaryPlan>()
+        every { calculatePlanPreviewUseCase.execute(any(), any()) } returns previewResult()
+        viewModel.setSalaryDetails(BigDecimal("1000"), PayFrequency.MONTHLY, 1, "")
+        viewModel.setFixedCostsAndBuild(BigDecimal("400"), AllocationPreset.BALANCED)
+
+        viewModel.setAllocationsAndBuild(
+            flexibleSpend = BigDecimal("300"),
+            savings = BigDecimal("200"),
+            investing = BigDecimal("100"),
+            crypto = BigDecimal.ZERO,
+            isPercentage = false
+        )
+        advanceUntilIdle()
+
+        coVerify(atLeast = 1) { plannerRepository.savePlan(capture(savedPlans)) }
+        val rules = savedPlans.last().rules
+        assertEquals(BigDecimal("200"), rules.first { it.name == "Savings" }.amount)
+        assertFalse(rules.first { it.name == "Savings" }.isPercentage)
+        assertEquals(BigDecimal("100"), rules.first { it.name == "Investing" }.amount)
+        assertFalse(rules.first { it.name == "Investing" }.isPercentage)
     }
 
     @Test
@@ -280,4 +330,19 @@ class OnboardingViewModelTest {
         assertFalse(viewModel.uiState.value.shouldSecurePremiumAccess)
         assertEquals("home_more_account_connect_google_success", viewModel.uiState.value.googleConnectionMessage)
     }
+
+    private fun previewResult(): PlanPreview = PlanPreview(
+        incomePerPayday = BigDecimal("1000"),
+        fixedCostsPerPayday = BigDecimal("400"),
+        flexibleSpendPerPayday = BigDecimal("300"),
+        savingsPerPayday = BigDecimal("200"),
+        investingPerPayday = BigDecimal("100"),
+        cryptoPerPayday = BigDecimal("0"),
+        debtPerPayday = BigDecimal("0"),
+        weeklyFlexibleSpend = BigDecimal("75"),
+        monthlyGoalContribution = BigDecimal("200"),
+        nextPayday = LocalDate.now(),
+        goalTargetDate = null,
+        summary = "Preview snippet"
+    )
 }
