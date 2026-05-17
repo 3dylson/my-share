@@ -14,6 +14,7 @@ import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.domain.use_case.BuildPaydayNotificationMessageUseCase
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
+import pt.ms.myshare.domain.use_case.ResolveAllocationStrategyRulesUseCase
 import pt.ms.myshare.presentation.MyShareApp
 import timber.log.Timber
 import java.time.DayOfWeek
@@ -34,7 +35,7 @@ class ReminderWorker(
         com.google.firebase.auth.FirebaseAuth.getInstance(),
         com.google.firebase.firestore.FirebaseFirestore.getInstance()
     )
-    private val calculatePlanPreviewUseCase = CalculatePlanPreviewUseCase()
+    private val calculatePlanPreviewUseCase = CalculatePlanPreviewUseCase(ResolveAllocationStrategyRulesUseCase())
     private val buildPaydayNotificationMessageUseCase = BuildPaydayNotificationMessageUseCase(calculatePlanPreviewUseCase)
 
     override fun doWork(): Result {

@@ -24,7 +24,7 @@ class BuildPaydayNotificationMessageUseCase @Inject constructor(
             messageArgs = listOf(
                 currency.format(preview.fixedCostsPerPayday),
                 currency.format(preview.flexibleSpendPerPayday),
-                currency.format(preview.savingsPerPayday),
+                currency.format(preview.priorityContributionPerPayday),
                 currency.format(preview.investingPerPayday)
             )
         )

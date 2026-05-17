@@ -61,6 +61,7 @@ fun PlanPreviewScreen(
     val locale = userPreferences.locale
     val currency = NumberFormat.getCurrencyInstance(locale).apply { currency = userPreferences.currency }
     val dateFormatter = DateTimeFormatter.ofPattern("d MMM", locale)
+    val hasPriorityContribution = preview.priorityContributionPerPayday > BigDecimal.ZERO
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -136,15 +137,25 @@ fun PlanPreviewScreen(
                     )
                 }
 
-                // Mission Step 2: Goal Contribution
+                // Mission Step 2: Priority Contribution
                 item {
-                    MissionStepCard(
-                        title = stringResource(R.string.onboarding_plan_preview_step_goal_title, goalName),
-                        body = stringResource(R.string.onboarding_plan_preview_step_goal_body, currency.format(preview.savingsPerPayday), goalName),
-                        icon = Icons.Default.Flag,
-                        iconColor = MySharePositive,
-                        amount = currency.format(preview.savingsPerPayday)
-                    )
+                    if (hasPriorityContribution) {
+                        MissionStepCard(
+                            title = stringResource(R.string.onboarding_plan_preview_step_priority_title),
+                            body = stringResource(R.string.onboarding_plan_preview_step_priority_body, currency.format(preview.priorityContributionPerPayday)),
+                            icon = Icons.Default.Flag,
+                            iconColor = MySharePositive,
+                            amount = currency.format(preview.priorityContributionPerPayday)
+                        )
+                    } else {
+                        MissionStepCard(
+                            title = stringResource(R.string.onboarding_plan_preview_step_custom_title),
+                            body = stringResource(R.string.onboarding_plan_preview_step_custom_body),
+                            icon = Icons.Default.Tune,
+                            iconColor = MySharePositive,
+                            amount = currency.format(BigDecimal.ZERO)
+                        )
+                    }
                 }
 
                 // Mission Step 3: Flexible Spending

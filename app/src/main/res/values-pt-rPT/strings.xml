@@ -121,6 +121,10 @@
     <string name="onboarding_plan_preview_step_fixed_body">Mova %1$s para a sua conta de custos fixos imediatamente.</string>
     <string name="onboarding_plan_preview_step_goal_title">2.º Alimente a sua visão: %1$s</string>
     <string name="onboarding_plan_preview_step_goal_body">Contribua com %1$s para se manter no caminho certo por %2$s.</string>
+    <string name="onboarding_plan_preview_step_priority_title">2.º Financie a sua estratégia</string>
+    <string name="onboarding_plan_preview_step_priority_body">Mova %1$s para as prioridades escolhidas.</string>
+    <string name="onboarding_plan_preview_step_custom_title">2.º Mantenha flexível</string>
+    <string name="onboarding_plan_preview_step_custom_body">Esta estratégia não exige uma transferência prioritária.</string>
     <string name="onboarding_plan_preview_step_flex_title">3.º Aproveite a sua vida</string>
     <string name="onboarding_plan_preview_step_flex_body">Restam-lhe %1$s para o mês (%2$s por semana).</string>
     <string name="onboarding_plan_preview_impact_title">O panorama geral</string>
@@ -193,6 +197,17 @@
     <string name="onboarding_fixed_costs_preset_balanced_desc">Uma linha de base mensal moderada.</string>
     <string name="onboarding_fixed_costs_preset_growth">Crescimento</string>
     <string name="onboarding_fixed_costs_preset_growth_desc">Deixe mais espaço para investir.</string>
+    <string name="onboarding_fixed_costs_strategy_title">Estratégia do dia de pagamento</string>
+    <string name="onboarding_strategy_balanced_savings">Poupança equilibrada</string>
+    <string name="onboarding_strategy_balanced_savings_desc">Mantenha uma meta de poupança sem apertar a vida diária.</string>
+    <string name="onboarding_strategy_no_savings">Sem poupança por agora</string>
+    <string name="onboarding_strategy_no_savings_desc">Use o plano sem forçar uma categoria de poupança.</string>
+    <string name="onboarding_strategy_debt_first">Dívida primeiro</string>
+    <string name="onboarding_strategy_debt_first_desc">Priorize amortizações antes de poupança ou investimento.</string>
+    <string name="onboarding_strategy_investing_first">Investimento primeiro</string>
+    <string name="onboarding_strategy_investing_first_desc">Direcione mais de cada pagamento para ativos de longo prazo.</string>
+    <string name="onboarding_strategy_flexible_only">Só orçamento flexível</string>
+    <string name="onboarding_strategy_flexible_only_desc">Acompanhe o dinheiro seguro para gastar sem contribuições para metas.</string>
     <string name="onboarding_priorities_allocated">Alocado %1$s</string>
     <string name="onboarding_priorities_remaining">Restantes %1$s</string>
     <string name="onboarding_priorities_over">Acima do orçamento em %1$s</string>
@@ -206,6 +221,8 @@
     <string name="onboarding_priorities_desc_inv">Alocação de capital a longo prazo.</string>
     <string name="onboarding_priorities_label_cry">Criptografia</string>
     <string name="onboarding_priorities_desc_cry">Atribuição opcional de maior risco.</string>
+    <string name="onboarding_priorities_label_debt">Dívida</string>
+    <string name="onboarding_priorities_desc_debt">Amortizações extra além dos mínimos fixos.</string>
     <string name="onboarding_priorities_button_ready">Parece bom</string>
     <string name="onboarding_priorities_button_balance">Alocação de saldo</string>
     <string name="onboarding_trajectory_label_payday">Atribuição de dia de pagamento</string>
@@ -393,7 +410,7 @@
     <string name="coaching_first_step_headline">Domínio do primeiro passo</string>
     <string name="coaching_first_step_body">Ótimo começo com a sua primeira avaliação! Quanto mais registar, mais inteligente se torna o seu ciclo de hábitos.</string>
     <string name="notification_payday_title">A sua missão do dia de pagamento</string>
-    <string name="notification_payday_body">Garanta %1$s para as contas e poupe %3$s. Tem %2$s para gastar com segurança.</string>
+    <string name="notification_payday_body">Garanta %1$s para as contas e reserve %3$s. Tem %2$s para gastar com segurança.</string>
     <string name="home_plan_next_payday">Próximo dia de pagamento: %1$s</string>
     <string name="home_goal_mission_accomplished">Missão Cumprida!</string>
     <string name="home_goal_on_pace">Ao ritmo por %1$s</string>
@@ -467,4 +484,18 @@
     <string name="required_update_message">Esta versão do My Share já não é suportada. Atualize para continuar a usar o seu plano.</string>
     <string name="required_update_primary_action">Atualizar na Play Store</string>
     <string name="required_update_fallback_action">Abrir a Play Store no navegador</string>
+    <string name="onboarding_strategy_custom">Estratégia personalizada</string>
+    <string name="onboarding_strategy_custom_desc">Comece com uma divisão em branco e molde as regras.</string>
+    <string name="onboarding_strategy_custom_label">Nome da estratégia</string>
+    <string name="onboarding_strategy_custom_placeholder">ex.: Reinício para férias</string>
+    <string name="onboarding_trajectory_label_strategy">Caminho da estratégia</string>
+    <string name="onboarding_trajectory_strategy_pending">Esta estratégia não precisa de data-alvo.</string>
+    <string name="onboarding_trajectory_flexible_title">Transferência prioritária</string>
+    <string name="onboarding_trajectory_flexible_desc">Esta estratégia mantém flexível o dinheiro restante do pagamento.</string>
+    <string name="home_plan_label_priority">Prioridade</string>
+    <string name="plan_summary_no_savings_now">Uma divisão prática que não força poupança antes de estar pronto.</string>
+    <string name="plan_summary_debt_first">Uma divisão focada em amortizar dívida com mais pressão.</string>
+    <string name="plan_summary_investing_first">Uma divisão liderada por investimento para manter ativos a crescer.</string>
+    <string name="plan_summary_flexible_budget_only">Um plano flexível focado na clareza do dinheiro seguro para gastar.</string>
+    <string name="plan_summary_custom_strategy">Uma divisão personalizada moldada pelas suas regras de pagamento.</string>
 </resources>

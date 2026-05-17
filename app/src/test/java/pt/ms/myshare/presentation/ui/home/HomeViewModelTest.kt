@@ -38,6 +38,7 @@ import pt.ms.myshare.domain.use_case.GetReviewHistoryUseCase
 import pt.ms.myshare.domain.use_case.UpdateGoalProgressUseCase
 import pt.ms.myshare.domain.use_case.GetPerformanceStatsUseCase
 import pt.ms.myshare.domain.use_case.GetCoachingInsightsUseCase
+import pt.ms.myshare.domain.use_case.ResolveAllocationStrategyRulesUseCase
 import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.model.User
 import pt.ms.myshare.TestUserPreferencesRepository
@@ -67,6 +68,7 @@ class HomeViewModelTest {
         Dispatchers.setMain(testDispatcher)
         fakePlannerRepository = FakePlannerRepository()
         fakeEntitlementRepository = TestFakeEntitlementRepository()
+        val calculatePlanPreviewUseCase = CalculatePlanPreviewUseCase(ResolveAllocationStrategyRulesUseCase())
         
         every { mockAuthRepository.currentUser } returns flowOf(null)
         every { mockGetReviewHistoryUseCase.execute() } returns flowOf(emptyList())
@@ -76,13 +78,13 @@ class HomeViewModelTest {
             authRepository = mockAuthRepository,
             entitlementRepository = fakeEntitlementRepository,
             userPreferencesRepository = TestUserPreferencesRepository(),
-            calculatePlanPreviewUseCase = CalculatePlanPreviewUseCase(),
-            createReviewInsightUseCase = CreateReviewInsightUseCase(CalculatePlanPreviewUseCase()),
+            calculatePlanPreviewUseCase = calculatePlanPreviewUseCase,
+            createReviewInsightUseCase = CreateReviewInsightUseCase(calculatePlanPreviewUseCase),
             resolvePricingStrategyUseCase = ResolvePricingStrategyUseCase(),
             getReviewHistoryUseCase = mockGetReviewHistoryUseCase,
             updateGoalProgressUseCase = mockUpdateGoalProgressUseCase,
             getPerformanceStatsUseCase = GetPerformanceStatsUseCase(fakePlannerRepository),
-            getCoachingInsightsUseCase = GetCoachingInsightsUseCase(CalculatePlanPreviewUseCase()),
+            getCoachingInsightsUseCase = GetCoachingInsightsUseCase(calculatePlanPreviewUseCase),
             reminderWorkScheduler = mockReminderWorkScheduler,
             userLocaleManager = mockUserLocaleManager
         )

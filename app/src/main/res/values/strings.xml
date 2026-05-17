@@ -150,6 +150,10 @@
     <string name="onboarding_plan_preview_step_fixed_body">Move %1$s to your fixed costs account immediately.</string>
     <string name="onboarding_plan_preview_step_goal_title">2. Fuel your vision: %1$s</string>
     <string name="onboarding_plan_preview_step_goal_body">Contribute %1$s to stay on track for %2$s.</string>
+    <string name="onboarding_plan_preview_step_priority_title">2. Fund your strategy</string>
+    <string name="onboarding_plan_preview_step_priority_body">Move %1$s toward your selected priorities.</string>
+    <string name="onboarding_plan_preview_step_custom_title">2. Keep it flexible</string>
+    <string name="onboarding_plan_preview_step_custom_body">No priority transfer is required for this strategy.</string>
     <string name="onboarding_plan_preview_step_flex_title">3. Enjoy your life</string>
     <string name="onboarding_plan_preview_step_flex_body">You have %1$s left for the month (%2$s per week).</string>
     <string name="onboarding_plan_preview_impact_title">The Big Picture</string>
@@ -227,6 +231,21 @@
     <string name="onboarding_fixed_costs_preset_balanced_desc">A moderate monthly baseline.</string>
     <string name="onboarding_fixed_costs_preset_growth">Growth</string>
     <string name="onboarding_fixed_costs_preset_growth_desc">Leave more room for investing.</string>
+    <string name="onboarding_fixed_costs_strategy_title">Payday strategy</string>
+    <string name="onboarding_strategy_balanced_savings">Balanced savings</string>
+    <string name="onboarding_strategy_balanced_savings_desc">Keep a savings goal while leaving room for life.</string>
+    <string name="onboarding_strategy_no_savings">No savings for now</string>
+    <string name="onboarding_strategy_no_savings_desc">Use the plan without forcing a savings bucket.</string>
+    <string name="onboarding_strategy_debt_first">Debt first</string>
+    <string name="onboarding_strategy_debt_first_desc">Prioritize repayments before savings or investing.</string>
+    <string name="onboarding_strategy_investing_first">Investing first</string>
+    <string name="onboarding_strategy_investing_first_desc">Route more of each payday toward long-term assets.</string>
+    <string name="onboarding_strategy_flexible_only">Flexible budget only</string>
+    <string name="onboarding_strategy_flexible_only_desc">Track safe-to-spend money without goal contributions.</string>
+    <string name="onboarding_strategy_custom">Custom strategy</string>
+    <string name="onboarding_strategy_custom_desc">Start from a blank split and shape the rules yourself.</string>
+    <string name="onboarding_strategy_custom_label">Strategy name</string>
+    <string name="onboarding_strategy_custom_placeholder">e.g. Travel season reset</string>
     <string name="onboarding_priorities_allocated">Allocated %1$s</string>
     <string name="onboarding_priorities_remaining">Remaining %1$s</string>
     <string name="onboarding_priorities_over">Over budget by %1$s</string>
@@ -240,14 +259,20 @@
     <string name="onboarding_priorities_desc_inv">Long-term capital allocation.</string>
     <string name="onboarding_priorities_label_cry">Crypto</string>
     <string name="onboarding_priorities_desc_cry">Optional higher-risk allocation.</string>
+    <string name="onboarding_priorities_label_debt">Debt</string>
+    <string name="onboarding_priorities_desc_debt">Extra repayments beyond fixed minimums.</string>
     <string name="onboarding_priorities_button_ready">Looks good</string>
     <string name="onboarding_priorities_button_balance">Balance allocation</string>
     <string name="onboarding_trajectory_label_payday">Payday allocation</string>
     <string name="onboarding_trajectory_desc_payday">What each payday should do.</string>
     <string name="onboarding_trajectory_label_goal">Goal path</string>
+    <string name="onboarding_trajectory_label_strategy">Strategy path</string>
     <string name="onboarding_trajectory_goal_pending">Path pending</string>
+    <string name="onboarding_trajectory_strategy_pending">No target date is needed for this strategy.</string>
     <string name="onboarding_trajectory_intensity_title">Contribution intensity</string>
     <string name="onboarding_trajectory_intensity_desc">How much of each payday goes toward future you.</string>
+    <string name="onboarding_trajectory_flexible_title">Priority transfer</string>
+    <string name="onboarding_trajectory_flexible_desc">This strategy keeps the remaining payday money flexible.</string>
     <string name="onboarding_banksync_interest_title">Interest registered</string>
     <string name="onboarding_banksync_interest_body">We saved your interest on this device and will use app updates to announce bank sync when it is ready.</string>
     <string name="onboarding_reminder_error_permission">Notification permission is required for reminders.</string>
@@ -267,6 +292,7 @@
     <string name="home_plan_label_fixed">Fixed</string>
     <string name="home_plan_label_flexible">Flexible</string>
     <string name="home_plan_label_investing">Investing</string>
+    <string name="home_plan_label_priority">Priority</string>
     <string name="home_plan_benefit_title">Smart adjustments</string>
     <string name="home_plan_benefit_desc">Upgrade to automate recurring rules and adaptive buffers.</string>
     <string name="home_strategy_goals_title">Financial goals</string>
@@ -436,7 +462,7 @@
     <string name="coaching_first_step_body">Great start with your first review! The more you log, the smarter your habit loop becomes.</string>
 
     <string name="notification_payday_title">Your Payday Mission</string>
-    <string name="notification_payday_body">Secure %1$s for bills and save %3$s. You have %2$s for safe spending.</string>
+    <string name="notification_payday_body">Secure %1$s for bills and set aside %3$s. You have %2$s for safe spending.</string>
 
     <!-- Home ViewModel Additions -->
     <string name="home_plan_next_payday">Next payday: %1$s</string>
@@ -509,6 +535,11 @@
     <string name="plan_summary_invest_with_discipline">A disciplined split that keeps investing consistent each payday.</string>
     <string name="plan_summary_stop_overspending">A tighter plan that protects future money before flexible spending.</string>
     <string name="plan_summary_plan_together">A shared-friendly split that keeps bills clear and progress visible.</string>
+    <string name="plan_summary_no_savings_now">A practical split that does not force savings before you are ready.</string>
+    <string name="plan_summary_debt_first">A repayment-first split that puts extra pressure on debt.</string>
+    <string name="plan_summary_investing_first">An investing-led split that keeps long-term assets moving.</string>
+    <string name="plan_summary_flexible_budget_only">A flexible plan focused on safe-to-spend clarity.</string>
+    <string name="plan_summary_custom_strategy">A custom split shaped around your own payday rules.</string>
     <string name="required_update_title">Update required</string>
     <string name="required_update_message">This version of My Share is no longer supported. Please update to continue using your plan.</string>
     <string name="required_update_primary_action">Update from Play Store</string>

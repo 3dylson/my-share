@@ -20,7 +20,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import pt.ms.myshare.domain.model.AllocationPreset
+import pt.ms.myshare.domain.model.AllocationStrategy
 import pt.ms.myshare.domain.model.PayFrequency
+import pt.ms.myshare.domain.model.PaydayRuleType
 import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.domain.model.PricingStrategy
 import pt.ms.myshare.domain.model.BillingPlan
@@ -184,6 +186,54 @@ class OnboardingViewModelTest {
         assertFalse(rules.first { it.name == "Savings" }.isPercentage)
         assertEquals(BigDecimal("100"), rules.first { it.name == "Investing" }.amount)
         assertFalse(rules.first { it.name == "Investing" }.isPercentage)
+    }
+
+    @Test
+    fun `setAllocationsAndBuild supports no savings and debt allocation`() = runTest {
+        val savedPlans = mutableListOf<SalaryPlan>()
+        every { calculatePlanPreviewUseCase.execute(any(), any()) } returns previewResult()
+        viewModel.setSalaryDetails(BigDecimal("1000"), PayFrequency.MONTHLY, 1, "")
+        viewModel.setFixedCostsAndBuild(
+            monthlyFixedCosts = BigDecimal("400"),
+            preset = AllocationPreset.BALANCED,
+            strategy = AllocationStrategy.DEBT_FIRST
+        )
+
+        viewModel.setAllocationsAndBuild(
+            flexibleSpend = BigDecimal("50"),
+            savings = BigDecimal.ZERO,
+            investing = BigDecimal("10"),
+            crypto = BigDecimal.ZERO,
+            debt = BigDecimal("40"),
+            isPercentage = true
+        )
+        advanceUntilIdle()
+
+        coVerify(atLeast = 1) { plannerRepository.savePlan(capture(savedPlans)) }
+        val plan = savedPlans.last()
+        assertEquals(AllocationStrategy.DEBT_FIRST, plan.strategy)
+        assertTrue(plan.rules.none { it.type == PaydayRuleType.SAVINGS })
+        assertEquals(BigDecimal("40"), plan.rules.first { it.type == PaydayRuleType.DEBT }.amount)
+    }
+
+    @Test
+    fun `setFixedCostsAndBuild persists custom strategy name on saved plan`() = runTest {
+        val savedPlans = mutableListOf<SalaryPlan>()
+        every { calculatePlanPreviewUseCase.execute(any(), any()) } returns previewResult()
+        viewModel.setSalaryDetails(BigDecimal("1000"), PayFrequency.MONTHLY, 1, "")
+
+        viewModel.setFixedCostsAndBuild(
+            monthlyFixedCosts = BigDecimal("400"),
+            preset = AllocationPreset.BALANCED,
+            strategy = AllocationStrategy.CUSTOM,
+            customStrategyName = "Travel reset"
+        )
+        advanceUntilIdle()
+
+        coVerify(atLeast = 1) { plannerRepository.savePlan(capture(savedPlans)) }
+        val plan = savedPlans.last()
+        assertEquals(AllocationStrategy.CUSTOM, plan.strategy)
+        assertEquals("Travel reset", plan.customStrategyName)
     }
 
     @Test

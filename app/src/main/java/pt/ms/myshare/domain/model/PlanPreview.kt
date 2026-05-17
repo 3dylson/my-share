@@ -12,6 +12,10 @@ data class PlanPreview(
     val investingPerPayday: BigDecimal,
     val cryptoPerPayday: BigDecimal,
     val debtPerPayday: BigDecimal,
+    val priorityContributionPerPayday: BigDecimal = savingsPerPayday
+        .add(investingPerPayday)
+        .add(cryptoPerPayday)
+        .add(debtPerPayday),
     val weeklyFlexibleSpend: BigDecimal,
     val monthlyGoalContribution: BigDecimal,
     val nextPayday: LocalDate,

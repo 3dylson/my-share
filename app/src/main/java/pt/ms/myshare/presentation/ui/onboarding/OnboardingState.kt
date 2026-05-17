@@ -1,6 +1,7 @@
 package pt.ms.myshare.presentation.ui.onboarding
 
 import pt.ms.myshare.domain.model.AllocationPreset
+import pt.ms.myshare.domain.model.AllocationStrategy
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.domain.model.PlanPreview
@@ -21,10 +22,13 @@ data class OnboardingState(
     val monthlyPayday: Int = 1,
     val nextBiweeklyPaydayText: String = java.time.LocalDate.now().plusDays(14).toString(),
     val preset: AllocationPreset = AllocationPreset.BALANCED,
+    val strategy: AllocationStrategy = AllocationStrategy.BALANCED_SAVINGS,
+    val customStrategyName: String = "",
     val allocatedFlexibleSpend: BigDecimal? = null,
     val allocatedSavings: BigDecimal? = null,
     val allocatedInvesting: BigDecimal? = null,
     val allocatedCrypto: BigDecimal? = null,
+    val allocatedDebt: BigDecimal? = null,
     val allocationIsPercentage: Boolean = true,
     val planPreview: PlanPreview? = null,
     val userPreferences: UserPreferences = UserPreferences.defaults(),

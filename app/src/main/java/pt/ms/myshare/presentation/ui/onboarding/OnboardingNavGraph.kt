@@ -77,11 +77,13 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                 initialFixedCosts = state.monthlyFixedCosts,
                 incomePerPayday = state.netIncomePerPayday,
                 initialPreset = state.preset,
+                initialStrategy = state.strategy,
+                initialCustomStrategyName = state.customStrategyName,
                 userPreferences = state.userPreferences,
                 error = state.error,
                 onBack = { navController.popBackStack() },
-                onNext = { fixedCosts, preset ->
-                    if (viewModel.setFixedCostsAndBuild(fixedCosts, preset)) {
+                onNext = { fixedCosts, preset, strategy, customStrategyName ->
+                    if (viewModel.setFixedCostsAndBuild(fixedCosts, preset, strategy, customStrategyName)) {
                         navController.navigate(OnboardingRoute.AllocationPriorities.route)
                     }
                 }
@@ -90,18 +92,19 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
         composable(OnboardingRoute.AllocationPriorities.route) {
             val preview = state.planPreview
             if (preview != null) {
-                val totalAvailable = preview.incomePerPayday - preview.fixedCostsPerPayday - preview.debtPerPayday
+                val totalAvailable = preview.incomePerPayday - preview.fixedCostsPerPayday
                 AllocationPrioritiesScreen(
                     initialFlexibleSpend = preview.flexibleSpendPerPayday,
                     initialSavings = preview.savingsPerPayday,
                     initialInvesting = preview.investingPerPayday,
                     initialCrypto = preview.cryptoPerPayday,
+                    initialDebt = preview.debtPerPayday,
                     totalAvailable = totalAvailable,
                     initialAllocationIsPercentage = state.allocationIsPercentage,
                     userPreferences = state.userPreferences,
                     onBack = { navController.popBackStack() },
-                    onNext = { flex, sav, inv, cry, isPercentage ->
-                        if (viewModel.setAllocationsAndBuild(flex, sav, inv, cry, isPercentage)) {
+                    onNext = { flex, sav, inv, cry, debt, isPercentage ->
+                        if (viewModel.setAllocationsAndBuild(flex, sav, inv, cry, debt, isPercentage)) {
                             navController.navigate(OnboardingRoute.BuildingPlan.route)
                         }
                     }

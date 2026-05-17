@@ -26,6 +26,7 @@ import pt.ms.myshare.domain.use_case.CheckEntitlementLimitUseCase
 import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
 import pt.ms.myshare.domain.use_case.ResolveAppUpdateDecisionUseCase
+import pt.ms.myshare.domain.use_case.ResolveAllocationStrategyRulesUseCase
 import javax.inject.Singleton
 
 @Module
@@ -87,7 +88,9 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideCalculatePlanPreviewUseCase(): CalculatePlanPreviewUseCase = CalculatePlanPreviewUseCase()
+    fun provideCalculatePlanPreviewUseCase(
+        resolveAllocationStrategyRulesUseCase: ResolveAllocationStrategyRulesUseCase
+    ): CalculatePlanPreviewUseCase = CalculatePlanPreviewUseCase(resolveAllocationStrategyRulesUseCase)
 
     @Provides
     fun provideCreateReviewInsightUseCase(calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase): CreateReviewInsightUseCase =

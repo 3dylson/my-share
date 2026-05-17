@@ -114,7 +114,7 @@ fun LazyListScope.homePlanTab(
                         accentColor = MySharePositive
                     ),
                     AllocationGridItem(
-                        label = stringResource(R.string.savings_label),
+                        label = stringResource(R.string.home_plan_label_priority),
                         value = card.savingsLabel,
                         icon = Icons.Default.Savings
                     ),

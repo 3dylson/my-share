@@ -121,6 +121,10 @@ Für Absicht gebaut</string>
     <string name="onboarding_plan_preview_step_fixed_body">Übertragen Sie %1$s sofort auf Ihr Fixkostenkonto.</string>
     <string name="onboarding_plan_preview_step_goal_title">2. Fördern Sie Ihre Vision: %1$s</string>
     <string name="onboarding_plan_preview_step_goal_body">Tragen Sie %1$s bei, um %2$s auf dem richtigen Weg zu bleiben.</string>
+    <string name="onboarding_plan_preview_step_priority_title">2. Strategie finanzieren</string>
+    <string name="onboarding_plan_preview_step_priority_body">Legen Sie %1$s für Ihre gewählten Prioritäten zurück.</string>
+    <string name="onboarding_plan_preview_step_custom_title">2. Flexibel halten</string>
+    <string name="onboarding_plan_preview_step_custom_body">Diese Strategie erfordert keine Prioritätsüberweisung.</string>
     <string name="onboarding_plan_preview_step_flex_title">3. Genieße dein Leben</string>
     <string name="onboarding_plan_preview_step_flex_body">Sie haben noch %1$s für den Monat übrig (%2$s pro Woche).</string>
     <string name="onboarding_plan_preview_impact_title">Das große Ganze</string>
@@ -193,6 +197,17 @@ Für Absicht gebaut</string>
     <string name="onboarding_fixed_costs_preset_balanced_desc">Eine moderate monatliche Grundlinie.</string>
     <string name="onboarding_fixed_costs_preset_growth">Wachstum</string>
     <string name="onboarding_fixed_costs_preset_growth_desc">Lassen Sie mehr Spielraum für Investitionen.</string>
+    <string name="onboarding_fixed_costs_strategy_title">Zahltagsstrategie</string>
+    <string name="onboarding_strategy_balanced_savings">Ausgewogenes Sparen</string>
+    <string name="onboarding_strategy_balanced_savings_desc">Behalten Sie ein Sparziel, ohne den Alltag zu stark einzuschränken.</string>
+    <string name="onboarding_strategy_no_savings">Vorerst kein Sparen</string>
+    <string name="onboarding_strategy_no_savings_desc">Nutzen Sie den Plan ohne erzwungene Sparkategorie.</string>
+    <string name="onboarding_strategy_debt_first">Schulden zuerst</string>
+    <string name="onboarding_strategy_debt_first_desc">Priorisieren Sie Rückzahlungen vor Sparen oder Investieren.</string>
+    <string name="onboarding_strategy_investing_first">Investieren zuerst</string>
+    <string name="onboarding_strategy_investing_first_desc">Leiten Sie mehr von jedem Zahltag in langfristige Anlagen.</string>
+    <string name="onboarding_strategy_flexible_only">Nur flexibles Budget</string>
+    <string name="onboarding_strategy_flexible_only_desc">Verfolgen Sie frei verfügbares Geld ohne Zielbeiträge.</string>
     <string name="onboarding_priorities_allocated">%1$s zugewiesen</string>
     <string name="onboarding_priorities_remaining">Verbleibende %1$s</string>
     <string name="onboarding_priorities_over">Budget um %1$s überschritten</string>
@@ -206,6 +221,8 @@ Für Absicht gebaut</string>
     <string name="onboarding_priorities_desc_inv">Langfristige Kapitalallokation.</string>
     <string name="onboarding_priorities_label_cry">Krypto</string>
     <string name="onboarding_priorities_desc_cry">Optionale Zuteilung mit höherem Risiko.</string>
+    <string name="onboarding_priorities_label_debt">Schulden</string>
+    <string name="onboarding_priorities_desc_debt">Zusätzliche Rückzahlungen über feste Mindestbeträge hinaus.</string>
     <string name="onboarding_priorities_button_ready">Sieht gut aus</string>
     <string name="onboarding_priorities_button_balance">Saldozuweisung</string>
     <string name="onboarding_trajectory_label_payday">Zahltagzuteilung</string>
@@ -393,7 +410,7 @@ Für Absicht gebaut</string>
     <string name="coaching_first_step_headline">Beherrschung des ersten Schritts</string>
     <string name="coaching_first_step_body">Toller Start mit Ihrer ersten Bewertung! Je mehr Sie protokollieren, desto intelligenter wird Ihre Gewohnheitsschleife.</string>
     <string name="notification_payday_title">Ihre Zahltag-Mission</string>
-    <string name="notification_payday_body">Sichern Sie sich %1$s für Rechnungen und sparen Sie %3$s. Sie haben %2$s für sichere Ausgaben.</string>
+    <string name="notification_payday_body">Sichern Sie %1$s für Rechnungen und legen Sie %3$s zurück. Sie haben %2$s für sichere Ausgaben.</string>
     <string name="home_plan_next_payday">Nächster Zahltag: %1$s</string>
     <string name="home_goal_mission_accomplished">Mission erfüllt!</string>
     <string name="home_goal_on_pace">Auf Tempo für %1$s</string>
@@ -467,4 +484,18 @@ Für Absicht gebaut</string>
     <string name="required_update_message">Diese Version von My Share wird nicht mehr unterstützt. Bitte aktualisieren Sie, um Ihren Plan weiter zu verwenden.</string>
     <string name="required_update_primary_action">Im Play Store aktualisieren</string>
     <string name="required_update_fallback_action">Play Store im Browser öffnen</string>
+    <string name="onboarding_strategy_custom">Eigene Strategie</string>
+    <string name="onboarding_strategy_custom_desc">Starten Sie mit einer leeren Aufteilung und formen Sie die Regeln.</string>
+    <string name="onboarding_strategy_custom_label">Strategiename</string>
+    <string name="onboarding_strategy_custom_placeholder">z. B. Reisezeit-Reset</string>
+    <string name="onboarding_trajectory_label_strategy">Strategiepfad</string>
+    <string name="onboarding_trajectory_strategy_pending">Diese Strategie benötigt kein Zieldatum.</string>
+    <string name="onboarding_trajectory_flexible_title">Prioritätsüberweisung</string>
+    <string name="onboarding_trajectory_flexible_desc">Diese Strategie hält das restliche Zahltagsgeld flexibel.</string>
+    <string name="home_plan_label_priority">Priorität</string>
+    <string name="plan_summary_no_savings_now">Eine praktische Aufteilung ohne erzwungenes Sparen.</string>
+    <string name="plan_summary_debt_first">Eine rückzahlungsorientierte Aufteilung mit Fokus auf Schulden.</string>
+    <string name="plan_summary_investing_first">Eine investitionsgeführte Aufteilung für langfristige Anlagen.</string>
+    <string name="plan_summary_flexible_budget_only">Ein flexibler Plan für klare sichere Ausgaben.</string>
+    <string name="plan_summary_custom_strategy">Eine eigene Aufteilung nach Ihren Zahltagsregeln.</string>
 </resources>

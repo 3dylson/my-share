@@ -28,11 +28,12 @@ fun AllocationPrioritiesScreen(
     initialSavings: BigDecimal,
     initialInvesting: BigDecimal,
     initialCrypto: BigDecimal,
+    initialDebt: BigDecimal,
     totalAvailable: BigDecimal,
     initialAllocationIsPercentage: Boolean,
     userPreferences: UserPreferences,
     onBack: () -> Unit,
-    onNext: (BigDecimal, BigDecimal, BigDecimal, BigDecimal, Boolean) -> Unit
+    onNext: (BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal, Boolean) -> Unit
 ) {
     val locale = userPreferences.locale
     fun fixedAmountTextToPercentageText(amountText: String): String {
@@ -52,17 +53,20 @@ fun AllocationPrioritiesScreen(
     var savAmount by remember(userPreferences.languageTag) { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialSavings, locale)) }
     var invAmount by remember(userPreferences.languageTag) { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialInvesting, locale)) }
     var cryAmount by remember(userPreferences.languageTag) { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialCrypto, locale)) }
+    var debtAmount by remember(userPreferences.languageTag) { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialDebt, locale)) }
     var flexPercent by remember(userPreferences.languageTag, totalAvailable) { mutableStateOf(initialFlexibleSpend.formatPercentOf(totalAvailable, locale)) }
     var savPercent by remember(userPreferences.languageTag, totalAvailable) { mutableStateOf(initialSavings.formatPercentOf(totalAvailable, locale)) }
     var invPercent by remember(userPreferences.languageTag, totalAvailable) { mutableStateOf(initialInvesting.formatPercentOf(totalAvailable, locale)) }
     var cryPercent by remember(userPreferences.languageTag, totalAvailable) { mutableStateOf(initialCrypto.formatPercentOf(totalAvailable, locale)) }
+    var debtPercent by remember(userPreferences.languageTag, totalAvailable) { mutableStateOf(initialDebt.formatPercentOf(totalAvailable, locale)) }
 
     val parsedFlex = LocalizedAmountFormatter.parseAmount(if (allocationIsPercentage) flexPercent else flexAmount, locale) ?: BigDecimal.ZERO
     val parsedSav = LocalizedAmountFormatter.parseAmount(if (allocationIsPercentage) savPercent else savAmount, locale) ?: BigDecimal.ZERO
     val parsedInv = LocalizedAmountFormatter.parseAmount(if (allocationIsPercentage) invPercent else invAmount, locale) ?: BigDecimal.ZERO
     val parsedCry = LocalizedAmountFormatter.parseAmount(if (allocationIsPercentage) cryPercent else cryAmount, locale) ?: BigDecimal.ZERO
+    val parsedDebt = LocalizedAmountFormatter.parseAmount(if (allocationIsPercentage) debtPercent else debtAmount, locale) ?: BigDecimal.ZERO
 
-    val allocated = parsedFlex + parsedSav + parsedInv + parsedCry
+    val allocated = parsedFlex + parsedSav + parsedInv + parsedCry + parsedDebt
     val targetAllocation = if (allocationIsPercentage) BigDecimal("100") else totalAvailable
     val remaining = targetAllocation - allocated
     val hasAvailableIncome = totalAvailable > BigDecimal.ZERO
@@ -92,7 +96,7 @@ fun AllocationPrioritiesScreen(
         },
         actionEnabled = isValid,
         onBack = onBack,
-        onAction = { onNext(parsedFlex, parsedSav, parsedInv, parsedCry, allocationIsPercentage) }
+        onAction = { onNext(parsedFlex, parsedSav, parsedInv, parsedCry, parsedDebt, allocationIsPercentage) }
     ) {
             val progress = if (targetAllocation > BigDecimal.ZERO) {
                 (allocated.toDouble() / targetAllocation.toDouble()).coerceIn(0.0, 1.1).toFloat()
@@ -186,6 +190,7 @@ fun AllocationPrioritiesScreen(
                                     savPercent = fixedAmountTextToPercentageText(savAmount)
                                     invPercent = fixedAmountTextToPercentageText(invAmount)
                                     cryPercent = fixedAmountTextToPercentageText(cryAmount)
+                                    debtPercent = fixedAmountTextToPercentageText(debtAmount)
                                 }
                                 allocationIsPercentage = true
                             },
@@ -204,6 +209,7 @@ fun AllocationPrioritiesScreen(
                                     savAmount = percentageTextToFixedAmountText(savPercent)
                                     invAmount = percentageTextToFixedAmountText(invPercent)
                                     cryAmount = percentageTextToFixedAmountText(cryPercent)
+                                    debtAmount = percentageTextToFixedAmountText(debtPercent)
                                 }
                                 allocationIsPercentage = false
                             },
@@ -275,6 +281,21 @@ fun AllocationPrioritiesScreen(
                     prefix = { Text(if (allocationIsPercentage) stringResource(R.string.percentage_prefix) else "$symbol ") },
                     placeholder = if (allocationIsPercentage) stringResource(R.string.rule_add_hint_rate) else amountPlaceholder,
                     description = stringResource(R.string.onboarding_priorities_desc_cry),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+                )
+                PremiumTextField(
+                    value = if (allocationIsPercentage) debtPercent else debtAmount,
+                    onValueChange = {
+                        if (allocationIsPercentage) {
+                            debtPercent = LocalizedAmountFormatter.sanitizeAmountInput(it, locale)
+                        } else {
+                            debtAmount = LocalizedAmountFormatter.sanitizeAmountInput(it, locale)
+                        }
+                    },
+                    label = stringResource(R.string.onboarding_priorities_label_debt),
+                    prefix = { Text(if (allocationIsPercentage) stringResource(R.string.percentage_prefix) else "$symbol ") },
+                    placeholder = if (allocationIsPercentage) stringResource(R.string.rule_add_hint_rate) else amountPlaceholder,
+                    description = stringResource(R.string.onboarding_priorities_desc_debt),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                 )
             }

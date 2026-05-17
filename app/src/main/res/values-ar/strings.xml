@@ -121,6 +121,10 @@
     <string name="onboarding_plan_preview_step_fixed_body">انقل %1$s إلى حساب التكاليف الثابتة الخاص بك على الفور.</string>
     <string name="onboarding_plan_preview_step_goal_title">2. عزز رؤيتك: %1$s</string>
     <string name="onboarding_plan_preview_step_goal_body">ساهم بـ %1$s للبقاء على المسار الصحيح لـ %2$s.</string>
+    <string name="onboarding_plan_preview_step_priority_title">2. موّل استراتيجيتك</string>
+    <string name="onboarding_plan_preview_step_priority_body">انقل %1$s نحو أولوياتك المختارة.</string>
+    <string name="onboarding_plan_preview_step_custom_title">2. أبقها مرنة</string>
+    <string name="onboarding_plan_preview_step_custom_body">هذه الاستراتيجية لا تتطلب تحويلاً ذا أولوية.</string>
     <string name="onboarding_plan_preview_step_flex_title">3. استمتع بحياتك</string>
     <string name="onboarding_plan_preview_step_flex_body">يتبقى لديك %1$s للشهر (%2$s في الأسبوع).</string>
     <string name="onboarding_plan_preview_impact_title">الصورة الكبيرة</string>
@@ -193,6 +197,17 @@
     <string name="onboarding_fixed_costs_preset_balanced_desc">خط أساس شهري معتدل.</string>
     <string name="onboarding_fixed_costs_preset_growth">النمو</string>
     <string name="onboarding_fixed_costs_preset_growth_desc">اترك مساحة أكبر للاستثمار.</string>
+    <string name="onboarding_fixed_costs_strategy_title">استراتيجية يوم الدفع</string>
+    <string name="onboarding_strategy_balanced_savings">ادخار متوازن</string>
+    <string name="onboarding_strategy_balanced_savings_desc">احتفظ بهدف ادخار مع مساحة للحياة اليومية.</string>
+    <string name="onboarding_strategy_no_savings">بدون ادخار الآن</string>
+    <string name="onboarding_strategy_no_savings_desc">استخدم الخطة من دون فرض خانة ادخار.</string>
+    <string name="onboarding_strategy_debt_first">الديون أولاً</string>
+    <string name="onboarding_strategy_debt_first_desc">أعط الأولوية للسداد قبل الادخار أو الاستثمار.</string>
+    <string name="onboarding_strategy_investing_first">الاستثمار أولاً</string>
+    <string name="onboarding_strategy_investing_first_desc">وجّه المزيد من كل راتب إلى أصول طويلة الأجل.</string>
+    <string name="onboarding_strategy_flexible_only">ميزانية مرنة فقط</string>
+    <string name="onboarding_strategy_flexible_only_desc">تابع المال الآمن للإنفاق بدون مساهمات للأهداف.</string>
     <string name="onboarding_priorities_allocated">تم تخصيص %1$s</string>
     <string name="onboarding_priorities_remaining">المتبقي %1$s</string>
     <string name="onboarding_priorities_over">تجاوز الميزانية بمقدار %1$s</string>
@@ -206,6 +221,8 @@
     <string name="onboarding_priorities_desc_inv">تخصيص رأس المال على المدى الطويل.</string>
     <string name="onboarding_priorities_label_cry">تشفير</string>
     <string name="onboarding_priorities_desc_cry">التخصيص الاختياري عالي المخاطر.</string>
+    <string name="onboarding_priorities_label_debt">الديون</string>
+    <string name="onboarding_priorities_desc_debt">مدفوعات إضافية فوق الحدود الدنيا الثابتة.</string>
     <string name="onboarding_priorities_button_ready">تبدو جيدة</string>
     <string name="onboarding_priorities_button_balance">تخصيص الرصيد</string>
     <string name="onboarding_trajectory_label_payday">تخصيص يوم الدفع</string>
@@ -393,7 +410,7 @@
     <string name="coaching_first_step_headline">إتقان الخطوة الأولى</string>
     <string name="coaching_first_step_body">بداية رائعة بمراجعتك الأولى! كلما قمت بتسجيل الدخول أكثر، أصبحت حلقة عادتك أكثر ذكاءً.</string>
     <string name="notification_payday_title">مهمة يوم الدفع الخاصة بك</string>
-    <string name="notification_payday_body">قم بتأمين %1$s للفواتير ووفر %3$s. لديك %2$s للإنفاق الآمن.</string>
+    <string name="notification_payday_body">قم بتأمين %1$s للفواتير وخصّص %3$s. لديك %2$s للإنفاق الآمن.</string>
     <string name="home_plan_next_payday">يوم الدفع التالي: %1$s</string>
     <string name="home_goal_mission_accomplished">المهمة أنجزت!</string>
     <string name="home_goal_on_pace">على وتيرة %1$s</string>
@@ -467,4 +484,18 @@
     <string name="required_update_message">لم يعد هذا الإصدار من My Share مدعوما. يرجى التحديث لمتابعة استخدام خطتك.</string>
     <string name="required_update_primary_action">التحديث من Play Store</string>
     <string name="required_update_fallback_action">فتح Play Store في المتصفح</string>
+    <string name="onboarding_strategy_custom">استراتيجية مخصصة</string>
+    <string name="onboarding_strategy_custom_desc">ابدأ بتقسيم فارغ وشكّل القواعد بنفسك.</string>
+    <string name="onboarding_strategy_custom_label">اسم الاستراتيجية</string>
+    <string name="onboarding_strategy_custom_placeholder">مثال: إعادة ضبط السفر</string>
+    <string name="onboarding_trajectory_label_strategy">مسار الاستراتيجية</string>
+    <string name="onboarding_trajectory_strategy_pending">هذه الاستراتيجية لا تحتاج إلى تاريخ هدف.</string>
+    <string name="onboarding_trajectory_flexible_title">تحويل الأولوية</string>
+    <string name="onboarding_trajectory_flexible_desc">هذه الاستراتيجية تبقي المال المتبقي من الراتب مرناً.</string>
+    <string name="home_plan_label_priority">الأولوية</string>
+    <string name="plan_summary_no_savings_now">تقسيم عملي لا يفرض الادخار قبل الاستعداد.</string>
+    <string name="plan_summary_debt_first">تقسيم يركز أولاً على ضغط الديون.</string>
+    <string name="plan_summary_investing_first">تقسيم تقوده الاستثمارات طويلة الأجل.</string>
+    <string name="plan_summary_flexible_budget_only">خطة مرنة تركز على وضوح الإنفاق الآمن.</string>
+    <string name="plan_summary_custom_strategy">تقسيم مخصص حسب قواعد يوم الدفع الخاصة بك.</string>
 </resources>

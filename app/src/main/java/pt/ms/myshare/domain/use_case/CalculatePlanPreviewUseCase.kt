@@ -1,8 +1,6 @@
 package pt.ms.myshare.domain.use_case
 
-import pt.ms.myshare.domain.model.AllocationPreset
 import pt.ms.myshare.domain.model.PayFrequency
-import pt.ms.myshare.domain.model.PaydayRule
 import pt.ms.myshare.domain.model.PaydayRuleType
 import pt.ms.myshare.domain.model.PlanPreview
 import pt.ms.myshare.domain.model.PlanningFocus
@@ -13,14 +11,16 @@ import java.time.LocalDate
 import java.time.YearMonth
 import javax.inject.Inject
 
-class CalculatePlanPreviewUseCase @Inject constructor() {
+class CalculatePlanPreviewUseCase @Inject constructor(
+    private val resolveAllocationStrategyRulesUseCase: ResolveAllocationStrategyRulesUseCase
+) {
 
     fun execute(plan: SalaryPlan, goalAmount: BigDecimal): PlanPreview {
         val fixedCostsPerPayday = fixedCostsPerPayday(plan.monthlyFixedCosts, plan.payFrequency)
         val remainingAfterFixed = plan.netIncomePerPayday.subtract(fixedCostsPerPayday).max(BigDecimal.ZERO)
 
         val rules = if (plan.rules.isEmpty()) {
-            generateRulesFromPreset(plan)
+            resolveAllocationStrategyRulesUseCase.execute(plan.focus, plan.preset, plan.strategy)
         } else {
             plan.rules
         }
@@ -56,11 +56,18 @@ class CalculatePlanPreviewUseCase @Inject constructor() {
 
         val nextPayday = nextPayday(plan)
         val goalTargetDate = calculateGoalTargetDate(goalAmount, monthlyGoalContribution)
-        val summary = when (plan.focus) {
-            PlanningFocus.SAVE_WITHOUT_STRESS -> "plan_summary_save_without_stress"
-            PlanningFocus.INVEST_WITH_DISCIPLINE -> "plan_summary_invest_with_discipline"
-            PlanningFocus.STOP_OVERSPENDING -> "plan_summary_stop_overspending"
-            PlanningFocus.PLAN_TOGETHER -> "plan_summary_plan_together"
+        val summary = when (plan.strategy) {
+            pt.ms.myshare.domain.model.AllocationStrategy.NO_SAVINGS_NOW -> "plan_summary_no_savings_now"
+            pt.ms.myshare.domain.model.AllocationStrategy.DEBT_FIRST -> "plan_summary_debt_first"
+            pt.ms.myshare.domain.model.AllocationStrategy.INVESTING_FIRST -> "plan_summary_investing_first"
+            pt.ms.myshare.domain.model.AllocationStrategy.FLEXIBLE_BUDGET_ONLY -> "plan_summary_flexible_budget_only"
+            pt.ms.myshare.domain.model.AllocationStrategy.CUSTOM -> "plan_summary_custom_strategy"
+            pt.ms.myshare.domain.model.AllocationStrategy.BALANCED_SAVINGS -> when (plan.focus) {
+                PlanningFocus.SAVE_WITHOUT_STRESS -> "plan_summary_save_without_stress"
+                PlanningFocus.INVEST_WITH_DISCIPLINE -> "plan_summary_invest_with_discipline"
+                PlanningFocus.STOP_OVERSPENDING -> "plan_summary_stop_overspending"
+                PlanningFocus.PLAN_TOGETHER -> "plan_summary_plan_together"
+            }
         }
 
         return PlanPreview(
@@ -71,6 +78,7 @@ class CalculatePlanPreviewUseCase @Inject constructor() {
             investingPerPayday = investing.setScale(2, RoundingMode.HALF_UP),
             cryptoPerPayday = crypto.setScale(2, RoundingMode.HALF_UP),
             debtPerPayday = debt.setScale(2, RoundingMode.HALF_UP),
+            priorityContributionPerPayday = totalRuleContribution.setScale(2, RoundingMode.HALF_UP),
             weeklyFlexibleSpend = weeklySpend,
             monthlyGoalContribution = monthlyGoalContribution.setScale(2, RoundingMode.HALF_UP),
             nextPayday = nextPayday,
@@ -118,62 +126,7 @@ class CalculatePlanPreviewUseCase @Inject constructor() {
     private fun percentageOf(base: BigDecimal, percentage: BigDecimal): BigDecimal =
         base.multiply(percentage).setScale(2, RoundingMode.HALF_UP)
 
-    private fun generateRulesFromPreset(plan: SalaryPlan): List<PaydayRule> {
-        val weights = adjustedWeights(plan.focus, plan.preset)
-        val rules = mutableListOf<PaydayRule>()
-        
-        if (weights.savings > BigDecimal.ZERO) {
-            rules.add(PaydayRule(name = "Savings", amount = weights.savings.multiply(BigDecimal("100")), type = PaydayRuleType.SAVINGS, isPercentage = true))
-        }
-        if (weights.investing > BigDecimal.ZERO) {
-            rules.add(PaydayRule(name = "Investing", amount = weights.investing.multiply(BigDecimal("100")), type = PaydayRuleType.INVESTING, isPercentage = true))
-        }
-        if (weights.crypto > BigDecimal.ZERO) {
-            rules.add(PaydayRule(name = "Crypto", amount = weights.crypto.multiply(BigDecimal("100")), type = PaydayRuleType.CRYPTO, isPercentage = true))
-        }
-        
-        return rules
-    }
-
-    private fun adjustedWeights(focus: PlanningFocus, preset: AllocationPreset): AllocationWeights {
-        val base = when (focus) {
-            PlanningFocus.SAVE_WITHOUT_STRESS -> AllocationWeights(
-                flexibleSpend = bd("0.45"), savings = bd("0.35"), investing = bd("0.15"), crypto = bd("0.00")
-            )
-            PlanningFocus.INVEST_WITH_DISCIPLINE -> AllocationWeights(
-                flexibleSpend = bd("0.35"), savings = bd("0.20"), investing = bd("0.30"), crypto = bd("0.10")
-            )
-            PlanningFocus.STOP_OVERSPENDING -> AllocationWeights(
-                flexibleSpend = bd("0.40"), savings = bd("0.35"), investing = bd("0.10"), crypto = bd("0.00")
-            )
-            PlanningFocus.PLAN_TOGETHER -> AllocationWeights(
-                flexibleSpend = bd("0.50"), savings = bd("0.25"), investing = bd("0.10"), crypto = bd("0.00")
-            )
-        }
-        return when (preset) {
-            AllocationPreset.CONSERVATIVE -> base.copy(
-                savings = base.savings.add(bd("0.10")),
-                investing = base.investing.subtract(bd("0.05")).max(BigDecimal.ZERO),
-                crypto = base.crypto.subtract(bd("0.05")).max(BigDecimal.ZERO)
-            )
-            AllocationPreset.BALANCED -> base
-            AllocationPreset.GROWTH -> base.copy(
-                savings = base.savings.subtract(bd("0.10")).max(BigDecimal.ZERO),
-                investing = base.investing.add(bd("0.07")),
-                crypto = base.crypto.add(bd("0.03"))
-            )
-        }
-    }
-
-    private data class AllocationWeights(
-        val flexibleSpend: BigDecimal,
-        val savings: BigDecimal,
-        val investing: BigDecimal,
-        val crypto: BigDecimal
-    )
-
     private companion object {
         const val SCALE = 4
-        fun bd(value: String): BigDecimal = BigDecimal(value)
     }
 }

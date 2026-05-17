@@ -14,6 +14,7 @@ import kotlinx.coroutines.tasks.await
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import pt.ms.myshare.domain.model.AllocationPreset
+import pt.ms.myshare.domain.model.AllocationStrategy
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.domain.model.PlanningFocus
@@ -57,7 +58,7 @@ class PlannerRepositoryImpl @Inject constructor(
     override fun loadPlan(): SalaryPlan? = planState.value
 
     override suspend fun savePlan(plan: SalaryPlan) {
-        Timber.tag(TAG).d("savePlan focus=%s income=%s cadence=%s", plan.focus, plan.netIncomePerPayday, plan.payFrequency)
+        Timber.tag(TAG).d("savePlan focus=%s strategy=%s income=%s cadence=%s", plan.focus, plan.strategy, plan.netIncomePerPayday, plan.payFrequency)
         prefs.edit()
             .putString(KEY_FOCUS, plan.focus.name)
             .putString(KEY_NET_INCOME, plan.netIncomePerPayday.toPlainString())
@@ -69,6 +70,8 @@ class PlannerRepositoryImpl @Inject constructor(
             .remove(KEY_GOAL_AMOUNT)
             .putLong(KEY_PLAN_CREATED_AT_EPOCH, plan.createdAt.toEpochDay())
             .putString(KEY_PRESET, plan.preset.name)
+            .putString(KEY_STRATEGY, plan.strategy.name)
+            .putString(KEY_CUSTOM_STRATEGY_NAME, plan.customStrategyName.orEmpty())
             .apply()
         planState.value = plan
         
@@ -86,6 +89,8 @@ class PlannerRepositoryImpl @Inject constructor(
                 "monthlyPayday" to (plan.monthlyPayday ?: 1),
                 "nextBiweeklyPaydayText" to (plan.nextBiweeklyPayday?.toString() ?: ""),
                 "preset" to plan.preset.name,
+                "strategy" to plan.strategy.name,
+                "customStrategyName" to plan.customStrategyName.orEmpty(),
                 "createdAtDate" to plan.createdAt.toString()
             )
             try {
@@ -121,6 +126,8 @@ class PlannerRepositoryImpl @Inject constructor(
                 val fixed = planDoc.getString("monthlyFixedCosts")?.toBigDecimalOrNull() ?: BigDecimal.ZERO
                 val freq = planDoc.getString("payFrequency")?.let { PayFrequency.valueOf(it) } ?: PayFrequency.MONTHLY
                 val preset = planDoc.getString("preset")?.let { AllocationPreset.valueOf(it) } ?: AllocationPreset.BALANCED
+                val strategy = planDoc.getString("strategy")?.let { AllocationStrategy.valueOf(it) } ?: AllocationStrategy.BALANCED_SAVINGS
+                val customStrategyName = planDoc.getString("customStrategyName")?.takeIf { it.isNotBlank() }
                 
                 val plan = SalaryPlan(
                     focus = focus,
@@ -130,6 +137,8 @@ class PlannerRepositoryImpl @Inject constructor(
                     monthlyPayday = planDoc.getLong("monthlyPayday")?.toInt(),
                     nextBiweeklyPayday = planDoc.getString("nextBiweeklyPaydayText")?.takeIf { it.isNotBlank() }?.let { LocalDate.parse(it) },
                     preset = preset,
+                    strategy = strategy,
+                    customStrategyName = customStrategyName,
                     createdAt = planDoc.getString("createdAtDate")?.let { LocalDate.parse(it) } ?: LocalDate.now()
                 )
                 savePlan(plan)
@@ -448,6 +457,9 @@ class PlannerRepositoryImpl @Inject constructor(
     private fun readPlan(): SalaryPlan? {
         val preset = prefs.getString(KEY_PRESET, null)?.let { runCatching { AllocationPreset.valueOf(it) }.getOrNull() } 
             ?: AllocationPreset.BALANCED // SEED: Fallback to Balanced if null during audit
+        val strategy = prefs.getString(KEY_STRATEGY, null)?.let { runCatching { AllocationStrategy.valueOf(it) }.getOrNull() }
+            ?: AllocationStrategy.BALANCED_SAVINGS
+        val customStrategyName = prefs.getString(KEY_CUSTOM_STRATEGY_NAME, null)?.takeIf { it.isNotBlank() }
         val income = prefs.getString(KEY_NET_INCOME, null)?.toBigDecimalOrNull()
             ?: BigDecimal.ZERO
         val focusText = prefs.getString(KEY_FOCUS, null)
@@ -468,6 +480,8 @@ class PlannerRepositoryImpl @Inject constructor(
             monthlyPayday = monthlyPayday,
             nextBiweeklyPayday = biweeklyEpoch.takeIf { it != NO_EPOCH }?.let(LocalDate::ofEpochDay),
             preset = preset,
+            strategy = strategy,
+            customStrategyName = customStrategyName,
             createdAt = LocalDate.ofEpochDay(createdAtEpoch)
         )
     }
@@ -511,6 +525,8 @@ class PlannerRepositoryImpl @Inject constructor(
         const val KEY_MONTHLY_PAYDAY = "planner_monthly_payday"
         const val KEY_BIWEEKLY_PAYDAY_EPOCH = "planner_biweekly_payday_epoch"
         const val KEY_PRESET = "planner_preset"
+        const val KEY_STRATEGY = "planner_strategy"
+        const val KEY_CUSTOM_STRATEGY_NAME = "planner_custom_strategy_name"
         const val KEY_GOAL_NAME = "planner_goal_name"
         const val KEY_GOAL_AMOUNT = "planner_goal_amount"
         const val KEY_FLEXIBLE_SPEND = "planner_flexible_spend"

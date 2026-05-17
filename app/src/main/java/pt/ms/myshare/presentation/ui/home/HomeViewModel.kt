@@ -148,12 +148,12 @@ class HomeViewModel @Inject constructor(
                     signals.history.reversed().takeLast(5).map { review ->
                         val preview = calculatePlanPreviewUseCase.execute(core.plan, BigDecimal.ZERO)
                         val flexTarget = review.plannedFlexibleSpend ?: preview.flexibleSpendPerPayday
-                        val goalTarget = review.plannedGoalContribution ?: preview.savingsPerPayday
+                        val goalTarget = review.plannedGoalContribution ?: preview.priorityContributionPerPayday
                         
                         val flexPerformance = if (review.actualFlexibleSpend <= flexTarget) 1.0f else 
                             (flexTarget.toDouble() / review.actualFlexibleSpend.toDouble()).coerceIn(0.0, 1.0).toFloat()
                         
-                        val goalPerformance = if (review.actualGoalContribution >= goalTarget) 1.0f else
+                        val goalPerformance = if (goalTarget <= BigDecimal.ZERO || review.actualGoalContribution >= goalTarget) 1.0f else
                             (review.actualGoalContribution.toDouble() / goalTarget.toDouble()).coerceIn(0.0, 1.0).toFloat()
                             
                         (flexPerformance + goalPerformance) / 2f
@@ -321,7 +321,7 @@ class HomeViewModel @Inject constructor(
             incomeLabel = currencyFormat.format(plan.netIncomePerPayday),
             fixedCostsLabel = currencyFormat.format(preview.fixedCostsPerPayday),
             flexibleSpendLabel = currencyFormat.format(preview.flexibleSpendPerPayday),
-            savingsLabel = currencyFormat.format(preview.savingsPerPayday),
+            savingsLabel = currencyFormat.format(preview.priorityContributionPerPayday),
             investingLabel = currencyFormat.format(preview.investingPerPayday.add(preview.cryptoPerPayday)),
             weeklySpendLabel = currencyFormat.format(preview.weeklyFlexibleSpend),
             summary = preview.summary,
@@ -391,7 +391,7 @@ class HomeViewModel @Inject constructor(
         }
         val preview = plan?.let { calculatePlanPreviewUseCase.execute(it, BigDecimal.ZERO) }
         val defaultFlexibleSpend = review?.actualFlexibleSpend ?: preview?.flexibleSpendPerPayday
-        val defaultGoalContribution = review?.actualGoalContribution ?: preview?.savingsPerPayday
+        val defaultGoalContribution = review?.actualGoalContribution ?: preview?.priorityContributionPerPayday
         val flexibleMax = reviewRangeMax(defaultFlexibleSpend ?: BigDecimal.ZERO)
         val goalMax = reviewRangeMax(defaultGoalContribution ?: BigDecimal.ZERO)
 
@@ -444,13 +444,13 @@ class HomeViewModel @Inject constructor(
                 actualFlexibleSpend = actualFlexible,
                 actualGoalContribution = actualGoal,
                 plannedFlexibleSpend = preview.flexibleSpendPerPayday,
-                plannedGoalContribution = preview.savingsPerPayday
+                plannedGoalContribution = preview.priorityContributionPerPayday
             )
             plannerRepository.saveReview(review)
             updateGoalProgressUseCase.execute(actualGoal)
             
             FirebaseUtils.logEvent("weekly_checkin_completed")
-            Timber.tag(TAG).d("Review saved with snapshots. planFlex=%s planGoal=%s", preview.flexibleSpendPerPayday, preview.savingsPerPayday)
+            Timber.tag(TAG).d("Review saved with snapshots. planFlex=%s planPriority=%s", preview.flexibleSpendPerPayday, preview.priorityContributionPerPayday)
         }
     }
 

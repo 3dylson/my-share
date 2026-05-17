@@ -55,7 +55,7 @@ class GetReviewHistoryUseCase @Inject constructor(
         } else {
             val targetAmount = goals.firstOrNull()?.targetAmount ?: BigDecimal.ZERO
             val preview = plan?.let { calculatePlanPreviewUseCase.execute(it, targetAmount) }
-            (preview?.flexibleSpendPerPayday ?: BigDecimal.ZERO) to (preview?.savingsPerPayday ?: BigDecimal.ZERO)
+            (preview?.flexibleSpendPerPayday ?: BigDecimal.ZERO) to (preview?.priorityContributionPerPayday ?: BigDecimal.ZERO)
         }
 
         val flexibleDelta = review.actualFlexibleSpend.subtract(blueprintFlexible)

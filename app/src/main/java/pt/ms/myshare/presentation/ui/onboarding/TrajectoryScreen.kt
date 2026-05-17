@@ -113,6 +113,7 @@ fun TrajectoryScreen(
 
             if (preview != null) {
                 val context = androidx.compose.ui.platform.LocalContext.current
+                val hasPriorityContribution = preview.priorityContributionPerPayday > java.math.BigDecimal.ZERO
                 val paydaySummary = remember(preview.summary) {
                     val resId = context.resources.getIdentifier(preview.summary, "string", context.packageName)
                     if (resId != 0) context.getString(resId) else preview.summary
@@ -127,7 +128,8 @@ fun TrajectoryScreen(
                         android.text.format.DateFormat.format("MMMM yyyy", calendar).toString()
                     },
                     goalName = goalName,
-                    contribution = currencyFormat.format(preview.savingsPerPayday)
+                    contribution = currencyFormat.format(preview.priorityContributionPerPayday),
+                    hasPriorityContribution = hasPriorityContribution
                 )
 
                 Spacer(Modifier.height(18.dp))
@@ -159,7 +161,8 @@ private fun TrajectorySummaryCard(
     paydaySummary: String,
     goalDate: String?,
     goalName: String,
-    contribution: String
+    contribution: String,
+    hasPriorityContribution: Boolean
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -179,16 +182,32 @@ private fun TrajectorySummaryCard(
                 iconTint = MySharePrimary
             )
             TrajectorySummaryRow(
-                title = stringResource(R.string.onboarding_trajectory_label_goal),
+                title = if (hasPriorityContribution) {
+                    stringResource(R.string.onboarding_trajectory_label_goal)
+                } else {
+                    stringResource(R.string.onboarding_trajectory_label_strategy)
+                },
                 value = goalDate ?: stringResource(R.string.onboarding_trajectory_goal_pending),
-                body = stringResource(R.string.onboarding_trajectory_goal_subtitle, goalName),
+                body = if (hasPriorityContribution) {
+                    stringResource(R.string.onboarding_trajectory_goal_subtitle, goalName)
+                } else {
+                    stringResource(R.string.onboarding_trajectory_strategy_pending)
+                },
                 icon = Icons.Default.CalendarMonth,
                 iconTint = MySharePositive
             )
             TrajectorySummaryRow(
-                title = stringResource(R.string.onboarding_trajectory_intensity_title),
+                title = if (hasPriorityContribution) {
+                    stringResource(R.string.onboarding_trajectory_intensity_title)
+                } else {
+                    stringResource(R.string.onboarding_trajectory_flexible_title)
+                },
                 value = contribution,
-                body = stringResource(R.string.onboarding_trajectory_intensity_desc),
+                body = if (hasPriorityContribution) {
+                    stringResource(R.string.onboarding_trajectory_intensity_desc)
+                } else {
+                    stringResource(R.string.onboarding_trajectory_flexible_desc)
+                },
                 icon = Icons.AutoMirrored.Filled.TrendingUp,
                 iconTint = MySharePrimary
             )

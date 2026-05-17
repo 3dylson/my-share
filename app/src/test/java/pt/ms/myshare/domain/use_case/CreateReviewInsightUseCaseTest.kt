@@ -11,7 +11,8 @@ import java.math.BigDecimal
 
 class CreateReviewInsightUseCaseTest {
 
-    private val reviewInsightUseCase = CreateReviewInsightUseCase(CalculatePlanPreviewUseCase())
+    private val calculatePlanPreviewUseCase = CalculatePlanPreviewUseCase(ResolveAllocationStrategyRulesUseCase())
+    private val reviewInsightUseCase = CreateReviewInsightUseCase(calculatePlanPreviewUseCase)
 
     @Test
     fun `returns on track when spend is below plan and contributions are above plan`() {

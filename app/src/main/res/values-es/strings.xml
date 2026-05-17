@@ -121,6 +121,10 @@ Creado con intención</string>
     <string name="onboarding_plan_preview_step_fixed_body">Mueve %1$s a tu cuenta de costos fijos inmediatamente.</string>
     <string name="onboarding_plan_preview_step_goal_title">2. Impulsa tu visión: %1$s</string>
     <string name="onboarding_plan_preview_step_goal_body">Contribuye con %1$s para mantener el rumbo de %2$s.</string>
+    <string name="onboarding_plan_preview_step_priority_title">2. Financia tu estrategia</string>
+    <string name="onboarding_plan_preview_step_priority_body">Mueve %1$s hacia tus prioridades elegidas.</string>
+    <string name="onboarding_plan_preview_step_custom_title">2. Mantenlo flexible</string>
+    <string name="onboarding_plan_preview_step_custom_body">Esta estrategia no requiere una transferencia prioritaria.</string>
     <string name="onboarding_plan_preview_step_flex_title">3. Disfruta tu vida</string>
     <string name="onboarding_plan_preview_step_flex_body">Te quedan %1$s para el mes (%2$s por semana).</string>
     <string name="onboarding_plan_preview_impact_title">El panorama general</string>
@@ -193,6 +197,17 @@ Creado con intención</string>
     <string name="onboarding_fixed_costs_preset_balanced_desc">Una base mensual moderada.</string>
     <string name="onboarding_fixed_costs_preset_growth">Crecimiento</string>
     <string name="onboarding_fixed_costs_preset_growth_desc">Deje más espacio para invertir.</string>
+    <string name="onboarding_fixed_costs_strategy_title">Estrategia de día de pago</string>
+    <string name="onboarding_strategy_balanced_savings">Ahorro equilibrado</string>
+    <string name="onboarding_strategy_balanced_savings_desc">Mantén una meta de ahorro sin apretar la vida diaria.</string>
+    <string name="onboarding_strategy_no_savings">Sin ahorro por ahora</string>
+    <string name="onboarding_strategy_no_savings_desc">Usa el plan sin forzar una categoría de ahorro.</string>
+    <string name="onboarding_strategy_debt_first">Deuda primero</string>
+    <string name="onboarding_strategy_debt_first_desc">Prioriza pagos de deuda antes de ahorrar o invertir.</string>
+    <string name="onboarding_strategy_investing_first">Inversión primero</string>
+    <string name="onboarding_strategy_investing_first_desc">Dirige más de cada pago a activos de largo plazo.</string>
+    <string name="onboarding_strategy_flexible_only">Solo presupuesto flexible</string>
+    <string name="onboarding_strategy_flexible_only_desc">Controla el dinero seguro para gastar sin contribuciones a metas.</string>
     <string name="onboarding_priorities_allocated">%1$s asignados</string>
     <string name="onboarding_priorities_remaining">%1$s restantes</string>
     <string name="onboarding_priorities_over">Excedió el presupuesto en %1$s</string>
@@ -206,6 +221,8 @@ Creado con intención</string>
     <string name="onboarding_priorities_desc_inv">Asignación de capital a largo plazo.</string>
     <string name="onboarding_priorities_label_cry">Cripto</string>
     <string name="onboarding_priorities_desc_cry">Asignación opcional de mayor riesgo.</string>
+    <string name="onboarding_priorities_label_debt">Deuda</string>
+    <string name="onboarding_priorities_desc_debt">Pagos extra más allá de los mínimos fijos.</string>
     <string name="onboarding_priorities_button_ready">se ve bien</string>
     <string name="onboarding_priorities_button_balance">Asignación de saldo</string>
     <string name="onboarding_trajectory_label_payday">Asignación de día de pago</string>
@@ -393,7 +410,7 @@ Creado con intención</string>
     <string name="coaching_first_step_headline">Dominio del primer paso</string>
     <string name="coaching_first_step_body">¡Buen comienzo con tu primera reseña! Cuanto más inicias sesión, más inteligente se vuelve tu ciclo de hábitos.</string>
     <string name="notification_payday_title">Tu misión de día de pago</string>
-    <string name="notification_payday_body">Asegure %1$s para facturas y ahorre %3$s. Tienes %2$s para gastar de forma segura.</string>
+    <string name="notification_payday_body">Asegure %1$s para facturas y reserve %3$s. Tienes %2$s para gastar de forma segura.</string>
     <string name="home_plan_next_payday">Próximo día de pago: %1$s</string>
     <string name="home_goal_mission_accomplished">¡Misión Cumplida!</string>
     <string name="home_goal_on_pace">En ritmo para %1$s</string>
@@ -467,4 +484,18 @@ Creado con intención</string>
     <string name="required_update_message">Esta versión de My Share ya no es compatible. Actualice para seguir usando su plan.</string>
     <string name="required_update_primary_action">Actualizar desde Play Store</string>
     <string name="required_update_fallback_action">Abrir Play Store en el navegador</string>
+    <string name="onboarding_strategy_custom">Estrategia personalizada</string>
+    <string name="onboarding_strategy_custom_desc">Empieza con una división en blanco y ajusta las reglas.</string>
+    <string name="onboarding_strategy_custom_label">Nombre de la estrategia</string>
+    <string name="onboarding_strategy_custom_placeholder">p. ej., Reinicio para viajes</string>
+    <string name="onboarding_trajectory_label_strategy">Camino de estrategia</string>
+    <string name="onboarding_trajectory_strategy_pending">Esta estrategia no necesita una fecha objetivo.</string>
+    <string name="onboarding_trajectory_flexible_title">Transferencia prioritaria</string>
+    <string name="onboarding_trajectory_flexible_desc">Esta estrategia mantiene flexible el dinero restante del pago.</string>
+    <string name="home_plan_label_priority">Prioridad</string>
+    <string name="plan_summary_no_savings_now">Una división práctica que no fuerza el ahorro antes de estar listo.</string>
+    <string name="plan_summary_debt_first">Una división centrada en pagar deuda con más presión.</string>
+    <string name="plan_summary_investing_first">Una división liderada por inversión para mantener activos en marcha.</string>
+    <string name="plan_summary_flexible_budget_only">Un plan flexible centrado en claridad para gastar con seguridad.</string>
+    <string name="plan_summary_custom_strategy">Una división personalizada según tus propias reglas de pago.</string>
 </resources>

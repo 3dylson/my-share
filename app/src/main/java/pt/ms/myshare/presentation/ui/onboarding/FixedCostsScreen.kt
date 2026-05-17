@@ -12,6 +12,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.AllocationPreset
+import pt.ms.myshare.domain.model.AllocationStrategy
 import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.presentation.ui.components.PremiumChoiceCard
 import pt.ms.myshare.presentation.ui.components.PremiumTextField
@@ -25,15 +26,19 @@ fun FixedCostsScreen(
     initialFixedCosts: BigDecimal?,
     incomePerPayday: BigDecimal?,
     initialPreset: AllocationPreset,
+    initialStrategy: AllocationStrategy,
+    initialCustomStrategyName: String,
     userPreferences: UserPreferences,
     error: String? = null,
     onBack: () -> Unit,
-    onNext: (BigDecimal, AllocationPreset) -> Unit
+    onNext: (BigDecimal, AllocationPreset, AllocationStrategy, String?) -> Unit
 ) {
     val context = LocalContext.current
     val locale = userPreferences.locale
     var fixedCostsText by remember(userPreferences.languageTag) { mutableStateOf(initialFixedCosts?.let { LocalizedAmountFormatter.formatEditableAmount(it, locale) } ?: "") }
     var preset by remember { mutableStateOf(initialPreset) }
+    var strategy by remember { mutableStateOf(initialStrategy) }
+    var customStrategyName by remember { mutableStateOf(initialCustomStrategyName) }
     var validationRequested by remember { mutableStateOf(false) }
 
     val currencySymbol = remember(locale, userPreferences.currencyCode) {
@@ -53,7 +58,7 @@ fun FixedCostsScreen(
     fun continueIfValid() {
         validationRequested = true
         if (isFixedCostsValid) {
-            onNext(fixedCosts ?: BigDecimal.ZERO, preset)
+            onNext(fixedCosts ?: BigDecimal.ZERO, preset, strategy, customStrategyName)
         }
     }
 
@@ -107,6 +112,46 @@ fun FixedCostsScreen(
                         onClick = { preset = p }
                     )
                 }
+            }
+
+            Spacer(Modifier.height(28.dp))
+
+            Text(
+                stringResource(R.string.onboarding_fixed_costs_strategy_title),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(Modifier.height(16.dp))
+
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                val strategies = listOf(
+                    Triple(AllocationStrategy.BALANCED_SAVINGS, stringResource(R.string.onboarding_strategy_balanced_savings), stringResource(R.string.onboarding_strategy_balanced_savings_desc)),
+                    Triple(AllocationStrategy.NO_SAVINGS_NOW, stringResource(R.string.onboarding_strategy_no_savings), stringResource(R.string.onboarding_strategy_no_savings_desc)),
+                    Triple(AllocationStrategy.DEBT_FIRST, stringResource(R.string.onboarding_strategy_debt_first), stringResource(R.string.onboarding_strategy_debt_first_desc)),
+                    Triple(AllocationStrategy.INVESTING_FIRST, stringResource(R.string.onboarding_strategy_investing_first), stringResource(R.string.onboarding_strategy_investing_first_desc)),
+                    Triple(AllocationStrategy.FLEXIBLE_BUDGET_ONLY, stringResource(R.string.onboarding_strategy_flexible_only), stringResource(R.string.onboarding_strategy_flexible_only_desc)),
+                    Triple(AllocationStrategy.CUSTOM, stringResource(R.string.onboarding_strategy_custom), stringResource(R.string.onboarding_strategy_custom_desc))
+                )
+
+                strategies.forEach { (item, label, desc) ->
+                    PremiumChoiceCard(
+                        title = label,
+                        description = desc,
+                        isSelected = strategy == item,
+                        onClick = { strategy = item }
+                    )
+                }
+            }
+
+            if (strategy == AllocationStrategy.CUSTOM) {
+                Spacer(Modifier.height(16.dp))
+                PremiumTextField(
+                    value = customStrategyName,
+                    onValueChange = { customStrategyName = it },
+                    label = stringResource(R.string.onboarding_strategy_custom_label),
+                    placeholder = stringResource(R.string.onboarding_strategy_custom_placeholder)
+                )
             }
 
             if (error != null) {

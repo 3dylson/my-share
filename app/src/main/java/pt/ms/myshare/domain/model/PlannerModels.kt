@@ -40,6 +40,8 @@ data class SalaryPlan(
     val monthlyPayday: Int? = null,
     val nextBiweeklyPayday: LocalDate? = null,
     val preset: AllocationPreset,
+    val strategy: AllocationStrategy = AllocationStrategy.BALANCED_SAVINGS,
+    val customStrategyName: String? = null,
     val rules: List<PaydayRule> = emptyList(),
     val createdAt: LocalDate = LocalDate.now()
 )

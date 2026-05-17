@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pt.ms.myshare.domain.model.AllocationPreset
+import pt.ms.myshare.domain.model.AllocationStrategy
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.model.GoalType
@@ -154,7 +155,15 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    fun setFixedCostsAndBuild(monthlyFixedCosts: BigDecimal, preset: AllocationPreset): Boolean {
+    fun setFixedCostsAndBuild(
+        monthlyFixedCosts: BigDecimal,
+        preset: AllocationPreset,
+        strategy: AllocationStrategy = AllocationStrategy.BALANCED_SAVINGS,
+        customStrategyName: String? = null
+    ): Boolean {
+        val cleanCustomStrategyName = customStrategyName
+            ?.trim()
+            ?.takeIf { strategy == AllocationStrategy.CUSTOM && it.isNotBlank() }
         val income = state.value.netIncomePerPayday
         if (income != null && monthlyFixedCosts > income) {
             Timber.tag(TAG).d(
@@ -166,6 +175,8 @@ class OnboardingViewModel @Inject constructor(
                 it.copy(
                     monthlyFixedCosts = monthlyFixedCosts,
                     preset = preset,
+                    strategy = strategy,
+                    customStrategyName = cleanCustomStrategyName.orEmpty(),
                     error = FIXED_COSTS_EXCEED_INCOME_ERROR,
                     planSaved = false
                 )
@@ -177,6 +188,8 @@ class OnboardingViewModel @Inject constructor(
             it.copy(
                 monthlyFixedCosts = monthlyFixedCosts,
                 preset = preset,
+                strategy = strategy,
+                customStrategyName = cleanCustomStrategyName.orEmpty(),
                 error = null
             )
         }
@@ -188,15 +201,17 @@ class OnboardingViewModel @Inject constructor(
         savings: BigDecimal,
         investing: BigDecimal,
         crypto: BigDecimal,
+        debt: BigDecimal = BigDecimal.ZERO,
         isPercentage: Boolean
     ): Boolean {
         Timber.tag(TAG).d(
-            "Set onboarding allocations: isPercentage=%s flexible=%s savings=%s investing=%s crypto=%s",
+            "Set onboarding allocations: isPercentage=%s flexible=%s savings=%s investing=%s crypto=%s debt=%s",
             isPercentage,
             flexibleSpend,
             savings,
             investing,
-            crypto
+            crypto,
+            debt
         )
         state.update {
             it.copy(
@@ -204,6 +219,7 @@ class OnboardingViewModel @Inject constructor(
                 allocatedSavings = savings,
                 allocatedInvesting = investing,
                 allocatedCrypto = crypto,
+                allocatedDebt = debt,
                 allocationIsPercentage = isPercentage
             )
         }
@@ -412,10 +428,13 @@ class OnboardingViewModel @Inject constructor(
                 monthlyPayday = 1,
                 monthlyFixedCosts = BigDecimal("600"),
                 preset = AllocationPreset.BALANCED,
+                strategy = AllocationStrategy.BALANCED_SAVINGS,
+                customStrategyName = "",
                 allocatedFlexibleSpend = BigDecimal("400"),
                 allocatedSavings = BigDecimal("300"),
                 allocatedInvesting = BigDecimal("200"),
                 allocatedCrypto = BigDecimal.ZERO,
+                allocatedDebt = BigDecimal.ZERO,
                 allocationIsPercentage = false,
                 goalName = "",
                 goalAmount = BigDecimal("5000"),
@@ -431,7 +450,9 @@ class OnboardingViewModel @Inject constructor(
                 monthlyFixedCosts = BigDecimal("600"),
                 payFrequency = PayFrequency.MONTHLY,
                 monthlyPayday = 1,
-                preset = AllocationPreset.BALANCED
+                preset = AllocationPreset.BALANCED,
+                strategy = AllocationStrategy.BALANCED_SAVINGS,
+                customStrategyName = null
             )
             plannerRepository.savePlan(plan)
             plannerRepository.saveGoal(
@@ -568,6 +589,9 @@ class OnboardingViewModel @Inject constructor(
         current.allocatedCrypto?.let { 
             if (it > BigDecimal.ZERO) rules.add(PaydayRule(name = "Crypto", amount = it, type = PaydayRuleType.CRYPTO, isPercentage = current.allocationIsPercentage)) 
         }
+        current.allocatedDebt?.let {
+            if (it > BigDecimal.ZERO) rules.add(PaydayRule(name = "Debt", amount = it, type = PaydayRuleType.DEBT, isPercentage = current.allocationIsPercentage))
+        }
 
         return SalaryPlan(
             focus = current.selectedFocus,
@@ -577,6 +601,8 @@ class OnboardingViewModel @Inject constructor(
             monthlyPayday = current.monthlyPayday.coerceIn(1, 28),
             nextBiweeklyPayday = nextBiweeklyPayday,
             preset = current.preset,
+            strategy = current.strategy,
+            customStrategyName = current.customStrategyName.takeIf { current.strategy == AllocationStrategy.CUSTOM && it.isNotBlank() },
             rules = rules
         )
     }

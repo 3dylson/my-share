@@ -121,6 +121,10 @@ Conçu pour l\'intention</string>
     <string name="onboarding_plan_preview_step_fixed_body">Déplacez immédiatement %1$s vers votre compte de coûts fixes.</string>
     <string name="onboarding_plan_preview_step_goal_title">2. Alimentez votre vision : %1$s</string>
     <string name="onboarding_plan_preview_step_goal_body">Contribuez %1$s pour rester sur la bonne voie pour %2$s.</string>
+    <string name="onboarding_plan_preview_step_priority_title">2. Financez votre stratégie</string>
+    <string name="onboarding_plan_preview_step_priority_body">Placez %1$s vers vos priorités choisies.</string>
+    <string name="onboarding_plan_preview_step_custom_title">2. Gardez de la flexibilité</string>
+    <string name="onboarding_plan_preview_step_custom_body">Cette stratégie n’exige aucun transfert prioritaire.</string>
     <string name="onboarding_plan_preview_step_flex_title">3. Profitez de votre vie</string>
     <string name="onboarding_plan_preview_step_flex_body">Il vous reste %1$s pour le mois (%2$s par semaine).</string>
     <string name="onboarding_plan_preview_impact_title">La grande image</string>
@@ -193,6 +197,17 @@ Conçu pour l\'intention</string>
     <string name="onboarding_fixed_costs_preset_balanced_desc">Une base de référence mensuelle modérée.</string>
     <string name="onboarding_fixed_costs_preset_growth">Croissance</string>
     <string name="onboarding_fixed_costs_preset_growth_desc">Laissez plus de place pour investir.</string>
+    <string name="onboarding_fixed_costs_strategy_title">Stratégie de paie</string>
+    <string name="onboarding_strategy_balanced_savings">Épargne équilibrée</string>
+    <string name="onboarding_strategy_balanced_savings_desc">Gardez un objectif d’épargne sans serrer le quotidien.</string>
+    <string name="onboarding_strategy_no_savings">Pas d’épargne pour l’instant</string>
+    <string name="onboarding_strategy_no_savings_desc">Utilisez le plan sans imposer une catégorie d’épargne.</string>
+    <string name="onboarding_strategy_debt_first">Dette d’abord</string>
+    <string name="onboarding_strategy_debt_first_desc">Priorisez les remboursements avant l’épargne ou l’investissement.</string>
+    <string name="onboarding_strategy_investing_first">Investir d’abord</string>
+    <string name="onboarding_strategy_investing_first_desc">Dirigez plus de chaque paie vers des actifs à long terme.</string>
+    <string name="onboarding_strategy_flexible_only">Budget flexible seul</string>
+    <string name="onboarding_strategy_flexible_only_desc">Suivez l’argent disponible sans contributions aux objectifs.</string>
     <string name="onboarding_priorities_allocated">%1$s alloués</string>
     <string name="onboarding_priorities_remaining">Restant %1$s</string>
     <string name="onboarding_priorities_over">Dépassement du budget de %1$s</string>
@@ -206,6 +221,8 @@ Conçu pour l\'intention</string>
     <string name="onboarding_priorities_desc_inv">Allocation de capital à long terme.</string>
     <string name="onboarding_priorities_label_cry">Cryptomonnaie</string>
     <string name="onboarding_priorities_desc_cry">Allocation facultative à risque plus élevé.</string>
+    <string name="onboarding_priorities_label_debt">Dette</string>
+    <string name="onboarding_priorities_desc_debt">Remboursements extra au-delà des minimums fixes.</string>
     <string name="onboarding_priorities_button_ready">Ça a l\'air bien</string>
     <string name="onboarding_priorities_button_balance">Répartition du solde</string>
     <string name="onboarding_trajectory_label_payday">Allocation sur salaire</string>
@@ -393,7 +410,7 @@ Conçu pour l\'intention</string>
     <string name="coaching_first_step_headline">Maîtrise du premier pas</string>
     <string name="coaching_first_step_body">Bon début avec votre premier avis ! Plus vous vous connectez, plus votre boucle d’habitudes devient intelligente.</string>
     <string name="notification_payday_title">Votre mission sur salaire</string>
-    <string name="notification_payday_body">Mets %1$s de côté pour les factures et épargne %3$s. Il te reste %2$s pour les dépenses sûres.</string>
+    <string name="notification_payday_body">Mets %1$s de côté pour les factures et réserve %3$s. Il te reste %2$s pour les dépenses sûres.</string>
     <string name="home_plan_next_payday">Prochain jour de paie : %1$s</string>
     <string name="home_goal_mission_accomplished">Mission accomplie !</string>
     <string name="home_goal_on_pace">Au rythme pour %1$s</string>
@@ -467,4 +484,18 @@ Conçu pour l\'intention</string>
     <string name="required_update_message">Cette version de My Share n’est plus prise en charge. Mettez l’application à jour pour continuer à utiliser votre plan.</string>
     <string name="required_update_primary_action">Mettre à jour via Play Store</string>
     <string name="required_update_fallback_action">Ouvrir Play Store dans le navigateur</string>
+    <string name="onboarding_strategy_custom">Stratégie personnalisée</string>
+    <string name="onboarding_strategy_custom_desc">Commencez avec une répartition vide et ajustez les règles.</string>
+    <string name="onboarding_strategy_custom_label">Nom de la stratégie</string>
+    <string name="onboarding_strategy_custom_placeholder">ex. Réinitialisation voyage</string>
+    <string name="onboarding_trajectory_label_strategy">Parcours de stratégie</string>
+    <string name="onboarding_trajectory_strategy_pending">Cette stratégie n’a pas besoin de date cible.</string>
+    <string name="onboarding_trajectory_flexible_title">Transfert prioritaire</string>
+    <string name="onboarding_trajectory_flexible_desc">Cette stratégie garde flexible l’argent restant de la paie.</string>
+    <string name="home_plan_label_priority">Priorité</string>
+    <string name="plan_summary_no_savings_now">Une répartition pratique qui ne force pas l’épargne trop tôt.</string>
+    <string name="plan_summary_debt_first">Une répartition axée sur le remboursement de la dette.</string>
+    <string name="plan_summary_investing_first">Une répartition menée par l’investissement à long terme.</string>
+    <string name="plan_summary_flexible_budget_only">Un plan flexible centré sur l’argent sûr à dépenser.</string>
+    <string name="plan_summary_custom_strategy">Une répartition personnalisée selon vos règles de paie.</string>
 </resources>
