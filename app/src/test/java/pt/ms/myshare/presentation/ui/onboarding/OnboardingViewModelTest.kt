@@ -6,6 +6,7 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -25,7 +26,9 @@ import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.domain.model.PaydayRuleType
 import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.domain.model.PricingStrategy
+import pt.ms.myshare.domain.model.BillingFlowLaunchResult
 import pt.ms.myshare.domain.model.BillingPlan
+import pt.ms.myshare.domain.model.BillingPurchaseEvent
 import pt.ms.myshare.domain.model.SalaryPlan
 import pt.ms.myshare.domain.model.PlanPreview
 import pt.ms.myshare.domain.model.StoreProduct
@@ -54,6 +57,7 @@ class OnboardingViewModelTest {
     private val userLocaleManager: UserLocaleManager = mockk(relaxed = true)
     private lateinit var isProFlow: MutableStateFlow<Boolean>
     private lateinit var availableProductsFlow: MutableStateFlow<List<StoreProduct>>
+    private lateinit var purchaseEventsFlow: MutableSharedFlow<BillingPurchaseEvent>
     private lateinit var currentUserFlow: MutableStateFlow<User?>
 
     private lateinit var viewModel: OnboardingViewModel
@@ -75,9 +79,12 @@ class OnboardingViewModelTest {
         every { resolvePricingStrategyUseCase.execute(any()) } returns pricingStrategy
         isProFlow = MutableStateFlow(false)
         availableProductsFlow = MutableStateFlow(emptyList())
+        purchaseEventsFlow = MutableSharedFlow(extraBufferCapacity = 1)
         currentUserFlow = MutableStateFlow(null)
         every { entitlementRepository.isPro } returns isProFlow
         every { entitlementRepository.availableProducts } returns availableProductsFlow
+        every { entitlementRepository.purchaseEvents } returns purchaseEventsFlow
+        coEvery { entitlementRepository.purchasePlan(any(), any()) } returns BillingFlowLaunchResult.Launched
         every { authRepository.currentUser } returns currentUserFlow
 
         viewModel = OnboardingViewModel(
@@ -334,6 +341,31 @@ class OnboardingViewModelTest {
         viewModel.purchasePremium(activity)
         advanceUntilIdle()
         coVerify { entitlementRepository.purchasePlan(activity, monthlyProduct) }
+        assertEquals("paywall_billing_handoff", viewModel.uiState.value.billingMessage)
+    }
+
+    @Test
+    fun `purchasePremium shows checkout failure when Play rejects billing launch`() = runTest {
+        val monthlyProduct = StoreProduct(
+            productId = "myshare_monthly",
+            name = "Monthly",
+            description = "Monthly premium",
+            price = "€4.99/mo",
+            basePlanId = "monthly-base",
+            offerToken = "token-monthly-123"
+        )
+        availableProductsFlow.value = listOf(monthlyProduct)
+        coEvery { entitlementRepository.purchasePlan(any(), any()) } returns BillingFlowLaunchResult.Failed(
+            responseCode = 5,
+            debugMessage = "Developer error"
+        )
+
+        viewModel.setSelectedBillingPlan(BillingPlan.MONTHLY)
+        viewModel.purchasePremium(mockk(relaxed = true))
+        advanceUntilIdle()
+
+        assertEquals("paywall_billing_checkout_failed", viewModel.uiState.value.billingMessage)
+        assertFalse(viewModel.uiState.value.isBillingActionInProgress)
     }
 
     @Test

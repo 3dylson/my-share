@@ -191,6 +191,7 @@ fun PlanPreviewScreen(
 @Composable
 fun PaywallScreen(
     pricingStrategy: PricingStrategy,
+    userPreferences: UserPreferences,
     availableProducts: List<StoreProduct> = emptyList(),
     selectedPlan: BillingPlan,
     isBillingActionInProgress: Boolean = false,
@@ -236,6 +237,15 @@ fun PaywallScreen(
         BillingPlan.ANNUAL -> stringResource(R.string.paywall_period_year)
     }
     val selectedTrialDays = selectedProduct?.freeTrialDays?.takeIf { it > 0 }
+    val currencyMismatchNotice = selectedProduct?.priceCurrencyCode
+        ?.takeUnless { it.equals(userPreferences.currencyCode, ignoreCase = true) }
+        ?.let {
+            stringResource(
+                R.string.paywall_currency_mismatch_notice,
+                userPreferences.currencyCode,
+                it
+            )
+        }
     val checkoutTerms = when {
         selectedProduct == null -> stringResource(R.string.paywall_footer_store_terms_unavailable)
         selectedTrialDays != null -> stringResource(
@@ -300,6 +310,7 @@ fun PaywallScreen(
                         else -> stringResource(R.string.paywall_upgrade_button)
                     },
                     billingMessage = resolvedBillingMessage,
+                    currencyMismatchNotice = currencyMismatchNotice,
                     isBillingActionInProgress = isBillingActionInProgress,
                     isPurchaseEnabled = isPurchaseReady,
                     onPurchaseClick = {
@@ -524,6 +535,7 @@ private fun PaywallPurchaseFooter(
     checkoutTerms: String,
     ctaText: String,
     billingMessage: String?,
+    currencyMismatchNotice: String?,
     isBillingActionInProgress: Boolean,
     isPurchaseEnabled: Boolean,
     onPurchaseClick: () -> Unit
@@ -553,6 +565,16 @@ private fun PaywallPurchaseFooter(
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
+            if (currencyMismatchNotice != null) {
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    currencyMismatchNotice,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            }
             Spacer(Modifier.height(10.dp))
             PremiumButton(
                 text = if (isBillingActionInProgress) {

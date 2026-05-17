@@ -356,6 +356,7 @@
     <string name="paywall_footer_trial_terms">Teste grátis de %1$d dias; depois renova automaticamente por %2$s / %3$s, salvo cancelamento no Google Play antes do fim do teste.</string>
     <string name="paywall_footer_no_trial_terms">Renova automaticamente por %1$s / %2$s. Podes cancelar quando quiseres no Google Play.</string>
     <string name="paywall_footer_store_terms_unavailable">A compra segura abre no Google Play. O preço e a elegibilidade do teste aparecem lá.</string>
+    <string name="paywall_currency_mismatch_notice">O teu plano usa %1$s. O Google Play cobra em %2$s com base na região da tua Play Store.</string>
     <string name="paywall_trust_play_title">Compra no Google Play</string>
     <string name="paywall_trust_play_body">Preço, elegibilidade do teste, renovação e cancelamento são geridos pelo Google Play.</string>
     <string name="paywall_trust_manual_title">Plano manual primeiro</string>
@@ -368,6 +369,10 @@
     <string name="paywall_billing_starting">A preparar o ecrã seguro de compra do Play…</string>
     <string name="paywall_billing_handoff">O ecrã de compra do Play abriu. Conclui lá para ativar o Premium.</string>
     <string name="paywall_billing_products_unavailable">Os produtos Premium ainda não estão disponíveis. Verifica a configuração da Play Store ou tenta mais tarde.</string>
+    <string name="paywall_billing_checkout_failed">O Google Play não conseguiu abrir a compra. Não foi iniciada qualquer cobrança. Tenta novamente ou atualiza a Play Store.</string>
+    <string name="paywall_billing_canceled">Compra cancelada. Não foi feita qualquer cobrança.</string>
+    <string name="paywall_billing_pending">O Google Play ainda está a processar esta compra. O Premium desbloqueia após aprovação.</string>
+    <string name="paywall_billing_completed">Compra recebida. O Premium está a ser ativado.</string>
     <string name="paywall_restore_checking">A verificar compras anteriores…</string>
     <string name="paywall_restore_success">Premium restaurado.</string>
     <string name="paywall_restore_none">Não foi encontrada nenhuma compra Premium nesta conta Play.</string>

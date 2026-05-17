@@ -547,13 +547,34 @@ fun PremiumPaywallCard(
                         )
                     }
                 }
-                if (isSelected) {
-                    Icon(
-                        imageVector = Icons.Default.CheckCircle,
-                        contentDescription = stringResource(R.string.content_description_selected),
-                        tint = MySharePrimary,
-                        modifier = Modifier.size(24.dp)
-                    )
+                if (badge != null || isSelected) {
+                    Column(
+                        horizontalAlignment = Alignment.End,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        if (badge != null) {
+                            Surface(
+                                color = MySharePrimary,
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text(
+                                    text = badge,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color.White,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                        if (isSelected) {
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = stringResource(R.string.content_description_selected),
+                                tint = MySharePrimary,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    }
                 }
             }
             
@@ -600,23 +621,6 @@ fun PremiumPaywallCard(
             }
         }
 
-        if (badge != null) {
-            Surface(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(8.dp),
-                color = MySharePrimary,
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(
-                    text = badge,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Color.White,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
     }
 }
 

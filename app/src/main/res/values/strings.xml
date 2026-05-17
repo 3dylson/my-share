@@ -400,6 +400,7 @@
     <string name="paywall_footer_trial_terms">%1$d-day free trial, then automatically renews at %2$s / %3$s unless canceled in Google Play before the trial ends.</string>
     <string name="paywall_footer_no_trial_terms">Automatically renews at %1$s / %2$s. Cancel anytime in Google Play.</string>
     <string name="paywall_footer_store_terms_unavailable">Secure checkout opens in Google Play. Pricing and trial eligibility appear there.</string>
+    <string name="paywall_currency_mismatch_notice">Your plan uses %1$s. Google Play charges in %2$s based on your Play Store region.</string>
     <string name="paywall_trust_play_title">Google Play checkout</string>
     <string name="paywall_trust_play_body">Price, trial eligibility, renewal, and cancellation are handled by Google Play.</string>
     <string name="paywall_trust_manual_title">Manual-first plan</string>
@@ -412,6 +413,10 @@
     <string name="paywall_billing_starting">Preparing the secure Play purchase screen…</string>
     <string name="paywall_billing_handoff">Play purchase screen opened. Finish there to activate Premium.</string>
     <string name="paywall_billing_products_unavailable">Premium products are not available yet. Check Play Store setup or try again later.</string>
+    <string name="paywall_billing_checkout_failed">Google Play could not open checkout. No charge was started. Try again or update Play Store.</string>
+    <string name="paywall_billing_canceled">Purchase canceled. No charge was made.</string>
+    <string name="paywall_billing_pending">Google Play is still processing this purchase. Premium unlocks after approval.</string>
+    <string name="paywall_billing_completed">Purchase received. Premium is being activated.</string>
     <string name="paywall_restore_checking">Checking for previous purchases…</string>
     <string name="paywall_restore_success">Premium restored.</string>
     <string name="paywall_restore_none">No Premium purchase was found for this Play account.</string>

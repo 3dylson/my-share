@@ -7,6 +7,9 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import kotlinx.coroutines.flow.emptyFlow
+import pt.ms.myshare.domain.model.BillingFlowLaunchResult
+import pt.ms.myshare.domain.model.BillingPurchaseEvent
 import pt.ms.myshare.domain.model.AllocationPreset
 import pt.ms.myshare.domain.model.StoreProduct
 import pt.ms.myshare.domain.repository.EntitlementRepository
@@ -88,6 +91,7 @@ class FakeEntitlementRepository : EntitlementRepository {
 
     private val _availableProducts = MutableStateFlow<List<StoreProduct>>(emptyList())
     override val availableProducts = _availableProducts.asStateFlow()
+    override val purchaseEvents = emptyFlow<BillingPurchaseEvent>()
 
     suspend fun setProState(value: Boolean) {
         _isPro.emit(value)
@@ -95,7 +99,8 @@ class FakeEntitlementRepository : EntitlementRepository {
 
     override suspend fun checkActiveEntitlement() {}
 
-    override suspend fun purchasePlan(activity: android.app.Activity, product: StoreProduct) {}
+    override suspend fun purchasePlan(activity: android.app.Activity, product: StoreProduct): BillingFlowLaunchResult =
+        BillingFlowLaunchResult.ProductUnavailable
 
     override suspend fun restorePurchases() {}
 }

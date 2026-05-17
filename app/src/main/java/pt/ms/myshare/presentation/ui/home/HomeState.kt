@@ -87,6 +87,8 @@ data class MoreCardState(
     val pricingStrategy: PricingStrategy? = null,
     val actualMonthlyPrice: String? = null,
     val actualAnnualPrice: String? = null,
+    val actualMonthlyPriceCurrencyCode: String? = null,
+    val actualAnnualPriceCurrencyCode: String? = null,
     val annualMonthlyEquivalentPrice: String? = null,
     val annualSavingsPrice: String? = null,
     val actualMonthlyTrialDays: Int? = null,

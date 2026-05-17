@@ -178,6 +178,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
             if (pricing != null) {
                 PaywallScreen(
                     pricingStrategy = pricing,
+                    userPreferences = state.userPreferences,
                     availableProducts = state.availableProducts,
                     selectedPlan = state.selectedBillingPlan,
                     isBillingActionInProgress = state.isBillingActionInProgress,

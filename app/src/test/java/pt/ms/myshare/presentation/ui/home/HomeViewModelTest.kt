@@ -3,6 +3,7 @@ package pt.ms.myshare.presentation.ui.home
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -16,7 +17,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import pt.ms.myshare.domain.model.AllocationPreset
+import pt.ms.myshare.domain.model.BillingFlowLaunchResult
 import pt.ms.myshare.domain.model.BillingPlan
+import pt.ms.myshare.domain.model.BillingPurchaseEvent
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.PaydayRule
 import pt.ms.myshare.domain.model.PayFrequency
@@ -200,6 +203,71 @@ class HomeViewModelTest {
     }
 
     @Test
+    fun `unlockPremium shows checkout failure when Play rejects billing launch`() = runTest {
+        fakeEntitlementRepository.setProducts(
+            listOf(
+                StoreProduct(
+                    productId = PremiumSubscriptionProducts.MONTHLY_ID,
+                    name = "Monthly",
+                    description = "Monthly premium",
+                    price = "€4.99",
+                    basePlanId = "monthly",
+                    offerToken = "monthly-token"
+                )
+            )
+        )
+        fakeEntitlementRepository.purchaseResult = BillingFlowLaunchResult.Failed(
+            responseCode = 5,
+            debugMessage = "Developer error"
+        )
+        advanceUntilIdle()
+
+        viewModel.chooseBillingPlan(BillingPlan.MONTHLY)
+        viewModel.unlockPremium(mockk(relaxed = true), "test_gate")
+        advanceUntilIdle()
+
+        assertEquals(
+            "paywall_billing_checkout_failed",
+            viewModel.state.value.moreCard.billingMessage
+        )
+        assertEquals(false, viewModel.state.value.moreCard.isBillingActionInProgress)
+    }
+
+    @Test
+    fun `purchase canceled event replaces handoff feedback`() = runTest {
+        fakeEntitlementRepository.setProducts(
+            listOf(
+                StoreProduct(
+                    productId = PremiumSubscriptionProducts.MONTHLY_ID,
+                    name = "Monthly",
+                    description = "Monthly premium",
+                    price = "€4.99",
+                    basePlanId = "monthly",
+                    offerToken = "monthly-token"
+                )
+            )
+        )
+        advanceUntilIdle()
+
+        viewModel.chooseBillingPlan(BillingPlan.MONTHLY)
+        viewModel.unlockPremium(mockk(relaxed = true), "test_gate")
+        advanceUntilIdle()
+
+        assertEquals(
+            "paywall_billing_handoff",
+            viewModel.state.value.moreCard.billingMessage
+        )
+
+        fakeEntitlementRepository.emitPurchaseEvent(BillingPurchaseEvent.Canceled)
+        advanceUntilIdle()
+
+        assertEquals(
+            "paywall_billing_canceled",
+            viewModel.state.value.moreCard.billingMessage
+        )
+    }
+
+    @Test
     fun `connectGoogleAccount shows success feedback`() = runTest {
         coEvery { mockAuthRepository.connectGoogleAccount("google-token") } returns Result.success(
             User(email = "user@example.com")
@@ -279,10 +347,14 @@ class TestFakeEntitlementRepository : EntitlementRepository {
     override val isPro = _isPro.asStateFlow()
     private val _availableProducts = MutableStateFlow<List<StoreProduct>>(emptyList())
     override val availableProducts = _availableProducts.asStateFlow()
+    private val _purchaseEvents = MutableSharedFlow<BillingPurchaseEvent>(extraBufferCapacity = 1)
+    override val purchaseEvents = _purchaseEvents
+    var purchaseResult: BillingFlowLaunchResult = BillingFlowLaunchResult.Launched
 
     override suspend fun checkActiveEntitlement() {}
-    override suspend fun purchasePlan(activity: android.app.Activity, product: StoreProduct) {}
+    override suspend fun purchasePlan(activity: android.app.Activity, product: StoreProduct): BillingFlowLaunchResult = purchaseResult
     suspend fun setProducts(products: List<StoreProduct>) { _availableProducts.emit(products) }
+    suspend fun emitPurchaseEvent(event: BillingPurchaseEvent) { _purchaseEvents.emit(event) }
     suspend fun setPro(value: Boolean) { _isPro.emit(value) }
     override suspend fun restorePurchases() {}
 }

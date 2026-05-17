@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import io.mockk.*
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -12,6 +13,8 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import pt.ms.myshare.domain.model.BillingPurchaseEvent
+import pt.ms.myshare.domain.model.StoreProduct
 
 class PlayBillingEntitlementRepositoryTest {
 
@@ -25,6 +28,8 @@ class PlayBillingEntitlementRepositoryTest {
     @Before
     fun setup() {
         every { billingWrapper.purchases } returns purchasesFlow
+        every { billingWrapper.availableProducts } returns MutableStateFlow<List<StoreProduct>>(emptyList())
+        every { billingWrapper.purchaseEvents } returns MutableSharedFlow<BillingPurchaseEvent>()
         repository = PlayBillingEntitlementRepository(
             billingWrapper,
             firebaseAuth,

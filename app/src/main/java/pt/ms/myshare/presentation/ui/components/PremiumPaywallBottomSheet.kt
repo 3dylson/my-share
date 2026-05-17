@@ -7,8 +7,10 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -28,6 +30,7 @@ fun PremiumPaywallBottomSheet(
 ) {
     val resolvedTitle = title ?: stringResource(R.string.premium_gate_general_title)
     val resolvedBody = body ?: stringResource(R.string.premium_gate_general_body)
+    val context = LocalContext.current
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -67,6 +70,10 @@ fun PremiumPaywallBottomSheet(
             )
 
             if (billingMessage != null) {
+                val resolvedBillingMessage = remember(billingMessage, context) {
+                    val resId = context.resources.getIdentifier(billingMessage, "string", context.packageName)
+                    if (resId != 0) context.getString(resId) else billingMessage
+                }
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -85,14 +92,7 @@ fun PremiumPaywallBottomSheet(
                             tint = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            text = stringResource(
-                                when (billingMessage) {
-                                    "paywall_billing_starting" -> R.string.paywall_billing_starting
-                                    "paywall_billing_handoff" -> R.string.paywall_billing_handoff
-                                    "paywall_billing_products_unavailable" -> R.string.paywall_billing_products_unavailable
-                                    else -> R.string.paywall_billing_status_body
-                                }
-                            ),
+                            text = resolvedBillingMessage,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

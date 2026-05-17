@@ -356,6 +356,7 @@ Conçu pour l\'intention</string>
     <string name="paywall_footer_trial_terms">Essai gratuit de %1$d jours, puis renouvellement automatique à %2$s / %3$s sauf annulation dans Google Play avant la fin de l’essai.</string>
     <string name="paywall_footer_no_trial_terms">Renouvellement automatique à %1$s / %2$s. Annule quand tu veux dans Google Play.</string>
     <string name="paywall_footer_store_terms_unavailable">Le paiement sécurisé s’ouvre dans Google Play. Le prix et l’éligibilité à l’essai y seront affichés.</string>
+    <string name="paywall_currency_mismatch_notice">Ton plan utilise %1$s. Google Play facture en %2$s selon la région de ton Play Store.</string>
     <string name="paywall_trust_play_title">Paiement Google Play</string>
     <string name="paywall_trust_play_body">Google Play gère le prix, l’éligibilité à l’essai, le renouvellement et l’annulation.</string>
     <string name="paywall_trust_manual_title">Plan manuel d’abord</string>
@@ -368,6 +369,10 @@ Conçu pour l\'intention</string>
     <string name="paywall_billing_starting">Préparation de l’écran d’achat sécurisé Play…</string>
     <string name="paywall_billing_handoff">L’écran d’achat Play est ouvert. Termine l’achat pour activer Premium.</string>
     <string name="paywall_billing_products_unavailable">Les produits Premium ne sont pas encore disponibles. Vérifie la configuration Play Store ou réessaie plus tard.</string>
+    <string name="paywall_billing_checkout_failed">Google Play n’a pas pu ouvrir le paiement. Aucun débit n’a été lancé. Réessaie ou mets à jour le Play Store.</string>
+    <string name="paywall_billing_canceled">Achat annulé. Aucun débit n’a été effectué.</string>
+    <string name="paywall_billing_pending">Google Play traite encore cet achat. Premium se débloquera après validation.</string>
+    <string name="paywall_billing_completed">Achat reçu. Premium est en cours d’activation.</string>
     <string name="paywall_restore_checking">Recherche des achats précédents…</string>
     <string name="paywall_restore_success">Premium restauré.</string>
     <string name="paywall_restore_none">Aucun achat Premium trouvé pour ce compte Play.</string>

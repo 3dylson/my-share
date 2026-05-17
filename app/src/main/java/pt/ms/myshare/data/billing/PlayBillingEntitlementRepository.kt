@@ -12,6 +12,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.android.billingclient.api.Purchase
+import pt.ms.myshare.domain.model.BillingFlowLaunchResult
 import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
 import timber.log.Timber
 
@@ -33,6 +34,7 @@ class PlayBillingEntitlementRepository(
     }
 
     override val availableProducts: Flow<List<StoreProduct>> = billingClientWrapper.availableProducts
+    override val purchaseEvents = billingClientWrapper.purchaseEvents
 
     init {
         billingClientWrapper.startBillingConnection()
@@ -75,14 +77,14 @@ class PlayBillingEntitlementRepository(
         billingClientWrapper.queryActivePurchases()
     }
 
-    override suspend fun purchasePlan(activity: Activity, product: StoreProduct) {
+    override suspend fun purchasePlan(activity: Activity, product: StoreProduct): BillingFlowLaunchResult {
         val obfuscatedAccountId = ObfuscatedAccountIdFactory.fromFirebaseUid(firebaseAuth.currentUser?.uid)
         Timber.tag("BillingRepo").d(
             "Launching billing flow for product=%s authenticated=%s",
             product.productId,
             obfuscatedAccountId != null
         )
-        billingClientWrapper.launchBillingFlow(activity, product, obfuscatedAccountId)
+        return billingClientWrapper.launchBillingFlow(activity, product, obfuscatedAccountId)
     }
 
     override suspend fun restorePurchases() {

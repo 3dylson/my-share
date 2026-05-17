@@ -118,6 +118,20 @@ fun LazyListScope.homeMoreTab(
                 } else {
                     state.actualMonthlyTrialDays
                 }
+                val selectedPriceCurrencyCode = if (state.selectedBillingPlan == BillingPlan.ANNUAL) {
+                    state.actualAnnualPriceCurrencyCode
+                } else {
+                    state.actualMonthlyPriceCurrencyCode
+                }
+                val currencyMismatchNotice = selectedPriceCurrencyCode
+                    ?.takeUnless { it.equals(state.userPreferences.currencyCode, ignoreCase = true) }
+                    ?.let {
+                        stringResource(
+                            R.string.paywall_currency_mismatch_notice,
+                            state.userPreferences.currencyCode,
+                            it
+                        )
+                    }
                 val checkoutTerms = when {
                     selectedPrice == null -> stringResource(R.string.paywall_footer_store_terms_unavailable)
                     selectedTrialDays != null -> stringResource(
@@ -134,6 +148,14 @@ fun LazyListScope.homeMoreTab(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
                 )
+                if (currencyMismatchNotice != null) {
+                    Text(
+                        text = currencyMismatchNotice,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                    )
+                }
                 Spacer(Modifier.height(10.dp))
                 val context = LocalContext.current
                 if (state.error != null && state.billingMessage == null) {

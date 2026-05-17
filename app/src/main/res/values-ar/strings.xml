@@ -356,6 +356,7 @@
     <string name="paywall_footer_trial_terms">تجربة مجانية لمدة %1$d أيام، ثم يتجدد تلقائيًا بسعر %2$s / %3$s ما لم يتم الإلغاء في Google Play قبل نهاية التجربة.</string>
     <string name="paywall_footer_no_trial_terms">يتجدد تلقائيًا بسعر %1$s / %2$s. يمكنك الإلغاء في أي وقت من Google Play.</string>
     <string name="paywall_footer_store_terms_unavailable">تفتح عملية الشراء الآمنة في Google Play. سيظهر السعر وأهلية التجربة هناك.</string>
+    <string name="paywall_currency_mismatch_notice">تستخدم خطتك %1$s. يفرض Google Play الرسوم بـ %2$s حسب منطقة Play Store لديك.</string>
     <string name="paywall_trust_play_title">الدفع عبر Google Play</string>
     <string name="paywall_trust_play_body">يتولى Google Play السعر وأهلية التجربة والتجديد والإلغاء.</string>
     <string name="paywall_trust_manual_title">خطة يدوية أولًا</string>
@@ -368,6 +369,10 @@
     <string name="paywall_billing_starting">جارٍ تجهيز شاشة الشراء الآمنة في Play…</string>
     <string name="paywall_billing_handoff">تم فتح شاشة الشراء في Play. أكمل هناك لتفعيل Premium.</string>
     <string name="paywall_billing_products_unavailable">منتجات Premium غير متاحة بعد. تحقق من إعداد Play Store أو حاول لاحقًا.</string>
+    <string name="paywall_billing_checkout_failed">تعذر على Google Play فتح عملية الشراء. لم يبدأ أي خصم. حاول مرة أخرى أو حدّث Play Store.</string>
+    <string name="paywall_billing_canceled">تم إلغاء الشراء. لم يتم أي خصم.</string>
+    <string name="paywall_billing_pending">لا يزال Google Play يعالج عملية الشراء. سيتم فتح Premium بعد الموافقة.</string>
+    <string name="paywall_billing_completed">تم استلام الشراء. جارٍ تفعيل Premium.</string>
     <string name="paywall_restore_checking">جارٍ التحقق من المشتريات السابقة…</string>
     <string name="paywall_restore_success">تمت استعادة Premium.</string>
     <string name="paywall_restore_none">لم يتم العثور على أي شراء Premium لهذا حساب Play.</string>

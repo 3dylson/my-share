@@ -356,6 +356,7 @@ Für Absicht gebaut</string>
     <string name="paywall_footer_trial_terms">%1$d Tage kostenlos testen, danach automatische Verlängerung für %2$s / %3$s, sofern du nicht vor Ende der Testphase in Google Play kündigst.</string>
     <string name="paywall_footer_no_trial_terms">Verlängert sich automatisch für %1$s / %2$s. Jederzeit in Google Play kündbar.</string>
     <string name="paywall_footer_store_terms_unavailable">Der sichere Kauf wird in Google Play geöffnet. Preis und Testberechtigung werden dort angezeigt.</string>
+    <string name="paywall_currency_mismatch_notice">Dein Plan verwendet %1$s. Google Play berechnet in %2$s basierend auf deiner Play Store-Region.</string>
     <string name="paywall_trust_play_title">Google Play-Kauf</string>
     <string name="paywall_trust_play_body">Preis, Testberechtigung, Verlängerung und Kündigung werden von Google Play verwaltet.</string>
     <string name="paywall_trust_manual_title">Manueller Plan zuerst</string>
@@ -368,6 +369,10 @@ Für Absicht gebaut</string>
     <string name="paywall_billing_starting">Sicherer Play-Kaufbildschirm wird vorbereitet…</string>
     <string name="paywall_billing_handoff">Der Play-Kaufbildschirm wurde geöffnet. Schließe dort ab, um Premium zu aktivieren.</string>
     <string name="paywall_billing_products_unavailable">Premium-Produkte sind noch nicht verfügbar. Prüfe die Play Store-Einrichtung oder versuche es später erneut.</string>
+    <string name="paywall_billing_checkout_failed">Google Play konnte den Kauf nicht öffnen. Es wurde keine Abbuchung gestartet. Versuche es erneut oder aktualisiere den Play Store.</string>
+    <string name="paywall_billing_canceled">Kauf abgebrochen. Es wurde nichts berechnet.</string>
+    <string name="paywall_billing_pending">Google Play verarbeitet diesen Kauf noch. Premium wird nach der Genehmigung freigeschaltet.</string>
+    <string name="paywall_billing_completed">Kauf erhalten. Premium wird aktiviert.</string>
     <string name="paywall_restore_checking">Vorherige Käufe werden geprüft…</string>
     <string name="paywall_restore_success">Premium wiederhergestellt.</string>
     <string name="paywall_restore_none">Für dieses Play-Konto wurde kein Premium-Kauf gefunden.</string>

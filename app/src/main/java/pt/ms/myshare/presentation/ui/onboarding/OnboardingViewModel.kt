@@ -12,7 +12,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pt.ms.myshare.domain.model.AllocationPreset
 import pt.ms.myshare.domain.model.AllocationStrategy
+import pt.ms.myshare.domain.model.BillingFlowLaunchResult
 import pt.ms.myshare.domain.model.BillingPlan
+import pt.ms.myshare.domain.model.BillingPurchaseEvent
 import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.model.GoalType
 import pt.ms.myshare.domain.model.PayFrequency
@@ -30,6 +32,8 @@ import pt.ms.myshare.domain.repository.UserPreferencesRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
 import pt.ms.myshare.presentation.ui.localization.UserLocaleManager
+import pt.ms.myshare.presentation.ui.paywall.BillingStatusMessageKeys
+import pt.ms.myshare.presentation.ui.paywall.BillingStatusMessageMapper
 import pt.ms.myshare.utils.logs.FirebaseUtils
 import timber.log.Timber
 import java.math.BigDecimal
@@ -119,6 +123,18 @@ class OnboardingViewModel @Inject constructor(
             entitlementRepository.availableProducts.collect { products ->
                 Timber.d("OnboardingVM: received ${products.size} live billing products")
                 state.update { it.copy(availableProducts = products) }
+            }
+        }
+        viewModelScope.launch {
+            entitlementRepository.purchaseEvents.collect { event ->
+                val messageKey = BillingStatusMessageMapper.fromPurchaseEvent(event)
+                state.update {
+                    it.copy(
+                        isBillingActionInProgress = false,
+                        billingMessage = messageKey
+                    )
+                }
+                logBillingPurchaseEvent(event, "onboarding_paywall")
             }
         }
     }
@@ -292,14 +308,19 @@ class OnboardingViewModel @Inject constructor(
     fun purchasePremium(activity: android.app.Activity) {
         val storeProductId = PremiumSubscriptionProducts.productIdFor(state.value.selectedBillingPlan)
         viewModelScope.launch {
-            state.update { it.copy(isBillingActionInProgress = true, billingMessage = "paywall_billing_starting") }
+            state.update {
+                it.copy(
+                    isBillingActionInProgress = true,
+                    billingMessage = BillingStatusMessageKeys.STARTING
+                )
+            }
             val products = entitlementRepository.availableProducts.first()
             val product = products.find { it.productId == storeProductId }
             if (product == null) {
                 state.update {
                     it.copy(
                         isBillingActionInProgress = false,
-                        billingMessage = "paywall_billing_products_unavailable"
+                        billingMessage = BillingStatusMessageKeys.PRODUCTS_UNAVAILABLE
                     )
                 }
                 FirebaseUtils.logEvent("purchase_unavailable", Bundle().apply {
@@ -318,8 +339,14 @@ class OnboardingViewModel @Inject constructor(
                 putBoolean("has_trial", product.hasFreeTrial)
                 putString("source", "onboarding_paywall")
             })
-            entitlementRepository.purchasePlan(activity, product)
-            state.update { it.copy(isBillingActionInProgress = false, billingMessage = "paywall_billing_handoff") }
+            val launchResult = entitlementRepository.purchasePlan(activity, product)
+            state.update {
+                it.copy(
+                    isBillingActionInProgress = false,
+                    billingMessage = BillingStatusMessageMapper.fromLaunchResult(launchResult)
+                )
+            }
+            logBillingLaunchResult(launchResult, product.productId, "onboarding_paywall")
         }
     }
 
@@ -488,6 +515,55 @@ class OnboardingViewModel @Inject constructor(
             })
             Timber.tag("OnboardingBilling").d("Restore purchases completed. restored=%s", restored)
             onRestored(restored)
+        }
+    }
+
+    private fun logBillingLaunchResult(
+        result: BillingFlowLaunchResult,
+        productId: String,
+        source: String
+    ) {
+        when (result) {
+            BillingFlowLaunchResult.Launched -> Timber.tag("OnboardingBilling").d(
+                "Billing launch accepted product=%s source=%s",
+                productId,
+                source
+            )
+            BillingFlowLaunchResult.ProductUnavailable -> Timber.tag("OnboardingBilling").e(
+                "Billing launch unavailable product=%s source=%s",
+                productId,
+                source
+            )
+            is BillingFlowLaunchResult.Failed -> Timber.tag("OnboardingBilling").e(
+                "Billing launch failed product=%s source=%s code=%d message=%s",
+                productId,
+                source,
+                result.responseCode,
+                result.debugMessage
+            )
+        }
+    }
+
+    private fun logBillingPurchaseEvent(event: BillingPurchaseEvent, source: String) {
+        when (event) {
+            BillingPurchaseEvent.Completed -> Timber.tag("OnboardingBilling").d(
+                "Billing purchase completed source=%s",
+                source
+            )
+            BillingPurchaseEvent.Pending -> Timber.tag("OnboardingBilling").d(
+                "Billing purchase pending source=%s",
+                source
+            )
+            BillingPurchaseEvent.Canceled -> Timber.tag("OnboardingBilling").d(
+                "Billing purchase canceled source=%s",
+                source
+            )
+            is BillingPurchaseEvent.Failed -> Timber.tag("OnboardingBilling").e(
+                "Billing purchase failed source=%s code=%d message=%s",
+                source,
+                event.responseCode,
+                event.debugMessage
+            )
         }
     }
 

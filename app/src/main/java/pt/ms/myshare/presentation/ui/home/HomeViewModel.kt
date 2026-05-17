@@ -10,7 +10,9 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import pt.ms.myshare.domain.model.BillingFlowLaunchResult
 import pt.ms.myshare.domain.model.BillingPlan
+import pt.ms.myshare.domain.model.BillingPurchaseEvent
 import pt.ms.myshare.domain.model.PaydayRule
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.ReviewInsight
@@ -37,6 +39,8 @@ import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.presentation.ui.formatting.SubscriptionSavingsFormatter
 import pt.ms.myshare.presentation.ui.localization.UserLocaleManager
 import pt.ms.myshare.presentation.ui.onboarding.ReminderWorkScheduler
+import pt.ms.myshare.presentation.ui.paywall.BillingStatusMessageKeys
+import pt.ms.myshare.presentation.ui.paywall.BillingStatusMessageMapper
 import pt.ms.myshare.utils.logs.FirebaseUtils
 import timber.log.Timber
 import java.math.BigDecimal
@@ -85,6 +89,7 @@ class HomeViewModel @Inject constructor(
         }
         userLocaleManager.apply(currentPreferences)
         observeProducts()
+        observeBillingPurchaseEvents()
         observePlannerData()
         observeReviewHistory()
         FirebaseUtils.logScreen("home")
@@ -103,6 +108,24 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             entitlementRepository.availableProducts.collect { products ->
                 availableStoreProducts = products
+            }
+        }
+    }
+
+    private fun observeBillingPurchaseEvents() {
+        viewModelScope.launch {
+            entitlementRepository.purchaseEvents.collect { event ->
+                val messageKey = BillingStatusMessageMapper.fromPurchaseEvent(event)
+                uiState.update {
+                    it.copy(
+                        moreCard = it.moreCard.copy(
+                            isBillingActionInProgress = false,
+                            billingMessage = messageKey,
+                            error = null
+                        )
+                    )
+                }
+                logBillingPurchaseEvent(event)
             }
         }
     }
@@ -222,7 +245,7 @@ class HomeViewModel @Inject constructor(
                     BillingPlan.ANNUAL -> annualProduct != null
                 }
                 val shouldClearUnavailableMessage =
-                    currentMore.billingMessage == "paywall_billing_products_unavailable" && selectedProductAvailable
+                    currentMore.billingMessage == BillingStatusMessageKeys.PRODUCTS_UNAVAILABLE && selectedProductAvailable
 
                 val moreCard = MoreCardState(
                     reminderEnabled = reminder.enabled,
@@ -244,6 +267,8 @@ class HomeViewModel @Inject constructor(
                     pricingStrategy = pricingStrategy,
                     actualMonthlyPrice = monthlyProduct?.price,
                     actualAnnualPrice = annualProduct?.price,
+                    actualMonthlyPriceCurrencyCode = monthlyProduct?.priceCurrencyCode,
+                    actualAnnualPriceCurrencyCode = annualProduct?.priceCurrencyCode,
                     annualMonthlyEquivalentPrice = annualComparison?.monthlyEquivalentPrice,
                     annualSavingsPrice = annualComparison?.savingsPrice,
                     actualMonthlyTrialDays = monthlyProduct?.freeTrialDays?.takeIf { it > 0 },
@@ -568,6 +593,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun logPremiumGateViewed(gate: HomePremiumGate) {
+        clearIdleBillingFeedback()
         logPremiumGateEvent("premium_gate_viewed", gate)
     }
 
@@ -581,10 +607,15 @@ class HomeViewModel @Inject constructor(
 
         viewModelScope.launch {
             uiState.update {
-                it.copy(moreCard = it.moreCard.copy(isBillingActionInProgress = true, billingMessage = "paywall_billing_starting", error = null))
+                it.copy(
+                    moreCard = it.moreCard.copy(
+                        isBillingActionInProgress = true,
+                        billingMessage = BillingStatusMessageKeys.STARTING,
+                        error = null
+                    )
+                )
             }
             if (realProduct != null) {
-                entitlementRepository.purchasePlan(activity, realProduct)
                 FirebaseUtils.logEvent("purchase_started", android.os.Bundle().apply {
                     putString("billing_plan", uiState.value.moreCard.selectedBillingPlan.name.lowercase(Locale.US))
                     putString("price_cluster", currentPricingStrategy().marketCluster)
@@ -592,9 +623,17 @@ class HomeViewModel @Inject constructor(
                     putBoolean("has_trial", realProduct.hasFreeTrial)
                     putString("source", source)
                 })
+                val launchResult = entitlementRepository.purchasePlan(activity, realProduct)
                 uiState.update {
-                    it.copy(moreCard = it.moreCard.copy(isBillingActionInProgress = false, billingMessage = "paywall_billing_handoff"))
+                    it.copy(
+                        moreCard = it.moreCard.copy(
+                            isBillingActionInProgress = false,
+                            billingMessage = BillingStatusMessageMapper.fromLaunchResult(launchResult),
+                            error = null
+                        )
+                    )
                 }
+                logBillingLaunchResult(launchResult, realProduct.productId, source)
             } else {
                 FirebaseUtils.logEvent("purchase_unavailable", android.os.Bundle().apply {
                     putString("billing_plan", uiState.value.moreCard.selectedBillingPlan.name.lowercase(Locale.US))
@@ -606,13 +645,67 @@ class HomeViewModel @Inject constructor(
                     it.copy(
                         moreCard = it.moreCard.copy(
                             isBillingActionInProgress = false,
-                            billingMessage = "paywall_billing_products_unavailable",
+                            billingMessage = BillingStatusMessageKeys.PRODUCTS_UNAVAILABLE,
                             error = "more_error_products_not_loaded"
                         )
                     )
                 }
                 Timber.tag(TAG).e("Cannot purchase: Product %s not found in store", storeProductId)
             }
+        }
+    }
+
+    private fun clearIdleBillingFeedback() {
+        uiState.update { current ->
+            if (current.moreCard.isBillingActionInProgress) {
+                current
+            } else {
+                current.copy(
+                    moreCard = current.moreCard.copy(
+                        billingMessage = null,
+                        error = null
+                    )
+                )
+            }
+        }
+    }
+
+    private fun logBillingLaunchResult(
+        result: BillingFlowLaunchResult,
+        productId: String,
+        source: String
+    ) {
+        when (result) {
+            BillingFlowLaunchResult.Launched -> Timber.tag(TAG).d(
+                "Billing launch accepted product=%s source=%s",
+                productId,
+                source
+            )
+            BillingFlowLaunchResult.ProductUnavailable -> Timber.tag(TAG).e(
+                "Billing launch unavailable product=%s source=%s",
+                productId,
+                source
+            )
+            is BillingFlowLaunchResult.Failed -> Timber.tag(TAG).e(
+                "Billing launch failed product=%s source=%s code=%d message=%s",
+                productId,
+                source,
+                result.responseCode,
+                result.debugMessage
+            )
+        }
+    }
+
+    private fun logBillingPurchaseEvent(event: BillingPurchaseEvent) {
+        when (event) {
+            BillingPurchaseEvent.Completed -> Timber.tag(TAG).d("Billing purchase completed")
+            BillingPurchaseEvent.Pending -> Timber.tag(TAG).d("Billing purchase pending")
+            BillingPurchaseEvent.Canceled -> Timber.tag(TAG).d("Billing purchase canceled")
+            is BillingPurchaseEvent.Failed -> Timber.tag(TAG).e(
+                "Billing purchase failed code=%d message=%s",
+                event.responseCode,
+                event.debugMessage
+            )
         }
     }
 

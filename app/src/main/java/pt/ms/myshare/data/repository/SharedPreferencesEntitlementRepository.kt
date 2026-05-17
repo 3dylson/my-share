@@ -7,6 +7,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.emptyFlow
+import pt.ms.myshare.domain.model.BillingFlowLaunchResult
+import pt.ms.myshare.domain.model.BillingPurchaseEvent
 import pt.ms.myshare.domain.model.StoreProduct
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import timber.log.Timber
@@ -23,13 +26,15 @@ class SharedPreferencesEntitlementRepository @Inject constructor(
 
     override val isPro: Flow<Boolean> = premiumState.asStateFlow()
     override val availableProducts: Flow<List<StoreProduct>> = MutableStateFlow(emptyList())
+    override val purchaseEvents: Flow<BillingPurchaseEvent> = emptyFlow()
 
     override suspend fun checkActiveEntitlement() {
         // No-op for shared prefs
     }
 
-    override suspend fun purchasePlan(activity: Activity, product: StoreProduct) {
-        // No-op for shared prefs
+    override suspend fun purchasePlan(activity: Activity, product: StoreProduct): BillingFlowLaunchResult {
+        Timber.tag(TAG).d("purchasePlan unavailable for shared preferences entitlement")
+        return BillingFlowLaunchResult.ProductUnavailable
     }
 
     suspend fun setPro(value: Boolean) {
