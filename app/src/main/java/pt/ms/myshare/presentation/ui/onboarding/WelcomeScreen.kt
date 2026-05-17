@@ -6,8 +6,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoGraph
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,6 +23,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.ms.myshare.R
@@ -65,39 +69,77 @@ fun WelcomeScreen(
         )
     }
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        bottomBar = {
+            Surface(color = MaterialTheme.colorScheme.background, tonalElevation = 4.dp) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .navigationBarsPadding()
+                        .padding(horizontal = 24.dp, vertical = 14.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    PremiumButton(
+                        text = stringResource(R.string.onboarding_welcome_button_get_started),
+                        onClick = onContinue
+                    )
+
+                    if (onSkipDev != null) {
+                        TextButton(
+                            onClick = onSkipDev,
+                            modifier = Modifier.height(40.dp)
+                        ) {
+                            Text(
+                                stringResource(R.string.onboarding_welcome_button_skip_dev),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(innerPadding)
                 .statusBarsPadding()
-                .navigationBarsPadding()
                 .verticalScroll(rememberScrollState())
-                .padding(24.dp),
+                .padding(horizontal = 24.dp)
+                .padding(top = 24.dp, bottom = 18.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(48.dp))
-
-            // Premium Visual Anchor - Glow effect
             Surface(
-                modifier = Modifier.size(100.dp),
-                shape = RoundedCornerShape(32.dp),
-                color = MaterialTheme.colorScheme.primaryContainer,
-                shadowElevation = 8.dp
+                shape = RoundedCornerShape(999.dp),
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f),
+                border = androidx.compose.foundation.BorderStroke(
+                    1.dp,
+                    MySharePrimary.copy(alpha = 0.24f)
+                )
             ) {
-                Box(contentAlignment = Alignment.Center) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+                    horizontalArrangement = Arrangement.spacedBy(7.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Icon(
                         imageVector = Icons.Default.AutoGraph,
                         contentDescription = null,
                         tint = MySharePrimary,
-                        modifier = Modifier.size(48.dp)
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Text(
+                        text = stringResource(R.string.onboarding_welcome_badge).uppercase(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MySharePrimary,
+                        fontWeight = FontWeight.Black
                     )
                 }
             }
-            
-            Spacer(Modifier.height(32.dp))
+
+            Spacer(Modifier.height(22.dp))
 
             Text(
                 stringResource(R.string.onboarding_welcome_title), 
@@ -107,23 +149,25 @@ fun WelcomeScreen(
                 lineHeight = 42.sp,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            
-            Spacer(Modifier.height(16.dp))
-            
+
             Text(
                 stringResource(R.string.onboarding_welcome_subtitle),
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 8.dp),
-                lineHeight = 26.sp
+                modifier = Modifier.padding(top = 12.dp, start = 4.dp, end = 4.dp),
+                lineHeight = 24.sp
             )
 
-            Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(22.dp))
+
+            WelcomeOutcomeCard()
+
+            Spacer(Modifier.height(16.dp))
 
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 WelcomePreferenceRow(
                     title = stringResource(R.string.preferences_language_title),
@@ -138,31 +182,85 @@ fun WelcomeScreen(
                     onClick = { showCurrencyPicker = true }
                 )
             }
+        }
+    }
+}
 
-            Spacer(Modifier.height(32.dp))
+@Composable
+private fun WelcomeOutcomeCard() {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp,
+            MySharePrimary.copy(alpha = 0.22f)
+        ),
+        shadowElevation = 1.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            WelcomeOutcomeRow(
+                title = stringResource(R.string.onboarding_welcome_outcome_payday_title),
+                body = stringResource(R.string.onboarding_welcome_outcome_payday_body),
+                icon = Icons.Default.CalendarMonth
+            )
+            WelcomeOutcomeRow(
+                title = stringResource(R.string.onboarding_welcome_outcome_weekly_title),
+                body = stringResource(R.string.onboarding_welcome_outcome_weekly_body),
+                icon = Icons.Default.Savings
+            )
+            WelcomeOutcomeRow(
+                title = stringResource(R.string.onboarding_welcome_outcome_trust_title),
+                body = stringResource(R.string.onboarding_welcome_outcome_trust_body),
+                icon = Icons.Default.CheckCircle
+            )
+        }
+    }
+}
 
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-              ) {
-                PremiumButton(
-                    text = stringResource(R.string.onboarding_welcome_button_get_started),
-                    onClick = onContinue
-                )
-
-                // Only shown in debug builds; compiled away in release
-                if (onSkipDev != null) {
-                    TextButton(onClick = onSkipDev) {
-                        Text(
-                            stringResource(R.string.onboarding_welcome_button_skip_dev), 
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                        )
-                    }
-                }
-            }
-            
-            Spacer(Modifier.height(16.dp))
+@Composable
+private fun WelcomeOutcomeRow(
+    title: String,
+    body: String,
+    icon: ImageVector
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Surface(
+            shape = RoundedCornerShape(10.dp),
+            color = MySharePrimary.copy(alpha = 0.12f)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MySharePrimary,
+                modifier = Modifier.padding(7.dp).size(18.dp)
+            )
+        }
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = body,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                lineHeight = 17.sp
+            )
         }
     }
 }
@@ -177,21 +275,21 @@ private fun WelcomePreferenceRow(
     Surface(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(12.dp),
         color = MaterialTheme.colorScheme.surface,
         border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.18f)),
-        shadowElevation = 1.dp
+        shadowElevation = 0.dp
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 11.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
                 tint = MySharePrimary,
-                modifier = Modifier.size(22.dp)
+                modifier = Modifier.size(20.dp)
             )
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -202,9 +300,11 @@ private fun WelcomePreferenceRow(
                 )
                 Text(
                     text = value,
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }

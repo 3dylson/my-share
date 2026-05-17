@@ -520,16 +520,42 @@ class HomeViewModel @Inject constructor(
     }
 
     fun updateLanguage(languageTag: String) {
-        val current = currentPreferences
+        val updated = currentPreferences.copy(languageTag = languageTag)
+        updatePreferenceState(updated)
         viewModelScope.launch {
-            userPreferencesRepository.savePreferences(current.copy(languageTag = languageTag))
+            userPreferencesRepository.savePreferences(updated)
+            userLocaleManager.apply(userPreferencesRepository.loadPreferences())
         }
     }
 
     fun updateCurrency(currencyCode: String) {
-        val current = currentPreferences
+        val updated = currentPreferences.copy(currencyCode = currencyCode)
+        updatePreferenceState(updated)
         viewModelScope.launch {
-            userPreferencesRepository.savePreferences(current.copy(currencyCode = currencyCode))
+            userPreferencesRepository.savePreferences(updated)
+        }
+    }
+
+    private fun updatePreferenceState(preferences: UserPreferences) {
+        currentPreferences = preferences
+        val updatedPricing = resolvePricingStrategyUseCase.execute(preferences.locale)
+        uiState.update { current ->
+            val previousPricing = current.moreCard.pricingStrategy
+            val updatedSelectedPlan = previousPricing?.let { oldPricing ->
+                if (current.moreCard.selectedBillingPlan == oldPricing.heroPlan) {
+                    updatedPricing.heroPlan
+                } else {
+                    current.moreCard.selectedBillingPlan
+                }
+            } ?: updatedPricing.heroPlan
+
+            current.copy(
+                moreCard = current.moreCard.copy(
+                    userPreferences = preferences,
+                    pricingStrategy = updatedPricing,
+                    selectedBillingPlan = updatedSelectedPlan
+                )
+            )
         }
     }
 

@@ -25,9 +25,15 @@
     <string name="id_amount_for_stocks" translatable="false">amount_for_stocks</string>
     <string name="id_amount_for_crypto" translatable="false">amount_for_crypto</string>
     <string name="id_amount_for_savings" translatable="false">amount_for_savings</string>
-    <string name="onboarding_welcome_title">أموالك،
-مصممة من أجل النية</string>
-    <string name="onboarding_welcome_subtitle">توقف عن الإنفاق التفاعلي. ابدأ في بناء مخططك للحرية المالية اليوم.</string>
+    <string name="onboarding_welcome_title">اعرف ما تفعل\nعندما يصل المال</string>
+    <string name="onboarding_welcome_subtitle">أنشئ خطة راتب واضحة في أقل من دقيقتين، ثم استخدمها يدويًا أو دع Premium يوجه التعديلات القادمة.</string>
+    <string name="onboarding_welcome_badge">خطة راتب في دقيقتين</string>
+    <string name="onboarding_welcome_outcome_payday_title">خطة عمل الراتب القادم</string>
+    <string name="onboarding_welcome_outcome_payday_body">اعرف ما يجب نقله للفواتير والأهداف والإنفاق اليومي.</string>
+    <string name="onboarding_welcome_outcome_weekly_title">دليل الإنفاق الأسبوعي</string>
+    <string name="onboarding_welcome_outcome_weekly_body">حوّل مال الراتب إلى مبلغ أسبوعي يمكنك الوثوق به.</string>
+    <string name="onboarding_welcome_outcome_trust_title">يدوي أولًا، بلا بنك</string>
+    <string name="onboarding_welcome_outcome_trust_body">ابدأ دون ربط الحسابات. يظهر Premium فقط بعد أن تصبح خطتك جاهزة.</string>
     <string name="onboarding_welcome_button_get_started">ابدأ</string>
     <string name="onboarding_welcome_button_skip_dev" translatable="false">Skip to Home (Dev)</string>
     <string name="onboarding_goal_picker_title">لماذا نبني؟</string>

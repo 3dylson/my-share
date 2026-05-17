@@ -1,7 +1,9 @@
 package pt.ms.myshare.presentation.ui.preferences
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.SupportedLanguage
@@ -78,15 +83,7 @@ fun CurrencyPickerDialog(
 ) {
     var query by remember { mutableStateOf("") }
     val currencies = remember(locale) {
-        Currency.getAvailableCurrencies()
-            .map { currency ->
-                CurrencyOption(
-                    code = currency.currencyCode,
-                    symbol = currency.getSymbol(locale),
-                    displayName = currency.getDisplayName(locale)
-                )
-            }
-            .sortedWith(compareBy<CurrencyOption> { it.displayName }.thenBy { it.code })
+        CurrencyPickerCatalog.options(locale)
     }
     val filtered = remember(query, currencies) {
         val normalized = query.trim()
@@ -156,12 +153,70 @@ private fun CurrencyRow(
     selected: Boolean,
     onClick: () -> Unit
 ) {
-    PreferenceSelectionRow(
-        title = "${option.code} · ${option.displayName}",
-        subtitle = option.symbol,
-        selected = selected,
-        onClick = onClick
-    )
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        color = if (selected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f) else MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(
+            1.dp,
+            if (selected) MySharePrimary.copy(alpha = 0.32f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.14f)
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 11.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = if (selected) MySharePrimary.copy(alpha = 0.16f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.52f)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .widthIn(min = 52.dp)
+                        .padding(horizontal = 9.dp, vertical = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = option.code,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = if (selected) MySharePrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontWeight = FontWeight.Black,
+                        maxLines = 1
+                    )
+                }
+            }
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = option.displayName,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = option.symbol,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            if (selected) {
+                Icon(
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = stringResource(R.string.content_description_selected),
+                    tint = MySharePrimary,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -206,12 +261,6 @@ private fun PreferenceSelectionRow(
         }
     }
 }
-
-data class CurrencyOption(
-    val code: String,
-    val symbol: String,
-    val displayName: String
-)
 
 fun languageLabel(languageTag: String): String {
     return UserPreferences.supportedLanguages.firstOrNull { it.languageTag == languageTag }?.displayName

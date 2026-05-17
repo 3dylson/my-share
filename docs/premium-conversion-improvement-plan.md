@@ -211,7 +211,9 @@ Status after onboarding value-ladder pass on 2026-05-17:
 - Done: The paywall value copy now frames Premium around review-based adjustment guidance, while keeping the free manual path visible.
 - Done: The paywall now shows a concrete example Premium adjustment based on the user's plan, such as moving an unused buffer toward the selected goal while protecting the weekly guide.
 - Done: Trajectory now bridges into the paywall with review-based guidance copy tied to the user's weekly guide and priority transfer.
-- Pending: Welcome, Goal Picker, Salary, Fixed Costs, and Allocation still need visual/copy passes to create a consistent premium setup flow before the paywall.
+- Done: Welcome now leads with a concrete payday outcome, a compact outcome card, a manual-first trust cue, quieter language/currency controls, and a sticky CTA.
+- Done: Welcome preference controls now feel less crowded: the currency picker uses a curated high-confidence currency list, currency rows separate code/name/symbol clearly, and language/currency selections update the visible app state immediately.
+- Pending: Goal Picker, Salary, Fixed Costs, and Allocation still need visual/copy passes to create a consistent premium setup flow before the paywall.
 
 ### Problems
 

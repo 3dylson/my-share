@@ -25,9 +25,15 @@
     <string name="id_amount_for_stocks" translatable="false">amount_for_stocks</string>
     <string name="id_amount_for_crypto" translatable="false">amount_for_crypto</string>
     <string name="id_amount_for_savings" translatable="false">amount_for_savings</string>
-    <string name="onboarding_welcome_title">Su dinero,
-Creado con intención</string>
-    <string name="onboarding_welcome_subtitle">Detener el gasto reactivo. Start building your blueprint for financial freedom today.</string>
+    <string name="onboarding_welcome_title">Sabe qué hacer\ncuando llega el dinero</string>
+    <string name="onboarding_welcome_subtitle">Crea un plan de cobro claro en menos de dos minutos y luego úsalo manualmente o deja que Premium guíe futuros ajustes.</string>
+    <string name="onboarding_welcome_badge">Plan de cobro en 2 minutos</string>
+    <string name="onboarding_welcome_outcome_payday_title">Plan de acción del próximo cobro</string>
+    <string name="onboarding_welcome_outcome_payday_body">Ve qué mover a facturas, objetivos y gasto diario.</string>
+    <string name="onboarding_welcome_outcome_weekly_title">Guía de gasto semanal</string>
+    <string name="onboarding_welcome_outcome_weekly_body">Convierte el dinero del cobro en una cantidad semanal confiable.</string>
+    <string name="onboarding_welcome_outcome_trust_title">Manual primero, sin banco</string>
+    <string name="onboarding_welcome_outcome_trust_body">Empieza sin conectar cuentas. Premium se ofrece solo cuando tu plan esté listo.</string>
     <string name="onboarding_welcome_button_get_started">Empezar</string>
     <string name="onboarding_welcome_button_skip_dev" translatable="false">Skip to Home (Dev)</string>
     <string name="onboarding_goal_picker_title">¿Para qué estamos construyendo?</string>

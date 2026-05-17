@@ -25,8 +25,15 @@
     <string name="id_amount_for_crypto" translatable="false">amount_for_crypto</string>
     <string name="id_amount_for_savings" translatable="false">amount_for_savings</string>
     <!-- Welcome Screen -->
-    <string name="onboarding_welcome_title">Your Money,\nBuilt for Intention</string>
-    <string name="onboarding_welcome_subtitle">Stop reactive spending. Start building your blueprint for financial freedom today.</string>
+    <string name="onboarding_welcome_title">Know what to do\nwhen money lands</string>
+    <string name="onboarding_welcome_subtitle">Build a clear payday plan in under two minutes, then run it manually or let Premium guide future adjustments.</string>
+    <string name="onboarding_welcome_badge">Payday plan in 2 minutes</string>
+    <string name="onboarding_welcome_outcome_payday_title">Next payday action plan</string>
+    <string name="onboarding_welcome_outcome_payday_body">See what to move to bills, goals, and everyday spending.</string>
+    <string name="onboarding_welcome_outcome_weekly_title">Weekly spend guide</string>
+    <string name="onboarding_welcome_outcome_weekly_body">Turn payday money into a weekly amount you can trust.</string>
+    <string name="onboarding_welcome_outcome_trust_title">Manual-first, no bank required</string>
+    <string name="onboarding_welcome_outcome_trust_body">Start without connecting accounts. Premium is offered only after your plan is ready.</string>
     <string name="onboarding_welcome_button_get_started">Get Started</string>
     <string name="onboarding_welcome_button_skip_dev" translatable="false">Skip to Home (Dev)</string>
 

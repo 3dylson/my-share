@@ -25,9 +25,15 @@
     <string name="id_amount_for_stocks" translatable="false">amount_for_stocks</string>
     <string name="id_amount_for_crypto" translatable="false">amount_for_crypto</string>
     <string name="id_amount_for_savings" translatable="false">amount_for_savings</string>
-    <string name="onboarding_welcome_title">Ihr Geld,
-Für Absicht gebaut</string>
-    <string name="onboarding_welcome_subtitle">Stoppen Sie reaktive Ausgaben. Beginnen Sie noch heute mit der Entwicklung Ihres Plans für finanzielle Freiheit.</string>
+    <string name="onboarding_welcome_title">Wisse, was zu tun ist,\nwenn Geld eingeht</string>
+    <string name="onboarding_welcome_subtitle">Erstelle in unter zwei Minuten einen klaren Zahltag-Plan und nutze ihn manuell oder lass Premium künftige Anpassungen leiten.</string>
+    <string name="onboarding_welcome_badge">Zahltag-Plan in 2 Minuten</string>
+    <string name="onboarding_welcome_outcome_payday_title">Aktionsplan für den nächsten Zahltag</string>
+    <string name="onboarding_welcome_outcome_payday_body">Sieh, was zu Rechnungen, Zielen und Alltag verschoben werden sollte.</string>
+    <string name="onboarding_welcome_outcome_weekly_title">Wöchentlicher Ausgabenleitwert</string>
+    <string name="onboarding_welcome_outcome_weekly_body">Mach aus deinem Zahltag-Geld einen verlässlichen Wochenbetrag.</string>
+    <string name="onboarding_welcome_outcome_trust_title">Manuell zuerst, keine Bank nötig</string>
+    <string name="onboarding_welcome_outcome_trust_body">Starte ohne Kontoverbindung. Premium wird erst angeboten, wenn dein Plan bereit ist.</string>
     <string name="onboarding_welcome_button_get_started">Legen Sie los</string>
     <string name="onboarding_welcome_button_skip_dev" translatable="false">Skip to Home (Dev)</string>
     <string name="onboarding_goal_picker_title">Wofür bauen wir?</string>

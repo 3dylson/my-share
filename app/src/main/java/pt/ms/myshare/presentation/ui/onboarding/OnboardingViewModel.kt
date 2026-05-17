@@ -78,17 +78,7 @@ class OnboardingViewModel @Inject constructor(
         }
         viewModelScope.launch {
             userPreferencesRepository.observePreferences().collect { updatedPreferences ->
-                userLocaleManager.apply(updatedPreferences)
-                val updatedPricing = resolvePricingStrategyUseCase.execute(updatedPreferences.locale)
-                state.update { current ->
-                    current.copy(
-                        userPreferences = updatedPreferences,
-                        pricingStrategy = updatedPricing,
-                        selectedBillingPlan = current.pricingStrategy?.let { oldPricing ->
-                            if (current.selectedBillingPlan == oldPricing.heroPlan) updatedPricing.heroPlan else current.selectedBillingPlan
-                        } ?: updatedPricing.heroPlan
-                    )
-                }
+                applyPreferenceState(updatedPreferences, shouldApplyLocale = true)
                 Timber.tag(TAG).d(
                     "Onboarding preferences updated language=%s currency=%s",
                     updatedPreferences.languageTag,
@@ -292,16 +282,42 @@ class OnboardingViewModel @Inject constructor(
     }
 
     fun updateLanguage(languageTag: String) {
-        val current = state.value.userPreferences
+        val updated = state.value.userPreferences.copy(languageTag = languageTag)
+        applyPreferenceState(updated, shouldApplyLocale = false)
         viewModelScope.launch {
-            userPreferencesRepository.savePreferences(current.copy(languageTag = languageTag))
+            userPreferencesRepository.savePreferences(updated)
+            userLocaleManager.apply(userPreferencesRepository.loadPreferences())
         }
     }
 
     fun updateCurrency(currencyCode: String) {
-        val current = state.value.userPreferences
+        val updated = state.value.userPreferences.copy(currencyCode = currencyCode)
+        applyPreferenceState(updated, shouldApplyLocale = false)
         viewModelScope.launch {
-            userPreferencesRepository.savePreferences(current.copy(currencyCode = currencyCode))
+            userPreferencesRepository.savePreferences(updated)
+        }
+    }
+
+    private fun applyPreferenceState(
+        preferences: pt.ms.myshare.domain.model.UserPreferences,
+        shouldApplyLocale: Boolean
+    ) {
+        if (shouldApplyLocale) {
+            userLocaleManager.apply(preferences)
+        }
+        val updatedPricing = resolvePricingStrategyUseCase.execute(preferences.locale)
+        state.update { current ->
+            current.copy(
+                userPreferences = preferences,
+                pricingStrategy = updatedPricing,
+                selectedBillingPlan = current.pricingStrategy?.let { oldPricing ->
+                    if (current.selectedBillingPlan == oldPricing.heroPlan) {
+                        updatedPricing.heroPlan
+                    } else {
+                        current.selectedBillingPlan
+                    }
+                } ?: updatedPricing.heroPlan
+            )
         }
     }
 

@@ -25,9 +25,15 @@
     <string name="id_amount_for_stocks" translatable="false">amount_for_stocks</string>
     <string name="id_amount_for_crypto" translatable="false">amount_for_crypto</string>
     <string name="id_amount_for_savings" translatable="false">amount_for_savings</string>
-    <string name="onboarding_welcome_title">Votre argent,
-Conçu pour l\'intention</string>
-    <string name="onboarding_welcome_subtitle">Arrêtez les dépenses réactives. Commencez dès aujourd’hui à élaborer votre projet de liberté financière.</string>
+    <string name="onboarding_welcome_title">Sache quoi faire\nquand l’argent arrive</string>
+    <string name="onboarding_welcome_subtitle">Crée un plan de paie clair en moins de deux minutes, puis utilise-le manuellement ou laisse Premium guider les futurs ajustements.</string>
+    <string name="onboarding_welcome_badge">Plan de paie en 2 minutes</string>
+    <string name="onboarding_welcome_outcome_payday_title">Plan d’action de la prochaine paie</string>
+    <string name="onboarding_welcome_outcome_payday_body">Vois quoi déplacer vers les factures, les objectifs et les dépenses quotidiennes.</string>
+    <string name="onboarding_welcome_outcome_weekly_title">Guide de dépense hebdomadaire</string>
+    <string name="onboarding_welcome_outcome_weekly_body">Transforme l’argent de la paie en montant hebdomadaire fiable.</string>
+    <string name="onboarding_welcome_outcome_trust_title">Manuel d’abord, sans banque</string>
+    <string name="onboarding_welcome_outcome_trust_body">Commence sans connecter de comptes. Premium est proposé seulement quand ton plan est prêt.</string>
     <string name="onboarding_welcome_button_get_started">Commencer</string>
     <string name="onboarding_welcome_button_skip_dev" translatable="false">Skip to Home (Dev)</string>
     <string name="onboarding_goal_picker_title">Pour quoi construisons-nous ?</string>

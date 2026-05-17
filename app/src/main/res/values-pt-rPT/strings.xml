@@ -26,8 +26,15 @@
     <string name="id_amount_for_stocks" translatable="false">amount_for_stocks</string>
     <string name="id_amount_for_crypto" translatable="false">amount_for_crypto</string>
     <string name="id_amount_for_savings" translatable="false">amount_for_savings</string>
-    <string name="onboarding_welcome_title">O teu dinheiro,\ncom intenção</string>
-    <string name="onboarding_welcome_subtitle">Deixa de gastar por impulso. Começa hoje a criar o teu plano de liberdade financeira.</string>
+    <string name="onboarding_welcome_title">Sabe o que fazer\nquando o dinheiro entra</string>
+    <string name="onboarding_welcome_subtitle">Cria um plano de pagamento claro em menos de dois minutos, depois usa-o manualmente ou deixa o Premium orientar ajustes futuros.</string>
+    <string name="onboarding_welcome_badge">Plano de pagamento em 2 minutos</string>
+    <string name="onboarding_welcome_outcome_payday_title">Plano de ação do próximo pagamento</string>
+    <string name="onboarding_welcome_outcome_payday_body">Vê o que mover para contas, objetivos e gastos do dia a dia.</string>
+    <string name="onboarding_welcome_outcome_weekly_title">Guia de gasto semanal</string>
+    <string name="onboarding_welcome_outcome_weekly_body">Transforma o dinheiro do pagamento num valor semanal em que podes confiar.</string>
+    <string name="onboarding_welcome_outcome_trust_title">Manual primeiro, sem banco</string>
+    <string name="onboarding_welcome_outcome_trust_body">Começa sem ligar contas. O Premium só aparece quando o teu plano estiver pronto.</string>
     <string name="onboarding_welcome_button_get_started">Começar</string>
     <string name="onboarding_welcome_button_skip_dev" translatable="false">Skip to Home (Dev)</string>
     <string name="onboarding_goal_picker_title">Qual é o teu objetivo?</string>
