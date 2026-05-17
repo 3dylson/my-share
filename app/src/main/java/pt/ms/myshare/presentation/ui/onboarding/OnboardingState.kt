@@ -39,5 +39,10 @@ data class OnboardingState(
     val bankSyncHandled: Boolean = false,
     val onboardingCompleted: Boolean = false,
     val isPremium: Boolean = false,
+    val isAnonymousUser: Boolean = false,
+    val shouldSecurePremiumAccess: Boolean = false,
+    val isGoogleConnectionInProgress: Boolean = false,
+    val googleConnectionMessage: String? = null,
+    val googleConnectionError: String? = null,
     val error: String? = null
 )

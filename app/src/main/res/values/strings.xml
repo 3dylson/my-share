@@ -390,6 +390,10 @@
     <string name="paywall_restore_success">Premium restored.</string>
     <string name="paywall_restore_none">No Premium purchase was found for this Play account.</string>
     <string name="paywall_billing_status_body">You can keep using My Share while this is resolved.</string>
+    <string name="paywall_secure_account_title">Secure your Premium access</string>
+    <string name="paywall_secure_account_body">Connect Google so your plan and Premium access are easier to recover if this device is reset.</string>
+    <string name="paywall_secure_account_button">Connect Google account</string>
+    <string name="paywall_secure_account_continue">Continue without connecting</string>
     <string name="paywall_period_month">month</string>
     <string name="paywall_period_year">year</string>
 

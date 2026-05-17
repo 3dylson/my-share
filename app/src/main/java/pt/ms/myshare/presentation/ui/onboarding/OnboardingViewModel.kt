@@ -92,8 +92,25 @@ class OnboardingViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            val isPremium = entitlementRepository.isPro.first()
-            state.update { current -> current.copy(isPremium = isPremium) }
+            entitlementRepository.isPro.collect { isPremium ->
+                state.update { current ->
+                    current.copy(
+                        isPremium = isPremium,
+                        shouldSecurePremiumAccess = isPremium && current.isAnonymousUser
+                    )
+                }
+            }
+        }
+        viewModelScope.launch {
+            authRepository.currentUser.collect { user ->
+                val isAnonymous = user?.isAnonymous == true
+                state.update { current ->
+                    current.copy(
+                        isAnonymousUser = isAnonymous,
+                        shouldSecurePremiumAccess = current.isPremium && isAnonymous
+                    )
+                }
+            }
         }
         // Collect live Play Billing products so the paywall always shows
         // real, country-correct prices from the Play Store instead of locale estimates.
@@ -278,6 +295,69 @@ class OnboardingViewModel @Inject constructor(
             entitlementRepository.purchasePlan(activity, product)
             state.update { it.copy(isBillingActionInProgress = false, billingMessage = "paywall_billing_handoff") }
         }
+    }
+
+    fun connectGoogleAccount(idToken: String) {
+        viewModelScope.launch {
+            state.update {
+                it.copy(
+                    isGoogleConnectionInProgress = true,
+                    googleConnectionMessage = null,
+                    googleConnectionError = null
+                )
+            }
+
+            val result = authRepository.connectGoogleAccount(idToken)
+            result.fold(
+                onSuccess = { user ->
+                    userPreferencesRepository.syncToFirestoreIfAuthenticated()
+                    state.update {
+                        it.copy(
+                            isAnonymousUser = user.isAnonymous,
+                            shouldSecurePremiumAccess = it.isPremium && user.isAnonymous,
+                            isGoogleConnectionInProgress = false,
+                            googleConnectionMessage = "home_more_account_connect_google_success",
+                            googleConnectionError = null
+                        )
+                    }
+                    FirebaseUtils.logEvent("google_account_connected", Bundle().apply {
+                        putString("source", "onboarding_paywall")
+                    })
+                    Timber.tag(TAG).d("Google account connected from onboarding paywall")
+                },
+                onFailure = { throwable ->
+                    state.update {
+                        it.copy(
+                            isGoogleConnectionInProgress = false,
+                            googleConnectionMessage = null,
+                            googleConnectionError = "home_more_account_connect_google_error_generic"
+                        )
+                    }
+                    FirebaseUtils.logEvent("google_account_connect_failed", Bundle().apply {
+                        putString("source", "onboarding_paywall")
+                    })
+                    Timber.tag(TAG).e(throwable, "Google account connection failed from onboarding paywall")
+                }
+            )
+        }
+    }
+
+    fun setGoogleConnectionCredentialError(errorKey: String) {
+        state.update {
+            it.copy(
+                isGoogleConnectionInProgress = false,
+                googleConnectionMessage = null,
+                googleConnectionError = errorKey
+            )
+        }
+    }
+
+    fun dismissSecurePremiumAccessPrompt() {
+        state.update { it.copy(shouldSecurePremiumAccess = false) }
+        FirebaseUtils.logEvent("premium_account_link_skipped", Bundle().apply {
+            putString("source", "onboarding_paywall")
+        })
+        Timber.tag(TAG).d("Premium account link prompt skipped from onboarding paywall")
     }
 
 

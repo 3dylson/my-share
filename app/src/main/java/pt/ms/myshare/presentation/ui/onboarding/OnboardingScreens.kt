@@ -24,17 +24,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.credentials.CredentialManager
+import kotlinx.coroutines.launch
+import pt.ms.myshare.BuildConfig
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.PlanPreview
 import pt.ms.myshare.domain.model.PricingStrategy
 import pt.ms.myshare.domain.model.StoreProduct
 import pt.ms.myshare.domain.model.UserPreferences
+import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReadResult
+import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReader
+import pt.ms.myshare.presentation.ui.components.GoogleSignInButton
 import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.components.PremiumInfoCard
 import pt.ms.myshare.presentation.ui.components.PremiumPaywallCard
 import pt.ms.myshare.presentation.ui.formatting.SubscriptionSavingsFormatter
 import pt.ms.myshare.presentation.ui.theme.*
+import timber.log.Timber
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.time.format.DateTimeFormatter
@@ -171,14 +178,29 @@ fun PaywallScreen(
     selectedPlan: BillingPlan,
     isBillingActionInProgress: Boolean = false,
     billingMessage: String? = null,
+    showSecurePremiumAccessPrompt: Boolean = false,
+    isGoogleConnectionInProgress: Boolean = false,
+    googleConnectionMessage: String? = null,
+    googleConnectionError: String? = null,
     onPlanSelected: (BillingPlan) -> Unit,
     onClose: () -> Unit,
     onRestore: () -> Unit,
-    onPurchaseSelected: (android.app.Activity) -> Unit
+    onPurchaseSelected: (android.app.Activity) -> Unit,
+    onConnectGoogleAccount: (String) -> Unit = {},
+    onGoogleConnectionCredentialError: (String) -> Unit = {},
+    onContinueWithoutSecuring: () -> Unit = {}
 ) {
     val activity = androidx.activity.compose.LocalActivity.current
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val googleIdTokenReader = remember(context) {
+        GoogleIdTokenReader(
+            credentialManager = CredentialManager.create(context),
+            serverClientId = BuildConfig.GOOGLE_CLIENT_ID
+        )
+    }
     val scrollState = rememberScrollState()
+    var isGoogleCredentialRequestInProgress by remember { mutableStateOf(false) }
     val monthlyProduct = availableProducts.find { it.productId.contains("monthly", ignoreCase = true) }
     val annualProduct = availableProducts.find { it.productId.contains("annual", ignoreCase = true) }
     val annualComparison = remember(monthlyProduct, annualProduct) {
@@ -218,26 +240,58 @@ fun PaywallScreen(
             if (resId != 0) context.getString(resId) else it
         }
     }
+    val googleConnectionFeedback = remember(googleConnectionMessage, googleConnectionError, context) {
+        val messageKey = googleConnectionError ?: googleConnectionMessage
+        messageKey?.let {
+            val resId = context.resources.getIdentifier(it, "string", context.packageName)
+            if (resId != 0) context.getString(resId) else it
+        }
+    }
+    val startGoogleConnection: () -> Unit = {
+        if (!isGoogleCredentialRequestInProgress && !isGoogleConnectionInProgress) {
+            coroutineScope.launch {
+                isGoogleCredentialRequestInProgress = true
+                when (val result = googleIdTokenReader.readIdToken(context, "onboarding_paywall")) {
+                    is GoogleIdTokenReadResult.Success -> onConnectGoogleAccount(result.idToken)
+                    GoogleIdTokenReadResult.NoCredential -> {
+                        Timber.e("Google account link failed because no credential is available")
+                        onGoogleConnectionCredentialError("home_more_account_connect_google_error_no_credentials")
+                    }
+                    GoogleIdTokenReadResult.UnsupportedCredential -> {
+                        onGoogleConnectionCredentialError("home_more_account_connect_google_error_generic")
+                    }
+                    is GoogleIdTokenReadResult.Failure -> {
+                        onGoogleConnectionCredentialError("home_more_account_connect_google_error_generic")
+                    }
+                }
+                isGoogleCredentialRequestInProgress = false
+            }
+        }
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
-            PaywallPurchaseFooter(
-                checkoutTerms = checkoutTerms,
-                ctaText = when {
-                    selectedProduct == null -> stringResource(R.string.paywall_price_loading)
-                    selectedTrialDays != null -> stringResource(R.string.paywall_start_trial_button)
-                    else -> stringResource(R.string.paywall_upgrade_button)
-                },
-                billingMessage = resolvedBillingMessage,
-                isBillingActionInProgress = isBillingActionInProgress,
-                isPurchaseEnabled = isPurchaseReady,
-                onPurchaseClick = {
-                    if (isPurchaseReady) {
-                        activity?.let(onPurchaseSelected)
+            if (showSecurePremiumAccessPrompt) {
+                SecurePremiumAccessFooter(onContinue = onContinueWithoutSecuring)
+            } else {
+                PaywallPurchaseFooter(
+                    checkoutTerms = checkoutTerms,
+                    ctaText = when {
+                        selectedProduct == null -> stringResource(R.string.paywall_price_loading)
+                        selectedTrialDays != null -> stringResource(R.string.paywall_start_trial_button)
+                        else -> stringResource(R.string.paywall_upgrade_button)
+                    },
+                    billingMessage = resolvedBillingMessage,
+                    isBillingActionInProgress = isBillingActionInProgress,
+                    isPurchaseEnabled = isPurchaseReady,
+                    onPurchaseClick = {
+                        if (isPurchaseReady) {
+                            activity?.let(onPurchaseSelected)
+                        }
                     }
-                }
-            )
+                )
+            }
         }
     ) { innerPadding ->
         Column(
@@ -292,6 +346,16 @@ fun PaywallScreen(
                     stringResource(R.string.premium_badge)
                 }
             )
+
+            if (showSecurePremiumAccessPrompt) {
+                Spacer(Modifier.height(16.dp))
+                SecurePremiumAccessCard(
+                    isLoading = isGoogleConnectionInProgress || isGoogleCredentialRequestInProgress,
+                    feedback = googleConnectionFeedback,
+                    isError = googleConnectionError != null,
+                    onConnectGoogle = startGoogleConnection
+                )
+            }
             
             Spacer(Modifier.height(22.dp))
 
@@ -479,6 +543,89 @@ private fun PaywallPurchaseFooter(
                 onClick = onPurchaseClick,
                 enabled = isPurchaseEnabled,
                 isLoading = isBillingActionInProgress
+            )
+        }
+    }
+}
+
+@Composable
+private fun SecurePremiumAccessFooter(
+    onContinue: () -> Unit
+) {
+    Surface(
+        color = MaterialTheme.colorScheme.background,
+        tonalElevation = 6.dp
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(horizontal = 24.dp, vertical = 14.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            PremiumButton(
+                text = stringResource(R.string.paywall_secure_account_continue),
+                onClick = onContinue
+            )
+        }
+    }
+}
+
+@Composable
+private fun SecurePremiumAccessCard(
+    isLoading: Boolean,
+    feedback: String?,
+    isError: Boolean,
+    onConnectGoogle: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.35f))
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Icon(
+                    imageVector = Icons.Default.VerifiedUser,
+                    contentDescription = null,
+                    tint = MySharePrimary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                        text = stringResource(R.string.paywall_secure_account_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    Text(
+                        text = stringResource(R.string.paywall_secure_account_body),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.78f),
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+            if (feedback != null) {
+                Text(
+                    text = feedback,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            GoogleSignInButton(
+                text = stringResource(R.string.paywall_secure_account_button),
+                isLoading = isLoading,
+                onClick = onConnectGoogle
             )
         }
     }

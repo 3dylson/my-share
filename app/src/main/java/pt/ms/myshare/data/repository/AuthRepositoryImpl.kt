@@ -21,7 +21,8 @@ class AuthRepositoryImpl @Inject constructor(
             val firebaseUser = auth.currentUser
             val user = firebaseUser?.let {
                 User(
-                    email = it.email
+                    email = it.email,
+                    isAnonymous = it.isAnonymous
                 )
             }
             trySend(user)
@@ -85,6 +86,6 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     private fun com.google.firebase.auth.FirebaseUser.toDomainResult(): Result<User> {
-        return Result.success(User(email = email))
+        return Result.success(User(email = email, isAnonymous = isAnonymous))
     }
 }

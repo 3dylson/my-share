@@ -26,6 +26,8 @@ import pt.ms.myshare.domain.model.PricingStrategy
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.SalaryPlan
 import pt.ms.myshare.domain.model.PlanPreview
+import pt.ms.myshare.domain.model.StoreProduct
+import pt.ms.myshare.domain.model.User
 import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
@@ -48,6 +50,9 @@ class OnboardingViewModelTest {
     private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase = mockk()
     private val reminderWorkScheduler: ReminderWorkScheduler = mockk(relaxed = true)
     private val userLocaleManager: UserLocaleManager = mockk(relaxed = true)
+    private lateinit var isProFlow: MutableStateFlow<Boolean>
+    private lateinit var availableProductsFlow: MutableStateFlow<List<StoreProduct>>
+    private lateinit var currentUserFlow: MutableStateFlow<User?>
 
     private lateinit var viewModel: OnboardingViewModel
 
@@ -66,7 +71,12 @@ class OnboardingViewModelTest {
             paywallSubhead = "Try it free"
         )
         every { resolvePricingStrategyUseCase.execute(any()) } returns pricingStrategy
-        every { entitlementRepository.isPro } returns MutableStateFlow(false)
+        isProFlow = MutableStateFlow(false)
+        availableProductsFlow = MutableStateFlow(emptyList())
+        currentUserFlow = MutableStateFlow(null)
+        every { entitlementRepository.isPro } returns isProFlow
+        every { entitlementRepository.availableProducts } returns availableProductsFlow
+        every { authRepository.currentUser } returns currentUserFlow
 
         viewModel = OnboardingViewModel(
             plannerRepository,
@@ -210,7 +220,7 @@ class OnboardingViewModelTest {
 
     @Test
     fun `purchasePremium uses real StoreProduct from availableProducts`() = runTest {
-        val monthlyProduct = pt.ms.myshare.domain.model.StoreProduct(
+        val monthlyProduct = StoreProduct(
             productId = "myshare_monthly",
             name = "Monthly",
             description = "Monthly premium",
@@ -218,7 +228,7 @@ class OnboardingViewModelTest {
             basePlanId = "monthly-base",
             offerToken = "token-monthly-123"
         )
-        every { entitlementRepository.availableProducts } returns MutableStateFlow(listOf(monthlyProduct))
+        availableProductsFlow.value = listOf(monthlyProduct)
         viewModel.setSelectedBillingPlan(BillingPlan.MONTHLY)
         val activity = mockk<android.app.Activity>(relaxed = true)
         viewModel.purchasePremium(activity)
@@ -228,12 +238,46 @@ class OnboardingViewModelTest {
 
     @Test
     fun `purchasePremium shows billing message when product not yet loaded`() = runTest {
-        every { entitlementRepository.availableProducts } returns MutableStateFlow(emptyList())
+        availableProductsFlow.value = emptyList()
         val activity = mockk<android.app.Activity>(relaxed = true)
         viewModel.purchasePremium(activity)
         advanceUntilIdle()
         assertEquals("paywall_billing_products_unavailable", viewModel.uiState.value.billingMessage)
         assertFalse(viewModel.uiState.value.isBillingActionInProgress)
         coVerify(exactly = 0) { entitlementRepository.purchasePlan(any(), any()) }
+    }
+
+    @Test
+    fun `premium anonymous user is prompted to secure access`() = runTest {
+        currentUserFlow.value = User(isAnonymous = true)
+        isProFlow.value = true
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.shouldSecurePremiumAccess)
+    }
+
+    @Test
+    fun `premium linked user is not prompted to secure access`() = runTest {
+        currentUserFlow.value = User(email = "user@example.com", isAnonymous = false)
+        isProFlow.value = true
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.shouldSecurePremiumAccess)
+    }
+
+    @Test
+    fun `connectGoogleAccount clears secure prompt after successful link`() = runTest {
+        currentUserFlow.value = User(isAnonymous = true)
+        isProFlow.value = true
+        coEvery { authRepository.connectGoogleAccount("google-token") } returns Result.success(
+            User(email = "user@example.com", isAnonymous = false)
+        )
+        advanceUntilIdle()
+
+        viewModel.connectGoogleAccount("google-token")
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.shouldSecurePremiumAccess)
+        assertEquals("home_more_account_connect_google_success", viewModel.uiState.value.googleConnectionMessage)
     }
 }

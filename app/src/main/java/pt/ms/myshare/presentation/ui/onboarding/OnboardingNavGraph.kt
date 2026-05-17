@@ -165,8 +165,8 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
             val pricing = state.pricingStrategy
             val isPremium = state.isPremium
             
-            LaunchedEffect(isPremium) {
-                if (isPremium) {
+            LaunchedEffect(isPremium, state.shouldSecurePremiumAccess) {
+                if (isPremium && !state.shouldSecurePremiumAccess) {
                     navController.navigate(OnboardingRoute.ReminderSetup.route)
                 }
             }
@@ -178,6 +178,10 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                     selectedPlan = state.selectedBillingPlan,
                     isBillingActionInProgress = state.isBillingActionInProgress,
                     billingMessage = state.billingMessage,
+                    showSecurePremiumAccessPrompt = state.shouldSecurePremiumAccess,
+                    isGoogleConnectionInProgress = state.isGoogleConnectionInProgress,
+                    googleConnectionMessage = state.googleConnectionMessage,
+                    googleConnectionError = state.googleConnectionError,
                     onPlanSelected = viewModel::setSelectedBillingPlan,
                     onClose = { navController.navigate(OnboardingRoute.ReminderSetup.route) },
                     onRestore = {
@@ -187,7 +191,10 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                             }
                         }
                     },
-                    onPurchaseSelected = { activity -> viewModel.purchasePremium(activity) }
+                    onPurchaseSelected = { activity -> viewModel.purchasePremium(activity) },
+                    onConnectGoogleAccount = viewModel::connectGoogleAccount,
+                    onGoogleConnectionCredentialError = viewModel::setGoogleConnectionCredentialError,
+                    onContinueWithoutSecuring = viewModel::dismissSecurePremiumAccessPrompt
                 )
             }
 

@@ -76,7 +76,13 @@ class PlayBillingEntitlementRepository(
     }
 
     override suspend fun purchasePlan(activity: Activity, product: StoreProduct) {
-        billingClientWrapper.launchBillingFlow(activity, product)
+        val obfuscatedAccountId = ObfuscatedAccountIdFactory.fromFirebaseUid(firebaseAuth.currentUser?.uid)
+        Timber.tag("BillingRepo").d(
+            "Launching billing flow for product=%s authenticated=%s",
+            product.productId,
+            obfuscatedAccountId != null
+        )
+        billingClientWrapper.launchBillingFlow(activity, product, obfuscatedAccountId)
     }
 
     override suspend fun restorePurchases() {

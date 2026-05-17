@@ -355,6 +355,10 @@ Conçu pour l\'intention</string>
     <string name="paywall_restore_success">Premium restauré.</string>
     <string name="paywall_restore_none">Aucun achat Premium trouvé pour ce compte Play.</string>
     <string name="paywall_billing_status_body">Tu peux continuer à utiliser My Share pendant la résolution.</string>
+    <string name="paywall_secure_account_title">Sécuriser votre accès Premium</string>
+    <string name="paywall_secure_account_body">Connectez Google pour récupérer plus facilement votre plan et votre accès Premium si cet appareil est réinitialisé.</string>
+    <string name="paywall_secure_account_button">Connecter un compte Google</string>
+    <string name="paywall_secure_account_continue">Continuer sans connecter</string>
     <string name="paywall_period_month">mois</string>
     <string name="paywall_period_year">an</string>
     <string name="paywall_headline_emerging">Garde ton plan de paie en pilote automatique</string>

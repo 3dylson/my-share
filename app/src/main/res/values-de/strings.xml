@@ -355,6 +355,10 @@ Für Absicht gebaut</string>
     <string name="paywall_restore_success">Premium wiederhergestellt.</string>
     <string name="paywall_restore_none">Für dieses Play-Konto wurde kein Premium-Kauf gefunden.</string>
     <string name="paywall_billing_status_body">Du kannst My Share weiter nutzen, während das geklärt wird.</string>
+    <string name="paywall_secure_account_title">Premium-Zugriff sichern</string>
+    <string name="paywall_secure_account_body">Verbinde Google, damit dein Plan und dein Premium-Zugriff leichter wiederhergestellt werden können, falls dieses Gerät zurückgesetzt wird.</string>
+    <string name="paywall_secure_account_button">Google-Konto verbinden</string>
+    <string name="paywall_secure_account_continue">Ohne Verbindung fortfahren</string>
     <string name="paywall_period_month">Monat</string>
     <string name="paywall_period_year">Jahr</string>
     <string name="paywall_headline_emerging">Lass deinen Zahltag-Plan automatisch weiterlaufen</string>

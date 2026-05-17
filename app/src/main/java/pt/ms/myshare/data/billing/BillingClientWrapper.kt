@@ -94,7 +94,7 @@ class BillingClientWrapper(context: Context) : PurchasesUpdatedListener {
         }
     }
 
-    fun launchBillingFlow(activity: Activity, product: StoreProduct) {
+    fun launchBillingFlow(activity: Activity, product: StoreProduct, obfuscatedAccountId: String? = null) {
         val params = QueryProductDetailsParams.newBuilder()
             .setProductList(
                 listOf(QueryProductDetailsParams.Product.newBuilder()
@@ -107,16 +107,19 @@ class BillingClientWrapper(context: Context) : PurchasesUpdatedListener {
             val productDetails = productDetailsResult.productDetailsList.find { it.productId == product.productId }
             if (productDetails != null) {
                 val offerToken = product.offerToken ?: return@queryProductDetailsAsync
-                val billingFlowParams = BillingFlowParams.newBuilder()
+                val billingFlowParamsBuilder = BillingFlowParams.newBuilder()
                     .setProductDetailsParamsList(
                         listOf(
                             BillingFlowParams.ProductDetailsParams.newBuilder()
                                 .setProductDetails(productDetails)
                                 .setOfferToken(offerToken)
                                 .build()
-                        )
+                            )
                     )
-                    .build()
+                if (obfuscatedAccountId != null) {
+                    billingFlowParamsBuilder.setObfuscatedAccountId(obfuscatedAccountId)
+                }
+                val billingFlowParams = billingFlowParamsBuilder.build()
                 billingClient.launchBillingFlow(activity, billingFlowParams)
             }
         }

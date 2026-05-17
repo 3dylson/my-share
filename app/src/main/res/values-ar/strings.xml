@@ -355,6 +355,10 @@
     <string name="paywall_restore_success">تمت استعادة Premium.</string>
     <string name="paywall_restore_none">لم يتم العثور على أي شراء Premium لهذا حساب Play.</string>
     <string name="paywall_billing_status_body">يمكنك متابعة استخدام My Share أثناء حل ذلك.</string>
+    <string name="paywall_secure_account_title">تأمين وصولك إلى Premium</string>
+    <string name="paywall_secure_account_body">اربط Google حتى يسهل استرداد خطتك ووصولك إلى Premium إذا تمت إعادة ضبط هذا الجهاز.</string>
+    <string name="paywall_secure_account_button">ربط حساب Google</string>
+    <string name="paywall_secure_account_continue">المتابعة دون ربط</string>
     <string name="paywall_period_month">شهر</string>
     <string name="paywall_period_year">سنة</string>
     <string name="paywall_headline_emerging">اجعل خطة الراتب تعمل تلقائيًا</string>
