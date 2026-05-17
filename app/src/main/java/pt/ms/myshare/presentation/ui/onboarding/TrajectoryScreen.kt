@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material3.CircularProgressIndicator
@@ -48,8 +49,10 @@ import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.PlanPreview
 import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.presentation.ui.components.PremiumButton
+import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.presentation.ui.theme.MySharePositive
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
+import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.Calendar
 import java.util.Locale
@@ -132,7 +135,27 @@ fun TrajectoryScreen(
                     hasPriorityContribution = hasPriorityContribution
                 )
 
-                Spacer(Modifier.height(18.dp))
+                Spacer(Modifier.height(16.dp))
+
+                TrajectoryPremiumBridgeCard(
+                    weeklyFlexibleSpend = LocalizedAmountFormatter.formatCurrency(
+                        amount = preview.weeklyFlexibleSpend,
+                        locale = userPreferences.locale,
+                        currencyCode = userPreferences.currencyCode
+                    ),
+                    priorityContribution = preview.priorityContributionPerPayday
+                        .takeIf { it > BigDecimal.ZERO }
+                        ?.let { amount ->
+                            LocalizedAmountFormatter.formatCurrency(
+                                amount = amount,
+                                locale = userPreferences.locale,
+                                currencyCode = userPreferences.currencyCode
+                            )
+                        },
+                    goalName = goalName
+                )
+
+                Spacer(Modifier.height(14.dp))
 
                 Text(
                     text = stringResource(R.string.onboarding_trajectory_footer),
@@ -152,6 +175,81 @@ fun TrajectoryScreen(
             }
 
             Spacer(Modifier.height(24.dp))
+        }
+    }
+}
+
+@Composable
+private fun TrajectoryPremiumBridgeCard(
+    weeklyFlexibleSpend: String,
+    priorityContribution: String?,
+    goalName: String,
+    modifier: Modifier = Modifier
+) {
+    val body = if (priorityContribution != null && goalName.isNotBlank()) {
+        stringResource(
+            R.string.onboarding_trajectory_premium_bridge_body,
+            weeklyFlexibleSpend,
+            priorityContribution,
+            goalName
+        )
+    } else {
+        stringResource(
+            R.string.onboarding_trajectory_premium_bridge_body_without_priority,
+            weeklyFlexibleSpend
+        )
+    }
+
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.34f),
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.24f))
+    ) {
+        Row(
+            modifier = Modifier.padding(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Surface(
+                shape = CircleShape,
+                color = MySharePrimary.copy(alpha = 0.16f)
+            ) {
+                Box(
+                    modifier = Modifier.size(40.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AutoAwesome,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.onboarding_trajectory_premium_bridge_label).uppercase(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MySharePrimary,
+                    fontWeight = FontWeight.Black
+                )
+                Text(
+                    text = stringResource(R.string.onboarding_trajectory_premium_bridge_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = body,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 18.sp
+                )
+            }
         }
     }
 }

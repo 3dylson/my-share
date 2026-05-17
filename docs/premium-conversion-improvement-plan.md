@@ -205,6 +205,14 @@ Example outputs:
 
 ## Phase 4: Onboarding UX And Premium Feel
 
+Status after onboarding value-ladder pass on 2026-05-17:
+- Done: Plan Preview no longer presents two different choices that both lead to account setup; the CTA now honestly says `Continue to account setup`.
+- Done: The onboarding paywall now shows a personalized adaptive-plan preview using the user's weekly spend guide and priority move.
+- Done: The paywall value copy now frames Premium around review-based adjustment guidance, while keeping the free manual path visible.
+- Done: The paywall now shows a concrete example Premium adjustment based on the user's plan, such as moving an unused buffer toward the selected goal while protecting the weekly guide.
+- Done: Trajectory now bridges into the paywall with review-based guidance copy tied to the user's weekly guide and priority transfer.
+- Pending: Welcome, Goal Picker, Salary, Fixed Costs, and Allocation still need visual/copy passes to create a consistent premium setup flow before the paywall.
+
 ### Problems
 
 - Some onboarding screens still feel like plain forms.

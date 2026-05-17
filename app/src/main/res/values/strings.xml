@@ -57,8 +57,12 @@
     <string name="onboarding_trajectory_title">Your Blueprint</string>
     <string name="onboarding_trajectory_subtitle">Based on your numbers, here is how your wealth will grow with discipline.</string>
     <string name="onboarding_trajectory_goal_subtitle">Estimated date to reach your \"%1$s\" target.</string>
-    <string name="onboarding_trajectory_footer">Start free with your first goal. Unlock unlimited tracking to scale your wealth.</string>
+    <string name="onboarding_trajectory_footer">Your first plan is free. Premium adds review-based guidance when you want the plan to keep improving.</string>
     <string name="onboarding_trajectory_button">See Full Plan</string>
+    <string name="onboarding_trajectory_premium_bridge_label">Premium preview</string>
+    <string name="onboarding_trajectory_premium_bridge_title">Keep this path adjusting</string>
+    <string name="onboarding_trajectory_premium_bridge_body">Premium can compare each review with your %1$s weekly guide and show whether to move more or less than %2$s toward %3$s next payday.</string>
+    <string name="onboarding_trajectory_premium_bridge_body_without_priority">Premium can compare each review with your %1$s weekly guide and show what to tighten or relax before the next payday.</string>
 
     <!-- Bank Sync Screen -->
     <string name="onboarding_banksync_title">Manual planning is ready</string>
@@ -159,18 +163,18 @@
     <string name="onboarding_plan_preview_impact_title">The Big Picture</string>
     <string name="onboarding_plan_preview_impact_body">Follow this mission and you’ll reach your goal by %1$s %2$s!</string>
     <string name="onboarding_plan_preview_reminder_callout">We’ll remind you on %1$s to execute this mission.</string>
-    <string name="onboarding_plan_preview_button_secure">Automate My Mission</string>
+    <string name="onboarding_plan_preview_button_secure">Continue to account setup</string>
     <string name="onboarding_plan_preview_button_basic">I’ll do it manually</string>
 
     <!-- Paywall -->
     <string name="paywall_close_content_description">Close</string>
     <string name="paywall_restore_button">Restore</string>
-    <string name="paywall_feature_automation_title">Payday rules</string>
-    <string name="paywall_feature_automation_desc">Repeat your split every payday.</string>
-    <string name="paywall_feature_reminders_title">Check-ins</string>
-    <string name="paywall_feature_reminders_desc">Stay honest with reminders.</string>
-    <string name="paywall_feature_goals_title">Unlimited Goals</string>
-    <string name="paywall_feature_goals_desc">Plan more than one milestone.</string>
+    <string name="paywall_feature_automation_title">Adaptive adjustments</string>
+    <string name="paywall_feature_automation_desc">Get the next payday change to consider after each review.</string>
+    <string name="paywall_feature_reminders_title">Payday rhythm</string>
+    <string name="paywall_feature_reminders_desc">Keep check-ins tied to the plan you just built.</string>
+    <string name="paywall_feature_goals_title">Multiple goals</string>
+    <string name="paywall_feature_goals_desc">Split each payday across every target that matters.</string>
 
     <!-- Compatibility aliases for the Compose refactor -->
     <string name="back">Back</string>
@@ -385,7 +389,7 @@
     <string name="dialog_save">Save</string>
     <string name="dialog_not_now">Not now</string>
     <string name="paywall_feature_tracking_title">Plan vs actual</string>
-    <string name="paywall_feature_tracking_desc">Compare each check-in to plan.</string>
+    <string name="paywall_feature_tracking_desc">See drift early and adjust before it becomes a habit.</string>
     <string name="paywall_plan_monthly">Monthly</string>
     <string name="paywall_plan_annual">Annual</string>
     <string name="paywall_desc_monthly">Flexible start</string>
@@ -395,12 +399,24 @@
     <string name="paywall_annual_savings_label">Save %1$s per year</string>
     <string name="paywall_hero_trial_badge">%1$d-day trial</string>
     <string name="paywall_plan_section_title">Choose your plan</string>
-    <string name="paywall_value_section_title">What Premium unlocks</string>
+    <string name="paywall_value_section_title">How Premium improves this plan</string>
     <string name="paywall_price_loading">Checking Play price</string>
     <string name="paywall_footer_trial_terms">%1$d-day free trial, then automatically renews at %2$s / %3$s unless canceled in Google Play before the trial ends.</string>
     <string name="paywall_footer_no_trial_terms">Automatically renews at %1$s / %2$s. Cancel anytime in Google Play.</string>
     <string name="paywall_footer_store_terms_unavailable">Secure checkout opens in Google Play. Pricing and trial eligibility appear there.</string>
     <string name="paywall_currency_mismatch_notice">Your plan uses %1$s. Google Play charges in %2$s based on your Play Store region.</string>
+    <string name="paywall_autopilot_preview_goal_label">Built for %1$s</string>
+    <string name="paywall_autopilot_preview_title">This plan can adapt</string>
+    <string name="paywall_autopilot_preview_body">Premium starts with your %1$s weekly guide and %2$s priority move, then recommends the next adjustment after each review.</string>
+    <string name="paywall_autopilot_preview_body_without_priority">Premium starts with your %1$s weekly guide, then recommends the next adjustment after each review.</string>
+    <string name="paywall_autopilot_preview_body_generic">Premium starts with the plan you built, then recommends the next adjustment after each review.</string>
+    <string name="paywall_autopilot_recommendation_title">Example Premium adjustment</string>
+    <string name="paywall_autopilot_recommendation_body">If your review shows %1$s unused, Premium can suggest moving it to %2$s while protecting your %3$s weekly guide.</string>
+    <string name="paywall_autopilot_recommendation_body_without_priority">Premium watches your %1$s weekly guide after each review and shows what to tighten or relax before next payday.</string>
+    <string name="paywall_autopilot_recommendation_body_generic">After each review, Premium shows what to adjust before next payday.</string>
+    <string name="paywall_autopilot_preview_free_label">Free plan</string>
+    <string name="paywall_autopilot_preview_free_body">Follow this split manually.</string>
+    <string name="paywall_autopilot_preview_premium_body">See what to change next.</string>
     <string name="paywall_trust_play_title">Google Play checkout</string>
     <string name="paywall_trust_play_body">Price, trial eligibility, renewal, and cancellation are handled by Google Play.</string>
     <string name="paywall_trust_manual_title">Manual-first plan</string>
@@ -429,12 +445,12 @@
     <string name="paywall_period_year">year</string>
 
     <!-- Paywall Clusters -->
-    <string name="paywall_headline_emerging">Keep your payday plan running on autopilot</string>
-    <string name="paywall_subhead_emerging">Monthly is the easier starting point here. Annual stays available once the value is clear.</string>
-    <string name="paywall_headline_brazil">Turn your salary plan into a repeatable routine</string>
-    <string name="paywall_subhead_brazil">Monthly is highlighted first. Annual is there for committed users.</string>
-    <string name="paywall_headline_default">Automate your Payday Action Plan</string>
-    <string name="paywall_subhead_default">Secure your mission with recurring rules and payday reminders.</string>
+    <string name="paywall_headline_emerging">Try adaptive payday guidance first</string>
+    <string name="paywall_subhead_emerging">Monthly keeps the first step lighter while Premium uses each review to guide the next one.</string>
+    <string name="paywall_headline_brazil">Make every salary review guide the next one</string>
+    <string name="paywall_subhead_brazil">Monthly is highlighted first so you can test the adaptive plan before committing.</string>
+    <string name="paywall_headline_default">Know what to adjust every payday</string>
+    <string name="paywall_subhead_default">Start with this plan. After each review, Premium shows the next change to consider.</string>
 
     <!-- Review Insights -->
     <string name="insight_review_save_stress_success_headline">Safety net growing</string>

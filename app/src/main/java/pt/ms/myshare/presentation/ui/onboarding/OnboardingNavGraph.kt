@@ -131,10 +131,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                     goalName = state.goalName,
                     goalAmount = state.goalAmount,
                     userPreferences = state.userPreferences,
-                    onAutopilot = {
-                        navController.navigate(OnboardingRoute.Signup.route)
-                    },
-                    onNotNow = { navController.navigate(OnboardingRoute.Signup.route) }
+                    onContinue = { navController.navigate(OnboardingRoute.Signup.route) }
                 )
             }
         }
@@ -179,6 +176,8 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                 PaywallScreen(
                     pricingStrategy = pricing,
                     userPreferences = state.userPreferences,
+                    planPreview = state.planPreview,
+                    goalName = state.goalName,
                     availableProducts = state.availableProducts,
                     selectedPlan = state.selectedBillingPlan,
                     isBillingActionInProgress = state.isBillingActionInProgress,

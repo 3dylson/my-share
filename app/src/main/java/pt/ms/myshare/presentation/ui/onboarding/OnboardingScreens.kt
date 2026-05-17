@@ -41,6 +41,8 @@ import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.components.PremiumInfoCard
 import pt.ms.myshare.presentation.ui.components.PremiumPaywallCard
 import pt.ms.myshare.presentation.ui.formatting.SubscriptionSavingsFormatter
+import pt.ms.myshare.presentation.ui.paywall.PaywallAutopilotPreviewMapper
+import pt.ms.myshare.presentation.ui.paywall.PaywallAutopilotPreviewUiState
 import pt.ms.myshare.presentation.ui.theme.*
 import timber.log.Timber
 import java.math.BigDecimal
@@ -55,8 +57,7 @@ fun PlanPreviewScreen(
     goalName: String,
     goalAmount: BigDecimal,
     userPreferences: UserPreferences,
-    onAutopilot: () -> Unit,
-    onNotNow: () -> Unit
+    onContinue: () -> Unit
 ) {
     val locale = userPreferences.locale
     val currency = NumberFormat.getCurrencyInstance(locale).apply { currency = userPreferences.currency }
@@ -77,21 +78,8 @@ fun PlanPreviewScreen(
                 ) {
                     PremiumButton(
                         text = stringResource(R.string.onboarding_plan_preview_button_secure),
-                        onClick = onAutopilot
+                        onClick = onContinue
                     )
-
-                    TextButton(
-                        onClick = onNotNow,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp)
-                    ) {
-                        Text(
-                            stringResource(R.string.onboarding_plan_preview_button_basic),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
                 }
             }
         }
@@ -192,6 +180,8 @@ fun PlanPreviewScreen(
 fun PaywallScreen(
     pricingStrategy: PricingStrategy,
     userPreferences: UserPreferences,
+    planPreview: PlanPreview? = null,
+    goalName: String = "",
     availableProducts: List<StoreProduct> = emptyList(),
     selectedPlan: BillingPlan,
     isBillingActionInProgress: Boolean = false,
@@ -227,6 +217,9 @@ fun PaywallScreen(
             annualProduct = annualProduct,
             locale = Locale.getDefault()
         )
+    }
+    val autopilotPreview = remember(planPreview, userPreferences) {
+        PaywallAutopilotPreviewMapper.map(planPreview, userPreferences)
     }
     val selectedProduct = when (selectedPlan) {
         BillingPlan.MONTHLY -> monthlyProduct
@@ -377,6 +370,13 @@ fun PaywallScreen(
                 }
             )
 
+            Spacer(Modifier.height(16.dp))
+
+            PaywallAutopilotPreviewCard(
+                state = autopilotPreview,
+                goalName = goalName
+            )
+
             if (showSecurePremiumAccessPrompt) {
                 Spacer(Modifier.height(16.dp))
                 SecurePremiumAccessCard(
@@ -451,6 +451,181 @@ fun PaywallScreen(
             PaywallTrustList()
 
             Spacer(Modifier.height(24.dp))
+        }
+    }
+}
+
+@Composable
+private fun PaywallAutopilotPreviewCard(
+    state: PaywallAutopilotPreviewUiState,
+    goalName: String,
+    modifier: Modifier = Modifier
+) {
+    val recommendationBody = when {
+        state.suggestedAdjustmentAmount != null && goalName.isNotBlank() -> stringResource(
+            R.string.paywall_autopilot_recommendation_body,
+            state.suggestedAdjustmentAmount,
+            goalName,
+            state.weeklyFlexibleSpend.orEmpty()
+        )
+        state.hasPersonalPlan -> stringResource(
+            R.string.paywall_autopilot_recommendation_body_without_priority,
+            state.weeklyFlexibleSpend.orEmpty()
+        )
+        else -> stringResource(R.string.paywall_autopilot_recommendation_body_generic)
+    }
+
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.28f))
+    ) {
+        Column(
+            modifier = Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MySharePrimary.copy(alpha = 0.14f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AutoAwesome,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.padding(8.dp).size(22.dp)
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(5.dp)
+                ) {
+                    if (goalName.isNotBlank()) {
+                        Text(
+                            text = stringResource(R.string.paywall_autopilot_preview_goal_label, goalName),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MySharePrimary,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    Text(
+                        text = stringResource(R.string.paywall_autopilot_recommendation_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = recommendationBody,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.16f))
+
+            PaywallAutopilotComparisonGrid()
+        }
+    }
+}
+
+@Composable
+private fun PaywallAutopilotComparisonGrid() {
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val shouldStack = maxWidth < 330.dp || LocalDensity.current.fontScale >= 1.3f
+        if (shouldStack) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                PaywallAutopilotComparisonPill(
+                    label = stringResource(R.string.paywall_autopilot_preview_free_label),
+                    body = stringResource(R.string.paywall_autopilot_preview_free_body),
+                    icon = Icons.Default.RadioButtonUnchecked,
+                    iconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                PaywallAutopilotComparisonPill(
+                    label = stringResource(R.string.premium_badge),
+                    body = stringResource(R.string.paywall_autopilot_preview_premium_body),
+                    icon = Icons.Default.CheckCircle,
+                    iconColor = MySharePrimary,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        } else {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                PaywallAutopilotComparisonPill(
+                    label = stringResource(R.string.paywall_autopilot_preview_free_label),
+                    body = stringResource(R.string.paywall_autopilot_preview_free_body),
+                    icon = Icons.Default.RadioButtonUnchecked,
+                    iconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f)
+                )
+                PaywallAutopilotComparisonPill(
+                    label = stringResource(R.string.premium_badge),
+                    body = stringResource(R.string.paywall_autopilot_preview_premium_body),
+                    icon = Icons.Default.CheckCircle,
+                    iconColor = MySharePrimary,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PaywallAutopilotComparisonPill(
+    label: String,
+    body: String,
+    icon: ImageVector,
+    iconColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.38f)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 9.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = iconColor,
+                modifier = Modifier.size(16.dp)
+            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(1.dp)
+            ) {
+                Text(
+                    text = label.uppercase(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = iconColor,
+                    fontWeight = FontWeight.Black,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = body,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 16.sp,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
     }
 }
