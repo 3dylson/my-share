@@ -47,6 +47,7 @@ import java.text.NumberFormat
 import java.time.format.DateTimeFormatter
 import java.util.*
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PlanPreviewScreen(
     preview: PlanPreview,
@@ -67,6 +68,7 @@ fun PlanPreviewScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .imePadding()
                         .navigationBarsPadding()
                         .padding(horizontal = 24.dp, vertical = 14.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -96,6 +98,8 @@ fun PlanPreviewScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .imeNestedScroll()
+                .imePadding()
                 .padding(horizontal = 24.dp)
         ) {
             Spacer(Modifier.height(40.dp))
@@ -117,8 +121,8 @@ fun PlanPreviewScreen(
 
             LazyColumn(
                 modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(bottom = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(bottom = 24.dp)
             ) {
                 // Mission Step 1: Fixed Costs
                 item {
@@ -171,6 +175,7 @@ fun PlanPreviewScreen(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PaywallScreen(
     pricingStrategy: PricingStrategy,
@@ -299,6 +304,8 @@ fun PaywallScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(horizontal = 24.dp)
+                .imeNestedScroll()
+                .imePadding()
                 .verticalScroll(scrollState)
         ) {
             Spacer(Modifier.height(16.dp))
@@ -516,6 +523,7 @@ private fun PaywallPurchaseFooter(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .imePadding()
                 .navigationBarsPadding()
                 .padding(horizontal = 24.dp, vertical = 14.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -559,6 +567,7 @@ private fun SecurePremiumAccessFooter(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .imePadding()
                 .navigationBarsPadding()
                 .padding(horizontal = 24.dp, vertical = 14.dp),
             horizontalAlignment = Alignment.CenterHorizontally

@@ -344,7 +344,7 @@ private fun ReviewAmountField(
         prefix = { Text(currencySymbol) },
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-        modifier = modifier,
+        modifier = modifier.bringFocusedInputIntoView(debugLabel = label),
         shape = RoundedCornerShape(16.dp)
     )
 }

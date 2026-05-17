@@ -2,6 +2,7 @@ package pt.ms.myshare.presentation.ui.onboarding
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -9,6 +10,8 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imeNestedScroll
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
@@ -33,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import pt.ms.myshare.R
 import pt.ms.myshare.presentation.ui.components.PremiumButton
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun OnboardingStepScaffold(
     title: String,
@@ -53,6 +57,7 @@ fun OnboardingStepScaffold(
                     enabled = actionEnabled,
                     modifier = Modifier
                         .fillMaxWidth()
+                        .imePadding()
                         .navigationBarsPadding()
                         .padding(horizontal = 24.dp, vertical = 16.dp)
                 )
@@ -65,6 +70,8 @@ fun OnboardingStepScaffold(
                 .padding(innerPadding)
                 .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
                 .padding(horizontal = 24.dp)
+                .imeNestedScroll()
+                .imePadding()
                 .verticalScroll(rememberScrollState())
         ) {
             Spacer(Modifier.height(12.dp))

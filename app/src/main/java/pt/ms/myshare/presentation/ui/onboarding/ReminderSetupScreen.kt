@@ -32,6 +32,7 @@ import pt.ms.myshare.presentation.ui.components.PremiumChoiceCard
 import pt.ms.myshare.presentation.ui.theme.*
 import java.time.LocalTime
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ReminderSetupScreen(
     onConfirm: (LocalTime, ReminderCadence) -> Unit,
@@ -73,6 +74,7 @@ fun ReminderSetupScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .imePadding()
                         .navigationBarsPadding()
                         .padding(horizontal = 24.dp, vertical = 14.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -102,6 +104,8 @@ fun ReminderSetupScreen(
                 .padding(innerPadding)
                 .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
                 .padding(horizontal = 24.dp)
+                .imeNestedScroll()
+                .imePadding()
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

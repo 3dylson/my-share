@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.SupportedLanguage
 import pt.ms.myshare.domain.model.UserPreferences
+import pt.ms.myshare.presentation.ui.components.bringFocusedInputIntoView
 import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
 import java.util.Currency
@@ -108,7 +109,9 @@ fun CurrencyPickerDialog(
                 OutlinedTextField(
                     value = query,
                     onValueChange = { query = it },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .bringFocusedInputIntoView(debugLabel = "currency search")
+                        .fillMaxWidth(),
                     singleLine = true,
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                     placeholder = { Text(stringResource(R.string.preferences_currency_search_hint)) }

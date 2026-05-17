@@ -33,6 +33,7 @@ import pt.ms.myshare.presentation.ui.components.GoogleSignInButton
 import pt.ms.myshare.presentation.ui.theme.*
 import timber.log.Timber
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SignupScreen(
     onSignup: (String) -> Unit,
@@ -77,6 +78,7 @@ fun SignupScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .imePadding()
                         .navigationBarsPadding()
                         .padding(horizontal = 24.dp, vertical = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -117,6 +119,8 @@ fun SignupScreen(
                 .padding(innerPadding)
                 .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
                 .padding(horizontal = 24.dp)
+                .imeNestedScroll()
+                .imePadding()
                 .verticalScroll(rememberScrollState())
         ) {
             Spacer(Modifier.height(40.dp))

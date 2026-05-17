@@ -102,7 +102,7 @@ fun HomeRoute(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -395,7 +395,9 @@ fun HomeScreen(
             NavigationBar(
                 containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
                 tonalElevation = 8.dp,
-                modifier = Modifier.background(MaterialTheme.colorScheme.surface.copy(alpha = 0.95f))
+                modifier = Modifier
+                    .imePadding()
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.95f))
             ) {
                 HomeDestination.entries.forEach { destination ->
                     val isSelected = state.selectedDestination == destination
@@ -453,6 +455,8 @@ fun HomeScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
+                    .imeNestedScroll()
+                    .imePadding()
                     .background(MaterialTheme.colorScheme.background),
                 contentPadding = PaddingValues(
                     start = 24.dp,

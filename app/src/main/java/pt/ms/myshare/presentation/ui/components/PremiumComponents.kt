@@ -458,7 +458,9 @@ fun PremiumTextField(
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = modifier.fillMaxWidth(),
+            modifier = modifier
+                .bringFocusedInputIntoView(debugLabel = label)
+                .fillMaxWidth(),
             label = { Text(label) },
             placeholder = placeholder?.let { { Text(it) } },
             shape = RoundedCornerShape(16.dp),

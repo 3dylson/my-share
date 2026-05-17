@@ -45,7 +45,7 @@ fun GoalAddRoute(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun GoalAddScreen(
     state: GoalAddState,
@@ -117,6 +117,7 @@ fun GoalAddScreen(
                         enabled = !state.isLoading,
                         modifier = Modifier
                             .fillMaxWidth()
+                            .imePadding()
                             .navigationBarsPadding()
                             .padding(horizontal = 24.dp, vertical = 16.dp)
                     )
@@ -143,6 +144,8 @@ fun GoalAddScreen(
                 .padding(innerPadding)
                 .navigationBarsPadding()
                 .padding(horizontal = 24.dp)
+                .imeNestedScroll()
+                .imePadding()
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally

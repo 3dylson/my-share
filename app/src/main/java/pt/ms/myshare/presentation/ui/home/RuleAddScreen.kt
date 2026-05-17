@@ -124,6 +124,7 @@ fun RuleAddScreen(
                         enabled = !state.isLoading,
                         modifier = Modifier
                             .fillMaxWidth()
+                            .imePadding()
                             .navigationBarsPadding()
                             .padding(horizontal = 24.dp, vertical = 16.dp)
                     )
@@ -150,6 +151,8 @@ fun RuleAddScreen(
                 .padding(innerPadding)
                 .navigationBarsPadding()
                 .padding(horizontal = 24.dp)
+                .imeNestedScroll()
+                .imePadding()
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
