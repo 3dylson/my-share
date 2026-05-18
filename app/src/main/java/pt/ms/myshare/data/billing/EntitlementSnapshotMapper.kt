@@ -10,15 +10,16 @@ internal object EntitlementSnapshotMapper {
     fun map(fields: Map<String, Any?>?, nowMillis: Long = System.currentTimeMillis()): EntitlementState? {
         if (fields == null) return null
 
-        stateFromString(fields["entitlementState"] as? String)?.let { return it }
-        stateFromString(fields["subscriptionState"] as? String)?.let { return it }
+        val expiryMillis = expiryMillis(fields["proExpiry"])
+            ?: expiryMillis(fields["expiryTimeMillis"])
+
+        stateFromString(fields["entitlementState"] as? String, expiryMillis, nowMillis)?.let { return it }
+        stateFromString(fields["subscriptionState"] as? String, expiryMillis, nowMillis)?.let { return it }
 
         val isPro = fields["isPro"] as? Boolean ?: return null
         if (!isPro) return EntitlementState.FREE
 
-        val expiryMillis = expiryMillis(fields["proExpiry"])
-            ?: expiryMillis(fields["expiryTimeMillis"])
-            ?: return EntitlementState.PRO
+        expiryMillis ?: return EntitlementState.PRO
 
         return if (expiryMillis > nowMillis) {
             EntitlementState.PRO
@@ -27,8 +28,8 @@ internal object EntitlementSnapshotMapper {
         }
     }
 
-    private fun stateFromString(value: String?): EntitlementState? {
-        return when (value?.uppercase(Locale.US)) {
+    private fun stateFromString(value: String?, expiryMillis: Long?, nowMillis: Long): EntitlementState? {
+        val state = when (value?.uppercase(Locale.US)) {
             "PRO",
             "ACTIVE",
             "SUBSCRIPTION_STATE_ACTIVE" -> EntitlementState.PRO
@@ -36,16 +37,33 @@ internal object EntitlementSnapshotMapper {
             "GRACE_PERIOD",
             "SUBSCRIPTION_STATE_IN_GRACE_PERIOD" -> EntitlementState.GRACE_PERIOD
 
+            "SUBSCRIPTION_STATE_CANCELED" -> {
+                if (expiryMillis != null && expiryMillis > nowMillis) {
+                    EntitlementState.PRO
+                } else {
+                    EntitlementState.FREE
+                }
+            }
+
             "FREE",
             "EXPIRED",
             "REVOKED",
             "ACCOUNT_HOLD",
             "SUBSCRIPTION_STATE_ON_HOLD",
-            "SUBSCRIPTION_STATE_CANCELED",
             "SUBSCRIPTION_STATE_EXPIRED" -> EntitlementState.FREE
 
             "UNKNOWN" -> EntitlementState.UNKNOWN
             else -> null
+        }
+
+        return state?.expireIfNeeded(expiryMillis, nowMillis)
+    }
+
+    private fun EntitlementState.expireIfNeeded(expiryMillis: Long?, nowMillis: Long): EntitlementState {
+        return if (hasPremiumAccess && expiryMillis != null && expiryMillis <= nowMillis) {
+            EntitlementState.FREE
+        } else {
+            this
         }
     }
 

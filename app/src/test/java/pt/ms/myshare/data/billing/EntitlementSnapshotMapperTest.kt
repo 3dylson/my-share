@@ -55,6 +55,32 @@ class EntitlementSnapshotMapperTest {
     }
 
     @Test
+    fun `map treats expired explicit pro snapshot as free`() {
+        val result = EntitlementSnapshotMapper.map(
+            mapOf(
+                "entitlementState" to "PRO",
+                "proExpiry" to Timestamp(NOW_SECONDS - 60, 0)
+            ),
+            nowMillis = NOW
+        )
+
+        assertEquals(EntitlementState.FREE, result)
+    }
+
+    @Test
+    fun `map treats canceled subscription with remaining paid time as pro`() {
+        val result = EntitlementSnapshotMapper.map(
+            mapOf(
+                "subscriptionState" to "SUBSCRIPTION_STATE_CANCELED",
+                "proExpiry" to Timestamp(NOW_SECONDS + 60, 0)
+            ),
+            nowMillis = NOW
+        )
+
+        assertEquals(EntitlementState.PRO, result)
+    }
+
+    @Test
     fun `map treats account hold as free access`() {
         val result = EntitlementSnapshotMapper.map(
             mapOf("entitlementState" to "SUBSCRIPTION_STATE_ON_HOLD"),
