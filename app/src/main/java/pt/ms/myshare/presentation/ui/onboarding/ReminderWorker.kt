@@ -19,6 +19,7 @@ import pt.ms.myshare.presentation.MyShareApp
 import timber.log.Timber
 import java.time.DayOfWeek
 import java.time.LocalDate
+import javax.inject.Provider
 
 class ReminderWorker(
     context: Context,
@@ -32,8 +33,8 @@ class ReminderWorker(
     )
     private val userPreferencesRepository = SharedUserPreferencesRepository(
         context,
-        com.google.firebase.auth.FirebaseAuth.getInstance(),
-        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+        Provider { com.google.firebase.auth.FirebaseAuth.getInstance() },
+        Provider { com.google.firebase.firestore.FirebaseFirestore.getInstance() }
     )
     private val calculatePlanPreviewUseCase = CalculatePlanPreviewUseCase(ResolveAllocationStrategyRulesUseCase())
     private val buildPaydayNotificationMessageUseCase = BuildPaydayNotificationMessageUseCase(calculatePlanPreviewUseCase)

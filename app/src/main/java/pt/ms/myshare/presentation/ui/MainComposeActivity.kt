@@ -25,7 +25,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.google.android.gms.ads.MobileAds
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import pt.ms.myshare.BuildConfig
 import pt.ms.myshare.presentation.AppOpenAdManager
 import pt.ms.myshare.presentation.ui.appupdate.AppUpdateGateState
@@ -59,6 +61,7 @@ class MainComposeActivity : ComponentActivity() {
     private var hasCheckedAppOpenForSession = false
     private var hasGatheredAdsConsentForSession = false
     private var hasInitializedAdsForSession = false
+    private var sessionCountForAds = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,9 +76,7 @@ class MainComposeActivity : ComponentActivity() {
             }
         }
         
-        val prefs = getSharedPreferences("myshare_prefs", MODE_PRIVATE)
-        val sessions = prefs.getInt("session_count", 0) + 1
-        prefs.edit().putInt("session_count", sessions).apply()
+        updateSessionCountForAds()
 
         consentManager = AdsConsentManager(this)
         
@@ -107,7 +108,7 @@ class MainComposeActivity : ComponentActivity() {
                         ) {
                             AppNavigation(
                                 onManageAdsConsent = {
-                                    ensureAdsConsentReady(sessions) {
+                                    ensureAdsConsentReady(sessionCountForAds) {
                                         consentManager.showPrivacyOptionsForm { formError ->
                                             if (formError != null) {
                                                 Timber.tag("AdsConsent").w("Privacy options form error: %s", formError.message)
@@ -117,7 +118,7 @@ class MainComposeActivity : ComponentActivity() {
                                 },
                                 adsConsentManager = consentManager,
                                 onFreeHomeReady = {
-                                    canRequestAdsForSession = consentManager.canRequestAds && sessions >= 2
+                                    canRequestAdsForSession = consentManager.canRequestAds && sessionCountForAds >= 2
                                     if (canRequestAdsForSession && !hasCheckedAppOpenForSession) {
                                         hasCheckedAppOpenForSession = true
                                         initializeAdsForSession()
@@ -165,6 +166,18 @@ class MainComposeActivity : ComponentActivity() {
                 .onFailure { error ->
                     Timber.e(error, "Active entitlement refresh failed on resume")
                 }
+        }
+    }
+
+    private fun updateSessionCountForAds() {
+        lifecycleScope.launch {
+            sessionCountForAds = withContext(Dispatchers.IO) {
+                val prefs = getSharedPreferences("myshare_prefs", MODE_PRIVATE)
+                val sessions = prefs.getInt("session_count", 0) + 1
+                prefs.edit().putInt("session_count", sessions).apply()
+                sessions
+            }
+            Timber.tag("AdsConsent").d("Session count updated for ads: %d", sessionCountForAds)
         }
     }
 

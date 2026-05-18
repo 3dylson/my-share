@@ -4,11 +4,13 @@ import android.app.Activity
 import android.content.Context
 import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import pt.ms.myshare.domain.model.BillingFlowLaunchResult
 import pt.ms.myshare.domain.model.BillingPurchaseEvent
 import pt.ms.myshare.domain.model.EntitlementState
@@ -42,13 +44,13 @@ class SharedPreferencesEntitlementRepository @Inject constructor(
         return BillingFlowLaunchResult.ProductUnavailable
     }
 
-    suspend fun setPro(value: Boolean) {
+    suspend fun setPro(value: Boolean) = withContext(Dispatchers.IO) {
         Timber.tag(TAG).d("setPro value=%s", value)
         prefs.edit().putBoolean(KEY_IS_PRO, value).apply()
         premiumState.value = value
     }
 
-    override suspend fun restorePurchases() {
+    override suspend fun restorePurchases() = withContext(Dispatchers.IO) {
         Timber.tag(TAG).d("restorePurchases placeholder current=%s", premiumState.value)
         premiumState.value = prefs.getBoolean(KEY_IS_PRO, false)
     }

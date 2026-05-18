@@ -7,12 +7,14 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Provider
 
 class FirebaseBillingAuthSession @Inject constructor(
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuthProvider: Provider<FirebaseAuth>
 ) : BillingAuthSession {
 
     override val userId: Flow<String?> = callbackFlow {
+        val firebaseAuth = firebaseAuthProvider.get()
         val listener = FirebaseAuth.AuthStateListener { auth ->
             trySend(auth.currentUser?.uid)
         }
@@ -21,12 +23,13 @@ class FirebaseBillingAuthSession @Inject constructor(
         awaitClose { firebaseAuth.removeAuthStateListener(listener) }
     }
 
-    override fun currentUserId(): String? = firebaseAuth.currentUser?.uid
+    override fun currentUserId(): String? = firebaseAuthProvider.get().currentUser?.uid
 
     override suspend fun requireAuthenticatedUserId(): Result<String> =
         requireAuthenticatedSession().map { it.userId }
 
     override suspend fun requireAuthenticatedSession(): Result<BillingAuthenticatedSession> {
+        val firebaseAuth = firebaseAuthProvider.get()
         val existingUid = firebaseAuth.currentUser?.uid
         if (!existingUid.isNullOrBlank()) {
             Timber.tag(TAG).d("Reusing existing Firebase billing session")
@@ -51,7 +54,7 @@ class FirebaseBillingAuthSession @Inject constructor(
 
     private suspend fun requireIdToken(uid: String): Result<BillingAuthenticatedSession> {
         return try {
-            val token = firebaseAuth.currentUser?.getIdToken(false)?.await()?.token
+            val token = firebaseAuthProvider.get().currentUser?.getIdToken(false)?.await()?.token
             if (token.isNullOrBlank()) {
                 Result.failure(IllegalStateException("Firebase billing session returned no ID token"))
             } else {

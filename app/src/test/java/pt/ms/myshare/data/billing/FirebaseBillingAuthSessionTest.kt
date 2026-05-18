@@ -12,11 +12,12 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import javax.inject.Provider
 
 class FirebaseBillingAuthSessionTest {
 
     private val firebaseAuth: FirebaseAuth = mockk(relaxed = true)
-    private val session = FirebaseBillingAuthSession(firebaseAuth)
+    private val session = FirebaseBillingAuthSession(Provider { firebaseAuth })
 
     @Test
     fun `requireAuthenticatedSession reuses existing Firebase user`() = runTest {

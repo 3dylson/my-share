@@ -9,6 +9,7 @@ import androidx.core.os.LocaleListCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import pt.ms.myshare.domain.model.UserPreferences
 import timber.log.Timber
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -28,6 +29,7 @@ class UserLocaleManager @Inject constructor(
     private fun applyPlatformLocale(preferences: UserPreferences) {
         val localeManager = context.getSystemService(LocaleManager::class.java)
         val current = localeManager.applicationLocales.toLanguageTags()
+        if (shouldUseSystemLocale(current, preferences)) return
         if (current == preferences.languageTag) return
         Timber.tag(TAG).d("Applying platform app locale language=%s", preferences.languageTag)
         localeManager.applicationLocales = LocaleList.forLanguageTags(preferences.languageTag)
@@ -35,9 +37,16 @@ class UserLocaleManager @Inject constructor(
 
     private fun applyAppCompatLocale(preferences: UserPreferences) {
         val current = AppCompatDelegate.getApplicationLocales().toLanguageTags()
+        if (shouldUseSystemLocale(current, preferences)) return
         if (current == preferences.languageTag) return
         Timber.tag(TAG).d("Applying AppCompat app locale language=%s", preferences.languageTag)
         AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(preferences.languageTag))
+    }
+
+    private fun shouldUseSystemLocale(currentAppLocaleTag: String, preferences: UserPreferences): Boolean {
+        if (currentAppLocaleTag.isNotBlank()) return false
+        val systemLanguageTag = UserPreferences.supportedLanguageFor(Locale.getDefault()).languageTag
+        return preferences.languageTag == systemLanguageTag
     }
 
     private companion object {

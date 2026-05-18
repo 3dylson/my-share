@@ -58,7 +58,7 @@ class PlannerRepositoryImpl @Inject constructor(
 
     override fun loadPlan(): SalaryPlan? = planState.value
 
-    override suspend fun savePlan(plan: SalaryPlan) {
+    override suspend fun savePlan(plan: SalaryPlan) = withContext(Dispatchers.IO) {
         Timber.tag(TAG).d("savePlan focus=%s strategy=%s income=%s cadence=%s", plan.focus, plan.strategy, plan.netIncomePerPayday, plan.payFrequency)
         prefs.edit()
             .putString(KEY_FOCUS, plan.focus.name)
@@ -104,7 +104,7 @@ class PlannerRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun clearPlan() {
+    override suspend fun clearPlan() = withContext(Dispatchers.IO) {
         Timber.tag(TAG).d("clearPlan")
         prefs.edit().clear().apply()
         planState.value = null
@@ -509,7 +509,7 @@ class PlannerRepositoryImpl @Inject constructor(
 
     override fun loadReminderConfiguration(): ReminderConfiguration = reminderState.value
 
-    override suspend fun saveReminderConfiguration(configuration: ReminderConfiguration) {
+    override suspend fun saveReminderConfiguration(configuration: ReminderConfiguration) = withContext(Dispatchers.IO) {
         Timber.tag(TAG).d(
             "saveReminderConfiguration enabled=%s hour=%s minute=%s cadence=%s",
             configuration.enabled,
@@ -546,7 +546,7 @@ class PlannerRepositoryImpl @Inject constructor(
 
     override fun observeAutomationEnabled(): Flow<Boolean> = automationState.asStateFlow()
 
-    override suspend fun saveAutomationEnabled(enabled: Boolean) {
+    override suspend fun saveAutomationEnabled(enabled: Boolean) = withContext(Dispatchers.IO) {
         Timber.tag(TAG).d("saveAutomationEnabled enabled=%s", enabled)
         prefs.edit().putBoolean(KEY_AUTOMATION_ENABLED, enabled).apply()
         automationState.value = enabled
@@ -567,7 +567,7 @@ class PlannerRepositoryImpl @Inject constructor(
 
     override fun isOnboardingCompleted(): Boolean = prefs.getBoolean(KEY_ONBOARDING_COMPLETED, false)
 
-    override suspend fun setOnboardingCompleted(completed: Boolean) {
+    override suspend fun setOnboardingCompleted(completed: Boolean) = withContext(Dispatchers.IO) {
         Timber.tag(TAG).d("setOnboardingCompleted completed=%s", completed)
         prefs.edit().putBoolean(KEY_ONBOARDING_COMPLETED, completed).apply()
         syncOnboardingStateToFirestore(completed)

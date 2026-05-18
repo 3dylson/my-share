@@ -29,6 +29,7 @@ import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
 import pt.ms.myshare.domain.use_case.ResolveAppUpdateDecisionUseCase
 import pt.ms.myshare.domain.use_case.ResolveAllocationStrategyRulesUseCase
+import javax.inject.Provider
 import javax.inject.Singleton
 
 @Module
@@ -55,8 +56,8 @@ object AppModule {
     @Singleton
     fun provideAppUpdatePolicyRepository(
         @ApplicationContext context: Context,
-        firestore: FirebaseFirestore
-    ): AppUpdatePolicyRepository = FirestoreAppUpdatePolicyRepository(context, firestore)
+        firestoreProvider: Provider<FirebaseFirestore>
+    ): AppUpdatePolicyRepository = FirestoreAppUpdatePolicyRepository(context, firestoreProvider)
 
     @Provides
     @Singleton
@@ -70,9 +71,9 @@ object AppModule {
     @Singleton
     fun provideUserPreferencesRepository(
         @ApplicationContext context: Context,
-        firebaseAuth: FirebaseAuth,
-        firestore: FirebaseFirestore
-    ): UserPreferencesRepository = SharedUserPreferencesRepository(context, firebaseAuth, firestore)
+        firebaseAuthProvider: Provider<FirebaseAuth>,
+        firestoreProvider: Provider<FirebaseFirestore>
+    ): UserPreferencesRepository = SharedUserPreferencesRepository(context, firebaseAuthProvider, firestoreProvider)
 
     @Provides
     @Singleton
@@ -80,17 +81,23 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideBillingAuthSession(firebaseAuth: FirebaseAuth): BillingAuthSession = FirebaseBillingAuthSession(firebaseAuth)
+    fun provideBillingAuthSession(firebaseAuthProvider: Provider<FirebaseAuth>): BillingAuthSession =
+        FirebaseBillingAuthSession(firebaseAuthProvider)
 
     @Provides
     @Singleton
     fun provideEntitlementRepository(
         billingClientWrapper: BillingClientWrapper,
         billingAuthSession: BillingAuthSession,
-        firestore: FirebaseFirestore,
-        firebaseFunctions: FirebaseFunctions
+        firestoreProvider: Provider<FirebaseFirestore>,
+        firebaseFunctionsProvider: Provider<FirebaseFunctions>
     ): EntitlementRepository = 
-        PlayBillingEntitlementRepository(billingClientWrapper, billingAuthSession, firestore, firebaseFunctions)
+        PlayBillingEntitlementRepository(
+            billingClientWrapper,
+            billingAuthSession,
+            firestoreProvider,
+            firebaseFunctionsProvider
+        )
 
     @Provides
     @Singleton

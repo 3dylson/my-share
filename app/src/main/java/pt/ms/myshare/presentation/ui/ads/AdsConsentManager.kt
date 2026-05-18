@@ -15,7 +15,10 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 class AdsConsentManager(private val activity: Activity) {
 
-    private val consentInformation: ConsentInformation = UserMessagingPlatform.getConsentInformation(activity)
+    private val consentInformation: ConsentInformation by lazy {
+        Timber.tag(TAG).d("Loading ads consent information")
+        UserMessagingPlatform.getConsentInformation(activity)
+    }
     private val isMobileAdsSdkInitialized = AtomicBoolean(false)
 
     /**
@@ -87,4 +90,8 @@ class AdsConsentManager(private val activity: Activity) {
      */
     val isPrivacyOptionsRequired: Boolean
         get() = consentInformation.privacyOptionsRequirementStatus == ConsentInformation.PrivacyOptionsRequirementStatus.REQUIRED
+
+    private companion object {
+        const val TAG = "AdsConsent"
+    }
 }

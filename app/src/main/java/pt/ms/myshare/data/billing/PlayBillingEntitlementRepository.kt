@@ -22,12 +22,13 @@ import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
 import pt.ms.myshare.domain.model.StoreProduct
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import timber.log.Timber
+import javax.inject.Provider
 
 class PlayBillingEntitlementRepository(
     private val billingClientWrapper: BillingClientWrapper,
     private val billingAuthSession: BillingAuthSession,
-    private val firestore: FirebaseFirestore,
-    private val firebaseFunctions: FirebaseFunctions
+    private val firestoreProvider: Provider<FirebaseFirestore>,
+    private val firebaseFunctionsProvider: Provider<FirebaseFunctions>
 ) : EntitlementRepository {
 
     private val localEntitlementState: Flow<EntitlementState> = combine(
@@ -67,7 +68,7 @@ class PlayBillingEntitlementRepository(
                 return
             }
 
-            registration = firestore.collection("users")
+            registration = firestoreProvider.get().collection("users")
                 .document(uid)
                 .addSnapshotListener { snapshot, error ->
                     if (error != null) {
@@ -134,7 +135,7 @@ class PlayBillingEntitlementRepository(
 
         try {
             Timber.tag(TAG).d("Verifying purchase product=%s userReady=%s", productId, session.userId.isNotBlank())
-            val result = firebaseFunctions
+            val result = firebaseFunctionsProvider.get()
                 .getHttpsCallable("verifySubscription")
                 .call(data)
                 .await()

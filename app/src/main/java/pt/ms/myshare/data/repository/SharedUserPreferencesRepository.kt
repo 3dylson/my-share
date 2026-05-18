@@ -19,13 +19,14 @@ import pt.ms.myshare.domain.repository.UserPreferencesRepository
 import timber.log.Timber
 import java.util.Locale
 import javax.inject.Inject
+import javax.inject.Provider
 import javax.inject.Singleton
 
 @Singleton
 class SharedUserPreferencesRepository @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val firebaseAuth: FirebaseAuth,
-    private val firestore: FirebaseFirestore
+    private val firebaseAuthProvider: Provider<FirebaseAuth>,
+    private val firestoreProvider: Provider<FirebaseFirestore>
 ) : UserPreferencesRepository {
 
     private val prefs = PreferenceManager.getDefaultSharedPreferences(context)
@@ -56,10 +57,10 @@ class SharedUserPreferencesRepository @Inject constructor(
     }
 
     override suspend fun syncFromFirestore() = withContext(Dispatchers.IO) {
-        val user = firebaseAuth.currentUser ?: return@withContext
+        val user = firebaseAuthProvider.get().currentUser ?: return@withContext
         try {
             Timber.tag(TAG).d("Syncing user preferences from Firestore")
-            val snapshot = firestore.collection("users").document(user.uid).get().await()
+            val snapshot = firestoreProvider.get().collection("users").document(user.uid).get().await()
             val remoteLanguage = snapshot.getString(FIELD_LANGUAGE_TAG)
             val remoteCurrency = snapshot.getString(FIELD_CURRENCY_CODE)
             if (remoteLanguage.isNullOrBlank() || remoteCurrency.isNullOrBlank()) {
@@ -77,11 +78,11 @@ class SharedUserPreferencesRepository @Inject constructor(
     }
 
     override suspend fun syncToFirestoreIfAuthenticated() = withContext(Dispatchers.IO) {
-        val user = firebaseAuth.currentUser ?: return@withContext
+        val user = firebaseAuthProvider.get().currentUser ?: return@withContext
         val preferences = preferencesState.value
         try {
             Timber.tag(TAG).d("Saving user preferences to Firestore language=%s currency=%s", preferences.languageTag, preferences.currencyCode)
-            firestore.collection("users").document(user.uid)
+            firestoreProvider.get().collection("users").document(user.uid)
                 .set(
                     mapOf(
                         FIELD_LANGUAGE_TAG to preferences.languageTag,

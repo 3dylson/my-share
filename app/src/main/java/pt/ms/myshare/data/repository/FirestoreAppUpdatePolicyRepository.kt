@@ -2,7 +2,9 @@ package pt.ms.myshare.data.repository
 
 import android.content.Context
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import pt.ms.myshare.data.remote.FirestoreAppUpdatePolicyMapper
 import pt.ms.myshare.domain.model.AppUpdatePolicy
 import pt.ms.myshare.domain.model.AppUpdatePolicyLoadResult
@@ -10,18 +12,22 @@ import pt.ms.myshare.domain.model.AppUpdatePolicySource
 import pt.ms.myshare.domain.repository.AppUpdatePolicyRepository
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Provider
 
 class FirestoreAppUpdatePolicyRepository @Inject constructor(
     context: Context,
-    private val firestore: FirebaseFirestore
+    private val firestoreProvider: Provider<FirebaseFirestore>
 ) : AppUpdatePolicyRepository {
 
-    private val preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
+    private val appContext = context.applicationContext
+    private val preferences by lazy {
+        appContext.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
+    }
 
-    override suspend fun loadPolicy(): AppUpdatePolicyLoadResult {
-        return try {
+    override suspend fun loadPolicy(): AppUpdatePolicyLoadResult = withContext(Dispatchers.IO) {
+        try {
             Timber.d("Fetching app update policy from Firestore")
-            val snapshot = firestore.collection(COLLECTION_APP_CONFIG)
+            val snapshot = firestoreProvider.get().collection(COLLECTION_APP_CONFIG)
                 .document(DOCUMENT_ANDROID_UPDATE_POLICY)
                 .get()
                 .await()
