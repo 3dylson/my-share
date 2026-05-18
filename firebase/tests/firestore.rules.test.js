@@ -182,9 +182,16 @@ describe("Authenticated user — own document", () => {
     ["entitlementState", "PRO"],
     ["subscriptionState", "ACTIVE"],
     ["purchaseToken", "fake-token"],
+    ["purchaseTokenHash", "hash"],
+    ["linkedPurchaseToken", "linked-token"],
+    ["linkedPurchaseTokenHash", "linked-hash"],
     ["subscriptionId", "myshare_annual"],
     ["expiryTimeMillis", 1842300000000],
     ["paymentState", "RECEIVED"],
+    ["verificationSource", "client"],
+    ["notificationType", 2],
+    ["latestOrderId", "GPA.1234-5678"],
+    ["regionCode", "PT"],
     ["proExpiry", 1842300000000],
     ["lastVerifiedAt", 1842300000000],
   ])("cannot update protected billing field %s", async (fieldName, fieldValue) => {
@@ -297,6 +304,58 @@ describe("Authenticated user — cross-user access denied", () => {
         .collection("plans")
         .doc("p1")
         .get()
+    );
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Server-only billing collections
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("Server-only billing collections", () => {
+  test("clients cannot read purchase token index documents", async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx
+        .firestore()
+        .collection("billing_purchase_tokens")
+        .doc("tokenHash")
+        .set({ uid: USER_A, purchaseToken: "raw-token" });
+    });
+
+    await assertFails(
+      authedDb(USER_A).collection("billing_purchase_tokens").doc("tokenHash").get()
+    );
+  });
+
+  test("clients cannot write purchase token index documents", async () => {
+    await assertFails(
+      authedDb(USER_A)
+        .collection("billing_purchase_tokens")
+        .doc("tokenHash")
+        .set({ uid: USER_A, purchaseToken: "raw-token" })
+    );
+  });
+
+  test("clients cannot read billing event audit documents", async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx
+        .firestore()
+        .collection("billing_events")
+        .doc("event1")
+        .set({ eventType: "unresolved_subscription_notification" });
+    });
+
+    await assertFails(
+      authedDb(USER_A).collection("billing_events").doc("event1").get()
+    );
+  });
+
+  test("clients cannot write billing event audit documents", async () => {
+    await assertFails(
+      authedDb(USER_A)
+        .collection("billing_events")
+        .doc("event1")
+        .set({ eventType: "fake" })
     );
   });
 });

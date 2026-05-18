@@ -13,15 +13,30 @@ service cloud.firestore {
         'entitlementState',
         'subscriptionState',
         'purchaseToken',
+        'purchaseTokenHash',
+        'linkedPurchaseToken',
+        'linkedPurchaseTokenHash',
         'subscriptionId',
         'expiryTimeMillis',
-        'paymentState'
+        'paymentState',
+        'verificationSource',
+        'notificationType',
+        'latestOrderId',
+        'regionCode'
       ];
     }
 
     match /app_config/android_update_policy {
       allow read: if true;
       allow write: if false;
+    }
+
+    match /billing_purchase_tokens/{doc} {
+      allow read, write: if false;
+    }
+
+    match /billing_events/{doc} {
+      allow read, write: if false;
     }
 
     // A user can only read/write their own document

@@ -477,8 +477,13 @@ Status after implementation pass on 2026-05-18:
 - Done: Extra goals and payday rules created during Premium remain visible after downgrade, but locked rows open the relevant Premium gate instead of edit screens.
 - Done: Direct add routes now block second goals/rules when Premium is inactive, so users cannot bypass the Strategy tab gates.
 - Done: Firebase `verifySubscription` now writes an explicit entitlement snapshot to the user document and `/users/{uid}/entitlements/current`.
-- Validated: focused premium lifecycle unit tests, full `testDebugUnitTest`, androidTest Kotlin compile, Firebase function syntax check, and emulator launch on `emulator-5554`.
+- Done: Backend Premium lifecycle hardening added a Google Play RTDN handler, scheduled entitlement revalidation, and a server-only purchase-token index.
+- Done: User-readable entitlement snapshots now store purchase-token hashes instead of raw Play purchase tokens; raw tokens are kept in server-only Firestore documents.
+- Done: Function cost guardrails keep warm instances at zero, cap billing lifecycle scale-out, and run scheduled revalidation daily because RTDN is the primary lifecycle path.
+- Done: Firebase functions and Firestore rules were deployed to `my-share-finance`.
+- Done: Play Console Real-time Developer Notifications are enabled for `projects/my-share-finance/topics/play-billing-rtdn`, with subscriptions and voided purchases selected.
+- Validated: focused premium lifecycle unit tests, full `testDebugUnitTest`, androidTest Kotlin compile, Firebase function lint/syntax/unit checks, Firebase rules tests, emulator launch on `emulator-5554`, and Play Console RTDN test notification received by `handlePlayBillingNotification`.
 
 Residual:
 - A successful paid purchase, restore, grace-period, and account-hold sequence still needs a Play Console/internal-test setup with license testers and real subscription test cards.
-- Server-side real-time downgrade automation still depends on how Play subscription lifecycle events are delivered to Firebase. A future backend pass should add Real-time Developer Notifications or a scheduled revalidation job so expired/account-hold states update even if the user does not open the app.
+- A real internal-test purchase should confirm renewal, cancel, refund, grace-period, and account-hold events reach Firebase with production Play payloads.
