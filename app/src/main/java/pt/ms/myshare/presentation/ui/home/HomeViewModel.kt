@@ -308,6 +308,8 @@ class HomeViewModel @Inject constructor(
                 val shouldClearUnavailableMessage =
                     currentMore.billingMessage == BillingStatusMessageKeys.PRODUCTS_UNAVAILABLE && selectedProductAvailable
 
+                val paydayRecommendationState = paydayRecommendation?.toState(preferences)
+                val recommendationMessageKey = currentState.reviewCard.recommendationMessageKey
                 val moreCard = MoreCardState(
                     reminderEnabled = reminder.enabled,
                     reminderLabelKey = if (reminder.enabled) {
@@ -353,6 +355,10 @@ class HomeViewModel @Inject constructor(
                     priorityMoveLabel = planCard?.savingsLabel.orEmpty(),
                     ruleCount = currentRules.size,
                     reviewCount = planner.reviewHistory.size,
+                    smartAdjustment = paydayRecommendationState.toSmartAdjustmentControlState(
+                        hasPlan = updatedPlan != null,
+                        messageKey = recommendationMessageKey
+                    ),
                     error = currentMore.error.takeUnless { shouldClearUnavailableMessage }
                 )
                 HomeState(
@@ -364,8 +370,8 @@ class HomeViewModel @Inject constructor(
                     performanceStats = performanceStats,
                     reviewCard = reviewCard.copy(
                         coachingInsights = coachingInsights,
-                        paydayRecommendation = paydayRecommendation?.toState(preferences),
-                        recommendationMessageKey = currentState.reviewCard.recommendationMessageKey
+                        paydayRecommendation = paydayRecommendationState,
+                        recommendationMessageKey = recommendationMessageKey
                     ),
                     reviewHistory = planner.reviewHistory.asReversed().map { it.toState() },
                     moreCard = moreCard,
@@ -1088,6 +1094,33 @@ class HomeViewModel @Inject constructor(
             adjustmentAmountLabel = currencyFormat.format(adjustmentAmount),
             confidencePercent = confidencePercent,
             isApplyable = isApplyable
+        )
+    }
+
+    private fun PaydayAdjustmentRecommendationState?.toSmartAdjustmentControlState(
+        hasPlan: Boolean,
+        messageKey: String?
+    ): SmartAdjustmentControlState {
+        if (this == null) {
+            return SmartAdjustmentControlState(
+                hasPlan = hasPlan,
+                lastActionMessageKey = messageKey
+            )
+        }
+
+        return SmartAdjustmentControlState(
+            hasPlan = hasPlan,
+            hasRecommendation = true,
+            isApplyable = isApplyable,
+            direction = direction,
+            currentFlexibleSpendLabel = currentFlexibleSpendLabel,
+            recommendedFlexibleSpendLabel = recommendedFlexibleSpendLabel,
+            currentPriorityContributionLabel = currentPriorityContributionLabel,
+            recommendedPriorityContributionLabel = recommendedPriorityContributionLabel,
+            adjustmentAmountLabel = adjustmentAmountLabel,
+            confidencePercent = confidencePercent,
+            analyzedReviewCount = analyzedReviewCount,
+            lastActionMessageKey = messageKey
         )
     }
 

@@ -444,6 +444,46 @@ class HomeViewModelTest {
     }
 
     @Test
+    fun `premium more card exposes pending smart adjustment`() = runTest {
+        val currentPlan = SalaryPlan(
+            focus = PlanningFocus.SAVE_WITHOUT_STRESS,
+            netIncomePerPayday = BigDecimal("1000"),
+            monthlyFixedCosts = BigDecimal("400"),
+            payFrequency = PayFrequency.MONTHLY,
+            monthlyPayday = 1,
+            preset = AllocationPreset.BALANCED
+        )
+        fakeEntitlementRepository.setPro(true)
+        fakePlannerRepository.saveAutomationEnabled(true)
+        fakePlannerRepository.savePlan(currentPlan)
+        fakePlannerRepository.saveReview(
+            ManualReview(
+                actualFlexibleSpend = BigDecimal("220"),
+                actualGoalContribution = BigDecimal("310"),
+                plannedFlexibleSpend = BigDecimal("300"),
+                plannedGoalContribution = BigDecimal("300")
+            )
+        )
+        advanceUntilIdle()
+
+        val moreCard = viewModel.state.value.moreCard
+        val smartAdjustment = moreCard.smartAdjustment
+
+        assertTrue(moreCard.automationEnabled)
+        assertTrue(smartAdjustment.hasPlan)
+        assertTrue(smartAdjustment.hasRecommendation)
+        assertTrue(smartAdjustment.isApplyable)
+        assertEquals(
+            PaydayAdjustmentRecommendationDirection.MOVE_MORE_TO_PRIORITY,
+            smartAdjustment.direction
+        )
+        assertTrue(smartAdjustment.recommendedFlexibleSpendLabel.isNotBlank())
+        assertTrue(smartAdjustment.recommendedPriorityContributionLabel.isNotBlank())
+        assertEquals(62, smartAdjustment.confidencePercent)
+        assertEquals(1, smartAdjustment.analyzedReviewCount)
+    }
+
+    @Test
     fun `premium user can apply payday recommendation to real rules`() = runTest {
         val currentPlan = SalaryPlan(
             focus = PlanningFocus.SAVE_WITHOUT_STRESS,

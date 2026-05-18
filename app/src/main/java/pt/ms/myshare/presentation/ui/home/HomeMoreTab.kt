@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import pt.ms.myshare.BuildConfig
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.BillingPlan
+import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.preferences.currencyLabel
 import pt.ms.myshare.presentation.ui.preferences.languageLabel
@@ -48,6 +49,7 @@ fun LazyListScope.homeMoreTab(
     onShowCurrencyPicker: () -> Unit,
     onShowAutomationLock: () -> Unit,
     onShowAccountDetails: () -> Unit,
+    onOpenReview: () -> Unit,
     isGoogleCredentialRequestInProgress: Boolean,
     onConnectGoogle: () -> Unit,
     onLogout: () -> Unit
@@ -69,6 +71,17 @@ fun LazyListScope.homeMoreTab(
             state = state,
             modifier = Modifier.padding(bottom = 20.dp)
         )
+    }
+
+    if (state.isPremium) {
+        item {
+            SmartAdjustmentControlCard(
+                state = state,
+                onToggleAutomation = onToggleAutomation,
+                onOpenReview = onOpenReview,
+                modifier = Modifier.padding(bottom = 20.dp)
+            )
+        }
     }
 
     item {
@@ -468,6 +481,368 @@ private fun MoreRoutineMetric(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun SmartAdjustmentControlCard(
+    state: MoreCardState,
+    onToggleAutomation: (Boolean) -> Unit,
+    onOpenReview: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val smartAdjustment = state.smartAdjustment
+    val statusText = when {
+        state.automationEnabled -> stringResource(R.string.home_more_smart_adjustments_status_watching)
+        else -> stringResource(R.string.home_more_smart_adjustments_status_paused)
+    }
+    val body = when {
+        !smartAdjustment.hasPlan -> stringResource(R.string.home_more_smart_adjustments_body_no_plan)
+        smartAdjustment.isApplyable -> stringResource(
+            R.string.home_more_smart_adjustments_body_pending,
+            smartAdjustment.recommendedFlexibleSpendLabel,
+            smartAdjustment.recommendedPriorityContributionLabel
+        )
+        smartAdjustment.hasRecommendation -> stringResource(
+            R.string.home_more_smart_adjustments_body_keep,
+            smartAdjustment.currentFlexibleSpendLabel,
+            smartAdjustment.currentPriorityContributionLabel
+        )
+        else -> stringResource(R.string.home_more_smart_adjustments_body_waiting)
+    }
+    val actionLabel = if (state.automationEnabled) {
+        stringResource(R.string.home_more_smart_adjustments_pause)
+    } else {
+        stringResource(R.string.home_more_smart_adjustments_enable)
+    }
+
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.18f),
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.22f)),
+        shadowElevation = 2.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = MySharePrimary.copy(alpha = 0.13f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AutoAwesome,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.padding(10.dp).size(22.dp)
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.home_more_smart_adjustments_label).uppercase(),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MySharePrimary,
+                            fontWeight = FontWeight.Black,
+                            modifier = Modifier.weight(1f)
+                        )
+                        SmartAdjustmentStatusPill(
+                            text = statusText,
+                            isActive = state.automationEnabled
+                        )
+                    }
+                    Text(
+                        text = stringResource(R.string.home_more_smart_adjustments_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = body,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+
+            SmartAdjustmentSignalGrid(smartAdjustment = smartAdjustment)
+
+            if (smartAdjustment.lastActionMessageKey != null) {
+                SmartAdjustmentLastAction(messageKey = smartAdjustment.lastActionMessageKey)
+            }
+
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 340.dp
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        SmartAdjustmentReviewButton(
+                            enabled = smartAdjustment.hasRecommendation,
+                            onClick = onOpenReview,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        OutlinedButton(
+                            onClick = { onToggleAutomation(!state.automationEnabled) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(14.dp)
+                        ) {
+                            Text(text = actionLabel, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                } else {
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        OutlinedButton(
+                            onClick = { onToggleAutomation(!state.automationEnabled) },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(14.dp)
+                        ) {
+                            Text(text = actionLabel, fontWeight = FontWeight.Bold)
+                        }
+                        SmartAdjustmentReviewButton(
+                            enabled = smartAdjustment.hasRecommendation,
+                            onClick = onOpenReview,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SmartAdjustmentStatusPill(
+    text: String,
+    isActive: Boolean,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(999.dp),
+        color = if (isActive) MySharePrimary.copy(alpha = 0.14f) else MaterialTheme.colorScheme.surface.copy(alpha = 0.72f),
+        border = BorderStroke(1.dp, if (isActive) MySharePrimary.copy(alpha = 0.28f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.18f))
+    ) {
+        Text(
+            text = text,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+            style = MaterialTheme.typography.labelSmall,
+            color = if (isActive) MySharePrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Composable
+private fun SmartAdjustmentSignalGrid(
+    smartAdjustment: SmartAdjustmentControlState,
+    modifier: Modifier = Modifier
+) {
+    val flexibleValue = when {
+        smartAdjustment.hasRecommendation -> smartAdjustment.recommendedFlexibleSpendLabel
+        smartAdjustment.hasPlan -> smartAdjustment.currentFlexibleSpendLabel.ifBlank { stringResource(R.string.home_more_routine_not_set) }
+        else -> stringResource(R.string.home_more_routine_not_set)
+    }
+    val priorityValue = when {
+        smartAdjustment.hasRecommendation -> smartAdjustment.recommendedPriorityContributionLabel
+        smartAdjustment.hasPlan -> smartAdjustment.currentPriorityContributionLabel.ifBlank { stringResource(R.string.home_more_routine_not_set) }
+        else -> stringResource(R.string.home_more_routine_not_set)
+    }
+    val evidenceValue = if (smartAdjustment.hasRecommendation) {
+        stringResource(
+            R.string.home_more_smart_adjustments_evidence_value,
+            smartAdjustment.confidencePercent,
+            smartAdjustment.analyzedReviewCount
+        )
+    } else {
+        stringResource(R.string.home_more_smart_adjustments_evidence_waiting)
+    }
+    val directionValue = when (smartAdjustment.direction) {
+        PaydayAdjustmentRecommendationDirection.MOVE_MORE_TO_PRIORITY ->
+            stringResource(R.string.home_more_smart_adjustments_direction_move)
+        PaydayAdjustmentRecommendationDirection.RESTORE_FLEXIBLE_BUFFER ->
+            stringResource(R.string.home_more_smart_adjustments_direction_restore)
+        PaydayAdjustmentRecommendationDirection.KEEP_PLAN ->
+            stringResource(R.string.home_more_smart_adjustments_direction_keep)
+        null -> stringResource(R.string.home_more_smart_adjustments_direction_waiting)
+    }
+
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+        val shouldStack = maxWidth < 300.dp
+        if (shouldStack) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                SmartAdjustmentSignalPill(
+                    label = stringResource(R.string.home_more_smart_adjustments_next_flex),
+                    value = flexibleValue,
+                    icon = Icons.Default.Payments,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                SmartAdjustmentSignalPill(
+                    label = stringResource(R.string.home_more_smart_adjustments_next_priority),
+                    value = priorityValue,
+                    icon = Icons.Default.Flag,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                SmartAdjustmentSignalPill(
+                    label = stringResource(R.string.home_more_smart_adjustments_signal),
+                    value = directionValue,
+                    icon = Icons.Default.AutoGraph,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                SmartAdjustmentSignalPill(
+                    label = stringResource(R.string.home_more_smart_adjustments_evidence),
+                    value = evidenceValue,
+                    icon = Icons.Default.QueryStats,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        } else {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    SmartAdjustmentSignalPill(
+                        label = stringResource(R.string.home_more_smart_adjustments_next_flex),
+                        value = flexibleValue,
+                        icon = Icons.Default.Payments,
+                        modifier = Modifier.weight(1f)
+                    )
+                    SmartAdjustmentSignalPill(
+                        label = stringResource(R.string.home_more_smart_adjustments_next_priority),
+                        value = priorityValue,
+                        icon = Icons.Default.Flag,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    SmartAdjustmentSignalPill(
+                        label = stringResource(R.string.home_more_smart_adjustments_signal),
+                        value = directionValue,
+                        icon = Icons.Default.AutoGraph,
+                        modifier = Modifier.weight(1f)
+                    )
+                    SmartAdjustmentSignalPill(
+                        label = stringResource(R.string.home_more_smart_adjustments_evidence),
+                        value = evidenceValue,
+                        icon = Icons.Default.QueryStats,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SmartAdjustmentSignalPill(
+    label: String,
+    value: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.heightIn(min = 74.dp),
+        shape = RoundedCornerShape(14.dp),
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.74f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f))
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MySharePrimary,
+                modifier = Modifier.size(17.dp)
+            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = label.uppercase(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Black,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SmartAdjustmentLastAction(
+    messageKey: String,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val message = remember(messageKey) {
+        val resId = context.resources.getIdentifier(messageKey, "string", context.packageName)
+        if (resId != 0) context.getString(resId) else messageKey
+    }
+
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Icon(
+            imageVector = Icons.Default.CheckCircle,
+            contentDescription = null,
+            tint = MySharePositive,
+            modifier = Modifier.size(18.dp)
+        )
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            lineHeight = 18.sp
+        )
+    }
+}
+
+@Composable
+private fun SmartAdjustmentReviewButton(
+    enabled: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = modifier,
+        shape = RoundedCornerShape(14.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Default.AutoGraph,
+            contentDescription = null,
+            modifier = Modifier.size(18.dp)
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = stringResource(R.string.home_more_smart_adjustments_review),
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 

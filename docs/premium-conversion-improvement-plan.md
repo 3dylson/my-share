@@ -502,7 +502,14 @@ Status after Premium recommendation apply-flow pass on 2026-05-18:
 - Done: The post-undo state uses inline card feedback instead of a duplicate snackbar.
 - Validated: focused `HomeViewModelTest` coverage, localization string parity, release build install on `emulator-5554`, recommendation confirmation, apply, Strategy handoff, and undo flow.
 
+Status after Smart Adjustments control-center pass on 2026-05-18:
+- Done: Premium users now see a Smart Adjustments control card in More with `Watching` or `Paused` status.
+- Done: The control card surfaces pending recommendation values, signal direction, confidence, and review count.
+- Done: `Review adjustment` routes directly to the Review recommendation so rule changes still require explicit user approval.
+- Done: `Enable watch` and `Pause watch` control the existing Premium automation state from the card.
+- Validated: focused `HomeViewModelTest` coverage, localization string parity, release build install on `emulator-5554`, normal-screen More card, Review handoff, automation toggle, and compact `720x1280 / 360dpi` layout. The temporary Firestore Premium snapshot used for this UI validation was restored to `FREE`.
+
 Next:
-- Deepen the real Premium value in automation so applied recommendations can become recurring payday behavior, not only one-time rule updates.
+- Deepen the real Premium value so applied recommendations can become scheduled payday check-ins, not only visible control-center status.
 - Add tighter premium empty states for users with many goals, rules, and reviews so advanced accounts stay scan-friendly.
 - Continue validating compact-screen layouts when new Premium controls are added.

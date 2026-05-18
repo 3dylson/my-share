@@ -692,6 +692,10 @@ fun HomeScreen(
                                 Timber.tag("HomeScreen").d("Account details opened from More tab")
                                 showAccountDetailsDialog = true
                             },
+                            onOpenReview = {
+                                Timber.tag("HomeScreen").d("Smart adjustment review opened from More tab")
+                                onDestinationSelected(HomeDestination.REVIEW)
+                            },
                             isGoogleCredentialRequestInProgress = isGoogleCredentialRequestInProgress,
                             onConnectGoogle = startGoogleAccountConnection,
                             onLogout = {

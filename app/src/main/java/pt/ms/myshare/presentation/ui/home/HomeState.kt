@@ -128,11 +128,27 @@ data class MoreCardState(
     val priorityMoveLabel: String = "",
     val ruleCount: Int = 0,
     val reviewCount: Int = 0,
+    val smartAdjustment: SmartAdjustmentControlState = SmartAdjustmentControlState(),
     val error: String? = null
 ) {
     val requiresPremiumAccountProtectionBeforeLogout: Boolean
         get() = isPremium && userEmail.isNullOrBlank()
 }
+
+data class SmartAdjustmentControlState(
+    val hasPlan: Boolean = false,
+    val hasRecommendation: Boolean = false,
+    val isApplyable: Boolean = false,
+    val direction: PaydayAdjustmentRecommendationDirection? = null,
+    val currentFlexibleSpendLabel: String = "",
+    val recommendedFlexibleSpendLabel: String = "",
+    val currentPriorityContributionLabel: String = "",
+    val recommendedPriorityContributionLabel: String = "",
+    val adjustmentAmountLabel: String = "",
+    val confidencePercent: Int = 0,
+    val analyzedReviewCount: Int = 0,
+    val lastActionMessageKey: String? = null
+)
 
 data class ReviewHistoryItemState(
     val id: String,
