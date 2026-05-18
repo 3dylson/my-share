@@ -40,6 +40,7 @@ import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReadResult
 import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReader
 import pt.ms.myshare.presentation.ui.components.*
+import pt.ms.myshare.presentation.ui.paywall.BillingStatusMessageKeys
 import pt.ms.myshare.presentation.ui.preferences.CurrencyPickerDialog
 import pt.ms.myshare.presentation.ui.preferences.LanguagePickerDialog
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
@@ -195,6 +196,14 @@ fun HomeScreen(
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
+
+    LaunchedEffect(showPaywallSheet, state.moreCard.isPremium) {
+        if (showPaywallSheet && state.moreCard.isPremium) {
+            showPaywallSheet = false
+            Timber.tag("HomeScreen").d("Premium gate dismissed after entitlement activation")
+        }
+    }
+
     val openPremiumGate: (HomePremiumGate) -> Unit = { gate ->
         premiumGate = gate
         showPaywallSheet = true
@@ -227,11 +236,12 @@ fun HomeScreen(
     }
 
     if (showPaywallSheet) {
+        val isPurchaseActivationPending = state.moreCard.billingMessage == BillingStatusMessageKeys.COMPLETED
         PremiumPaywallBottomSheet(
             onDismissRequest = { showPaywallSheet = false },
             title = stringResource(premiumGate.titleRes),
             body = stringResource(premiumGate.bodyRes),
-            isBillingActionInProgress = state.moreCard.isBillingActionInProgress,
+            isBillingActionInProgress = state.moreCard.isBillingActionInProgress || isPurchaseActivationPending,
             billingMessage = state.moreCard.billingMessage,
             onUpgradeClick = { 
                 onPremiumGateUpgradeClicked(premiumGate)
