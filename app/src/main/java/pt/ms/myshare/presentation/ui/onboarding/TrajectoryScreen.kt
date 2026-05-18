@@ -3,6 +3,7 @@ package pt.ms.myshare.presentation.ui.onboarding
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
@@ -29,6 +30,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -54,9 +58,9 @@ import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.presentation.ui.theme.MySharePositive
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.text.NumberFormat
 import java.util.Calendar
-import java.util.Locale
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -118,47 +122,62 @@ fun TrajectoryScreen(
             if (preview != null) {
                 val context = androidx.compose.ui.platform.LocalContext.current
                 val hasPriorityContribution = preview.priorityContributionPerPayday > java.math.BigDecimal.ZERO
+                val formattedWeeklyFlexibleSpend = LocalizedAmountFormatter.formatCurrency(
+                    amount = preview.weeklyFlexibleSpend,
+                    locale = userPreferences.locale,
+                    currencyCode = userPreferences.currencyCode
+                )
+                val formattedPriorityContribution = preview.priorityContributionPerPayday
+                    .takeIf { it > BigDecimal.ZERO }
+                    ?.let { amount ->
+                        LocalizedAmountFormatter.formatCurrency(
+                            amount = amount,
+                            locale = userPreferences.locale,
+                            currencyCode = userPreferences.currencyCode
+                        )
+                    }
+                val exampleUnusedAmount = preview.weeklyFlexibleSpend
+                    .multiply(BigDecimal("0.30"))
+                    .setScale(2, RoundingMode.HALF_UP)
+                val formattedExampleUnused = LocalizedAmountFormatter.formatCurrency(
+                    amount = exampleUnusedAmount,
+                    locale = userPreferences.locale,
+                    currencyCode = userPreferences.currencyCode
+                )
                 val paydaySummary = remember(preview.summary) {
                     val resId = context.resources.getIdentifier(preview.summary, "string", context.packageName)
                     if (resId != 0) context.getString(resId) else preview.summary
                 }
-            TrajectorySummaryCard(
-                paydaySummary = paydaySummary,
-                goalDate = preview.goalTargetDate?.let { date ->
+                TrajectorySummaryCard(
+                    paydaySummary = paydaySummary,
+                    goalDate = preview.goalTargetDate?.let { date ->
                         val calendar = Calendar.getInstance().apply {
                             set(Calendar.YEAR, date.year)
                             set(Calendar.MONTH, date.monthValue - 1)
                         }
                         android.text.format.DateFormat.format("MMMM yyyy", calendar).toString()
                     },
-                goalName = goalName,
-                contribution = currencyFormat.format(preview.priorityContributionPerPayday),
-                weeklyFlexibleSpend = LocalizedAmountFormatter.formatCurrency(
-                    amount = preview.weeklyFlexibleSpend,
-                    locale = userPreferences.locale,
-                    currencyCode = userPreferences.currencyCode
-                ),
-                hasPriorityContribution = hasPriorityContribution
-            )
+                    goalName = goalName,
+                    contribution = currencyFormat.format(preview.priorityContributionPerPayday),
+                    weeklyFlexibleSpend = formattedWeeklyFlexibleSpend,
+                    hasPriorityContribution = hasPriorityContribution
+                )
 
                 Spacer(Modifier.height(12.dp))
 
                 TrajectoryPremiumBridgeCard(
-                    weeklyFlexibleSpend = LocalizedAmountFormatter.formatCurrency(
-                        amount = preview.weeklyFlexibleSpend,
-                        locale = userPreferences.locale,
-                        currencyCode = userPreferences.currencyCode
-                    ),
-                    priorityContribution = preview.priorityContributionPerPayday
-                        .takeIf { it > BigDecimal.ZERO }
-                        ?.let { amount ->
-                            LocalizedAmountFormatter.formatCurrency(
-                                amount = amount,
-                                locale = userPreferences.locale,
-                                currencyCode = userPreferences.currencyCode
-                            )
-                        },
+                    weeklyFlexibleSpend = formattedWeeklyFlexibleSpend,
+                    priorityContribution = formattedPriorityContribution,
                     goalName = goalName
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                TrajectoryLockedAdjustmentCard(
+                    exampleUnusedAmount = formattedExampleUnused,
+                    weeklyFlexibleSpend = formattedWeeklyFlexibleSpend,
+                    goalName = goalName,
+                    hasPriorityContribution = hasPriorityContribution
                 )
 
                 Spacer(Modifier.height(10.dp))
@@ -181,6 +200,170 @@ fun TrajectoryScreen(
             }
 
             Spacer(Modifier.height(18.dp))
+        }
+    }
+}
+
+@Composable
+private fun TrajectoryLockedAdjustmentCard(
+    exampleUnusedAmount: String,
+    weeklyFlexibleSpend: String,
+    goalName: String,
+    hasPriorityContribution: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val body = if (hasPriorityContribution && goalName.isNotBlank()) {
+        stringResource(
+            R.string.onboarding_trajectory_adjustment_body,
+            exampleUnusedAmount,
+            goalName,
+            weeklyFlexibleSpend
+        )
+    } else {
+        stringResource(
+            R.string.onboarding_trajectory_adjustment_body_without_priority,
+            exampleUnusedAmount,
+            weeklyFlexibleSpend
+        )
+    }
+
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.28f))
+    ) {
+        Column(
+            modifier = Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = MySharePrimary.copy(alpha = 0.12f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.padding(8.dp).size(20.dp)
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.onboarding_trajectory_adjustment_label).uppercase(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MySharePrimary,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = stringResource(R.string.onboarding_trajectory_adjustment_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = body,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.16f))
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 320.dp
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        TrajectoryAdjustmentPill(
+                            label = stringResource(R.string.onboarding_trajectory_adjustment_free_label),
+                            body = stringResource(R.string.onboarding_trajectory_adjustment_free_body),
+                            icon = Icons.Default.RadioButtonUnchecked,
+                            iconTint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        TrajectoryAdjustmentPill(
+                            label = stringResource(R.string.onboarding_trajectory_adjustment_premium_label),
+                            body = stringResource(R.string.onboarding_trajectory_adjustment_premium_body),
+                            icon = Icons.Default.CheckCircle,
+                            iconTint = MySharePrimary,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                } else {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        TrajectoryAdjustmentPill(
+                            label = stringResource(R.string.onboarding_trajectory_adjustment_free_label),
+                            body = stringResource(R.string.onboarding_trajectory_adjustment_free_body),
+                            icon = Icons.Default.RadioButtonUnchecked,
+                            iconTint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1f)
+                        )
+                        TrajectoryAdjustmentPill(
+                            label = stringResource(R.string.onboarding_trajectory_adjustment_premium_label),
+                            body = stringResource(R.string.onboarding_trajectory_adjustment_premium_body),
+                            icon = Icons.Default.CheckCircle,
+                            iconTint = MySharePrimary,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TrajectoryAdjustmentPill(
+    label: String,
+    body: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    iconTint: androidx.compose.ui.graphics.Color,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+    ) {
+        Row(
+            modifier = Modifier.padding(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = iconTint,
+                modifier = Modifier.size(16.dp)
+            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = iconTint,
+                    fontWeight = FontWeight.Black,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = body,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 16.sp,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
     }
 }

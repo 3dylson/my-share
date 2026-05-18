@@ -205,7 +205,7 @@ Example outputs:
 
 ## Phase 4: Onboarding UX And Premium Feel
 
-Status after onboarding value-ladder pass on 2026-05-17:
+Status after onboarding value-ladder pass on 2026-05-18:
 - Done: Plan Preview no longer presents two different choices that both lead to account setup; the CTA now honestly says `Continue to account setup`.
 - Done: The onboarding paywall now shows a personalized adaptive-plan preview using the user's weekly spend guide and priority move.
 - Done: The paywall value copy now frames Premium around review-based adjustment guidance, while keeping the free manual path visible.
@@ -216,7 +216,11 @@ Status after onboarding value-ladder pass on 2026-05-17:
 - Done: Welcome now includes a native Compose payday-flow visual, and Trajectory now includes a plan-backed progress path using the user's weekly guide, priority transfer, and goal date.
 - Done: Goal Picker now uses outcome-first copy, a first-goal-free Premium cue, compact icon tiles, and a selected-goal details panel validated on normal and compact emulator viewports.
 - Done: Salary now frames income as the source for weekly guide, goal path, and reminders; income preview updates immediately, and monthly/biweekly scheduling was validated on normal and compact emulator viewports.
-- Pending: Fixed Costs and Allocation still need visual/copy passes to create a consistent premium setup flow before the paywall.
+- Done: Fixed Costs now frames essentials as protected first, shows live protected/remaining feedback, uses compact guardrail and strategy selectors, and adds a Premium recurring-rules cue validated on normal and compact emulator viewports.
+- Done: Allocation now frames available money after essentials, shows a clearer allocated/remaining summary, supports percent/fixed planning with live equivalents, and adds a Premium refinement cue validated on normal and compact emulator viewports.
+- Done: Plan Preview is now the onboarding aha reveal: it leads with safe weekly spend, bills protected, priority move, ordered payday actions, goal path, and a static-vs-adaptive Premium teaser validated on normal and compact emulator viewports.
+- Done: Trajectory now makes the manual-to-adaptive bridge concrete with a locked Premium adjustment example based on the user's weekly guide and goal transfer, plus clearer adaptive-plan CTA copy validated on normal and compact emulator viewports.
+- Pending: Run a final onboarding-to-paywall QA pass, capture dated evidence, then move into main-tab Premium value surfaces.
 
 ### Problems
 
@@ -321,21 +325,21 @@ Allocation:
 - Make static-vs-adaptive clear: free users are choosing today's split; Premium can refine it over time.
 
 Plan Preview:
-- This is already strong. Preserve it.
-- Consider making the Premium transition more honest:
-  - `Continue to account setup`
-  - Then sell automation on trajectory/paywall.
-- Add a subtle Premium teaser only after the action plan is visible:
-  - `Premium can repeat and adjust these moves after each check-in.`
+- Completed: make this the first true value reveal.
+- Lead with `Your payday plan is ready` and the user's safe weekly spend.
+- Show bills protected, priority move, and ordered payday actions before any Premium tease.
+- Keep `Continue to account setup` as the honest CTA.
+- Add Premium only after value is visible: free saves a static split, Premium reviews what happened and suggests the next adjustment.
 
 Signup:
 - Current compact layout is acceptable.
 - Keep Google optional and local mode clearly first-class.
 
 Trajectory:
-- Strong concept. Make the Premium bridge more concrete:
-  - `Premium can adjust this path after each review.`
-- Consider showing a locked example adjustment under the trajectory summary.
+- Completed: make the Premium bridge concrete.
+- Show a locked adjustment example under the trajectory summary.
+- Tie the example to the user's weekly guide and goal transfer.
+- Keep the CTA honest by pointing to the adaptive plan offer.
 
 Paywall:
 - Lead with Adaptive Payday Autopilot.
