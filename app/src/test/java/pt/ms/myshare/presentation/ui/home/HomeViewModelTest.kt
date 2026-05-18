@@ -481,6 +481,42 @@ class HomeViewModelTest {
     }
 
     @Test
+    fun `premium user can undo applied payday recommendation`() = runTest {
+        val currentPlan = SalaryPlan(
+            focus = PlanningFocus.SAVE_WITHOUT_STRESS,
+            netIncomePerPayday = BigDecimal("1000"),
+            monthlyFixedCosts = BigDecimal("400"),
+            payFrequency = PayFrequency.MONTHLY,
+            monthlyPayday = 1,
+            preset = AllocationPreset.BALANCED
+        )
+        fakeEntitlementRepository.setPro(true)
+        fakePlannerRepository.savePlan(currentPlan)
+        fakePlannerRepository.saveReview(
+            ManualReview(
+                actualFlexibleSpend = BigDecimal("220"),
+                actualGoalContribution = BigDecimal("310"),
+                plannedFlexibleSpend = BigDecimal("300"),
+                plannedGoalContribution = BigDecimal("300")
+            )
+        )
+        advanceUntilIdle()
+
+        assertTrue(viewModel.applyPaydayRecommendation())
+        advanceUntilIdle()
+        assertTrue(fakePlannerRepository.loadRules().isNotEmpty())
+
+        assertTrue(viewModel.undoPaydayRecommendation())
+        advanceUntilIdle()
+
+        assertTrue(fakePlannerRepository.loadRules().isEmpty())
+        assertEquals(
+            "home_review_recommendation_undone_feedback",
+            viewModel.state.value.reviewCard.recommendationMessageKey
+        )
+    }
+
+    @Test
     fun `grace period keeps premium automation available`() = runTest {
         fakeEntitlementRepository.setEntitlementState(EntitlementState.GRACE_PERIOD)
         fakePlannerRepository.saveAutomationEnabled(true)

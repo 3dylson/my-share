@@ -491,3 +491,18 @@ Residual:
 - The server-side acknowledgement path was deployed after the current test subscription was already completed; the next fresh Play test purchase should confirm `serverAcknowledgementStatus=acknowledged` on the entitlement/token documents.
 - Restore, grace-period, account-hold, renewal, cancel, and refund sequences still need Play Console/internal-test validation with subscription test cards.
 - A real internal-test purchase should confirm renewal, cancel, refund, grace-period, and account-hold events reach Firebase with production Play payloads.
+
+## Phase 8: Real Premium Product Work
+
+Status after Premium recommendation apply-flow pass on 2026-05-18:
+- Done: Premium review recommendations now open a confirmation sheet before mutating payday rules.
+- Done: The confirmation shows the current flexible guide and priority move beside the recommended next guide and next move.
+- Done: After applying, Premium users get a post-apply sheet with `Review rules` and `Undo adjustment`.
+- Done: Undo restores only the rules affected by the recommendation, preserving unrelated strategy data.
+- Done: The post-undo state uses inline card feedback instead of a duplicate snackbar.
+- Validated: focused `HomeViewModelTest` coverage, localization string parity, release build install on `emulator-5554`, recommendation confirmation, apply, Strategy handoff, and undo flow.
+
+Next:
+- Deepen the real Premium value in automation so applied recommendations can become recurring payday behavior, not only one-time rule updates.
+- Add tighter premium empty states for users with many goals, rules, and reviews so advanced accounts stay scan-friendly.
+- Continue validating compact-screen layouts when new Premium controls are added.

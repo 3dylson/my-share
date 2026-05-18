@@ -402,6 +402,17 @@
     <string name="home_review_recommendation_confidence">%1$d%% de confiança</string>
     <string name="home_review_recommendation_review_count">Com base em %1$d revisão(ões)</string>
     <string name="home_review_recommendation_apply">Aplicar ajuste</string>
+    <string name="home_review_recommendation_confirm_title">Aplicar este ajuste Premium?</string>
+    <string name="home_review_recommendation_confirm_desc">O My Share vai atualizar as regras de pagamento por trás do teu próximo guia. Podes rever ou anular a alteração logo a seguir.</string>
+    <string name="home_review_recommendation_confirm_current">Plano atual</string>
+    <string name="home_review_recommendation_confirm_after">Depois de aplicar</string>
+    <string name="home_review_recommendation_confirm_flexible">Guia flexível</string>
+    <string name="home_review_recommendation_confirm_priority">Movimento prioritário</string>
+    <string name="home_review_recommendation_confirm_evidence">%1$d%% de confiança com base em %2$d revisão(ões) recentes.</string>
+    <string name="home_review_recommendation_applied_title">Ajuste aplicado</string>
+    <string name="home_review_recommendation_applied_desc">As tuas regras do próximo pagamento correspondem agora a esta recomendação. Revê as regras se quiseres afinar alguma transferência.</string>
+    <string name="home_review_recommendation_review_rules">Rever regras</string>
+    <string name="home_review_recommendation_undo">Anular ajuste</string>
     <string name="home_review_coach_title">Canto do treinador</string>
     <string name="home_review_manual_title">Check-in no dia de pagamento</string>
     <string name="home_review_manual_desc">Introduza dados reais exatos para que o seu próximo guia permaneça honesto.</string>
@@ -608,6 +619,7 @@
     <string name="home_review_error_no_plan">Crie um plano antes de guardar uma avaliação.</string>
     <string name="home_review_error_invalid_amounts">Introduza valores válidos para ambos os campos de revisão.</string>
     <string name="home_review_recommendation_applied_feedback">Aplicado. As tuas regras de pagamento usam agora a recomendação Premium.</string>
+    <string name="home_review_recommendation_undone_feedback">Anulado. As tuas regras de pagamento voltaram à configuração anterior.</string>
     <string name="more_error_products_not_loaded">Produtos ainda não carregados. Verifique a sua ligação à Internet.</string>
     <string name="notification_channel_payday_reminders_name">Lembretes de dia de pagamento</string>
     <string name="notification_channel_payday_reminders_description">Lembra o que fazer com o seu próximo plano de pagamento.</string>

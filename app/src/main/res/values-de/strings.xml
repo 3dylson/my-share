@@ -401,6 +401,17 @@
     <string name="home_review_recommendation_confidence">%1$d%% Vertrauen</string>
     <string name="home_review_recommendation_review_count">Basierend auf %1$d Prüfung(en)</string>
     <string name="home_review_recommendation_apply">Anpassung anwenden</string>
+    <string name="home_review_recommendation_confirm_title">Diese Premium-Anpassung anwenden?</string>
+    <string name="home_review_recommendation_confirm_desc">My Share aktualisiert die Zahltagsregeln hinter deinem nächsten Leitwert. Du kannst die Änderung direkt danach prüfen oder rückgängig machen.</string>
+    <string name="home_review_recommendation_confirm_current">Aktueller Plan</string>
+    <string name="home_review_recommendation_confirm_after">Nach Anwendung</string>
+    <string name="home_review_recommendation_confirm_flexible">Flexibler Leitwert</string>
+    <string name="home_review_recommendation_confirm_priority">Prioritätsschritt</string>
+    <string name="home_review_recommendation_confirm_evidence">%1$d%% Vertrauen aus %2$d aktuellen Prüfung(en).</string>
+    <string name="home_review_recommendation_applied_title">Anpassung angewendet</string>
+    <string name="home_review_recommendation_applied_desc">Deine Regeln für den nächsten Zahltag entsprechen jetzt dieser Empfehlung. Prüfe die Regeln, wenn du eine Überweisung feinabstimmen möchtest.</string>
+    <string name="home_review_recommendation_review_rules">Regeln prüfen</string>
+    <string name="home_review_recommendation_undo">Anpassung rückgängig</string>
     <string name="home_review_coach_title">Trainerecke</string>
     <string name="home_review_manual_title">Check-in am Zahltag</string>
     <string name="home_review_manual_desc">Geben Sie genaue Ist-Werte ein, damit Ihr nächster Reiseführer ehrlich bleibt.</string>
@@ -607,6 +618,7 @@
     <string name="home_review_error_no_plan">Erstellen Sie einen Plan, bevor Sie eine Bewertung speichern.</string>
     <string name="home_review_error_invalid_amounts">Gib gültige Beträge für beide Prüfungsfelder ein.</string>
     <string name="home_review_recommendation_applied_feedback">Angewendet. Deine Zahltagsregeln nutzen jetzt die Premium-Empfehlung.</string>
+    <string name="home_review_recommendation_undone_feedback">Rückgängig gemacht. Deine Zahltagsregeln sind wieder in der vorherigen Einstellung.</string>
     <string name="more_error_products_not_loaded">Produkte noch nicht geladen. Bitte überprüfen Sie Ihre Internetverbindung.</string>
     <string name="notification_channel_payday_reminders_name">Zahltag-Erinnerungen</string>
     <string name="notification_channel_payday_reminders_description">Erinnert dich daran, was mit deinem nächsten Zahltagsplan zu tun ist.</string>

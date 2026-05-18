@@ -401,6 +401,17 @@
     <string name="home_review_recommendation_confidence">ثقة %1$d%%</string>
     <string name="home_review_recommendation_review_count">بناءً على %1$d مراجعة</string>
     <string name="home_review_recommendation_apply">تطبيق التعديل</string>
+    <string name="home_review_recommendation_confirm_title">هل تريد تطبيق تعديل Premium هذا؟</string>
+    <string name="home_review_recommendation_confirm_desc">سيحدّث My Share قواعد يوم الدفع خلف دليلك التالي. يمكنك مراجعة التغيير أو التراجع عنه مباشرة بعد ذلك.</string>
+    <string name="home_review_recommendation_confirm_current">الخطة الحالية</string>
+    <string name="home_review_recommendation_confirm_after">بعد التطبيق</string>
+    <string name="home_review_recommendation_confirm_flexible">الدليل المرن</string>
+    <string name="home_review_recommendation_confirm_priority">حركة الأولوية</string>
+    <string name="home_review_recommendation_confirm_evidence">ثقة %1$d%% من %2$d مراجعة حديثة.</string>
+    <string name="home_review_recommendation_applied_title">تم تطبيق التعديل</string>
+    <string name="home_review_recommendation_applied_desc">تطابق قواعد يوم الدفع التالي الآن هذه التوصية. راجع القواعد إذا أردت ضبط أي تحويل.</string>
+    <string name="home_review_recommendation_review_rules">مراجعة القواعد</string>
+    <string name="home_review_recommendation_undo">التراجع عن التعديل</string>
     <string name="home_review_coach_title">ركن المدرب</string>
     <string name="home_review_manual_title">تسجيل الوصول ليوم الدفع</string>
     <string name="home_review_manual_desc">أدخل القيم الفعلية الدقيقة حتى يظل دليلك التالي صادقًا.</string>
@@ -607,6 +618,7 @@
     <string name="home_review_error_no_plan">قم بإنشاء خطة قبل حفظ المراجعة.</string>
     <string name="home_review_error_invalid_amounts">أدخل مبالغ صالحة لكلا حقلي المراجعة.</string>
     <string name="home_review_recommendation_applied_feedback">تم التطبيق. تستخدم قواعد يوم الدفع الآن توصية Premium.</string>
+    <string name="home_review_recommendation_undone_feedback">تم التراجع. عادت قواعد يوم الدفع إلى الإعداد السابق.</string>
     <string name="more_error_products_not_loaded">لم يتم تحميل المنتجات بعد. يرجى التحقق من اتصالك بالإنترنت.</string>
     <string name="notification_channel_payday_reminders_name">تذكيرات يوم الراتب</string>
     <string name="notification_channel_payday_reminders_description">يذكرك بما يجب فعله في خطة الراتب القادمة.</string>

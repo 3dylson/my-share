@@ -446,6 +446,17 @@
     <string name="home_review_recommendation_confidence">%1$d%% confidence</string>
     <string name="home_review_recommendation_review_count">Based on %1$d review(s)</string>
     <string name="home_review_recommendation_apply">Apply adjustment</string>
+    <string name="home_review_recommendation_confirm_title">Apply this Premium adjustment?</string>
+    <string name="home_review_recommendation_confirm_desc">My Share will update the payday rules behind your next guide. You can review or undo the change right after.</string>
+    <string name="home_review_recommendation_confirm_current">Current plan</string>
+    <string name="home_review_recommendation_confirm_after">After applying</string>
+    <string name="home_review_recommendation_confirm_flexible">Flexible guide</string>
+    <string name="home_review_recommendation_confirm_priority">Priority move</string>
+    <string name="home_review_recommendation_confirm_evidence">%1$d%% confidence from %2$d recent review(s).</string>
+    <string name="home_review_recommendation_applied_title">Adjustment applied</string>
+    <string name="home_review_recommendation_applied_desc">Your next payday rules now match this recommendation. Review the rules if you want to fine-tune any transfer.</string>
+    <string name="home_review_recommendation_review_rules">Review rules</string>
+    <string name="home_review_recommendation_undo">Undo adjustment</string>
     <string name="home_review_coach_title">Coach corner</string>
     <string name="home_review_manual_title">Payday check-in</string>
     <string name="home_review_manual_desc">Enter exact actuals so your next guide stays honest.</string>
@@ -662,6 +673,7 @@
     <string name="home_review_error_no_plan">Create a plan before saving a review.</string>
     <string name="home_review_error_invalid_amounts">Enter valid amounts for both review fields.</string>
     <string name="home_review_recommendation_applied_feedback">Applied. Your payday rules now use the Premium recommendation.</string>
+    <string name="home_review_recommendation_undone_feedback">Undone. Your payday rules are back to the previous setup.</string>
     <string name="more_error_products_not_loaded">Products not loaded yet. Please check your internet connection.</string>
 <!-- Localization cleanup -->
     <string name="notification_channel_payday_reminders_name">Payday reminders</string>

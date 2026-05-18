@@ -401,6 +401,17 @@
     <string name="home_review_recommendation_confidence">%1$d%% de confianza</string>
     <string name="home_review_recommendation_review_count">Basado en %1$d revisión(es)</string>
     <string name="home_review_recommendation_apply">Aplicar ajuste</string>
+    <string name="home_review_recommendation_confirm_title">¿Aplicar este ajuste Premium?</string>
+    <string name="home_review_recommendation_confirm_desc">My Share actualizará las reglas de cobro detrás de tu próxima guía. Podrás revisar o deshacer el cambio justo después.</string>
+    <string name="home_review_recommendation_confirm_current">Plan actual</string>
+    <string name="home_review_recommendation_confirm_after">Después de aplicar</string>
+    <string name="home_review_recommendation_confirm_flexible">Guía flexible</string>
+    <string name="home_review_recommendation_confirm_priority">Movimiento prioritario</string>
+    <string name="home_review_recommendation_confirm_evidence">%1$d%% de confianza con %2$d revisión(es) recientes.</string>
+    <string name="home_review_recommendation_applied_title">Ajuste aplicado</string>
+    <string name="home_review_recommendation_applied_desc">Tus reglas del próximo cobro ahora coinciden con esta recomendación. Revisa las reglas si quieres ajustar alguna transferencia.</string>
+    <string name="home_review_recommendation_review_rules">Revisar reglas</string>
+    <string name="home_review_recommendation_undo">Deshacer ajuste</string>
     <string name="home_review_coach_title">Rincón del entrenador</string>
     <string name="home_review_manual_title">check-in de día de pago</string>
     <string name="home_review_manual_desc">Ingrese datos reales exactos para que su próxima guía sea honesta.</string>
@@ -607,6 +618,7 @@
     <string name="home_review_error_no_plan">Cree un plan antes de guardar una reseña.</string>
     <string name="home_review_error_invalid_amounts">Ingrese montos válidos para ambos campos de revisión.</string>
     <string name="home_review_recommendation_applied_feedback">Aplicado. Tus reglas de cobro ahora usan la recomendación Premium.</string>
+    <string name="home_review_recommendation_undone_feedback">Deshecho. Tus reglas de cobro volvieron a la configuración anterior.</string>
     <string name="more_error_products_not_loaded">Products not loaded yet. Por favor verifique su conexión a Internet.</string>
     <string name="notification_channel_payday_reminders_name">Recordatorios de día de pago</string>
     <string name="notification_channel_payday_reminders_description">Te recuerda qué hacer con tu próximo plan de pago.</string>

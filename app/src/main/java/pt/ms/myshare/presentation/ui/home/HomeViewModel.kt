@@ -81,6 +81,7 @@ class HomeViewModel @Inject constructor(
     private var currentPlan: SalaryPlan? = null
     private var currentReviews: List<ManualReview> = emptyList()
     private var currentPaydayRecommendation: PaydayAdjustmentRecommendation? = null
+    private var paydayRecommendationRollback: PaydayRecommendationRollback? = null
     private var nextReviewSavedEventId = 0L
 
     private var currentPreferences = userPreferencesRepository.loadPreferences()
@@ -406,6 +407,11 @@ class HomeViewModel @Inject constructor(
         val stats: PerformanceStats
     )
 
+    private data class PaydayRecommendationRollback(
+        val previousRules: List<PaydayRule>,
+        val affectedRuleIds: Set<String>
+    )
+
     private fun buildPlanCard(
         plan: pt.ms.myshare.domain.model.SalaryPlan,
         goalAmount: BigDecimal,
@@ -600,40 +606,91 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun applyPaydayRecommendation() {
+    fun applyPaydayRecommendation(): Boolean {
         val recommendation = currentPaydayRecommendation
         if (recommendation == null || !recommendation.isApplyable) {
             Timber.tag(TAG).d("Payday recommendation apply ignored. recommendationAvailable=%s", recommendation != null)
-            return
+            return false
         }
         if (!uiState.value.moreCard.isPremium) {
             Timber.tag(TAG).d("Payday recommendation apply blocked for free user")
-            return
+            return false
         }
 
+        val rulesBeforeApply = plannerRepository.loadRules()
+        val suggestedRules = recommendation.suggestedRules
+        paydayRecommendationRollback = PaydayRecommendationRollback(
+            previousRules = rulesBeforeApply,
+            affectedRuleIds = suggestedRules.map { it.id }.toSet()
+        )
+
         viewModelScope.launch {
-            recommendation.suggestedRules.forEach { rule ->
-                plannerRepository.saveRule(rule)
-            }
-            uiState.update {
-                it.copy(
-                    reviewCard = it.reviewCard.copy(
-                        recommendationMessageKey = "home_review_recommendation_applied_feedback"
+            try {
+                suggestedRules.forEach { rule ->
+                    plannerRepository.saveRule(rule)
+                }
+                uiState.update {
+                    it.copy(
+                        reviewCard = it.reviewCard.copy(
+                            recommendationMessageKey = "home_review_recommendation_applied_feedback"
+                        )
                     )
+                }
+                FirebaseUtils.logEvent("premium_payday_adjustment_applied", android.os.Bundle().apply {
+                    putString("direction", recommendation.direction.name.lowercase(Locale.US))
+                    putInt("review_count", recommendation.analyzedReviewCount)
+                    putString("adjustment_amount", recommendation.adjustmentAmount.toPlainString())
+                })
+                Timber.tag(TAG).d(
+                    "Premium payday recommendation applied. direction=%s rules=%d adjustment=%s",
+                    recommendation.direction,
+                    suggestedRules.size,
+                    recommendation.adjustmentAmount
                 )
+            } catch (exception: Exception) {
+                paydayRecommendationRollback = null
+                Timber.tag(TAG).e(exception, "Failed to apply Premium payday recommendation")
             }
-            FirebaseUtils.logEvent("premium_payday_adjustment_applied", android.os.Bundle().apply {
-                putString("direction", recommendation.direction.name.lowercase(Locale.US))
-                putInt("review_count", recommendation.analyzedReviewCount)
-                putString("adjustment_amount", recommendation.adjustmentAmount.toPlainString())
-            })
-            Timber.tag(TAG).d(
-                "Premium payday recommendation applied. direction=%s rules=%d adjustment=%s",
-                recommendation.direction,
-                recommendation.suggestedRules.size,
-                recommendation.adjustmentAmount
-            )
         }
+        return true
+    }
+
+    fun undoPaydayRecommendation(): Boolean {
+        val rollback = paydayRecommendationRollback
+        if (rollback == null) {
+            Timber.tag(TAG).d("Payday recommendation undo ignored; no rollback available")
+            return false
+        }
+
+        paydayRecommendationRollback = null
+        viewModelScope.launch {
+            try {
+                val previousRulesById = rollback.previousRules.associateBy { it.id }
+                rollback.affectedRuleIds.forEach { ruleId ->
+                    val previousRule = previousRulesById[ruleId]
+                    if (previousRule != null) {
+                        plannerRepository.saveRule(previousRule)
+                    } else {
+                        plannerRepository.deleteRule(ruleId)
+                    }
+                }
+                uiState.update {
+                    it.copy(
+                        reviewCard = it.reviewCard.copy(
+                            recommendationMessageKey = "home_review_recommendation_undone_feedback"
+                        )
+                    )
+                }
+                FirebaseUtils.logEvent("premium_payday_adjustment_undone")
+                Timber.tag(TAG).d(
+                    "Premium payday recommendation undone. affectedRules=%d",
+                    rollback.affectedRuleIds.size
+                )
+            } catch (exception: Exception) {
+                Timber.tag(TAG).e(exception, "Failed to undo Premium payday recommendation")
+            }
+        }
+        return true
     }
 
     private fun emitReviewSavedFeedback() {

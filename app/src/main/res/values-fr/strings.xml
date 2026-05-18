@@ -401,6 +401,17 @@
     <string name="home_review_recommendation_confidence">%1$d%% de confiance</string>
     <string name="home_review_recommendation_review_count">Basé sur %1$d bilan(s)</string>
     <string name="home_review_recommendation_apply">Appliquer l\'ajustement</string>
+    <string name="home_review_recommendation_confirm_title">Appliquer cet ajustement Premium ?</string>
+    <string name="home_review_recommendation_confirm_desc">My Share mettra à jour les règles de paie derrière votre prochain guide. Vous pourrez revoir ou annuler le changement juste après.</string>
+    <string name="home_review_recommendation_confirm_current">Plan actuel</string>
+    <string name="home_review_recommendation_confirm_after">Après application</string>
+    <string name="home_review_recommendation_confirm_flexible">Guide flexible</string>
+    <string name="home_review_recommendation_confirm_priority">Mouvement prioritaire</string>
+    <string name="home_review_recommendation_confirm_evidence">%1$d%% de confiance d\'après %2$d bilan(s) récent(s).</string>
+    <string name="home_review_recommendation_applied_title">Ajustement appliqué</string>
+    <string name="home_review_recommendation_applied_desc">Vos règles de la prochaine paie correspondent maintenant à cette recommandation. Revoyez les règles si vous voulez affiner un transfert.</string>
+    <string name="home_review_recommendation_review_rules">Revoir les règles</string>
+    <string name="home_review_recommendation_undo">Annuler l\'ajustement</string>
     <string name="home_review_coach_title">Coin des autocars</string>
     <string name="home_review_manual_title">Enregistrement sur salaire</string>
     <string name="home_review_manual_desc">Entrez les chiffres exacts pour que votre prochain guide reste honnête.</string>
@@ -607,6 +618,7 @@
     <string name="home_review_error_no_plan">Créez un plan avant d\'enregistrer un avis.</string>
     <string name="home_review_error_invalid_amounts">Saisissez des montants valides pour les deux champs de révision.</string>
     <string name="home_review_recommendation_applied_feedback">Appliqué. Vos règles de paie utilisent maintenant la recommandation Premium.</string>
+    <string name="home_review_recommendation_undone_feedback">Annulé. Vos règles de paie sont revenues à la configuration précédente.</string>
     <string name="more_error_products_not_loaded">Produits pas encore chargés. Veuillez vérifier votre connexion Internet.</string>
     <string name="notification_channel_payday_reminders_name">Rappels de paie</string>
     <string name="notification_channel_payday_reminders_description">Vous rappelle quoi faire avec votre prochain plan de paie.</string>

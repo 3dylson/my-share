@@ -93,6 +93,7 @@ fun HomeRoute(
         onDismissPremiumAccountPrompt = viewModel::dismissPremiumAccountPrompt,
         onReviewSavedFeedbackShown = viewModel::clearReviewSavedFeedback,
         onApplyPaydayRecommendation = viewModel::applyPaydayRecommendation,
+        onUndoPaydayRecommendation = viewModel::undoPaydayRecommendation,
         onUpdateReview = viewModel::updateReview,
         onDeleteReview = viewModel::deleteReview,
         onLanguageSelected = viewModel::updateLanguage,
@@ -132,7 +133,8 @@ fun HomeScreen(
     onGoogleConnectionCredentialError: (String) -> Unit,
     onDismissPremiumAccountPrompt: () -> Unit,
     onReviewSavedFeedbackShown: (Long) -> Unit,
-    onApplyPaydayRecommendation: () -> Unit,
+    onApplyPaydayRecommendation: () -> Boolean,
+    onUndoPaydayRecommendation: () -> Boolean,
     onUpdateReview: (String, String, String) -> Boolean,
     onDeleteReview: (String) -> Unit,
     onLanguageSelected: (String) -> Unit,
@@ -166,6 +168,8 @@ fun HomeScreen(
     var showLanguagePicker by remember { mutableStateOf(false) }
     var showCurrencyPicker by remember { mutableStateOf(false) }
     var showReviewHistoryTimeline by remember { mutableStateOf(false) }
+    var recommendationPendingApply by remember { mutableStateOf<PaydayAdjustmentRecommendationState?>(null) }
+    var showRecommendationAppliedSheet by remember { mutableStateOf(false) }
     var reviewBeingEdited by remember { mutableStateOf<ReviewHistoryItemState?>(null) }
     var reviewPendingDelete by remember { mutableStateOf<ReviewHistoryItemState?>(null) }
     var isGoogleCredentialRequestInProgress by remember { mutableStateOf(false) }
@@ -201,6 +205,15 @@ fun HomeScreen(
         if (showPaywallSheet && state.moreCard.isPremium) {
             showPaywallSheet = false
             Timber.tag("HomeScreen").d("Premium gate dismissed after entitlement activation")
+        }
+    }
+
+    LaunchedEffect(state.moreCard.isPremium, state.reviewCard.paydayRecommendation?.isApplyable) {
+        if (recommendationPendingApply != null &&
+            (!state.moreCard.isPremium || state.reviewCard.paydayRecommendation?.isApplyable != true)
+        ) {
+            recommendationPendingApply = null
+            Timber.tag("HomeScreen").d("Recommendation confirmation dismissed after recommendation changed")
         }
     }
 
@@ -261,6 +274,40 @@ fun HomeScreen(
             onDeleteReview = { review ->
                 showReviewHistoryTimeline = false
                 reviewPendingDelete = review
+            }
+        )
+    }
+
+    recommendationPendingApply?.let { recommendation ->
+        PaydayRecommendationConfirmationBottomSheet(
+            recommendation = recommendation,
+            onDismissRequest = { recommendationPendingApply = null },
+            onConfirm = {
+                val accepted = onApplyPaydayRecommendation()
+                if (accepted) {
+                    recommendationPendingApply = null
+                    showRecommendationAppliedSheet = true
+                    haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                    Timber.tag("HomeScreen").d("Payday recommendation apply confirmed")
+                }
+            }
+        )
+    }
+
+    if (showRecommendationAppliedSheet) {
+        PaydayRecommendationAppliedBottomSheet(
+            onDismissRequest = { showRecommendationAppliedSheet = false },
+            onReviewRules = {
+                showRecommendationAppliedSheet = false
+                onDestinationSelected(HomeDestination.STRATEGY)
+                Timber.tag("HomeScreen").d("Navigated to Strategy after applying recommendation")
+            },
+            onUndo = {
+                val undone = onUndoPaydayRecommendation()
+                showRecommendationAppliedSheet = false
+                if (undone) {
+                    Timber.tag("HomeScreen").d("Payday recommendation undo requested")
+                }
             }
         )
     }
@@ -609,7 +656,11 @@ fun HomeScreen(
                             onDeleteReview = { review ->
                                 reviewPendingDelete = review
                             },
-                            onApplyPaydayRecommendation = onApplyPaydayRecommendation
+                            onApplyPaydayRecommendation = {
+                                state.reviewCard.paydayRecommendation?.let { recommendation ->
+                                    recommendationPendingApply = recommendation
+                                }
+                            }
                         )
                     }
                     HomeDestination.MORE -> {
@@ -741,7 +792,8 @@ private fun HomeScreenPreview() {
             onGoogleConnectionCredentialError = { _ -> },
             onDismissPremiumAccountPrompt = {},
             onReviewSavedFeedbackShown = { _ -> },
-            onApplyPaydayRecommendation = {},
+            onApplyPaydayRecommendation = { true },
+            onUndoPaydayRecommendation = { true },
             onUpdateReview = { _, _, _ -> true },
             onDeleteReview = { _ -> },
             onLanguageSelected = { _ -> },
