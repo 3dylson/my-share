@@ -51,8 +51,8 @@
     <string name="onboarding_goal_picker_guidance_body">Premium peut répartir chaque paie entre tous les objectifs plus tard. Commence maintenant par un résultat clair.</string>
     <string name="onboarding_goal_picker_details_title">Détails de l’objectif choisi</string>
     <string name="onboarding_goal_picker_details_body">C’est la cible que ton premier plan de paie va protéger.</string>
-    <string name="onboarding_salary_title">La Fondation</string>
-    <string name="onboarding_salary_subtitle">Entrez votre revenu net et votre fréquence. Nous l\'utilisons pour calculer vos cycles de paie.</string>
+    <string name="onboarding_salary_title">Indique à My Share ce qui arrive à chaque paie</string>
+    <string name="onboarding_salary_subtitle">Cela devient ton guide hebdomadaire, ton chemin d’objectif et ton calendrier de rappels.</string>
     <string name="onboarding_salary_frequency_monthly">Mensuel</string>
     <string name="onboarding_salary_frequency_biweekly">Bihebdomadaire</string>
     <string name="onboarding_fixed_costs_title">Vos obligations</string>
@@ -200,6 +200,12 @@
     <string name="onboarding_salary_frequency_biweekly_desc">Payé toutes les deux semaines.</string>
     <string name="onboarding_salary_label_payday">Jour de paie du mois</string>
     <string name="onboarding_salary_label_next_date">Prochaine date de paie</string>
+    <string name="onboarding_salary_outcome_body_filled">Ce montant de paie guidera chaque répartition, rappel et futur ajustement.</string>
+    <string name="onboarding_salary_income_card_title">Ce qui arrive à la paie</string>
+    <string name="onboarding_salary_income_card_body">Utilise le revenu net après impôts. Aucune connexion bancaire n’est nécessaire.</string>
+    <string name="onboarding_salary_schedule_title">Quand arrive-t-il ?</string>
+    <string name="onboarding_salary_schedule_body_monthly">Utilise un jour de 1 à 28 pour que les rappels fonctionnent aussi les mois courts.</string>
+    <string name="onboarding_salary_schedule_body_biweekly">Saisis la prochaine date de paie pour répéter le cycle toutes les deux semaines.</string>
     <string name="onboarding_salary_error_income_required">Entrez votre revenu net par jour de paie.</string>
     <string name="onboarding_salary_error_income_positive">Le revenu doit être supérieur à zéro.</string>
     <string name="onboarding_salary_error_payday_range">Utilisez un jour de paie du 1 au 28.</string>

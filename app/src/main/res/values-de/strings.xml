@@ -51,8 +51,8 @@
     <string name="onboarding_goal_picker_guidance_body">Premium kann jeden Zahltag später auf alle Ziele verteilen. Starte jetzt mit einem klaren Ergebnis.</string>
     <string name="onboarding_goal_picker_details_title">Details zum gewählten Ziel</string>
     <string name="onboarding_goal_picker_details_body">Das ist das Ziel, das dein erster Zahltag-Plan schützt.</string>
-    <string name="onboarding_salary_title">Die Stiftung</string>
-    <string name="onboarding_salary_subtitle">Geben Sie Ihr Nettoeinkommen und Ihre Häufigkeit ein. Daraus berechnen wir Ihre Zahltagszyklen.</string>
+    <string name="onboarding_salary_title">Sag My Share, was an jedem Zahltag eingeht</string>
+    <string name="onboarding_salary_subtitle">Daraus werden dein Wochenleitwert, dein Zielpfad und dein Erinnerungsplan.</string>
     <string name="onboarding_salary_frequency_monthly">Monatlich</string>
     <string name="onboarding_salary_frequency_biweekly">Zweiwöchentlich</string>
     <string name="onboarding_fixed_costs_title">Ihre Pflichten</string>
@@ -200,6 +200,12 @@
     <string name="onboarding_salary_frequency_biweekly_desc">Wird alle zwei Wochen bezahlt.</string>
     <string name="onboarding_salary_label_payday">Zahltag des Monats</string>
     <string name="onboarding_salary_label_next_date">Nächster Zahltag</string>
+    <string name="onboarding_salary_outcome_body_filled">Dieser Zahltagsbetrag steuert jede Aufteilung, Erinnerung und künftige Anpassung.</string>
+    <string name="onboarding_salary_income_card_title">Was am Zahltag eingeht</string>
+    <string name="onboarding_salary_income_card_body">Nutze dein Nettoeinkommen nach Steuern. Eine Bankverbindung ist hier nicht nötig.</string>
+    <string name="onboarding_salary_schedule_title">Wann kommt es an?</string>
+    <string name="onboarding_salary_schedule_body_monthly">Nutze Tag 1-28, damit Erinnerungen auch in kurzen Monaten funktionieren.</string>
+    <string name="onboarding_salary_schedule_body_biweekly">Gib den nächsten Zahltag ein, damit sich der Zyklus alle zwei Wochen wiederholt.</string>
     <string name="onboarding_salary_error_income_required">Geben Sie Ihr Nettoeinkommen pro Zahltag ein.</string>
     <string name="onboarding_salary_error_income_positive">Das Einkommen muss größer als Null sein.</string>
     <string name="onboarding_salary_error_payday_range">Verwenden Sie einen Zahltag von 1 bis 28.</string>

@@ -51,8 +51,8 @@
     <string name="onboarding_goal_picker_guidance_body">Premium puede dividir cada cobro entre todas las metas más tarde. Empieza ahora con un resultado claro.</string>
     <string name="onboarding_goal_picker_details_title">Detalles de la meta elegida</string>
     <string name="onboarding_goal_picker_details_body">Este es el objetivo que protegerá tu primer plan de cobro.</string>
-    <string name="onboarding_salary_title">La Fundación</string>
-    <string name="onboarding_salary_subtitle">Ingrese su ingreso neto y frecuencia. Usamos esto para calcular sus ciclos de día de pago.</string>
+    <string name="onboarding_salary_title">Dile a My Share qué llega en cada cobro</string>
+    <string name="onboarding_salary_subtitle">Esto se convierte en tu guía semanal, ruta de meta y calendario de recordatorios.</string>
     <string name="onboarding_salary_frequency_monthly">Mensual</string>
     <string name="onboarding_salary_frequency_biweekly">Quincenal</string>
     <string name="onboarding_fixed_costs_title">Tus obligaciones</string>
@@ -200,6 +200,12 @@
     <string name="onboarding_salary_frequency_biweekly_desc">Pagado cada dos semanas.</string>
     <string name="onboarding_salary_label_payday">día de pago del mes</string>
     <string name="onboarding_salary_label_next_date">Próxima fecha del día de pago</string>
+    <string name="onboarding_salary_outcome_body_filled">Este importe de cobro guiará cada división, recordatorio y ajuste futuro.</string>
+    <string name="onboarding_salary_income_card_title">Qué llega en el cobro</string>
+    <string name="onboarding_salary_income_card_body">Usa el ingreso neto después de impuestos. No necesitas conectar el banco.</string>
+    <string name="onboarding_salary_schedule_title">¿Cuándo llega?</string>
+    <string name="onboarding_salary_schedule_body_monthly">Usa un día del 1 al 28 para que los recordatorios funcionen en meses cortos.</string>
+    <string name="onboarding_salary_schedule_body_biweekly">Introduce la próxima fecha de cobro para repetir el ciclo cada dos semanas.</string>
     <string name="onboarding_salary_error_income_required">Ingrese su ingreso neto por día de pago.</string>
     <string name="onboarding_salary_error_income_positive">El ingreso debe ser mayor que cero.</string>
     <string name="onboarding_salary_error_payday_range">Utilice un día de pago del 1 al 28.</string>

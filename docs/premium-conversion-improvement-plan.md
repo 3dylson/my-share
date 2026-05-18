@@ -215,7 +215,8 @@ Status after onboarding value-ladder pass on 2026-05-17:
 - Done: Welcome preference controls now feel less crowded: the currency picker uses a curated high-confidence currency list, currency rows separate code/name/symbol clearly, and language/currency selections update the visible app state immediately.
 - Done: Welcome now includes a native Compose payday-flow visual, and Trajectory now includes a plan-backed progress path using the user's weekly guide, priority transfer, and goal date.
 - Done: Goal Picker now uses outcome-first copy, a first-goal-free Premium cue, compact icon tiles, and a selected-goal details panel validated on normal and compact emulator viewports.
-- Pending: Salary, Fixed Costs, and Allocation still need visual/copy passes to create a consistent premium setup flow before the paywall.
+- Done: Salary now frames income as the source for weekly guide, goal path, and reminders; income preview updates immediately, and monthly/biweekly scheduling was validated on normal and compact emulator viewports.
+- Pending: Fixed Costs and Allocation still need visual/copy passes to create a consistent premium setup flow before the paywall.
 
 ### Problems
 

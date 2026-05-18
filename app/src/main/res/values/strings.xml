@@ -55,8 +55,8 @@
     <string name="onboarding_goal_picker_details_body">This is the target your first payday plan will protect.</string>
 
     <!-- Salary & Schedule Screen -->
-    <string name="onboarding_salary_title">The Foundation</string>
-    <string name="onboarding_salary_subtitle">Enter your net income and frequency. We use this to calculate your payday cycles.</string>
+    <string name="onboarding_salary_title">Tell My Share what arrives each payday</string>
+    <string name="onboarding_salary_subtitle">This becomes your weekly spend guide, goal path, and reminder schedule.</string>
     <string name="onboarding_salary_frequency_monthly">Monthly</string>
     <string name="onboarding_salary_frequency_biweekly">Bi-weekly</string>
 
@@ -235,6 +235,12 @@
     <string name="onboarding_salary_frequency_biweekly_desc">Paid every two weeks.</string>
     <string name="onboarding_salary_label_payday">Payday day of month</string>
     <string name="onboarding_salary_label_next_date">Next payday date</string>
+    <string name="onboarding_salary_outcome_body_filled">This payday amount will drive every split, reminder, and future adjustment.</string>
+    <string name="onboarding_salary_income_card_title">What lands on payday</string>
+    <string name="onboarding_salary_income_card_body">Use take-home pay after tax. No bank login is needed here.</string>
+    <string name="onboarding_salary_schedule_title">When does it land?</string>
+    <string name="onboarding_salary_schedule_body_monthly">Use day 1-28 so reminders still work in short months.</string>
+    <string name="onboarding_salary_schedule_body_biweekly">Enter the next payday date so the cycle can repeat every two weeks.</string>
     <string name="onboarding_salary_error_income_required">Enter your net income per payday.</string>
     <string name="onboarding_salary_error_income_positive">Income must be greater than zero.</string>
     <string name="onboarding_salary_error_payday_range">Use a payday day from 1 to 28.</string>

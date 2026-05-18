@@ -51,8 +51,8 @@
     <string name="onboarding_goal_picker_guidance_body">يمكن لـ Premium تقسيم كل راتب على كل الأهداف لاحقًا. ابدأ الآن بنتيجة واضحة واحدة.</string>
     <string name="onboarding_goal_picker_details_title">تفاصيل الهدف المختار</string>
     <string name="onboarding_goal_picker_details_body">هذا هو الهدف الذي ستحميه خطة الراتب الأولى.</string>
-    <string name="onboarding_salary_title">المؤسسة</string>
-    <string name="onboarding_salary_subtitle">أدخل صافي الدخل الخاص بك والتردد. نحن نستخدم هذا لحساب دورات يوم الدفع الخاصة بك.</string>
+    <string name="onboarding_salary_title">أخبر My Share بما يصل في كل راتب</string>
+    <string name="onboarding_salary_subtitle">هذا يصبح دليلك الأسبوعي ومسار الهدف وجدول التذكيرات.</string>
     <string name="onboarding_salary_frequency_monthly">شهريا</string>
     <string name="onboarding_salary_frequency_biweekly">نصف أسبوعية</string>
     <string name="onboarding_fixed_costs_title">التزاماتك</string>
@@ -200,6 +200,12 @@
     <string name="onboarding_salary_frequency_biweekly_desc">تدفع كل اسبوعين .</string>
     <string name="onboarding_salary_label_payday">يوم الدفع من الشهر</string>
     <string name="onboarding_salary_label_next_date">تاريخ يوم الدفع التالي</string>
+    <string name="onboarding_salary_outcome_body_filled">سيحدد مبلغ هذا الراتب كل تقسيم وتذكير وتعديل مستقبلي.</string>
+    <string name="onboarding_salary_income_card_title">ما يصل في الراتب</string>
+    <string name="onboarding_salary_income_card_body">استخدم صافي الدخل بعد الضرائب. لا حاجة لربط البنك هنا.</string>
+    <string name="onboarding_salary_schedule_title">متى يصل؟</string>
+    <string name="onboarding_salary_schedule_body_monthly">استخدم يومًا من 1 إلى 28 حتى تعمل التذكيرات في الأشهر القصيرة.</string>
+    <string name="onboarding_salary_schedule_body_biweekly">أدخل تاريخ الراتب التالي حتى تتكرر الدورة كل أسبوعين.</string>
     <string name="onboarding_salary_error_income_required">أدخل صافي دخلك لكل يوم دفع.</string>
     <string name="onboarding_salary_error_income_positive">يجب أن يكون الدخل أكبر من الصفر.</string>
     <string name="onboarding_salary_error_payday_range">استخدم يوم الدفع من 1 إلى 28.</string>

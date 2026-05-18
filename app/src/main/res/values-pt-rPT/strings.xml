@@ -52,8 +52,8 @@
     <string name="onboarding_goal_picker_guidance_body">O Premium pode dividir cada pagamento por todos os objetivos depois. Começa agora com um resultado claro.</string>
     <string name="onboarding_goal_picker_details_title">Detalhes do objetivo escolhido</string>
     <string name="onboarding_goal_picker_details_body">Este é o alvo que o teu primeiro plano de pagamento vai proteger.</string>
-    <string name="onboarding_salary_title">A base</string>
-    <string name="onboarding_salary_subtitle">Introduz o teu rendimento líquido e a frequência. Usamos isto para calcular os teus ciclos de pagamento.</string>
+    <string name="onboarding_salary_title">Diz ao My Share o que entra em cada pagamento</string>
+    <string name="onboarding_salary_subtitle">Isto torna-se o teu guia semanal, caminho do objetivo e calendário de lembretes.</string>
     <string name="onboarding_salary_frequency_monthly">Mensal</string>
     <string name="onboarding_salary_frequency_biweekly">Quinzenal</string>
     <string name="onboarding_fixed_costs_title">Os teus compromissos</string>
@@ -201,6 +201,12 @@
     <string name="onboarding_salary_frequency_biweekly_desc">Pago de duas em duas semanas.</string>
     <string name="onboarding_salary_label_payday">Dia de pagamento do mês</string>
     <string name="onboarding_salary_label_next_date">Próxima data de pagamento</string>
+    <string name="onboarding_salary_outcome_body_filled">Este valor de pagamento vai orientar cada divisão, lembrete e ajuste futuro.</string>
+    <string name="onboarding_salary_income_card_title">O que entra no pagamento</string>
+    <string name="onboarding_salary_income_card_body">Usa o rendimento líquido depois de impostos. Não é preciso ligar ao banco.</string>
+    <string name="onboarding_salary_schedule_title">Quando entra?</string>
+    <string name="onboarding_salary_schedule_body_monthly">Usa um dia de 1 a 28 para os lembretes funcionarem nos meses curtos.</string>
+    <string name="onboarding_salary_schedule_body_biweekly">Introduz a próxima data para repetir o ciclo de duas em duas semanas.</string>
     <string name="onboarding_salary_error_income_required">Introduza o seu lucro líquido por dia de pagamento.</string>
     <string name="onboarding_salary_error_income_positive">O rendimento deve ser maior que zero.</string>
     <string name="onboarding_salary_error_payday_range">Utilize um dia de pagamento de 1 a 28.</string>
