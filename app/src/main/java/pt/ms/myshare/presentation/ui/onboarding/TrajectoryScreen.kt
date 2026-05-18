@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imeNestedScroll
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
@@ -26,6 +24,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.AutoAwesome
@@ -54,6 +53,8 @@ import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.PlanPreview
 import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.presentation.ui.components.PremiumButton
+import pt.ms.myshare.presentation.ui.components.KeyboardDismissEffect
+import pt.ms.myshare.presentation.ui.components.rememberKeyboardDismissOnScrollConnection
 import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.presentation.ui.theme.MySharePositive
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
@@ -73,6 +74,9 @@ fun TrajectoryScreen(
     val currencyFormat = NumberFormat.getCurrencyInstance(userPreferences.locale).apply {
         currency = userPreferences.currency
     }
+    val keyboardDismissOnScrollConnection = rememberKeyboardDismissOnScrollConnection()
+
+    KeyboardDismissEffect(preview?.nextPayday)
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -83,7 +87,6 @@ fun TrajectoryScreen(
                     onClick = onNext,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .imePadding()
                         .navigationBarsPadding()
                         .padding(horizontal = 24.dp, vertical = 16.dp)
                 )
@@ -96,8 +99,7 @@ fun TrajectoryScreen(
                 .padding(innerPadding)
                 .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
                 .padding(horizontal = 24.dp)
-                .imeNestedScroll()
-                .imePadding()
+                .nestedScroll(keyboardDismissOnScrollConnection)
                 .verticalScroll(rememberScrollState())
         ) {
             Spacer(Modifier.height(24.dp))

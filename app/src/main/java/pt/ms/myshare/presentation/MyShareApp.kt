@@ -5,6 +5,11 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import pt.ms.myshare.BuildConfig
 import pt.ms.myshare.domain.repository.UserPreferencesRepository
 import pt.ms.myshare.presentation.ui.localization.UserLocaleManager
@@ -12,12 +17,14 @@ import pt.ms.myshare.utils.logs.CrashlyticsTree
 import pt.ms.myshare.utils.logs.FirebaseUtils
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Provider
 
 @HiltAndroidApp
 class MyShareApp : Application() {
 
-    @Inject lateinit var userPreferencesRepository: UserPreferencesRepository
+    @Inject lateinit var userPreferencesRepositoryProvider: Provider<UserPreferencesRepository>
     @Inject lateinit var userLocaleManager: UserLocaleManager
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     override fun onCreate() {
         super.onCreate()
@@ -31,11 +38,20 @@ class MyShareApp : Application() {
 
         FirebaseUtils.init(this)
 
-        userLocaleManager.apply(userPreferencesRepository.loadPreferences())
-
+        applyStoredLocale()
 
         createNotificationChannel()
         Timber.tag(TAG).d("Application created")
+    }
+
+    private fun applyStoredLocale() {
+        applicationScope.launch {
+            val preferences = withContext(Dispatchers.IO) {
+                userPreferencesRepositoryProvider.get().loadPreferences()
+            }
+            userLocaleManager.apply(preferences)
+            Timber.tag(TAG).d("Stored locale applied")
+        }
     }
 
     private fun createNotificationChannel() {

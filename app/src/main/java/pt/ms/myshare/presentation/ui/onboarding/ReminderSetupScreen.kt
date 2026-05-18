@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -27,8 +28,10 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.ReminderCadence
+import pt.ms.myshare.presentation.ui.components.KeyboardDismissEffect
 import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.components.PremiumChoiceCard
+import pt.ms.myshare.presentation.ui.components.rememberKeyboardDismissOnScrollConnection
 import pt.ms.myshare.presentation.ui.theme.*
 import java.time.LocalTime
 
@@ -42,6 +45,9 @@ fun ReminderSetupScreen(
     var cadence by remember { mutableStateOf(ReminderCadence.PAYDAY) }
     var message by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
+    val keyboardDismissOnScrollConnection = rememberKeyboardDismissOnScrollConnection()
+
+    KeyboardDismissEffect()
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -74,7 +80,6 @@ fun ReminderSetupScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .imePadding()
                         .navigationBarsPadding()
                         .padding(horizontal = 24.dp, vertical = 14.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -104,8 +109,7 @@ fun ReminderSetupScreen(
                 .padding(innerPadding)
                 .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
                 .padding(horizontal = 24.dp)
-                .imeNestedScroll()
-                .imePadding()
+                .nestedScroll(keyboardDismissOnScrollConnection)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

@@ -106,13 +106,18 @@ data class MoreCardState(
     val isGoogleConnectionInProgress: Boolean = false,
     val googleConnectionMessage: String? = null,
     val googleConnectionError: String? = null,
+    val isLogoutInProgress: Boolean = false,
+    val logoutError: String? = null,
     val userPreferences: UserPreferences = UserPreferences.defaults(),
     val weeklyGuideLabel: String = "",
     val priorityMoveLabel: String = "",
     val ruleCount: Int = 0,
     val reviewCount: Int = 0,
     val error: String? = null
-)
+) {
+    val requiresPremiumAccountProtectionBeforeLogout: Boolean
+        get() = isPremium && userEmail.isNullOrBlank()
+}
 
 data class ReviewHistoryItemState(
     val id: String,

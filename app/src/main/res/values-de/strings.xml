@@ -449,6 +449,7 @@
     <string name="home_more_account_manage_subscription_desc">Öffne Google Play, um die Abrechnung anzusehen oder zu kündigen.</string>
     <string name="home_more_account_signout">Abmelden</string>
     <string name="home_more_account_signout_desc">Auf diesem Gerät zur Einrichtung zurückkehren</string>
+    <string name="home_more_account_signout_error">Die Abmeldung konnte nicht abgeschlossen werden. Prüfe deine Verbindung und versuche es erneut.</string>
     <string name="home_more_signout_confirm_title">Abmelden?</string>
     <string name="home_more_signout_confirm_body">Dadurch meldest du dich ab und kehrst auf diesem Gerät zur Einrichtung zurück. Der lokale Plan auf diesem Gerät wird gelöscht.</string>
     <string name="home_more_version_label">Version %1$s</string>

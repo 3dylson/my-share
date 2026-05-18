@@ -449,6 +449,7 @@
     <string name="home_more_account_manage_subscription_desc">افتح Google Play لعرض الفوترة أو الإلغاء.</string>
     <string name="home_more_account_signout">تسجيل الخروج</string>
     <string name="home_more_account_signout_desc">العودة إلى الإعداد على هذا الجهاز</string>
+    <string name="home_more_account_signout_error">تعذر إكمال تسجيل الخروج. تحقق من الاتصال وحاول مرة أخرى.</string>
     <string name="home_more_signout_confirm_title">تسجيل الخروج؟</string>
     <string name="home_more_signout_confirm_body">يؤدي هذا إلى تسجيل خروجك وإعادة هذا الجهاز إلى الإعداد. سيتم حذف الخطة المحلية على هذا الجهاز.</string>
     <string name="home_more_version_label">الإصدار %1$s</string>

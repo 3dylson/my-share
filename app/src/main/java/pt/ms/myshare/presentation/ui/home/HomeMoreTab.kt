@@ -212,12 +212,12 @@ fun LazyListScope.homeMoreTab(
     item {
         PremiumSettingsGroup(title = stringResource(R.string.home_more_account_title)) {
             val uriHandler = LocalUriHandler.current
-            GoogleConnectionFeedback(state)
+            AccountFeedback(state)
             if (state.canConnectGoogle) {
                 PremiumSettingsRow(
                     title = stringResource(R.string.home_more_account_connect_google_title),
                     subtitle = stringResource(R.string.home_more_account_connect_google_desc),
-                    icon = Icons.Default.Cloud,
+                    icon = Icons.Default.AccountCircle,
                     iconColor = MySharePrimary,
                     trailingContent = {
                         if (state.isGoogleConnectionInProgress || isGoogleCredentialRequestInProgress) {
@@ -234,6 +234,9 @@ fun LazyListScope.homeMoreTab(
                                 modifier = Modifier.size(24.dp)
                             )
                         }
+                    },
+                    leadingIconContent = {
+                        GoogleLogo(modifier = Modifier.size(22.dp))
                     },
                     onClick = {
                         if (!state.isGoogleConnectionInProgress && !isGoogleCredentialRequestInProgress) {
@@ -257,8 +260,21 @@ fun LazyListScope.homeMoreTab(
                 icon = Icons.AutoMirrored.Filled.Logout,
                 iconColor = MaterialTheme.colorScheme.error,
                 titleColor = MaterialTheme.colorScheme.error,
+                trailingContent = {
+                    if (state.isLogoutInProgress) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(22.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                },
                 showDivider = false,
-                onClick = onLogout
+                onClick = {
+                    if (!state.isLogoutInProgress) {
+                        onLogout()
+                    }
+                }
             )
         }
 
@@ -759,14 +775,14 @@ private fun MorePremiumPreviewPill(
 }
 
 @Composable
-private fun GoogleConnectionFeedback(state: MoreCardState) {
+private fun AccountFeedback(state: MoreCardState) {
     val context = LocalContext.current
-    val messageKey = state.googleConnectionError ?: state.googleConnectionMessage ?: return
+    val messageKey = state.logoutError ?: state.googleConnectionError ?: state.googleConnectionMessage ?: return
     val message = remember(messageKey) {
         val resId = context.resources.getIdentifier(messageKey, "string", context.packageName)
         if (resId != 0) context.getString(resId) else messageKey
     }
-    val isError = state.googleConnectionError != null
+    val isError = state.logoutError != null || state.googleConnectionError != null
 
     Surface(
         modifier = Modifier

@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import pt.ms.myshare.R
+import pt.ms.myshare.presentation.ui.components.KeyboardDismissEffect
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
 
 @Composable
@@ -25,6 +26,8 @@ fun BuildingPlanScreen(onBuilt: () -> Unit) {
     var step2Visible by remember { mutableStateOf(false) }
     var step3Visible by remember { mutableStateOf(false) }
     var progress by remember { mutableStateOf(0f) }
+
+    KeyboardDismissEffect()
 
     LaunchedEffect(Unit) {
         delay(400)

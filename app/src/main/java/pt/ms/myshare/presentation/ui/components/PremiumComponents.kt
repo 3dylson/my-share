@@ -1203,7 +1203,7 @@ fun GoogleSignInButton(
 }
 
 @Composable
-private fun GoogleLogo(modifier: Modifier = Modifier) {
+fun GoogleLogo(modifier: Modifier = Modifier) {
     Canvas(modifier = modifier) {
         val strokeWidthPx = 3.4.dp.toPx()
         val radius = size.width / 2
@@ -1318,6 +1318,7 @@ fun PremiumSettingsRow(
     titleColor: Color? = null,
     trailingContent: @Composable (RowScope.() -> Unit)? = null,
     showDivider: Boolean = true,
+    leadingIconContent: (@Composable BoxScope.() -> Unit)? = null,
     onClick: () -> Unit
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
@@ -1335,12 +1336,16 @@ fun PremiumSettingsRow(
                     .background(iconColor.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = iconColor,
-                    modifier = Modifier.size(20.dp)
-                )
+                if (leadingIconContent != null) {
+                    leadingIconContent()
+                } else {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = iconColor,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {

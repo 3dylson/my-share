@@ -494,6 +494,7 @@
     <string name="home_more_account_manage_subscription_desc">Open Google Play to view billing or cancel.</string>
     <string name="home_more_account_signout">Sign out</string>
     <string name="home_more_account_signout_desc">Start setup again on this device</string>
+    <string name="home_more_account_signout_error">Sign out could not finish. Check your connection and try again.</string>
     <string name="home_more_signout_confirm_title">Sign out?</string>
     <string name="home_more_signout_confirm_body">This signs you out and starts setup again on this device. The local plan on this device will be cleared.</string>
     <string name="home_more_version_label">Version %1$s</string>

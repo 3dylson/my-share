@@ -450,6 +450,7 @@
     <string name="home_more_account_manage_subscription_desc">Abra o Google Play para ver a faturação ou cancelar.</string>
     <string name="home_more_account_signout">Sair</string>
     <string name="home_more_account_signout_desc">Voltar à configuração inicial neste dispositivo</string>
+    <string name="home_more_account_signout_error">Não foi possível terminar sessão. Verifica a ligação e tenta novamente.</string>
     <string name="home_more_signout_confirm_title">Sair?</string>
     <string name="home_more_signout_confirm_body">Isto termina a sessão e volta à configuração inicial neste dispositivo. O plano local neste dispositivo será eliminado.</string>
     <string name="home_more_version_label">Versão %1$s</string>

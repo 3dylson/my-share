@@ -449,6 +449,7 @@
     <string name="home_more_account_manage_subscription_desc">Ouvrez Google Play pour voir la facturation ou annuler.</string>
     <string name="home_more_account_signout">Se déconnecter</string>
     <string name="home_more_account_signout_desc">Revenir à la configuration initiale sur cet appareil</string>
+    <string name="home_more_account_signout_error">La déconnexion n’a pas pu se terminer. Vérifiez la connexion et réessayez.</string>
     <string name="home_more_signout_confirm_title">Se déconnecter?</string>
     <string name="home_more_signout_confirm_body">Cela vous déconnecte et renvoie cet appareil à la configuration initiale. Le plan local sur cet appareil sera supprimé.</string>
     <string name="home_more_version_label">Version %1$s</string>

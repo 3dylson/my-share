@@ -8,6 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -37,9 +38,11 @@ import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReadResult
 import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReader
 import pt.ms.myshare.presentation.ui.components.GoogleSignInButton
+import pt.ms.myshare.presentation.ui.components.KeyboardDismissEffect
 import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.components.PremiumInfoCard
 import pt.ms.myshare.presentation.ui.components.PremiumPaywallCard
+import pt.ms.myshare.presentation.ui.components.rememberKeyboardDismissOnScrollConnection
 import pt.ms.myshare.presentation.ui.formatting.SubscriptionSavingsFormatter
 import pt.ms.myshare.presentation.ui.paywall.PaywallAutopilotPreviewMapper
 import pt.ms.myshare.presentation.ui.paywall.PaywallAutopilotPreviewUiState
@@ -80,6 +83,7 @@ fun PaywallScreen(
         )
     }
     val scrollState = rememberScrollState()
+    val keyboardDismissOnScrollConnection = rememberKeyboardDismissOnScrollConnection()
     var isGoogleCredentialRequestInProgress by remember { mutableStateOf(false) }
     val monthlyProduct = availableProducts.find { it.productId.contains("monthly", ignoreCase = true) }
     val annualProduct = availableProducts.find { it.productId.contains("annual", ignoreCase = true) }
@@ -161,6 +165,8 @@ fun PaywallScreen(
         }
     }
 
+    KeyboardDismissEffect(showSecurePremiumAccessPrompt)
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
@@ -192,8 +198,7 @@ fun PaywallScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(horizontal = 24.dp)
-                .imeNestedScroll()
-                .imePadding()
+                .nestedScroll(keyboardDismissOnScrollConnection)
                 .verticalScroll(scrollState)
         ) {
             Spacer(Modifier.height(16.dp))
@@ -594,7 +599,6 @@ private fun PaywallPurchaseFooter(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .imePadding()
                 .navigationBarsPadding()
                 .padding(horizontal = 24.dp, vertical = 14.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -648,7 +652,6 @@ private fun SecurePremiumAccessFooter(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .imePadding()
                 .navigationBarsPadding()
                 .padding(horizontal = 24.dp, vertical = 14.dp),
             horizontalAlignment = Alignment.CenterHorizontally

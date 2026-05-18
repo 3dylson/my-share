@@ -323,6 +323,8 @@ class HomeViewModel @Inject constructor(
                     isGoogleConnectionInProgress = currentMore.isGoogleConnectionInProgress,
                     googleConnectionMessage = currentMore.googleConnectionMessage,
                     googleConnectionError = currentMore.googleConnectionError,
+                    isLogoutInProgress = currentMore.isLogoutInProgress,
+                    logoutError = currentMore.logoutError,
                     userPreferences = preferences,
                     weeklyGuideLabel = planCard?.weeklySpendLabel.orEmpty(),
                     priorityMoveLabel = planCard?.savingsLabel.orEmpty(),
@@ -837,11 +839,53 @@ class HomeViewModel @Inject constructor(
 
     fun onLogout(onComplete: () -> Unit) {
         viewModelScope.launch {
-            authRepository.signOut()
-            plannerRepository.clearPlan() // Reset local state on logout
-            plannerRepository.setOnboardingCompleted(false) // Force back to onboarding
-            FirebaseUtils.logEvent("user_logged_out")
-            onComplete()
+            val moreCard = uiState.value.moreCard
+            if (moreCard.requiresPremiumAccountProtectionBeforeLogout) {
+                uiState.update {
+                    it.copy(
+                        moreCard = it.moreCard.copy(
+                            showPremiumAccountPrompt = true,
+                            logoutError = null
+                        )
+                    )
+                }
+                FirebaseUtils.logEvent("premium_logout_blocked_until_account_secure")
+                Timber.tag(TAG).d("Blocked Premium sign-out until Google account connection is offered")
+                return@launch
+            }
+
+            uiState.update {
+                it.copy(
+                    moreCard = it.moreCard.copy(
+                        isLogoutInProgress = true,
+                        logoutError = null
+                    )
+                )
+            }
+
+            try {
+                authRepository.signOut()
+                plannerRepository.clearPlan()
+                plannerRepository.setOnboardingCompleted(false)
+                FirebaseUtils.logEvent("user_logged_out")
+                Timber.tag(TAG).d("User signed out and local planner state cleared")
+                uiState.update {
+                    it.copy(
+                        moreCard = it.moreCard.copy(isLogoutInProgress = false)
+                    )
+                }
+                onComplete()
+            } catch (error: Exception) {
+                uiState.update {
+                    it.copy(
+                        moreCard = it.moreCard.copy(
+                            isLogoutInProgress = false,
+                            logoutError = "home_more_account_signout_error"
+                        )
+                    )
+                }
+                Timber.tag(TAG).e(error, "Sign out failed")
+            }
         }
     }
 

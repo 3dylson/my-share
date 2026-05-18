@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imeNestedScroll
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,6 +20,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CheckCircle
@@ -55,7 +54,9 @@ import androidx.compose.ui.unit.sp
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.PlanPreview
 import pt.ms.myshare.domain.model.UserPreferences
+import pt.ms.myshare.presentation.ui.components.KeyboardDismissEffect
 import pt.ms.myshare.presentation.ui.components.PremiumButton
+import pt.ms.myshare.presentation.ui.components.rememberKeyboardDismissOnScrollConnection
 import pt.ms.myshare.presentation.ui.theme.MySharePositive
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
 import pt.ms.myshare.presentation.ui.theme.MyShareWarning
@@ -80,6 +81,9 @@ fun PlanPreviewScreen(
     val formattedNextPayday = preview.nextPayday.format(dateFormatter)
     val hasPriorityContribution = preview.priorityContributionPerPayday > BigDecimal.ZERO
     val goalLabel = goalName.ifBlank { stringResource(R.string.onboarding_plan_preview_default_goal) }
+    val keyboardDismissOnScrollConnection = rememberKeyboardDismissOnScrollConnection()
+
+    KeyboardDismissEffect(preview.nextPayday)
 
     LaunchedEffect(preview.nextPayday, preview.weeklyFlexibleSpend, preview.priorityContributionPerPayday) {
         Timber.d(
@@ -98,7 +102,6 @@ fun PlanPreviewScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .imePadding()
                         .navigationBarsPadding()
                         .padding(horizontal = 24.dp, vertical = 14.dp)
                 ) {
@@ -114,8 +117,7 @@ fun PlanPreviewScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .imeNestedScroll()
-                .imePadding()
+                .nestedScroll(keyboardDismissOnScrollConnection)
                 .padding(horizontal = 24.dp),
             contentPadding = PaddingValues(top = 30.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)

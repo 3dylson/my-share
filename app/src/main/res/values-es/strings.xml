@@ -449,6 +449,7 @@
     <string name="home_more_account_manage_subscription_desc">Abre Google Play para ver la facturación o cancelar.</string>
     <string name="home_more_account_signout">Cerrar sesión</string>
     <string name="home_more_account_signout_desc">Volver a la configuración inicial en este dispositivo</string>
+    <string name="home_more_account_signout_error">No se pudo cerrar la sesión. Comprueba la conexión e inténtalo de nuevo.</string>
     <string name="home_more_signout_confirm_title">¿Desconectar?</string>
     <string name="home_more_signout_confirm_body">Esto cierra la sesión y devuelve este dispositivo a la configuración inicial. El plan local en este dispositivo se borrará.</string>
     <string name="home_more_version_label">Versión %1$s</string>

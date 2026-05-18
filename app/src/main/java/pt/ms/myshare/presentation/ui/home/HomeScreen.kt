@@ -19,9 +19,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.zIndex
@@ -163,14 +160,7 @@ fun HomeScreen(
     var showCurrencyPicker by remember { mutableStateOf(false) }
     var isGoogleCredentialRequestInProgress by remember { mutableStateOf(false) }
     var pendingReminderSelection by remember { mutableStateOf<ReminderSettingsSelection?>(null) }
-    val clearFocusOnScrollConnection = remember(focusManager) {
-        object : NestedScrollConnection {
-            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                focusManager.clearFocus(force = true)
-                return Offset.Zero
-            }
-        }
-    }
+    val clearFocusOnScrollConnection = rememberKeyboardDismissOnScrollConnection()
     val notificationPermissionDeniedMessage = stringResource(R.string.onboarding_reminder_error_permission)
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -580,8 +570,13 @@ fun HomeScreen(
                             isGoogleCredentialRequestInProgress = isGoogleCredentialRequestInProgress,
                             onConnectGoogle = startGoogleAccountConnection,
                             onLogout = {
-                                Timber.tag("HomeScreen").d("Sign out confirmation requested")
-                                showSignOutDialog = true
+                                if (state.moreCard.requiresPremiumAccountProtectionBeforeLogout) {
+                                    Timber.tag("HomeScreen").d("Premium sign out requested before account is secured")
+                                    onLogout()
+                                } else {
+                                    Timber.tag("HomeScreen").d("Sign out confirmation requested")
+                                    showSignOutDialog = true
+                                }
                             }
                         )
                     }

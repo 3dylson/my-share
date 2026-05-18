@@ -53,6 +53,7 @@ import pt.ms.myshare.presentation.ui.onboarding.ReminderWorkScheduler
 import io.mockk.mockk
 import io.mockk.every
 import io.mockk.coEvery
+import io.mockk.coVerify
 import kotlinx.coroutines.flow.flowOf
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -68,6 +69,7 @@ class HomeViewModelTest {
     private val mockUpdateGoalProgressUseCase = mockk<UpdateGoalProgressUseCase>(relaxed = true)
     private val mockReminderWorkScheduler = mockk<ReminderWorkScheduler>(relaxed = true)
     private val mockUserLocaleManager = mockk<UserLocaleManager>(relaxed = true)
+    private lateinit var currentUserFlow: MutableStateFlow<User?>
 
     @Before
     fun setup() {
@@ -75,8 +77,9 @@ class HomeViewModelTest {
         fakePlannerRepository = FakePlannerRepository()
         fakeEntitlementRepository = TestFakeEntitlementRepository()
         val calculatePlanPreviewUseCase = CalculatePlanPreviewUseCase(ResolveAllocationStrategyRulesUseCase())
+        currentUserFlow = MutableStateFlow(null)
         
-        every { mockAuthRepository.currentUser } returns flowOf(null)
+        every { mockAuthRepository.currentUser } returns currentUserFlow
         every { mockGetReviewHistoryUseCase.execute() } returns flowOf(emptyList())
 
         viewModel = HomeViewModel(
@@ -369,6 +372,82 @@ class HomeViewModelTest {
         assertEquals(null, viewModel.state.value.moreCard.googleConnectionError)
         assertEquals(1, fakePlannerRepository.syncLocalStateIfAuthenticatedCalls)
     }
+
+    @Test
+    fun `logout clears local state and returns to onboarding for non premium user`() = runTest {
+        val currentPlan = SalaryPlan(
+            focus = PlanningFocus.SAVE_WITHOUT_STRESS,
+            netIncomePerPayday = BigDecimal("1000"),
+            monthlyFixedCosts = BigDecimal("400"),
+            payFrequency = PayFrequency.MONTHLY,
+            monthlyPayday = 1,
+            preset = AllocationPreset.BALANCED
+        )
+        fakePlannerRepository.savePlan(currentPlan)
+        fakePlannerRepository.setOnboardingCompleted(true)
+        var completed = false
+        advanceUntilIdle()
+
+        viewModel.onLogout { completed = true }
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) { mockAuthRepository.signOut() }
+        assertTrue(completed)
+        assertEquals(1, fakePlannerRepository.clearPlanCalls)
+        assertEquals(null, fakePlannerRepository.loadPlan())
+        assertFalse(fakePlannerRepository.isOnboardingCompleted())
+        assertFalse(viewModel.state.value.moreCard.isLogoutInProgress)
+    }
+
+    @Test
+    fun `logout blocks anonymous premium user and prompts account protection`() = runTest {
+        currentUserFlow.value = User(isAnonymous = true)
+        fakeEntitlementRepository.setEntitlementState(EntitlementState.PRO)
+        var completed = false
+        advanceUntilIdle()
+
+        viewModel.onLogout { completed = true }
+        advanceUntilIdle()
+
+        coVerify(exactly = 0) { mockAuthRepository.signOut() }
+        assertFalse(completed)
+        assertEquals(0, fakePlannerRepository.clearPlanCalls)
+        assertTrue(viewModel.state.value.moreCard.showPremiumAccountPrompt)
+        assertFalse(viewModel.state.value.moreCard.isLogoutInProgress)
+    }
+
+    @Test
+    fun `logout allows premium Google user because access is recoverable`() = runTest {
+        currentUserFlow.value = User(email = "user@example.com", isAnonymous = false)
+        fakeEntitlementRepository.setEntitlementState(EntitlementState.PRO)
+        var completed = false
+        advanceUntilIdle()
+
+        viewModel.onLogout { completed = true }
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) { mockAuthRepository.signOut() }
+        assertTrue(completed)
+        assertEquals(1, fakePlannerRepository.clearPlanCalls)
+    }
+
+    @Test
+    fun `logout failure surfaces account error and keeps user in app`() = runTest {
+        coEvery { mockAuthRepository.signOut() } throws IllegalStateException("network")
+        var completed = false
+        advanceUntilIdle()
+
+        viewModel.onLogout { completed = true }
+        advanceUntilIdle()
+
+        assertFalse(completed)
+        assertEquals(0, fakePlannerRepository.clearPlanCalls)
+        assertFalse(viewModel.state.value.moreCard.isLogoutInProgress)
+        assertEquals(
+            "home_more_account_signout_error",
+            viewModel.state.value.moreCard.logoutError
+        )
+    }
 }
 
 class FakePlannerRepository : PlannerRepository {
@@ -381,6 +460,7 @@ class FakePlannerRepository : PlannerRepository {
     private val automationFlow = MutableStateFlow(false)
     private var isOnboardingCompletedState = false
     var syncLocalStateIfAuthenticatedCalls = 0
+    var clearPlanCalls = 0
 
     override fun observePlan(): MutableStateFlow<SalaryPlan?> = planFlow
     override suspend fun savePlan(plan: SalaryPlan) { planFlow.emit(plan) }
@@ -426,7 +506,17 @@ class FakePlannerRepository : PlannerRepository {
     override fun isOnboardingCompleted(): Boolean = isOnboardingCompletedState
     override suspend fun setOnboardingCompleted(completed: Boolean) { isOnboardingCompletedState = completed }
     override fun loadPlan(): pt.ms.myshare.domain.model.SalaryPlan? = planFlow.value
-    override suspend fun clearPlan() { planFlow.emit(null) }
+    override suspend fun clearPlan() {
+        clearPlanCalls += 1
+        planFlow.emit(null)
+        rulesFlow.emit(emptyList())
+        goalsFlow.emit(emptyList())
+        reviewFlow.emit(null)
+        reviewsFlow.emit(emptyList())
+        reminderFlow.emit(ReminderConfiguration(false, 9, 0, ReminderCadence.PAYDAY))
+        automationFlow.emit(false)
+        isOnboardingCompletedState = false
+    }
     override suspend fun syncFromFirestore() {}
     override suspend fun syncLocalStateIfAuthenticated() {
         syncLocalStateIfAuthenticatedCalls += 1
