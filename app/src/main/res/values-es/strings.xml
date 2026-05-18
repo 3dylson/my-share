@@ -367,6 +367,15 @@
     <string name="home_review_score_count">%1$s reseñas</string>
     <string name="home_review_savings_title">Exceso de ahorro: %1$s</string>
     <string name="home_review_savings_desc">Gasto total flexible ahorrado en las revisiones.</string>
+    <string name="home_review_performance_locked_label">Tendencia Premium bloqueada</string>
+    <string name="home_review_performance_locked_title">Convierte tus revisiones en una tendencia</string>
+    <string name="home_review_performance_locked_desc">Premium convierte cada revisión guardada en una puntuación de confianza, una racha, una señal de ahorro y un patrón para el próximo cobro.</string>
+    <string name="home_review_performance_locked_latest">Última revisión: %1$s flexible, %2$s prioridad.</string>
+    <string name="home_review_performance_locked_free_label">Gratis</string>
+    <string name="home_review_performance_locked_free_body">Solo la última revisión</string>
+    <string name="home_review_performance_locked_premium_label">Plan Premium</string>
+    <string name="home_review_performance_locked_premium_body">Puntuación, racha, tendencia y ahorro</string>
+    <string name="home_review_performance_locked_action">Desbloquear análisis de rendimiento</string>
     <string name="home_review_recommendation_label">Vista Premium bloqueada</string>
     <string name="home_review_recommendation_title">Qué ajustaría Premium después</string>
     <string name="home_review_recommendation_success_body">Tu última revisión siguió el plan. Premium puede detectar excedentes repetidos y sugerir cuándo mover más allá de la guía de %1$s.</string>

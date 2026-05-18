@@ -368,6 +368,15 @@
     <string name="home_review_score_count">%1$s comentários</string>
     <string name="home_review_savings_title">Excesso de poupança: %1$s</string>
     <string name="home_review_savings_desc">Gasto flexível total poupado nas avaliações.</string>
+    <string name="home_review_performance_locked_label">Tendência Premium bloqueada</string>
+    <string name="home_review_performance_locked_title">Transformar check-ins numa tendência</string>
+    <string name="home_review_performance_locked_desc">O Premium transforma cada check-in guardado numa pontuação de confiança, sequência, sinal de poupança e padrão do próximo dia de pagamento.</string>
+    <string name="home_review_performance_locked_latest">Último check-in: %1$s flexível, %2$s prioridade.</string>
+    <string name="home_review_performance_locked_free_label">Gratuito</string>
+    <string name="home_review_performance_locked_free_body">Apenas o último check-in</string>
+    <string name="home_review_performance_locked_premium_label">Plano Premium</string>
+    <string name="home_review_performance_locked_premium_body">Pontuação, sequência, tendência e poupança</string>
+    <string name="home_review_performance_locked_action">Desbloquear informações de desempenho</string>
     <string name="home_review_recommendation_label">Pré-visualização Premium bloqueada</string>
     <string name="home_review_recommendation_title">O que o Premium ajustaria a seguir</string>
     <string name="home_review_recommendation_success_body">A tua última revisão ficou dentro do plano. O Premium pode detetar excedentes repetidos e sugerir quando mover acima do guia de %1$s.</string>

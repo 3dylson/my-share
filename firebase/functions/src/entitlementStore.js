@@ -13,7 +13,7 @@ function userEntitlementFields(snapshot) {
 }
 
 function tokenIndexFields(uid, purchaseToken, snapshot) {
-  return {
+  const fields = {
     uid,
     purchaseToken,
     purchaseTokenHash: snapshot.purchaseTokenHash,
@@ -26,10 +26,24 @@ function tokenIndexFields(uid, purchaseToken, snapshot) {
     expiryTimeMillis: snapshot.expiryTimeMillis,
     latestOrderId: snapshot.latestOrderId || null,
     regionCode: snapshot.regionCode || null,
+    acknowledgementState: snapshot.acknowledgementState || null,
+    serverAcknowledgementStatus:
+        snapshot.serverAcknowledgementStatus || null,
     verificationSource: snapshot.verificationSource,
     notificationType: snapshot.notificationType || null,
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
   };
+  if (snapshot.serverAcknowledgedAt) {
+    fields.serverAcknowledgedAt = snapshot.serverAcknowledgedAt;
+  }
+  if (snapshot.serverAcknowledgementError !== undefined) {
+    fields.serverAcknowledgementError = snapshot.serverAcknowledgementError;
+  }
+  if (snapshot.serverAcknowledgementFailedAt) {
+    fields.serverAcknowledgementFailedAt =
+        snapshot.serverAcknowledgementFailedAt;
+  }
+  return fields;
 }
 
 async function writeEntitlementSnapshot(uid, purchaseToken, snapshot) {

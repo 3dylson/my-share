@@ -46,6 +46,7 @@ function buildEntitlementSnapshot({
   subscriptionId,
   verificationSource,
   notificationType,
+  acknowledgementResult = null,
 }) {
   const subscriptionState = purchaseInfo.subscriptionState || null;
   const expiryTimeMillis = latestExpiryTimeMillis(purchaseInfo);
@@ -55,8 +56,11 @@ function buildEntitlementSnapshot({
       entitlementState === 'GRACE_PERIOD';
   const linkedPurchaseToken = purchaseInfo.linkedPurchaseToken || null;
   const tokenHash = purchaseTokenHash(purchaseToken);
+  const acknowledgementState = acknowledgementResult?.acknowledgementState ??
+      purchaseInfo.acknowledgementState ??
+      null;
 
-  return {
+  const snapshot = {
     isPro,
     entitlementState,
     subscriptionState,
@@ -72,12 +76,28 @@ function buildEntitlementSnapshot({
         null,
     expiryTimeMillis: expiryTimeMillis ? String(expiryTimeMillis) : null,
     paymentState: null,
+    acknowledgementState,
+    serverAcknowledgementStatus: acknowledgementResult?.status || null,
     latestOrderId: purchaseInfo.latestOrderId || null,
     regionCode: purchaseInfo.regionCode || null,
     verificationSource,
     notificationType: notificationType || null,
     lastVerifiedAt: admin.firestore.FieldValue.serverTimestamp(),
   };
+
+  if (acknowledgementResult?.status === 'acknowledged') {
+    snapshot.serverAcknowledgedAt =
+        admin.firestore.FieldValue.serverTimestamp();
+    snapshot.serverAcknowledgementError = null;
+  }
+
+  if (acknowledgementResult?.errorMessage) {
+    snapshot.serverAcknowledgementError = acknowledgementResult.errorMessage;
+    snapshot.serverAcknowledgementFailedAt =
+        admin.firestore.FieldValue.serverTimestamp();
+  }
+
+  return snapshot;
 }
 
 module.exports = {

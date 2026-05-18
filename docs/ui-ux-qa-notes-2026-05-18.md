@@ -189,3 +189,27 @@ Result:
 - Play Billing cannot be fully validated as a successful paid conversion until Play Console products/licensed tester setup can complete a real purchase/restore path.
 - On compact screens, the More paywall error message can push the `Start free trial` button slightly farther down after a failed checkout, but the CTA remains reachable with an extra scroll.
 - Reminder-denied onboarding returned cleanly to setup; the captured screen did not show a distinct denial snackbar, so that feedback can still be improved later.
+
+## Release Play Purchase Addendum
+
+Environment:
+
+- Target device: `emulator-5554` only. The connected physical USB tablet was not used.
+- Release artifact installed locally: `app/release/my-share-3.0.1-v9.aab`.
+- Installed package reported `versionCode=9` and `versionName=3.0.1`.
+
+Validated:
+
+- The release build launched cleanly and retained the completed onboarding state.
+- Google Play test checkout opened from the paywall with `Test card, always approves`.
+- Completing the annual test subscription returned to My Share and showed `Secure your Premium access`.
+- Firestore showed `entitlementState=PRO`, `subscriptionState=SUBSCRIPTION_STATE_ACTIVE`, and `isPro=true` for the test user.
+- More showed `PREMIUM MEMBER` and `Payday control center` after purchase.
+- A force-stop/cold-start returned to Home with the Premium pill and then More rebuilt the Premium control-center state.
+- Crash log buffer had no `pt.ms.myshare` fatal crash or ANR during the release smoke.
+- Firebase functions were updated afterward so callable purchase verification now attempts Android Publisher server-side acknowledgement before the app falls back to BillingClient acknowledgement.
+
+Residual:
+
+- The current successful purchase happened before the server-acknowledgement deploy, so the next fresh Play test purchase should confirm the new `serverAcknowledgementStatus=acknowledged` field.
+- The side-loaded release still is not equivalent to installing the reviewed build from Play; App Check/installer behavior should be retested once the Play review build is available.

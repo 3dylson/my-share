@@ -367,6 +367,15 @@
     <string name="home_review_score_count">%1$s مراجعات</string>
     <string name="home_review_savings_title">المدخرات الزائدة: %1$s</string>
     <string name="home_review_savings_desc">إجمالي الإنفاق المرن الذي تم توفيره عبر المراجعات.</string>
+    <string name="home_review_performance_locked_label">اتجاه Premium مقفل</string>
+    <string name="home_review_performance_locked_title">حوّل المراجعات إلى اتجاه</string>
+    <string name="home_review_performance_locked_desc">يحوّل Premium كل مراجعة محفوظة إلى درجة ثقة وسلسلة مستمرة وإشارة ادخار ونمط ليوم الراتب التالي.</string>
+    <string name="home_review_performance_locked_latest">آخر مراجعة: %1$s مرن، %2$s أولوية.</string>
+    <string name="home_review_performance_locked_free_label">مجاني</string>
+    <string name="home_review_performance_locked_free_body">آخر مراجعة فقط</string>
+    <string name="home_review_performance_locked_premium_label">خطة Premium</string>
+    <string name="home_review_performance_locked_premium_body">الدرجة والسلسلة والاتجاه والادخار</string>
+    <string name="home_review_performance_locked_action">فتح رؤى الأداء</string>
     <string name="home_review_recommendation_label">معاينة Premium مقفلة</string>
     <string name="home_review_recommendation_title">ما الذي سيعدله Premium لاحقًا</string>
     <string name="home_review_recommendation_success_body">بقيت مراجعتك الأخيرة ضمن الخطة. يمكن لـ Premium مراقبة الفوائض المتكررة واقتراح متى تنقل مبلغًا إضافيًا بعد دليل %1$s.</string>

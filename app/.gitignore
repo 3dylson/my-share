@@ -1,4 +1,4 @@
 /build
 /google-services.json
 /release/credentials/
-/release/app-release.aab
+/release/*.aab

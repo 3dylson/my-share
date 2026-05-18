@@ -72,3 +72,31 @@ test('maps expired subscription to free even when state is canceled', () => {
   assert.equal(snapshot.entitlementState, 'FREE');
   assert.equal(snapshot.proExpiry, null);
 });
+
+test('stores server acknowledgement result on entitlement snapshot', () => {
+  const snapshot = buildEntitlementSnapshot({
+    purchaseInfo: {
+      ...purchaseInfo(
+          'SUBSCRIPTION_STATE_ACTIVE',
+          '2099-01-01T00:00:00Z',
+      ),
+      acknowledgementState: 'ACKNOWLEDGEMENT_STATE_PENDING',
+    },
+    purchaseToken: 'raw-token',
+    subscriptionId: 'fallback_product',
+    verificationSource: 'callable',
+    notificationType: null,
+    acknowledgementResult: {
+      status: 'acknowledged',
+      acknowledgementState: 'ACKNOWLEDGEMENT_STATE_ACKNOWLEDGED',
+    },
+  });
+
+  assert.equal(
+      snapshot.acknowledgementState,
+      'ACKNOWLEDGEMENT_STATE_ACKNOWLEDGED',
+  );
+  assert.equal(snapshot.serverAcknowledgementStatus, 'acknowledged');
+  assert.ok(snapshot.serverAcknowledgedAt);
+  assert.equal(snapshot.serverAcknowledgementError, null);
+});

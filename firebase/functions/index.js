@@ -41,6 +41,8 @@ exports.verifySubscription = functions
           subscriptionState: snapshot.subscriptionState,
           expiryTimeMillis: snapshot.expiryTimeMillis,
           paymentState: snapshot.paymentState,
+          acknowledgementState: snapshot.acknowledgementState,
+          serverAcknowledgementStatus: snapshot.serverAcknowledgementStatus,
         };
       } catch (error) {
         console.error('Error verifying subscription:', error);

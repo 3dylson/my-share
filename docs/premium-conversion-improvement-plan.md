@@ -481,10 +481,13 @@ Status after implementation pass on 2026-05-18:
 - Done: Backend Premium lifecycle hardening added a Google Play RTDN handler, scheduled entitlement revalidation, and a server-only purchase-token index.
 - Done: User-readable entitlement snapshots now store purchase-token hashes instead of raw Play purchase tokens; raw tokens are kept in server-only Firestore documents.
 - Done: Function cost guardrails keep warm instances at zero, cap billing lifecycle scale-out, and run scheduled revalidation daily because RTDN is the primary lifecycle path.
+- Done: Firebase `verifySubscription` now attempts Android Publisher server-side acknowledgement for callable purchase verification before the app falls back to BillingClient acknowledgement.
 - Done: Firebase functions and Firestore rules were deployed to `my-share-finance`.
 - Done: Play Console Real-time Developer Notifications are enabled for `projects/my-share-finance/topics/play-billing-rtdn`, with subscriptions and voided purchases selected.
 - Validated: focused premium lifecycle unit tests, full `testDebugUnitTest`, androidTest Kotlin compile, Firebase function lint/syntax/unit checks, Firebase rules tests, emulator launch on `emulator-5554`, and Play Console RTDN test notification received by `handlePlayBillingNotification`.
+- Validated: release build `3.0.1` / `versionCode 9` was installed on `emulator-5554`, completed a Google Play test subscription, wrote `PRO` entitlement state in Firestore, showed the post-purchase account-protection prompt, preserved Premium on cold start, and showed the Premium control center in More.
 
 Residual:
-- A successful paid purchase, restore, grace-period, and account-hold sequence still needs a Play Console/internal-test setup with license testers and real subscription test cards.
+- The server-side acknowledgement path was deployed after the current test subscription was already completed; the next fresh Play test purchase should confirm `serverAcknowledgementStatus=acknowledged` on the entitlement/token documents.
+- Restore, grace-period, account-hold, renewal, cancel, and refund sequences still need Play Console/internal-test validation with subscription test cards.
 - A real internal-test purchase should confirm renewal, cancel, refund, grace-period, and account-hold events reach Firebase with production Play payloads.

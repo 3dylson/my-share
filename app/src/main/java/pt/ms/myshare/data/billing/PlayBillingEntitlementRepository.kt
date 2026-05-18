@@ -142,7 +142,12 @@ class PlayBillingEntitlementRepository(
             val resultMap = result.data as? Map<*, *>
             val isValid = resultMap?.get("isValid") as? Boolean ?: false
             if (isValid) {
-                billingClientWrapper.acknowledgePurchase(purchase.purchaseToken)
+                if (resultMap?.isServerAcknowledged() == true) {
+                    Timber.tag(TAG).d("Purchase acknowledged by server product=%s", productId)
+                } else {
+                    Timber.tag(TAG).d("Falling back to BillingClient acknowledgement product=%s", productId)
+                    billingClientWrapper.acknowledgePurchase(purchase.purchaseToken)
+                }
             } else {
                 Timber.tag(TAG).e("Purchase verification returned inactive entitlement for product=%s", productId)
             }
@@ -151,6 +156,14 @@ class PlayBillingEntitlementRepository(
         }
     }
 
+
+    private fun Map<*, *>.isServerAcknowledged(): Boolean {
+        return when (get("serverAcknowledgementStatus") as? String) {
+            "acknowledged",
+            "already_acknowledged" -> true
+            else -> false
+        }
+    }
 
     override suspend fun checkActiveEntitlement() {
         billingClientWrapper.queryActivePurchases()

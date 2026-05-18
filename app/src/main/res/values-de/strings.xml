@@ -367,6 +367,15 @@
     <string name="home_review_score_count">%1$s Bewertungen</string>
     <string name="home_review_savings_title">Überschüssige Einsparungen: %1$s</string>
     <string name="home_review_savings_desc">Insgesamt eingesparte flexible Ausgaben über die Bewertungen hinweg.</string>
+    <string name="home_review_performance_locked_label">Gesperrter Premium-Trend</string>
+    <string name="home_review_performance_locked_title">Check-ins in einen Trend verwandeln</string>
+    <string name="home_review_performance_locked_desc">Premium verwandelt jeden gespeicherten Check-in in Vertrauenswert, Serie, Sparsignal und Muster für den nächsten Zahltag.</string>
+    <string name="home_review_performance_locked_latest">Letzter Check-in: %1$s flexibel, %2$s Priorität.</string>
+    <string name="home_review_performance_locked_free_label">Kostenlos</string>
+    <string name="home_review_performance_locked_free_body">Nur letzter Check-in</string>
+    <string name="home_review_performance_locked_premium_label">Premium-Plan</string>
+    <string name="home_review_performance_locked_premium_body">Score, Serie, Trend und Ersparnisse</string>
+    <string name="home_review_performance_locked_action">Leistungsanalysen freischalten</string>
     <string name="home_review_recommendation_label">Gesperrte Premium-Vorschau</string>
     <string name="home_review_recommendation_title">Was Premium als Nächstes anpassen würde</string>
     <string name="home_review_recommendation_success_body">Deine letzte Prüfung blieb im Plan. Premium kann wiederholte Überschüsse erkennen und vorschlagen, wann mehr als der Leitwert von %1$s verschoben wird.</string>

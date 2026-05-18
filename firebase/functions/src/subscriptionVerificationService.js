@@ -1,4 +1,8 @@
-const {fetchSubscriptionPurchase} = require('./playBillingApi');
+const {
+  acknowledgeSubscriptionIfNeeded,
+  androidPublisherClient,
+  fetchSubscriptionPurchase,
+} = require('./playBillingApi');
 const {writeEntitlementSnapshot} = require('./entitlementStore');
 const {buildEntitlementSnapshot} = require('./subscriptionEntitlementSnapshot');
 
@@ -9,6 +13,7 @@ async function writePurchaseInfoForUid({
   verificationSource,
   notificationType,
   purchaseInfo,
+  acknowledgementResult = null,
 }) {
   const snapshot = buildEntitlementSnapshot({
     purchaseInfo,
@@ -16,6 +21,7 @@ async function writePurchaseInfoForUid({
     subscriptionId,
     verificationSource,
     notificationType,
+    acknowledgementResult,
   });
   await writeEntitlementSnapshot(uid, purchaseToken, snapshot);
   return snapshot;
@@ -33,7 +39,28 @@ async function processPurchaseForUid({
     subscriptionId,
     verificationSource,
   });
-  const purchaseInfo = await fetchSubscriptionPurchase(purchaseToken);
+  const androidPublisher = androidPublisherClient();
+  const purchaseInfo = await fetchSubscriptionPurchase(
+      purchaseToken,
+      androidPublisher,
+  );
+  const acknowledgementResult = verificationSource === 'callable' ?
+      await acknowledgeSubscriptionIfNeeded({
+        purchaseToken,
+        subscriptionId,
+        purchaseInfo,
+        androidPublisher,
+      }) :
+      null;
+
+  if (acknowledgementResult) {
+    console.log('Subscription acknowledgement evaluated', {
+      uid,
+      subscriptionId,
+      status: acknowledgementResult.status,
+    });
+  }
+
   return writePurchaseInfoForUid({
     uid,
     purchaseToken,
@@ -41,6 +68,7 @@ async function processPurchaseForUid({
     verificationSource,
     notificationType,
     purchaseInfo,
+    acknowledgementResult,
   });
 }
 

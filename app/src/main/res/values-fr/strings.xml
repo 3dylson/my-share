@@ -367,6 +367,15 @@
     <string name="home_review_score_count">%1$s avis</string>
     <string name="home_review_savings_title">Économies excédentaires : %1$s</string>
     <string name="home_review_savings_desc">Dépenses flexibles totales économisées au fil des avis.</string>
+    <string name="home_review_performance_locked_label">Tendance Premium verrouillée</string>
+    <string name="home_review_performance_locked_title">Transformer les bilans en tendance</string>
+    <string name="home_review_performance_locked_desc">Premium transforme chaque bilan enregistré en score de confiance, série, signal d’épargne et tendance pour la prochaine paie.</string>
+    <string name="home_review_performance_locked_latest">Dernier bilan : %1$s flexible, %2$s priorité.</string>
+    <string name="home_review_performance_locked_free_label">Gratuit</string>
+    <string name="home_review_performance_locked_free_body">Dernier bilan seulement</string>
+    <string name="home_review_performance_locked_premium_label">Offre Premium</string>
+    <string name="home_review_performance_locked_premium_body">Score, série, tendance et économies</string>
+    <string name="home_review_performance_locked_action">Débloquer les analyses de performance</string>
     <string name="home_review_recommendation_label">Aperçu Premium verrouillé</string>
     <string name="home_review_recommendation_title">Ce que Premium ajusterait ensuite</string>
     <string name="home_review_recommendation_success_body">Votre dernier bilan est resté dans le plan. Premium peut repérer les excédents répétés et suggérer quand déplacer plus que le guide de %1$s.</string>

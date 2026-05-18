@@ -583,8 +583,7 @@ fun PremiumPaywallCard(
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-                itemVerticalAlignment = Alignment.Bottom
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
                     text = price,

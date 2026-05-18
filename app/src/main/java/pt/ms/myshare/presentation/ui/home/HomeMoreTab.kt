@@ -824,6 +824,7 @@ private fun AccountFeedback(state: MoreCardState) {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun CompactBillingPlanRow(
     title: String,
@@ -854,8 +855,7 @@ private fun CompactBillingPlanRow(
             Column(modifier = Modifier.weight(1f)) {
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    itemVerticalAlignment = Alignment.CenterVertically
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
                         text = title,
@@ -885,8 +885,7 @@ private fun CompactBillingPlanRow(
                 ) {
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                        itemVerticalAlignment = Alignment.Bottom
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Text(
                             text = stringResource(R.string.price_per_period, price, period),
