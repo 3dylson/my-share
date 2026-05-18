@@ -34,17 +34,25 @@
     <string name="onboarding_welcome_outcome_weekly_body">Turn payday money into a weekly amount you can trust.</string>
     <string name="onboarding_welcome_outcome_trust_title">Manual-first, no bank required</string>
     <string name="onboarding_welcome_outcome_trust_body">Start without connecting accounts. Premium is offered only after your plan is ready.</string>
+    <string name="onboarding_welcome_flow_income">Income</string>
+    <string name="onboarding_welcome_flow_bills">Bills</string>
+    <string name="onboarding_welcome_flow_weekly">Weekly</string>
+    <string name="onboarding_welcome_flow_goal">Goal</string>
     <string name="onboarding_welcome_button_get_started">Get Started</string>
     <string name="onboarding_welcome_button_skip_dev" translatable="false">Skip to Home (Dev)</string>
 
     <!-- Goal Picker Screen -->
-    <string name="onboarding_goal_picker_title">What are we building for?</string>
-    <string name="onboarding_goal_picker_subtitle">Pick one primary focus to start. You can add more later.</string>
+    <string name="onboarding_goal_picker_title">Pick this payday’s protected goal</string>
+    <string name="onboarding_goal_picker_subtitle">This goal shapes the plan we build from your numbers.</string>
     <string name="onboarding_goal_picker_emergency">Emergency Fund</string>
     <string name="onboarding_goal_picker_debt">Debt Payoff</string>
     <string name="onboarding_goal_picker_investment">Investment Portfolio</string>
     <string name="onboarding_goal_picker_purchase">Major Purchase</string>
     <string name="onboarding_goal_picker_custom">Custom Goal</string>
+    <string name="onboarding_goal_picker_guidance_title">Your first goal is free</string>
+    <string name="onboarding_goal_picker_guidance_body">Premium can split each payday across every goal later. Start with one clear outcome now.</string>
+    <string name="onboarding_goal_picker_details_title">Selected goal details</string>
+    <string name="onboarding_goal_picker_details_body">This is the target your first payday plan will protect.</string>
 
     <!-- Salary & Schedule Screen -->
     <string name="onboarding_salary_title">The Foundation</string>

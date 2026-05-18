@@ -213,7 +213,9 @@ Status after onboarding value-ladder pass on 2026-05-17:
 - Done: Trajectory now bridges into the paywall with review-based guidance copy tied to the user's weekly guide and priority transfer.
 - Done: Welcome now leads with a concrete payday outcome, a compact outcome card, a manual-first trust cue, quieter language/currency controls, and a sticky CTA.
 - Done: Welcome preference controls now feel less crowded: the currency picker uses a curated high-confidence currency list, currency rows separate code/name/symbol clearly, and language/currency selections update the visible app state immediately.
-- Pending: Goal Picker, Salary, Fixed Costs, and Allocation still need visual/copy passes to create a consistent premium setup flow before the paywall.
+- Done: Welcome now includes a native Compose payday-flow visual, and Trajectory now includes a plan-backed progress path using the user's weekly guide, priority transfer, and goal date.
+- Done: Goal Picker now uses outcome-first copy, a first-goal-free Premium cue, compact icon tiles, and a selected-goal details panel validated on normal and compact emulator viewports.
+- Pending: Salary, Fixed Costs, and Allocation still need visual/copy passes to create a consistent premium setup flow before the paywall.
 
 ### Problems
 

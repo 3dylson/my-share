@@ -35,15 +35,23 @@
     <string name="onboarding_welcome_outcome_weekly_body">Transforma o dinheiro do pagamento num valor semanal em que podes confiar.</string>
     <string name="onboarding_welcome_outcome_trust_title">Manual primeiro, sem banco</string>
     <string name="onboarding_welcome_outcome_trust_body">Começa sem ligar contas. O Premium só aparece quando o teu plano estiver pronto.</string>
+    <string name="onboarding_welcome_flow_income">Rendimento</string>
+    <string name="onboarding_welcome_flow_bills">Contas</string>
+    <string name="onboarding_welcome_flow_weekly">Semana</string>
+    <string name="onboarding_welcome_flow_goal">Objetivo</string>
     <string name="onboarding_welcome_button_get_started">Começar</string>
     <string name="onboarding_welcome_button_skip_dev" translatable="false">Skip to Home (Dev)</string>
-    <string name="onboarding_goal_picker_title">Qual é o teu objetivo?</string>
-    <string name="onboarding_goal_picker_subtitle">Escolhe um foco principal para começar. Podes adicionar mais depois.</string>
+    <string name="onboarding_goal_picker_title">Escolhe o objetivo protegido deste pagamento</string>
+    <string name="onboarding_goal_picker_subtitle">Este objetivo molda o plano que criamos a partir dos teus números.</string>
     <string name="onboarding_goal_picker_emergency">Fundo de emergência</string>
     <string name="onboarding_goal_picker_debt">Pagamento de dívida</string>
     <string name="onboarding_goal_picker_investment">Carteira de investimento</string>
     <string name="onboarding_goal_picker_purchase">Compra importante</string>
     <string name="onboarding_goal_picker_custom">Objetivo personalizado</string>
+    <string name="onboarding_goal_picker_guidance_title">O primeiro objetivo é grátis</string>
+    <string name="onboarding_goal_picker_guidance_body">O Premium pode dividir cada pagamento por todos os objetivos depois. Começa agora com um resultado claro.</string>
+    <string name="onboarding_goal_picker_details_title">Detalhes do objetivo escolhido</string>
+    <string name="onboarding_goal_picker_details_body">Este é o alvo que o teu primeiro plano de pagamento vai proteger.</string>
     <string name="onboarding_salary_title">A base</string>
     <string name="onboarding_salary_subtitle">Introduz o teu rendimento líquido e a frequência. Usamos isto para calcular os teus ciclos de pagamento.</string>
     <string name="onboarding_salary_frequency_monthly">Mensal</string>

@@ -5,9 +5,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.AutoGraph
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Savings
@@ -200,13 +202,10 @@ private fun WelcomeOutcomeCard() {
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            verticalArrangement = Arrangement.spacedBy(13.dp)
         ) {
-            WelcomeOutcomeRow(
-                title = stringResource(R.string.onboarding_welcome_outcome_payday_title),
-                body = stringResource(R.string.onboarding_welcome_outcome_payday_body),
-                icon = Icons.Default.CalendarMonth
-            )
+            PaydayFlowVisual()
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.16f))
             WelcomeOutcomeRow(
                 title = stringResource(R.string.onboarding_welcome_outcome_weekly_title),
                 body = stringResource(R.string.onboarding_welcome_outcome_weekly_body),
@@ -219,6 +218,90 @@ private fun WelcomeOutcomeCard() {
             )
         }
     }
+}
+
+@Composable
+private fun PaydayFlowVisual() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        PaydayFlowNode(
+            label = stringResource(R.string.onboarding_welcome_flow_income),
+            icon = Icons.Default.Payments,
+            tint = MySharePrimary,
+            modifier = Modifier.weight(1f)
+        )
+        PaydayFlowConnector()
+        PaydayFlowNode(
+            label = stringResource(R.string.onboarding_welcome_flow_bills),
+            icon = Icons.Default.AccountBalance,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f)
+        )
+        PaydayFlowConnector()
+        PaydayFlowNode(
+            label = stringResource(R.string.onboarding_welcome_flow_weekly),
+            icon = Icons.Default.Savings,
+            tint = MySharePositive,
+            modifier = Modifier.weight(1f)
+        )
+        PaydayFlowConnector()
+        PaydayFlowNode(
+            label = stringResource(R.string.onboarding_welcome_flow_goal),
+            icon = Icons.Default.Flag,
+            tint = MySharePrimary,
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+private fun PaydayFlowNode(
+    label: String,
+    icon: ImageVector,
+    tint: androidx.compose.ui.graphics.Color,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(7.dp)
+    ) {
+        Surface(
+            shape = RoundedCornerShape(14.dp),
+            color = tint.copy(alpha = 0.12f),
+            border = androidx.compose.foundation.BorderStroke(1.dp, tint.copy(alpha = 0.18f))
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = tint,
+                modifier = Modifier.padding(9.dp).size(21.dp)
+            )
+        }
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Composable
+private fun PaydayFlowConnector() {
+    Surface(
+        modifier = Modifier
+            .width(14.dp)
+            .height(2.dp),
+        color = MySharePrimary.copy(alpha = 0.24f),
+        shape = RoundedCornerShape(999.dp),
+        content = {}
+    )
 }
 
 @Composable

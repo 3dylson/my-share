@@ -34,15 +34,23 @@
     <string name="onboarding_welcome_outcome_weekly_body">Transforme l’argent de la paie en montant hebdomadaire fiable.</string>
     <string name="onboarding_welcome_outcome_trust_title">Manuel d’abord, sans banque</string>
     <string name="onboarding_welcome_outcome_trust_body">Commence sans connecter de comptes. Premium est proposé seulement quand ton plan est prêt.</string>
+    <string name="onboarding_welcome_flow_income">Revenu</string>
+    <string name="onboarding_welcome_flow_bills">Factures</string>
+    <string name="onboarding_welcome_flow_weekly">Semaine</string>
+    <string name="onboarding_welcome_flow_goal">Objectif</string>
     <string name="onboarding_welcome_button_get_started">Commencer</string>
     <string name="onboarding_welcome_button_skip_dev" translatable="false">Skip to Home (Dev)</string>
-    <string name="onboarding_goal_picker_title">Pour quoi construisons-nous ?</string>
-    <string name="onboarding_goal_picker_subtitle">Choisissez un objectif principal pour commencer. Vous pourrez en ajouter d’autres plus tard.</string>
+    <string name="onboarding_goal_picker_title">Choisis l’objectif protégé de cette paie</string>
+    <string name="onboarding_goal_picker_subtitle">Cet objectif façonne le plan créé à partir de tes chiffres.</string>
     <string name="onboarding_goal_picker_emergency">Fonds d\'urgence</string>
     <string name="onboarding_goal_picker_debt">Remboursement de la dette</string>
     <string name="onboarding_goal_picker_investment">Portefeuille d\'investissement</string>
     <string name="onboarding_goal_picker_purchase">Achat majeur</string>
     <string name="onboarding_goal_picker_custom">Objectif personnalisé</string>
+    <string name="onboarding_goal_picker_guidance_title">Ton premier objectif est gratuit</string>
+    <string name="onboarding_goal_picker_guidance_body">Premium peut répartir chaque paie entre tous les objectifs plus tard. Commence maintenant par un résultat clair.</string>
+    <string name="onboarding_goal_picker_details_title">Détails de l’objectif choisi</string>
+    <string name="onboarding_goal_picker_details_body">C’est la cible que ton premier plan de paie va protéger.</string>
     <string name="onboarding_salary_title">La Fondation</string>
     <string name="onboarding_salary_subtitle">Entrez votre revenu net et votre fréquence. Nous l\'utilisons pour calculer vos cycles de paie.</string>
     <string name="onboarding_salary_frequency_monthly">Mensuel</string>

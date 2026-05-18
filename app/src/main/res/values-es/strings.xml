@@ -34,15 +34,23 @@
     <string name="onboarding_welcome_outcome_weekly_body">Convierte el dinero del cobro en una cantidad semanal confiable.</string>
     <string name="onboarding_welcome_outcome_trust_title">Manual primero, sin banco</string>
     <string name="onboarding_welcome_outcome_trust_body">Empieza sin conectar cuentas. Premium se ofrece solo cuando tu plan esté listo.</string>
+    <string name="onboarding_welcome_flow_income">Ingreso</string>
+    <string name="onboarding_welcome_flow_bills">Facturas</string>
+    <string name="onboarding_welcome_flow_weekly">Semana</string>
+    <string name="onboarding_welcome_flow_goal">Meta</string>
     <string name="onboarding_welcome_button_get_started">Empezar</string>
     <string name="onboarding_welcome_button_skip_dev" translatable="false">Skip to Home (Dev)</string>
-    <string name="onboarding_goal_picker_title">¿Para qué estamos construyendo?</string>
-    <string name="onboarding_goal_picker_subtitle">Elija un enfoque principal para comenzar. Puedes agregar más más tarde.</string>
+    <string name="onboarding_goal_picker_title">Elige la meta protegida de este cobro</string>
+    <string name="onboarding_goal_picker_subtitle">Esta meta da forma al plan que creamos con tus números.</string>
     <string name="onboarding_goal_picker_emergency">Fondo de Emergencia</string>
     <string name="onboarding_goal_picker_debt">Pago de deuda</string>
     <string name="onboarding_goal_picker_investment">Portafolio de Inversiones</string>
     <string name="onboarding_goal_picker_purchase">Compra importante</string>
     <string name="onboarding_goal_picker_custom">Objetivo personalizado</string>
+    <string name="onboarding_goal_picker_guidance_title">Tu primera meta es gratis</string>
+    <string name="onboarding_goal_picker_guidance_body">Premium puede dividir cada cobro entre todas las metas más tarde. Empieza ahora con un resultado claro.</string>
+    <string name="onboarding_goal_picker_details_title">Detalles de la meta elegida</string>
+    <string name="onboarding_goal_picker_details_body">Este es el objetivo que protegerá tu primer plan de cobro.</string>
     <string name="onboarding_salary_title">La Fundación</string>
     <string name="onboarding_salary_subtitle">Ingrese su ingreso neto y frecuencia. Usamos esto para calcular sus ciclos de día de pago.</string>
     <string name="onboarding_salary_frequency_monthly">Mensual</string>

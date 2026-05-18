@@ -34,15 +34,23 @@
     <string name="onboarding_welcome_outcome_weekly_body">Mach aus deinem Zahltag-Geld einen verlässlichen Wochenbetrag.</string>
     <string name="onboarding_welcome_outcome_trust_title">Manuell zuerst, keine Bank nötig</string>
     <string name="onboarding_welcome_outcome_trust_body">Starte ohne Kontoverbindung. Premium wird erst angeboten, wenn dein Plan bereit ist.</string>
+    <string name="onboarding_welcome_flow_income">Einkommen</string>
+    <string name="onboarding_welcome_flow_bills">Rechnungen</string>
+    <string name="onboarding_welcome_flow_weekly">Woche</string>
+    <string name="onboarding_welcome_flow_goal">Ziel</string>
     <string name="onboarding_welcome_button_get_started">Legen Sie los</string>
     <string name="onboarding_welcome_button_skip_dev" translatable="false">Skip to Home (Dev)</string>
-    <string name="onboarding_goal_picker_title">Wofür bauen wir?</string>
-    <string name="onboarding_goal_picker_subtitle">Wählen Sie zunächst einen Hauptschwerpunkt aus. Sie können später weitere hinzufügen.</string>
+    <string name="onboarding_goal_picker_title">Wähle das geschützte Ziel dieses Zahltags</string>
+    <string name="onboarding_goal_picker_subtitle">Dieses Ziel prägt den Plan, den wir aus deinen Zahlen erstellen.</string>
     <string name="onboarding_goal_picker_emergency">Notfallfonds</string>
     <string name="onboarding_goal_picker_debt">Schuldentilgung</string>
     <string name="onboarding_goal_picker_investment">Anlageportfolio</string>
     <string name="onboarding_goal_picker_purchase">Große Anschaffung</string>
     <string name="onboarding_goal_picker_custom">Benutzerdefiniertes Ziel</string>
+    <string name="onboarding_goal_picker_guidance_title">Dein erstes Ziel ist kostenlos</string>
+    <string name="onboarding_goal_picker_guidance_body">Premium kann jeden Zahltag später auf alle Ziele verteilen. Starte jetzt mit einem klaren Ergebnis.</string>
+    <string name="onboarding_goal_picker_details_title">Details zum gewählten Ziel</string>
+    <string name="onboarding_goal_picker_details_body">Das ist das Ziel, das dein erster Zahltag-Plan schützt.</string>
     <string name="onboarding_salary_title">Die Stiftung</string>
     <string name="onboarding_salary_subtitle">Geben Sie Ihr Nettoeinkommen und Ihre Häufigkeit ein. Daraus berechnen wir Ihre Zahltagszyklen.</string>
     <string name="onboarding_salary_frequency_monthly">Monatlich</string>

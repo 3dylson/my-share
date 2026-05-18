@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -95,7 +96,7 @@ fun TrajectoryScreen(
                 .imePadding()
                 .verticalScroll(rememberScrollState())
         ) {
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(24.dp))
 
             Text(
                 text = stringResource(R.string.onboarding_trajectory_title),
@@ -112,7 +113,7 @@ fun TrajectoryScreen(
                 modifier = Modifier.padding(top = 8.dp)
             )
 
-            Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(20.dp))
 
             if (preview != null) {
                 val context = androidx.compose.ui.platform.LocalContext.current
@@ -121,21 +122,26 @@ fun TrajectoryScreen(
                     val resId = context.resources.getIdentifier(preview.summary, "string", context.packageName)
                     if (resId != 0) context.getString(resId) else preview.summary
                 }
-                TrajectorySummaryCard(
-                    paydaySummary = paydaySummary,
-                    goalDate = preview.goalTargetDate?.let { date ->
+            TrajectorySummaryCard(
+                paydaySummary = paydaySummary,
+                goalDate = preview.goalTargetDate?.let { date ->
                         val calendar = Calendar.getInstance().apply {
                             set(Calendar.YEAR, date.year)
                             set(Calendar.MONTH, date.monthValue - 1)
                         }
                         android.text.format.DateFormat.format("MMMM yyyy", calendar).toString()
                     },
-                    goalName = goalName,
-                    contribution = currencyFormat.format(preview.priorityContributionPerPayday),
-                    hasPriorityContribution = hasPriorityContribution
-                )
+                goalName = goalName,
+                contribution = currencyFormat.format(preview.priorityContributionPerPayday),
+                weeklyFlexibleSpend = LocalizedAmountFormatter.formatCurrency(
+                    amount = preview.weeklyFlexibleSpend,
+                    locale = userPreferences.locale,
+                    currencyCode = userPreferences.currencyCode
+                ),
+                hasPriorityContribution = hasPriorityContribution
+            )
 
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(12.dp))
 
                 TrajectoryPremiumBridgeCard(
                     weeklyFlexibleSpend = LocalizedAmountFormatter.formatCurrency(
@@ -155,7 +161,7 @@ fun TrajectoryScreen(
                     goalName = goalName
                 )
 
-                Spacer(Modifier.height(14.dp))
+                Spacer(Modifier.height(10.dp))
 
                 Text(
                     text = stringResource(R.string.onboarding_trajectory_footer),
@@ -174,7 +180,7 @@ fun TrajectoryScreen(
                 }
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(18.dp))
         }
     }
 }
@@ -207,7 +213,7 @@ private fun TrajectoryPremiumBridgeCard(
         border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.24f))
     ) {
         Row(
-            modifier = Modifier.padding(14.dp),
+            modifier = Modifier.padding(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.Top
         ) {
@@ -260,6 +266,7 @@ private fun TrajectorySummaryCard(
     goalDate: String?,
     goalName: String,
     contribution: String,
+    weeklyFlexibleSpend: String,
     hasPriorityContribution: Boolean
 ) {
     Surface(
@@ -269,9 +276,16 @@ private fun TrajectorySummaryCard(
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.55f))
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            modifier = Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            TrajectoryPathVisual(
+                weeklyFlexibleSpend = weeklyFlexibleSpend,
+                contribution = contribution,
+                goalDate = goalDate,
+                hasPriorityContribution = hasPriorityContribution
+            )
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.16f))
             TrajectorySummaryRow(
                 title = stringResource(R.string.onboarding_trajectory_label_payday),
                 value = paydaySummary,
@@ -311,6 +325,115 @@ private fun TrajectorySummaryCard(
             )
         }
     }
+}
+
+@Composable
+private fun TrajectoryPathVisual(
+    weeklyFlexibleSpend: String,
+    contribution: String,
+    goalDate: String?,
+    hasPriorityContribution: Boolean
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Top
+    ) {
+        TrajectoryPathNode(
+            title = stringResource(R.string.onboarding_trajectory_label_payday),
+            value = weeklyFlexibleSpend,
+            icon = Icons.Default.Savings,
+            tint = MySharePrimary,
+            modifier = Modifier.weight(1f)
+        )
+        TrajectoryPathConnector()
+        TrajectoryPathNode(
+            title = if (hasPriorityContribution) {
+                stringResource(R.string.onboarding_trajectory_flexible_title)
+            } else {
+                stringResource(R.string.onboarding_trajectory_label_strategy)
+            },
+            value = contribution,
+            icon = Icons.AutoMirrored.Filled.TrendingUp,
+            tint = MySharePositive,
+            modifier = Modifier.weight(1f)
+        )
+        TrajectoryPathConnector()
+        TrajectoryPathNode(
+            title = if (hasPriorityContribution) {
+                stringResource(R.string.onboarding_trajectory_label_goal)
+            } else {
+                stringResource(R.string.onboarding_trajectory_goal_pending)
+            },
+            value = goalDate ?: stringResource(R.string.onboarding_trajectory_goal_pending),
+            icon = Icons.Default.CalendarMonth,
+            tint = MySharePrimary,
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+private fun TrajectoryPathNode(
+    title: String,
+    value: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    tint: androidx.compose.ui.graphics.Color,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(5.dp)
+    ) {
+        Surface(
+            shape = CircleShape,
+            color = tint.copy(alpha = 0.12f),
+            border = BorderStroke(1.dp, tint.copy(alpha = 0.18f))
+        ) {
+            Box(
+                modifier = Modifier.size(34.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = tint,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+        }
+        Text(
+            text = title,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = FontWeight.SemiBold,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.Black,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Composable
+private fun TrajectoryPathConnector() {
+    Surface(
+        modifier = Modifier
+            .padding(top = 17.dp)
+            .width(18.dp)
+            .height(2.dp),
+        color = MySharePrimary.copy(alpha = 0.24f),
+        shape = RoundedCornerShape(999.dp),
+        content = {}
+    )
 }
 
 @Composable
