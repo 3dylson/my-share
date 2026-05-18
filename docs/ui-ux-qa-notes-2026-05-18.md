@@ -153,7 +153,39 @@ The compact profile remained usable through the full path:
 - Review recommendation, review form, latest review row, and locked history preview remained reachable on the compact profile without overlapping the bottom nav.
 - More control-center metrics stacked cleanly on the compact profile, and the Premium preview, pricing CTA, legal links, and account rows remained reachable.
 
+## Phase 6 Full Pass
+
+Evidence folder: `/tmp/myshare-phase6-qa-2026-05-18`
+
+Scope:
+
+- Target device: `emulator-5554` only. The connected physical USB tablet was not used.
+- Automated check: `./gradlew testDebugUnitTest --console=plain` passed.
+- Clean install flow: app uninstalled and reinstalled on the emulator, then launched from `pt.ms.myshare/.presentation.ui.MainComposeActivity`.
+- Artifacts captured: 209 screenshots, UI-tree XML files, summaries, and log files.
+
+Validated:
+
+- Full onboarding from Welcome through goal picker, salary, fixed costs, allocation, Plan Preview, signup, trajectory, paywall, reminder setup, bank-sync skip, and Home.
+- Salary blank validation and fixed-costs-over-income validation.
+- Plan Preview aha moment, including safe weekly spend, protected bills, priority move, ordered payday actions, goal path, and adaptive Premium teaser.
+- Paywall top, checkout error handling, restore feedback, close behavior, and in-app recovery copy.
+- Reminder permission deny from onboarding and allow from More.
+- Plan tab summary, locked smart-adjustment preview, and contextual Premium gate.
+- Strategy goal/rule entry points, locked multi-goal split preview, locked adaptive-rules preview, and related Premium gates.
+- Review submission with an on-plan review and an off-plan review, including latest-first history, planned deltas, trust score, recommendation preview, and locked history copy.
+- More as a control center, including reminder settings, language dialog, currency dialog, automation lock, Premium upgrade section, checkout error handling, legal/account rows, account details, and sign-out confirmation without signing out.
+- Compact profile at `720x1280 / 360dpi` for onboarding, Plan, Strategy, Review, and More. Content stayed scrollable and reachable, and the emulator was restored afterward to `1080x2400 / 420dpi`.
+
+Result:
+
+- Pass for Phase 6 full end-to-end verification.
+- No `pt.ms.myshare` fatal crash or ANR was found in the captured logs.
+- The crash buffer included an emulator Bluetooth system-process abort outside the app.
+- Captured app-related log noise includes Firebase/Google Play first-run warnings and StrictMode stack traces around Firebase/Auth initialization.
+
 ## Residual Risk
 
-- Play Billing checkout handoff was not triggered during this pass to avoid starting an actual purchase flow.
-- Main-tab QA from the Phase 6 list remains separate from this onboarding conversion pass.
+- Play Billing cannot be fully validated as a successful paid conversion until Play Console products/licensed tester setup can complete a real purchase/restore path.
+- On compact screens, the More paywall error message can push the `Start free trial` button slightly farther down after a failed checkout, but the CTA remains reachable with an extra scroll.
+- Reminder-denied onboarding returned cleanly to setup; the captured screen did not show a distinct denial snackbar, so that feedback can still be improved later.

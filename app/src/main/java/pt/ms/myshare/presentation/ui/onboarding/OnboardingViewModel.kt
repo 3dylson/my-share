@@ -91,7 +91,8 @@ class OnboardingViewModel @Inject constructor(
                 state.update { current ->
                     current.copy(
                         isPremium = isPremium,
-                        shouldSecurePremiumAccess = isPremium && current.isAnonymousUser
+                        shouldSecurePremiumAccess = current.shouldSecurePremiumAccess ||
+                            (isPremium && current.isAnonymousUser && !current.hasDismissedSecurePremiumAccessPrompt)
                     )
                 }
             }
@@ -102,7 +103,8 @@ class OnboardingViewModel @Inject constructor(
                 state.update { current ->
                     current.copy(
                         isAnonymousUser = isAnonymous,
-                        shouldSecurePremiumAccess = current.isPremium && isAnonymous
+                        shouldSecurePremiumAccess = current.shouldSecurePremiumAccess ||
+                            (current.isPremium && isAnonymous && !current.hasDismissedSecurePremiumAccessPrompt)
                     )
                 }
             }
@@ -118,11 +120,24 @@ class OnboardingViewModel @Inject constructor(
         viewModelScope.launch {
             entitlementRepository.purchaseEvents.collect { event ->
                 val messageKey = BillingStatusMessageMapper.fromPurchaseEvent(event)
+                var shouldLogSecurePrompt = false
                 state.update {
+                    val shouldShowSecurePrompt = event == BillingPurchaseEvent.Completed &&
+                        it.isAnonymousUser &&
+                        !it.hasDismissedSecurePremiumAccessPrompt &&
+                        !it.shouldSecurePremiumAccess
+                    shouldLogSecurePrompt = shouldShowSecurePrompt
                     it.copy(
                         isBillingActionInProgress = false,
-                        billingMessage = messageKey
+                        billingMessage = messageKey,
+                        shouldSecurePremiumAccess = it.shouldSecurePremiumAccess || shouldShowSecurePrompt
                     )
+                }
+                if (shouldLogSecurePrompt) {
+                    FirebaseUtils.logEvent("premium_account_prompt_shown", Bundle().apply {
+                        putString("source", "onboarding_paywall")
+                    })
+                    Timber.tag(TAG).d("Premium account prompt shown from onboarding purchase event")
                 }
                 logBillingPurchaseEvent(event, "onboarding_paywall")
             }
@@ -383,7 +398,9 @@ class OnboardingViewModel @Inject constructor(
                     state.update {
                         it.copy(
                             isAnonymousUser = user.isAnonymous,
-                            shouldSecurePremiumAccess = it.isPremium && user.isAnonymous,
+                            shouldSecurePremiumAccess = it.isPremium &&
+                                user.isAnonymous &&
+                                !it.hasDismissedSecurePremiumAccessPrompt,
                             isGoogleConnectionInProgress = false,
                             googleConnectionMessage = "home_more_account_connect_google_success",
                             googleConnectionError = null
@@ -422,7 +439,12 @@ class OnboardingViewModel @Inject constructor(
     }
 
     fun dismissSecurePremiumAccessPrompt() {
-        state.update { it.copy(shouldSecurePremiumAccess = false) }
+        state.update {
+            it.copy(
+                shouldSecurePremiumAccess = false,
+                hasDismissedSecurePremiumAccessPrompt = true
+            )
+        }
         FirebaseUtils.logEvent("premium_account_link_skipped", Bundle().apply {
             putString("source", "onboarding_paywall")
         })

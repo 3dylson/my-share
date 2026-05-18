@@ -4,6 +4,31 @@ const {google} = require("googleapis");
 
 admin.initializeApp();
 
+async function requireAuthenticatedUid(data, context) {
+    if (context.auth && context.auth.uid) {
+        return context.auth.uid;
+    }
+
+    const firebaseIdToken = data.firebaseIdToken;
+    if (typeof firebaseIdToken !== "string" || firebaseIdToken.length === 0) {
+        throw new functions.https.HttpsError(
+            'unauthenticated',
+            'User must be authenticated to verify a subscription.'
+        );
+    }
+
+    try {
+        const decodedToken = await admin.auth().verifyIdToken(firebaseIdToken);
+        return decodedToken.uid;
+    } catch (error) {
+        console.error("Error verifying Firebase ID token:", error);
+        throw new functions.https.HttpsError(
+            'unauthenticated',
+            'User must be authenticated to verify a subscription.'
+        );
+    }
+}
+
 /**
  * Validates a Google Play Purchase Token with the Google Play Developer API.
  * 
@@ -11,14 +36,11 @@ admin.initializeApp();
  * - packageName: "pt.ms.myshare"
  * - serviceAccountEmail / privateKey configured in Firebase or Google Cloud
  */
-exports.verifySubscription = functions.https.onCall(async (data, context) => {
+exports.verifySubscription = functions
+    .runWith({ serviceAccount: "564550726509-compute@developer.gserviceaccount.com" })
+    .https.onCall(async (data, context) => {
     // 1. Authenticate caller
-    if (!context.auth) {
-        throw new functions.https.HttpsError(
-            'unauthenticated', 
-            'User must be authenticated to verify a subscription.'
-        );
-    }
+    const uid = await requireAuthenticatedUid(data, context);
 
     const purchaseToken = data.purchaseToken;
     const subscriptionId = data.subscriptionId; // e.g. "myshare_premium"
@@ -32,6 +54,8 @@ exports.verifySubscription = functions.https.onCall(async (data, context) => {
     }
 
     try {
+        console.log("Verifying subscription", {uid, subscriptionId});
+
         // 2. Initialize the Google Play Developer API client
         const auth = new google.auth.GoogleAuth({
             scopes: ['https://www.googleapis.com/auth/androidpublisher']
@@ -43,41 +67,74 @@ exports.verifySubscription = functions.https.onCall(async (data, context) => {
         });
 
         // 3. Verify the purchase token
-        const response = await androidPublisher.purchases.subscriptions.get({
+        const response = await androidPublisher.purchases.subscriptionsv2.get({
             packageName: packageName,
-            subscriptionId: subscriptionId,
             token: purchaseToken
         });
 
         const purchaseInfo = response.data;
         
         // 4. Validate if the subscription is still active
-        // paymentState 1 = Payment received. 
-        // expiryTimeMillis must be in the future.
+        const subscriptionState = purchaseInfo.subscriptionState ?? null;
+        const expiryTimeMillis = purchaseInfo.lineItems
+            ?.map((lineItem) => Date.parse(lineItem.expiryTime))
+            .filter((expiry) => !Number.isNaN(expiry))
+            .sort((a, b) => b - a)[0];
         const now = Date.now();
-        const expiryTime = parseInt(purchaseInfo.expiryTimeMillis, 10);
-        
-        const isActive = expiryTime > now;
+        const isEntitledState = [
+            "SUBSCRIPTION_STATE_ACTIVE",
+            "SUBSCRIPTION_STATE_IN_GRACE_PERIOD",
+            "SUBSCRIPTION_STATE_CANCELED"
+        ].includes(subscriptionState);
+        const isActive = isEntitledState && expiryTimeMillis > now;
 
-        // 5. Optionally, update the user's Firestore document
+        const entitlementState = isActive ?
+            (subscriptionState === "SUBSCRIPTION_STATE_IN_GRACE_PERIOD" ? "GRACE_PERIOD" : "PRO") :
+            "FREE";
+        const entitlementSnapshot = {
+            isPro: isActive,
+            entitlementState,
+            subscriptionState,
+            subscriptionId,
+            purchaseToken,
+            proExpiry: isActive && expiryTimeMillis ? admin.firestore.Timestamp.fromMillis(expiryTimeMillis) : null,
+            expiryTimeMillis: expiryTimeMillis ? String(expiryTimeMillis) : null,
+            paymentState: null,
+            lastVerifiedAt: admin.firestore.FieldValue.serverTimestamp()
+        };
+
+        // 5. Update the server entitlement snapshot.
         if (isActive) {
-            await admin.firestore().collection('users').doc(context.auth.uid).set({
+            await admin.firestore().collection('users').doc(uid).set({
                 isPro: true,
-                proExpiry: admin.firestore.Timestamp.fromMillis(expiryTime),
+                entitlementState,
+                subscriptionState,
+                proExpiry: admin.firestore.Timestamp.fromMillis(expiryTimeMillis),
                 lastVerifiedAt: admin.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
         } else {
             // Subscription expired
-            await admin.firestore().collection('users').doc(context.auth.uid).set({
-                isPro: false
+            await admin.firestore().collection('users').doc(uid).set({
+                isPro: false,
+                entitlementState,
+                subscriptionState,
+                lastVerifiedAt: admin.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
         }
+        await admin.firestore()
+            .collection('users')
+            .doc(uid)
+            .collection('entitlements')
+            .doc('current')
+            .set(entitlementSnapshot, { merge: true });
 
         // 6. Return the source of truth to the client
         return {
             isValid: isActive,
-            expiryTimeMillis: purchaseInfo.expiryTimeMillis,
-            paymentState: purchaseInfo.paymentState
+            entitlementState,
+            subscriptionState,
+            expiryTimeMillis: expiryTimeMillis ? String(expiryTimeMillis) : null,
+            paymentState: null
         };
 
     } catch (error) {

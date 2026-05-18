@@ -10,7 +10,9 @@ import dagger.hilt.components.SingletonComponent
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
+import pt.ms.myshare.data.billing.BillingAuthSession
 import pt.ms.myshare.data.billing.BillingClientWrapper
+import pt.ms.myshare.data.billing.FirebaseBillingAuthSession
 import pt.ms.myshare.data.billing.PlayBillingEntitlementRepository
 import pt.ms.myshare.data.repository.FirestoreAppUpdatePolicyRepository
 import pt.ms.myshare.data.repository.AuthRepositoryImpl
@@ -78,13 +80,17 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideBillingAuthSession(firebaseAuth: FirebaseAuth): BillingAuthSession = FirebaseBillingAuthSession(firebaseAuth)
+
+    @Provides
+    @Singleton
     fun provideEntitlementRepository(
         billingClientWrapper: BillingClientWrapper,
-        firebaseAuth: FirebaseAuth,
+        billingAuthSession: BillingAuthSession,
         firestore: FirebaseFirestore,
         firebaseFunctions: FirebaseFunctions
     ): EntitlementRepository = 
-        PlayBillingEntitlementRepository(billingClientWrapper, firebaseAuth, firestore, firebaseFunctions)
+        PlayBillingEntitlementRepository(billingClientWrapper, billingAuthSession, firestore, firebaseFunctions)
 
     @Provides
     @Singleton

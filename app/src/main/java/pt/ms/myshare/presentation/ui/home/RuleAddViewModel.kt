@@ -16,6 +16,7 @@ import pt.ms.myshare.domain.model.PaydayRuleType
 import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.repository.UserPreferencesRepository
+import pt.ms.myshare.domain.use_case.CheckEntitlementLimitUseCase
 import pt.ms.myshare.presentation.ui.formatting.AllocationAmountConverter
 import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import java.math.BigDecimal
@@ -45,6 +46,7 @@ data class RuleAddState(
 class RuleAddViewModel @Inject constructor(
     private val repository: PlannerRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
+    private val checkEntitlementLimitUseCase: CheckEntitlementLimitUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -153,6 +155,13 @@ class RuleAddViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            val isNewRule = _state.value.ruleId == null
+            if (isNewRule && !checkEntitlementLimitUseCase.canAddMultipleRules(repository.loadRules().size)) {
+                _state.update { it.copy(error = "rule_add_error_premium_required") }
+                Timber.tag(TAG).w("Blocked extra payday rule save because Premium is inactive")
+                return@launch
+            }
+
             _state.update { it.copy(isLoading = true, error = null) }
             
             val finalRule = PaydayRule(

@@ -8,8 +8,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.map
 import pt.ms.myshare.domain.model.BillingFlowLaunchResult
 import pt.ms.myshare.domain.model.BillingPurchaseEvent
+import pt.ms.myshare.domain.model.EntitlementState
 import pt.ms.myshare.domain.model.StoreProduct
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import timber.log.Timber
@@ -24,6 +26,9 @@ class SharedPreferencesEntitlementRepository @Inject constructor(
     private val prefs = PreferenceManager.getDefaultSharedPreferences(context)
     private val premiumState = MutableStateFlow(prefs.getBoolean(KEY_IS_PRO, false))
 
+    override val entitlementState: Flow<EntitlementState> = premiumState.map {
+        if (it) EntitlementState.PRO else EntitlementState.FREE
+    }
     override val isPro: Flow<Boolean> = premiumState.asStateFlow()
     override val availableProducts: Flow<List<StoreProduct>> = MutableStateFlow(emptyList())
     override val purchaseEvents: Flow<BillingPurchaseEvent> = emptyFlow()

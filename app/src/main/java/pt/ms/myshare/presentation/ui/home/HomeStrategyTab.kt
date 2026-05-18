@@ -106,7 +106,14 @@ fun LazyListScope.homeStrategyTab(
                 progress = goal.progress,
                 progressLabel = progressLabel,
                 targetDateLabel = targetDateLabel,
-                onClick = { onEditGoal(goal.id) },
+                isLocked = goal.isLockedByEntitlement,
+                onClick = {
+                    if (goal.isLockedByEntitlement) {
+                        onShowPaywall(HomePremiumGate.MultipleGoals)
+                    } else {
+                        onEditGoal(goal.id)
+                    }
+                },
                 modifier = Modifier
             )
             Spacer(Modifier.height(16.dp))
@@ -183,7 +190,14 @@ fun LazyListScope.homeStrategyTab(
                     localizedTypeLabel
                 },
                 isPremium = isPremium,
-                onClick = { onEditRule(rule.id) },
+                isLocked = rule.isLockedByEntitlement,
+                onClick = {
+                    if (rule.isLockedByEntitlement) {
+                        onShowPaywall(HomePremiumGate.MultipleRules)
+                    } else {
+                        onEditRule(rule.id)
+                    }
+                },
                 modifier = Modifier
             )
             Spacer(Modifier.height(16.dp))
@@ -228,6 +242,7 @@ private fun CompactStrategyGoalCard(
     progress: Float,
     progressLabel: String,
     targetDateLabel: String,
+    isLocked: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -273,12 +288,22 @@ private fun CompactStrategyGoalCard(
                         fontWeight = FontWeight.SemiBold
                     )
                 }
-                Text(
-                    text = NumberFormat.getPercentInstance(Locale.getDefault()).format(progress),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MySharePrimary,
-                    fontWeight = FontWeight.Black
-                )
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        text = NumberFormat.getPercentInstance(Locale.getDefault()).format(progress),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MySharePrimary,
+                        fontWeight = FontWeight.Black
+                    )
+                    if (isLocked) {
+                        Text(
+                            text = stringResource(R.string.premium_badge).uppercase(),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MySharePrimary,
+                            fontWeight = FontWeight.Black
+                        )
+                    }
+                }
             }
 
             PremiumProgressBar(progress = progress, color = MySharePrimary)
@@ -324,6 +349,7 @@ private fun CompactStrategyRuleCard(
     amountLabel: String,
     typeLabel: String,
     isPremium: Boolean,
+    isLocked: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -368,7 +394,15 @@ private fun CompactStrategyRuleCard(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    if (!isPremium) {
+                    if (isLocked) {
+                        Text(
+                            text = stringResource(R.string.premium_badge).uppercase(),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MySharePrimary,
+                            fontWeight = FontWeight.Black,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    } else if (!isPremium) {
                         Text(
                             text = stringResource(R.string.home_strategy_rule_static_badge).uppercase(),
                             style = MaterialTheme.typography.labelSmall,

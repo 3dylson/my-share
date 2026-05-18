@@ -598,9 +598,11 @@
     <string name="onboarding_error_next_payday_format">استخدم YYYY-MM-DD ليوم الدفع التالي كل أسبوعين.</string>
     <string name="goal_add_error_missing">هذا الهدف لم يعد متاحا.</string>
     <string name="goal_add_error_invalid_name_amount">الرجاء إدخال اسم صالح والمبلغ.</string>
+    <string name="goal_add_error_premium_required">تحتاج إلى Premium لإضافة هدف آخر. تبقى أهدافك المحفوظة آمنة، وتُفتح الأهداف الإضافية مرة أخرى عندما يكون Premium نشطاً.</string>
     <string name="rule_add_error_missing">هذه القاعدة لم تعد متوفرة.</string>
     <string name="rule_add_error_invalid_name_amount">الرجاء إدخال اسم صالح والمبلغ.</string>
     <string name="rule_add_error_exceeds_available">تتجاوز هذه القاعدة الدخل المتاح بعد التكاليف الثابتة. خفّض المبلغ أو عدّل قاعدة أخرى.</string>
+    <string name="rule_add_error_premium_required">تحتاج إلى Premium لإضافة قاعدة يوم دفع أخرى. تبقى قواعدك المحفوظة آمنة، وتُفتح القواعد الإضافية مرة أخرى عندما يكون Premium نشطاً.</string>
     <string name="rule_type_savings">الادخار</string>
     <string name="rule_type_investing">الاستثمار</string>
     <string name="rule_type_crypto">العملات المشفرة</string>

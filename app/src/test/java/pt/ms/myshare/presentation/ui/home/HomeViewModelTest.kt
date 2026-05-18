@@ -13,6 +13,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -20,6 +21,7 @@ import pt.ms.myshare.domain.model.AllocationPreset
 import pt.ms.myshare.domain.model.BillingFlowLaunchResult
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.BillingPurchaseEvent
+import pt.ms.myshare.domain.model.EntitlementState
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.PaydayRule
 import pt.ms.myshare.domain.model.PayFrequency
@@ -33,6 +35,7 @@ import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
+import pt.ms.myshare.domain.use_case.EnforcePremiumDowngradeUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
 import java.math.BigDecimal
 
@@ -83,6 +86,7 @@ class HomeViewModelTest {
             userPreferencesRepository = TestUserPreferencesRepository(),
             calculatePlanPreviewUseCase = calculatePlanPreviewUseCase,
             createReviewInsightUseCase = CreateReviewInsightUseCase(calculatePlanPreviewUseCase),
+            enforcePremiumDowngradeUseCase = EnforcePremiumDowngradeUseCase(fakePlannerRepository),
             resolvePricingStrategyUseCase = ResolvePricingStrategyUseCase(),
             getReviewHistoryUseCase = mockGetReviewHistoryUseCase,
             updateGoalProgressUseCase = mockUpdateGoalProgressUseCase,
@@ -268,6 +272,87 @@ class HomeViewModelTest {
     }
 
     @Test
+    fun `purchase completed asks local user to connect Google account`() = runTest {
+        advanceUntilIdle()
+
+        fakeEntitlementRepository.emitPurchaseEvent(BillingPurchaseEvent.Completed)
+        advanceUntilIdle()
+
+        assertTrue(viewModel.state.value.moreCard.showPremiumAccountPrompt)
+        assertEquals(
+            "paywall_billing_completed",
+            viewModel.state.value.moreCard.billingMessage
+        )
+    }
+
+    @Test
+    fun `dismissPremiumAccountPrompt hides post purchase account prompt`() = runTest {
+        advanceUntilIdle()
+        fakeEntitlementRepository.emitPurchaseEvent(BillingPurchaseEvent.Completed)
+        advanceUntilIdle()
+
+        viewModel.dismissPremiumAccountPrompt()
+        advanceUntilIdle()
+
+        assertFalse(viewModel.state.value.moreCard.showPremiumAccountPrompt)
+    }
+
+    @Test
+    fun `saveReview emits one shot review saved feedback`() = runTest {
+        val currentPlan = SalaryPlan(
+            focus = PlanningFocus.SAVE_WITHOUT_STRESS,
+            netIncomePerPayday = BigDecimal("1000"),
+            monthlyFixedCosts = BigDecimal("400"),
+            payFrequency = PayFrequency.MONTHLY,
+            monthlyPayday = 1,
+            preset = AllocationPreset.BALANCED
+        )
+        fakePlannerRepository.savePlan(currentPlan)
+        advanceUntilIdle()
+
+        viewModel.onFlexibleSpendChanged("200")
+        viewModel.onGoalContributionChanged("100")
+        viewModel.saveReview()
+        advanceUntilIdle()
+
+        val eventId = viewModel.state.value.reviewSavedEventId
+        assertTrue(eventId > 0L)
+
+        viewModel.clearReviewSavedFeedback(eventId)
+        advanceUntilIdle()
+
+        assertEquals(0L, viewModel.state.value.reviewSavedEventId)
+    }
+
+    @Test
+    fun `downgrade to free disables premium automation and locks more card`() = runTest {
+        fakeEntitlementRepository.setEntitlementState(EntitlementState.PRO)
+        fakePlannerRepository.saveAutomationEnabled(true)
+        advanceUntilIdle()
+
+        assertEquals(true, viewModel.state.value.moreCard.isPremium)
+        assertEquals(true, viewModel.state.value.moreCard.automationEnabled)
+
+        fakeEntitlementRepository.setEntitlementState(EntitlementState.FREE)
+        advanceUntilIdle()
+
+        assertEquals(false, fakePlannerRepository.automationEnabled())
+        assertEquals(false, viewModel.state.value.moreCard.isPremium)
+        assertEquals(false, viewModel.state.value.moreCard.automationEnabled)
+    }
+
+    @Test
+    fun `grace period keeps premium automation available`() = runTest {
+        fakeEntitlementRepository.setEntitlementState(EntitlementState.GRACE_PERIOD)
+        fakePlannerRepository.saveAutomationEnabled(true)
+        advanceUntilIdle()
+
+        assertEquals(true, fakePlannerRepository.automationEnabled())
+        assertEquals(true, viewModel.state.value.moreCard.isPremium)
+        assertEquals(true, viewModel.state.value.moreCard.automationEnabled)
+    }
+
+    @Test
     fun `connectGoogleAccount shows success feedback`() = runTest {
         coEvery { mockAuthRepository.connectGoogleAccount("google-token") } returns Result.success(
             User(email = "user@example.com")
@@ -334,6 +419,7 @@ class FakePlannerRepository : PlannerRepository {
     
     override fun observeAutomationEnabled(): Flow<Boolean> = automationFlow.asStateFlow()
     override suspend fun saveAutomationEnabled(enabled: Boolean) { automationFlow.emit(enabled) }
+    fun automationEnabled(): Boolean = automationFlow.value
 
     override fun isOnboardingCompleted(): Boolean = isOnboardingCompletedState
     override suspend fun setOnboardingCompleted(completed: Boolean) { isOnboardingCompletedState = completed }
@@ -345,6 +431,8 @@ class FakePlannerRepository : PlannerRepository {
 class TestFakeEntitlementRepository : EntitlementRepository {
     private val _isPro = MutableStateFlow(false)
     override val isPro = _isPro.asStateFlow()
+    private val _entitlementState = MutableStateFlow(EntitlementState.FREE)
+    override val entitlementState = _entitlementState.asStateFlow()
     private val _availableProducts = MutableStateFlow<List<StoreProduct>>(emptyList())
     override val availableProducts = _availableProducts.asStateFlow()
     private val _purchaseEvents = MutableSharedFlow<BillingPurchaseEvent>(extraBufferCapacity = 1)
@@ -355,6 +443,13 @@ class TestFakeEntitlementRepository : EntitlementRepository {
     override suspend fun purchasePlan(activity: android.app.Activity, product: StoreProduct): BillingFlowLaunchResult = purchaseResult
     suspend fun setProducts(products: List<StoreProduct>) { _availableProducts.emit(products) }
     suspend fun emitPurchaseEvent(event: BillingPurchaseEvent) { _purchaseEvents.emit(event) }
-    suspend fun setPro(value: Boolean) { _isPro.emit(value) }
+    suspend fun setPro(value: Boolean) {
+        _isPro.emit(value)
+        _entitlementState.emit(if (value) EntitlementState.PRO else EntitlementState.FREE)
+    }
+    suspend fun setEntitlementState(state: EntitlementState) {
+        _entitlementState.emit(state)
+        _isPro.emit(state.hasPremiumAccess)
+    }
     override suspend fun restorePurchases() {}
 }

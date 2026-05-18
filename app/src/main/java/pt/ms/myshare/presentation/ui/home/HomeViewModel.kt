@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pt.ms.myshare.domain.model.BillingFlowLaunchResult
@@ -29,6 +30,7 @@ import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.repository.UserPreferencesRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
+import pt.ms.myshare.domain.use_case.EnforcePremiumDowngradeUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
 import pt.ms.myshare.domain.use_case.GetReviewHistoryUseCase
 import pt.ms.myshare.domain.use_case.UpdateGoalProgressUseCase
@@ -57,6 +59,7 @@ class HomeViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     private val calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase,
     private val createReviewInsightUseCase: CreateReviewInsightUseCase,
+    private val enforcePremiumDowngradeUseCase: EnforcePremiumDowngradeUseCase,
     private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase,
     private val getReviewHistoryUseCase: GetReviewHistoryUseCase,
     private val updateGoalProgressUseCase: UpdateGoalProgressUseCase,
@@ -71,6 +74,7 @@ class HomeViewModel @Inject constructor(
 
     private var availableStoreProducts: List<pt.ms.myshare.domain.model.StoreProduct> = emptyList()
     private var currentPlan: SalaryPlan? = null
+    private var nextReviewSavedEventId = 0L
 
     private var currentPreferences = userPreferencesRepository.loadPreferences()
 
@@ -90,6 +94,7 @@ class HomeViewModel @Inject constructor(
         userLocaleManager.apply(currentPreferences)
         observeProducts()
         observeBillingPurchaseEvents()
+        observeEntitlementLifecycle()
         observePlannerData()
         observeReviewHistory()
         FirebaseUtils.logScreen("home")
@@ -116,17 +121,41 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             entitlementRepository.purchaseEvents.collect { event ->
                 val messageKey = BillingStatusMessageMapper.fromPurchaseEvent(event)
+                var shouldLogAccountPrompt = false
                 uiState.update {
+                    val shouldShowAccountPrompt = event == BillingPurchaseEvent.Completed &&
+                        it.moreCard.userEmail.isNullOrBlank() &&
+                        !it.moreCard.showPremiumAccountPrompt
+                    shouldLogAccountPrompt = shouldShowAccountPrompt
                     it.copy(
                         moreCard = it.moreCard.copy(
                             isBillingActionInProgress = false,
                             billingMessage = messageKey,
+                            showPremiumAccountPrompt = it.moreCard.showPremiumAccountPrompt || shouldShowAccountPrompt,
                             error = null
                         )
                     )
                 }
+                if (shouldLogAccountPrompt) {
+                    FirebaseUtils.logEvent("premium_account_prompt_shown")
+                    Timber.tag(TAG).d("Premium account prompt shown after purchase completion")
+                }
                 logBillingPurchaseEvent(event)
             }
+        }
+    }
+
+    private fun observeEntitlementLifecycle() {
+        viewModelScope.launch {
+            entitlementRepository.entitlementState
+                .distinctUntilChanged()
+                .collect { entitlementState ->
+                    val automationDisabled = enforcePremiumDowngradeUseCase.execute(entitlementState)
+                    if (automationDisabled) {
+                        FirebaseUtils.logEvent("premium_downgrade_enforced")
+                        Timber.tag(TAG).d("Premium downgrade enforced. entitlementState=%s automationDisabled=true", entitlementState)
+                    }
+                }
         }
     }
 
@@ -206,6 +235,7 @@ class HomeViewModel @Inject constructor(
                 authRepository.currentUser,
                 userPreferencesRepository.observePreferences()
             ) { planner, isPremium, products, user, preferences ->
+                val currentState = uiState.value
                 currentPreferences = preferences
                 userLocaleManager.apply(preferences)
                 val locale = preferences.locale
@@ -223,8 +253,16 @@ class HomeViewModel @Inject constructor(
                 val emptyMessage = if (updatedPlan == null) "home_empty_build_plan_first" else null
                 val primaryGoal = goals.firstOrNull()
                 val planCard = updatedPlan?.let { buildPlanCard(it, primaryGoal?.targetAmount ?: BigDecimal.ZERO, preferences) }
-                val goalCards = goals.map { buildGoalCard(it, updatedPlan, preferences) }
-                val ruleCards = currentRules.map { buildRuleCard(it, preferences) }
+                val goalCards = goals.mapIndexed { index, goal ->
+                    buildGoalCard(goal, updatedPlan, preferences).copy(
+                        isLockedByEntitlement = !isPremium && index > 0
+                    )
+                }
+                val ruleCards = currentRules.mapIndexed { index, rule ->
+                    buildRuleCard(rule, preferences).copy(
+                        isLockedByEntitlement = !isPremium && index > 0
+                    )
+                }
                 val reviewCard = buildReviewCard(updatedPlan, latestReview, preferences)
                 
                 val monthlyProduct = products.find { it.productId == PremiumSubscriptionProducts.MONTHLY_ID }
@@ -234,7 +272,7 @@ class HomeViewModel @Inject constructor(
                     annualProduct = annualProduct,
                     locale = locale
                 )
-                val currentMore = uiState.value.moreCard
+                val currentMore = currentState.moreCard
                 val selectedBillingPlan = if (currentMore.pricingStrategy == null) {
                     pricingStrategy.heroPlan
                 } else {
@@ -273,14 +311,15 @@ class HomeViewModel @Inject constructor(
                     annualSavingsPrice = annualComparison?.savingsPrice,
                     actualMonthlyTrialDays = monthlyProduct?.freeTrialDays?.takeIf { it > 0 },
                     actualAnnualTrialDays = annualProduct?.freeTrialDays?.takeIf { it > 0 },
-                    showAdsConsentOption = uiState.value.moreCard.showAdsConsentOption,
+                    showAdsConsentOption = currentMore.showAdsConsentOption,
                     selectedBillingPlan = selectedBillingPlan,
                     isBillingActionInProgress = currentMore.isBillingActionInProgress,
                     billingMessage = currentMore.billingMessage.takeUnless { shouldClearUnavailableMessage },
                     isPremium = isPremium,
-                    automationEnabled = automation,
+                    automationEnabled = automation && isPremium,
                     userEmail = user?.email,
                     canConnectGoogle = user?.email.isNullOrBlank(),
+                    showPremiumAccountPrompt = currentMore.showPremiumAccountPrompt && user?.email.isNullOrBlank(),
                     isGoogleConnectionInProgress = currentMore.isGoogleConnectionInProgress,
                     googleConnectionMessage = currentMore.googleConnectionMessage,
                     googleConnectionError = currentMore.googleConnectionError,
@@ -292,7 +331,7 @@ class HomeViewModel @Inject constructor(
                     error = currentMore.error.takeUnless { shouldClearUnavailableMessage }
                 )
                 HomeState(
-                    selectedDestination = uiState.value.selectedDestination,
+                    selectedDestination = currentState.selectedDestination,
                     plan = updatedPlan,
                     planCard = planCard,
                     goals = goalCards,
@@ -301,6 +340,7 @@ class HomeViewModel @Inject constructor(
                     reviewCard = reviewCard.copy(coachingInsights = planner.coachingInsights.map { it.toState() }),
                     reviewHistory = planner.reviewHistory.asReversed().map { it.toState() },
                     moreCard = moreCard,
+                    reviewSavedEventId = currentState.reviewSavedEventId,
                     isLoading = false,
                     emptyMessage = emptyMessage,
                     error = null
@@ -477,9 +517,27 @@ class HomeViewModel @Inject constructor(
             )
             plannerRepository.saveReview(review)
             updateGoalProgressUseCase.execute(actualGoal)
+            emitReviewSavedFeedback()
             
             FirebaseUtils.logEvent("weekly_checkin_completed")
             Timber.tag(TAG).d("Review saved with snapshots. planFlex=%s planPriority=%s", preview.flexibleSpendPerPayday, preview.priorityContributionPerPayday)
+        }
+    }
+
+    private fun emitReviewSavedFeedback() {
+        nextReviewSavedEventId += 1
+        val eventId = nextReviewSavedEventId
+        uiState.update { it.copy(reviewSavedEventId = eventId) }
+        Timber.tag(TAG).d("Review saved feedback emitted eventId=%d", eventId)
+    }
+
+    fun clearReviewSavedFeedback(eventId: Long) {
+        uiState.update { current ->
+            if (current.reviewSavedEventId == eventId) {
+                current.copy(reviewSavedEventId = 0L)
+            } else {
+                current
+            }
         }
     }
 
@@ -586,7 +644,8 @@ class HomeViewModel @Inject constructor(
                                 googleConnectionMessage = "home_more_account_connect_google_success",
                                 googleConnectionError = null,
                                 userEmail = user.email,
-                                canConnectGoogle = user.email.isNullOrBlank()
+                                canConnectGoogle = user.email.isNullOrBlank(),
+                                showPremiumAccountPrompt = false
                             )
                         )
                     }
@@ -620,6 +679,15 @@ class HomeViewModel @Inject constructor(
                 )
             )
         }
+    }
+
+    fun dismissPremiumAccountPrompt() {
+        uiState.update {
+            it.copy(
+                moreCard = it.moreCard.copy(showPremiumAccountPrompt = false)
+            )
+        }
+        Timber.tag(TAG).d("Premium account prompt dismissed")
     }
 
     fun logPremiumGateViewed(gate: HomePremiumGate) {

@@ -35,6 +35,7 @@ import pt.ms.myshare.presentation.ui.appupdate.RequiredUpdateScreen
 import pt.ms.myshare.presentation.ui.theme.MyShareTheme
 import pt.ms.myshare.presentation.ui.ads.AdsConsentManager
 import pt.ms.myshare.domain.use_case.ResolveAppUpdateDecisionUseCase
+import pt.ms.myshare.domain.use_case.RefreshEntitlementUseCase
 import pt.ms.myshare.utils.isDarkTheme
 import pt.ms.myshare.utils.logs.FirebaseUtils
 import timber.log.Timber
@@ -45,6 +46,9 @@ import javax.inject.Inject
 class MainComposeActivity : ComponentActivity() {
     @Inject
     lateinit var resolveAppUpdateDecisionUseCase: ResolveAppUpdateDecisionUseCase
+
+    @Inject
+    lateinit var refreshEntitlementUseCase: RefreshEntitlementUseCase
 
     private lateinit var consentManager: AdsConsentManager
     private lateinit var immediateAppUpdateCoordinator: ImmediateAppUpdateCoordinator
@@ -137,6 +141,7 @@ class MainComposeActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        refreshActiveEntitlement()
         val gateState = appUpdateGateState
         if (gateState is AppUpdateGateState.RequiredUpdate && gateState.policy.immediateUpdateRequired) {
             immediateAppUpdateCoordinator.resumeImmediateUpdateIfInProgress(
@@ -148,6 +153,18 @@ class MainComposeActivity : ComponentActivity() {
                     Timber.d("Required update gate remains active without an in-progress Play update")
                 }
             )
+        }
+    }
+
+    private fun refreshActiveEntitlement() {
+        lifecycleScope.launch {
+            runCatching { refreshEntitlementUseCase() }
+                .onSuccess {
+                    Timber.d("Active entitlement refresh requested on resume")
+                }
+                .onFailure { error ->
+                    Timber.e(error, "Active entitlement refresh failed on resume")
+                }
         }
     }
 

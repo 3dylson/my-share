@@ -46,6 +46,7 @@ data class OnboardingState(
     val isPremium: Boolean = false,
     val isAnonymousUser: Boolean = false,
     val shouldSecurePremiumAccess: Boolean = false,
+    val hasDismissedSecurePremiumAccessPrompt: Boolean = false,
     val isGoogleConnectionInProgress: Boolean = false,
     val googleConnectionMessage: String? = null,
     val googleConnectionError: String? = null,

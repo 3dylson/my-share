@@ -25,7 +25,9 @@ import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.domain.model.PaydayRule
 import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.domain.model.SalaryPlan
+import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
+import pt.ms.myshare.domain.use_case.CheckEntitlementLimitUseCase
 import pt.ms.myshare.TestUserPreferencesRepository
 import java.math.BigDecimal
 
@@ -52,6 +54,7 @@ class AddEditViewModelTest {
         val viewModel = GoalAddViewModel(
             repository = repository,
             userPreferencesRepository = TestUserPreferencesRepository(),
+            checkEntitlementLimitUseCase = checkEntitlementLimitUseCase(),
             savedStateHandle = SavedStateHandle(mapOf("goalId" to "missing-goal"))
         )
         advanceUntilIdle()
@@ -73,6 +76,7 @@ class AddEditViewModelTest {
         val viewModel = RuleAddViewModel(
             repository = repository,
             userPreferencesRepository = TestUserPreferencesRepository(),
+            checkEntitlementLimitUseCase = checkEntitlementLimitUseCase(),
             savedStateHandle = SavedStateHandle(mapOf("ruleId" to "missing-rule"))
         )
         advanceUntilIdle()
@@ -91,6 +95,7 @@ class AddEditViewModelTest {
         val viewModel = GoalAddViewModel(
             repository = mockk(relaxed = true),
             userPreferencesRepository = TestUserPreferencesRepository(),
+            checkEntitlementLimitUseCase = checkEntitlementLimitUseCase(),
             savedStateHandle = SavedStateHandle()
         )
 
@@ -109,6 +114,7 @@ class AddEditViewModelTest {
         val viewModel = RuleAddViewModel(
             repository = mockk(relaxed = true),
             userPreferencesRepository = TestUserPreferencesRepository(),
+            checkEntitlementLimitUseCase = checkEntitlementLimitUseCase(),
             savedStateHandle = SavedStateHandle()
         )
 
@@ -129,6 +135,7 @@ class AddEditViewModelTest {
         val viewModel = RuleAddViewModel(
             repository = repository,
             userPreferencesRepository = TestUserPreferencesRepository(),
+            checkEntitlementLimitUseCase = checkEntitlementLimitUseCase(),
             savedStateHandle = SavedStateHandle()
         )
 
@@ -146,6 +153,7 @@ class AddEditViewModelTest {
         val viewModel = RuleAddViewModel(
             repository = repository,
             userPreferencesRepository = TestUserPreferencesRepository(),
+            checkEntitlementLimitUseCase = checkEntitlementLimitUseCase(),
             savedStateHandle = SavedStateHandle()
         )
 
@@ -165,6 +173,7 @@ class AddEditViewModelTest {
         val viewModel = RuleAddViewModel(
             repository = repository,
             userPreferencesRepository = TestUserPreferencesRepository(),
+            checkEntitlementLimitUseCase = checkEntitlementLimitUseCase(),
             savedStateHandle = SavedStateHandle()
         )
 
@@ -186,6 +195,7 @@ class AddEditViewModelTest {
         val viewModel = RuleAddViewModel(
             repository = repository,
             userPreferencesRepository = TestUserPreferencesRepository(),
+            checkEntitlementLimitUseCase = checkEntitlementLimitUseCase(),
             savedStateHandle = SavedStateHandle()
         )
 
@@ -218,6 +228,7 @@ class AddEditViewModelTest {
         val viewModel = RuleAddViewModel(
             repository = repository,
             userPreferencesRepository = TestUserPreferencesRepository(),
+            checkEntitlementLimitUseCase = checkEntitlementLimitUseCase(),
             savedStateHandle = SavedStateHandle(mapOf("ruleId" to currentRule.id))
         )
         advanceUntilIdle()
@@ -235,6 +246,96 @@ class AddEditViewModelTest {
         coVerify(exactly = 1) { repository.saveRule(any<PaydayRule>()) }
     }
 
+    @Test
+    fun `free user cannot save a second goal from direct add route`() = runTest {
+        val repository = mockk<PlannerRepository>(relaxed = true)
+        every { repository.loadGoals() } returns listOf(
+            Goal(id = "goal-1", name = "Emergency", targetAmount = BigDecimal("500"))
+        )
+        val viewModel = GoalAddViewModel(
+            repository = repository,
+            userPreferencesRepository = TestUserPreferencesRepository(),
+            checkEntitlementLimitUseCase = checkEntitlementLimitUseCase(isPro = false),
+            savedStateHandle = SavedStateHandle()
+        )
+
+        viewModel.onNameChanged("Investing")
+        viewModel.onAmountChanged("1000")
+        viewModel.saveGoal()
+        advanceUntilIdle()
+
+        assertEquals("goal_add_error_premium_required", viewModel.state.value.error)
+        coVerify(exactly = 0) { repository.saveGoal(any<Goal>()) }
+    }
+
+    @Test
+    fun `premium user can save a second goal from direct add route`() = runTest {
+        val repository = mockk<PlannerRepository>(relaxed = true)
+        every { repository.loadGoals() } returns listOf(
+            Goal(id = "goal-1", name = "Emergency", targetAmount = BigDecimal("500"))
+        )
+        val viewModel = GoalAddViewModel(
+            repository = repository,
+            userPreferencesRepository = TestUserPreferencesRepository(),
+            checkEntitlementLimitUseCase = checkEntitlementLimitUseCase(isPro = true),
+            savedStateHandle = SavedStateHandle()
+        )
+
+        viewModel.onNameChanged("Investing")
+        viewModel.onAmountChanged("1000")
+        viewModel.saveGoal()
+        advanceUntilIdle()
+
+        assertTrue(viewModel.state.value.isSaved)
+        coVerify(exactly = 1) { repository.saveGoal(any<Goal>()) }
+    }
+
+    @Test
+    fun `free user cannot save a second payday rule from direct add route`() = runTest {
+        val repository = mockk<PlannerRepository>(relaxed = true)
+        every { repository.loadPlan() } returns null
+        every { repository.loadRules() } returns listOf(
+            PaydayRule(id = "rule-1", name = "Savings", amount = BigDecimal("10"))
+        )
+        val viewModel = RuleAddViewModel(
+            repository = repository,
+            userPreferencesRepository = TestUserPreferencesRepository(),
+            checkEntitlementLimitUseCase = checkEntitlementLimitUseCase(isPro = false),
+            savedStateHandle = SavedStateHandle()
+        )
+
+        viewModel.onNameChanged("Investing")
+        viewModel.onAmountChanged("5")
+        viewModel.saveRule()
+        advanceUntilIdle()
+
+        assertEquals("rule_add_error_premium_required", viewModel.state.value.error)
+        coVerify(exactly = 0) { repository.saveRule(any<PaydayRule>()) }
+    }
+
+    @Test
+    fun `premium user can save a second payday rule from direct add route`() = runTest {
+        val repository = mockk<PlannerRepository>(relaxed = true)
+        every { repository.loadPlan() } returns null
+        every { repository.loadRules() } returns listOf(
+            PaydayRule(id = "rule-1", name = "Savings", amount = BigDecimal("10"))
+        )
+        val viewModel = RuleAddViewModel(
+            repository = repository,
+            userPreferencesRepository = TestUserPreferencesRepository(),
+            checkEntitlementLimitUseCase = checkEntitlementLimitUseCase(isPro = true),
+            savedStateHandle = SavedStateHandle()
+        )
+
+        viewModel.onNameChanged("Investing")
+        viewModel.onAmountChanged("5")
+        viewModel.saveRule()
+        advanceUntilIdle()
+
+        assertTrue(viewModel.state.value.isSaved)
+        coVerify(exactly = 1) { repository.saveRule(any<PaydayRule>()) }
+    }
+
     private fun salaryPlan(): SalaryPlan = SalaryPlan(
         focus = PlanningFocus.SAVE_WITHOUT_STRESS,
         netIncomePerPayday = BigDecimal("1000"),
@@ -242,4 +343,10 @@ class AddEditViewModelTest {
         payFrequency = PayFrequency.MONTHLY,
         preset = AllocationPreset.BALANCED
     )
+
+    private fun checkEntitlementLimitUseCase(isPro: Boolean = false): CheckEntitlementLimitUseCase {
+        val entitlementRepository = mockk<EntitlementRepository>(relaxed = true)
+        every { entitlementRepository.isPro } returns flowOf(isPro)
+        return CheckEntitlementLimitUseCase(entitlementRepository)
+    }
 }

@@ -19,6 +19,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -87,6 +92,8 @@ fun HomeRoute(
         onPremiumGateUpgradeClicked = viewModel::logPremiumGateUpgradeClicked,
         onConnectGoogleAccount = viewModel::connectGoogleAccount,
         onGoogleConnectionCredentialError = viewModel::setGoogleConnectionCredentialError,
+        onDismissPremiumAccountPrompt = viewModel::dismissPremiumAccountPrompt,
+        onReviewSavedFeedbackShown = viewModel::clearReviewSavedFeedback,
         onLanguageSelected = viewModel::updateLanguage,
         onCurrencySelected = viewModel::updateCurrency,
         onLogout = {
@@ -122,6 +129,8 @@ fun HomeScreen(
     onPremiumGateUpgradeClicked: (HomePremiumGate) -> Unit,
     onConnectGoogleAccount: (String) -> Unit,
     onGoogleConnectionCredentialError: (String) -> Unit,
+    onDismissPremiumAccountPrompt: () -> Unit,
+    onReviewSavedFeedbackShown: (Long) -> Unit,
     onLanguageSelected: (String) -> Unit,
     onCurrencySelected: (String) -> Unit,
     onLogout: () -> Unit,
@@ -141,6 +150,7 @@ fun HomeScreen(
         )
     }
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+    val focusManager = LocalFocusManager.current
     val snackbarHostState = remember { SnackbarHostState() }
     val reviewSavedMessage = stringResource(R.string.home_review_saved_feedback)
     var showPaywallSheet by remember { mutableStateOf(false) }
@@ -151,9 +161,16 @@ fun HomeScreen(
     var showAccountDetailsDialog by remember { mutableStateOf(false) }
     var showLanguagePicker by remember { mutableStateOf(false) }
     var showCurrencyPicker by remember { mutableStateOf(false) }
-    var previousReviewCount by remember { mutableStateOf<Int?>(null) }
     var isGoogleCredentialRequestInProgress by remember { mutableStateOf(false) }
     var pendingReminderSelection by remember { mutableStateOf<ReminderSettingsSelection?>(null) }
+    val clearFocusOnScrollConnection = remember(focusManager) {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                focusManager.clearFocus(force = true)
+                return Offset.Zero
+            }
+        }
+    }
     val notificationPermissionDeniedMessage = stringResource(R.string.onboarding_reminder_error_permission)
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -199,15 +216,15 @@ fun HomeScreen(
         }
     }
 
-    LaunchedEffect(state.reviewHistory.size) {
-        val previousCount = previousReviewCount
-        if (previousCount != null && state.reviewHistory.size > previousCount) {
+    LaunchedEffect(state.reviewSavedEventId) {
+        val eventId = state.reviewSavedEventId
+        if (eventId > 0L) {
+            onReviewSavedFeedbackShown(eventId)
             snackbarHostState.showSnackbar(
                 message = reviewSavedMessage,
                 duration = SnackbarDuration.Short
             )
         }
-        previousReviewCount = state.reviewHistory.size
     }
 
     if (showPaywallSheet) {
@@ -253,6 +270,22 @@ fun HomeScreen(
                 showReminderSettingsDialog = false
                 saveReminderWithPermission(ReminderSettingsSelection(hourOfDay, minute, cadence))
             }
+        )
+    }
+
+    if (state.moreCard.showPremiumAccountPrompt) {
+        MyShareAlertDialog(
+            onDismissRequest = onDismissPremiumAccountPrompt,
+            icon = Icons.Default.WorkspacePremium,
+            title = stringResource(R.string.paywall_secure_account_title),
+            message = stringResource(R.string.paywall_secure_account_body),
+            confirmText = stringResource(R.string.paywall_secure_account_button),
+            onConfirm = {
+                onDismissPremiumAccountPrompt()
+                startGoogleAccountConnection()
+            },
+            dismissText = stringResource(R.string.paywall_secure_account_continue),
+            onDismiss = onDismissPremiumAccountPrompt
         )
     }
 
@@ -410,6 +443,7 @@ fun HomeScreen(
                     NavigationBarItem(
                         selected = isSelected,
                         onClick = {
+                            focusManager.clearFocus(force = true)
                             if (!isSelected) haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
                             Timber.tag("HomeScreen").d("Home tab selected: %s", destination.name)
                             onDestinationSelected(destination)
@@ -461,7 +495,7 @@ fun HomeScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .imeNestedScroll()
+                    .nestedScroll(clearFocusOnScrollConnection)
                     .imePadding()
                     .background(MaterialTheme.colorScheme.background),
                 contentPadding = PaddingValues(
@@ -637,6 +671,8 @@ private fun HomeScreenPreview() {
             onPremiumGateUpgradeClicked = { _ -> },
             onConnectGoogleAccount = { _ -> },
             onGoogleConnectionCredentialError = { _ -> },
+            onDismissPremiumAccountPrompt = {},
+            onReviewSavedFeedbackShown = { _ -> },
             onLanguageSelected = { _ -> },
             onCurrencySelected = { _ -> },
             onLogout = {},

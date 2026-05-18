@@ -1,36 +1,105 @@
 package pt.ms.myshare.data.billing
 
 import android.app.Activity
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import pt.ms.myshare.domain.model.StoreProduct
-import pt.ms.myshare.domain.repository.EntitlementRepository
+import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.Purchase
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.functions.FirebaseFunctions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.functions.FirebaseFunctions
-import com.android.billingclient.api.Purchase
+import kotlinx.coroutines.tasks.await
 import pt.ms.myshare.domain.model.BillingFlowLaunchResult
+import pt.ms.myshare.domain.model.EntitlementState
 import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
+import pt.ms.myshare.domain.model.StoreProduct
+import pt.ms.myshare.domain.repository.EntitlementRepository
 import timber.log.Timber
 
 class PlayBillingEntitlementRepository(
     private val billingClientWrapper: BillingClientWrapper,
-    private val firebaseAuth: FirebaseAuth,
+    private val billingAuthSession: BillingAuthSession,
     private val firestore: FirebaseFirestore,
     private val firebaseFunctions: FirebaseFunctions
 ) : EntitlementRepository {
 
-    override val isPro: Flow<Boolean> = billingClientWrapper.purchases.map { purchases ->
-        purchases.any { purchase ->
-            (
-                purchase.products.contains(PremiumSubscriptionProducts.ANNUAL_ID) ||
-                    purchase.products.contains(PremiumSubscriptionProducts.MONTHLY_ID)
-                ) &&
-                purchase.purchaseState == Purchase.PurchaseState.PURCHASED
+    private val localEntitlementState: Flow<EntitlementState> = combine(
+        billingClientWrapper.purchases,
+        billingClientWrapper.hasLoadedActivePurchases
+    ) { purchases, hasLoadedPurchases ->
+        if (!hasLoadedPurchases) {
+            EntitlementState.UNKNOWN
+        } else if (purchases.any { it.isActivePremiumSubscription() }) {
+            EntitlementState.PRO
+        } else {
+            EntitlementState.FREE
         }
+    }.distinctUntilChanged()
+
+    private val serverEntitlementState: Flow<EntitlementState?> = observeServerEntitlementState()
+
+    override val entitlementState: Flow<EntitlementState> = combine(
+        localEntitlementState,
+        serverEntitlementState
+    ) { localState, serverState ->
+        serverState ?: localState
+    }.distinctUntilChanged()
+
+    override val isPro: Flow<Boolean> = entitlementState
+        .map { it.hasPremiumAccess }
+        .distinctUntilChanged()
+
+    private fun observeServerEntitlementState(): Flow<EntitlementState?> = callbackFlow {
+        var registration: ListenerRegistration? = null
+
+        fun attachUser(uid: String?) {
+            registration?.remove()
+            registration = null
+            if (uid == null) {
+                trySend(null)
+                return
+            }
+
+            registration = firestore.collection("users")
+                .document(uid)
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        Timber.tag(TAG).e(error, "Server entitlement snapshot failed")
+                        trySend(null)
+                        return@addSnapshotListener
+                    }
+
+                    val state = EntitlementSnapshotMapper.map(snapshot?.data)
+                    Timber.tag(TAG).d("Server entitlement snapshot state=%s", state)
+                    trySend(state)
+                }
+        }
+
+        val authJob = launch {
+            billingAuthSession.userId.collect { uid ->
+                attachUser(uid)
+            }
+        }
+
+        awaitClose {
+            authJob.cancel()
+            registration?.remove()
+        }
+    }.distinctUntilChanged()
+
+    private fun Purchase.isActivePremiumSubscription(): Boolean {
+        return (
+            products.contains(PremiumSubscriptionProducts.ANNUAL_ID) ||
+                products.contains(PremiumSubscriptionProducts.MONTHLY_ID)
+            ) &&
+            purchaseState == Purchase.PurchaseState.PURCHASED
     }
 
     override val availableProducts: Flow<List<StoreProduct>> = billingClientWrapper.availableProducts
@@ -50,26 +119,35 @@ class PlayBillingEntitlementRepository(
 
     }
 
-    private fun verifyAndAcknowledge(purchase: Purchase) {
+    private suspend fun verifyAndAcknowledge(purchase: Purchase) {
         val productId = purchase.products.firstOrNull() ?: return
+        val session = billingAuthSession.requireAuthenticatedSession()
+            .onFailure { e ->
+                Timber.tag(TAG).e(e, "Cannot verify purchase because billing session authentication failed")
+            }
+            .getOrNull() ?: return
         val data = hashMapOf(
             "purchaseToken" to purchase.purchaseToken,
-            "subscriptionId" to productId
+            "subscriptionId" to productId,
+            "firebaseIdToken" to session.idToken
         )
 
-        firebaseFunctions
-            .getHttpsCallable("verifySubscription")
-            .call(data)
-            .addOnSuccessListener { result ->
-                val resultMap = result.data as? Map<*, *>
-                val isValid = resultMap?.get("isValid") as? Boolean ?: false
-                if (isValid) {
-                    billingClientWrapper.acknowledgePurchase(purchase.purchaseToken)
-                }
+        try {
+            Timber.tag(TAG).d("Verifying purchase product=%s userReady=%s", productId, session.userId.isNotBlank())
+            val result = firebaseFunctions
+                .getHttpsCallable("verifySubscription")
+                .call(data)
+                .await()
+            val resultMap = result.data as? Map<*, *>
+            val isValid = resultMap?.get("isValid") as? Boolean ?: false
+            if (isValid) {
+                billingClientWrapper.acknowledgePurchase(purchase.purchaseToken)
+            } else {
+                Timber.tag(TAG).e("Purchase verification returned inactive entitlement for product=%s", productId)
             }
-            .addOnFailureListener { e ->
-                Timber.tag("BillingRepo").e(e, "Verification failed")
-            }
+        } catch (e: Exception) {
+            Timber.tag(TAG).e(e, "Verification failed")
+        }
     }
 
 
@@ -78,8 +156,17 @@ class PlayBillingEntitlementRepository(
     }
 
     override suspend fun purchasePlan(activity: Activity, product: StoreProduct): BillingFlowLaunchResult {
-        val obfuscatedAccountId = ObfuscatedAccountIdFactory.fromFirebaseUid(firebaseAuth.currentUser?.uid)
-        Timber.tag("BillingRepo").d(
+        val userId = billingAuthSession.requireAuthenticatedUserId()
+            .onFailure { e ->
+                Timber.tag(TAG).e(e, "Cannot launch billing flow because billing session authentication failed")
+            }
+            .getOrNull()
+            ?: return BillingFlowLaunchResult.Failed(
+                responseCode = BillingClient.BillingResponseCode.ERROR,
+                debugMessage = "Billing account authentication failed"
+            )
+        val obfuscatedAccountId = ObfuscatedAccountIdFactory.fromFirebaseUid(userId)
+        Timber.tag(TAG).d(
             "Launching billing flow for product=%s authenticated=%s",
             product.productId,
             obfuscatedAccountId != null
@@ -89,5 +176,9 @@ class PlayBillingEntitlementRepository(
 
     override suspend fun restorePurchases() {
         billingClientWrapper.queryActivePurchases()
+    }
+
+    private companion object {
+        const val TAG = "BillingRepo"
     }
 }

@@ -378,7 +378,7 @@ Status after More tab premium value-surface pass on 2026-05-18:
 - Done: More subscription copy now explains the Premium upgrade with the user's current weekly guide, priority move, saved rules, and review-based automation instead of opening with a generic pricing dump.
 - Done: Auto rules lock copy now points to review-based rule adjustments and opens the contextual adaptive-adjustment gate.
 - Validated: normal and compact emulator passes captured Plan and Strategy screenshots/UI-tree summaries under `/tmp/myshare-main-tab-qa-2026-05-18`, Review under `/tmp/myshare-review-qa-2026-05-18`, and More under `/tmp/myshare-more-qa-2026-05-18`.
-- Pending: Phase 6 full end-to-end verification pass.
+- Done: Phase 6 full end-to-end verification pass completed on 2026-05-18.
 
 ### Plan
 
@@ -415,6 +415,19 @@ Status after More tab premium value-surface pass on 2026-05-18:
 - More remains useful as settings even for users who do not upgrade.
 
 ## Phase 6: Verification
+
+Status after full verification pass on 2026-05-18:
+- Done: Clean install, launch, and all manual QA interactions were run only on `emulator-5554`; the connected physical tablet stayed untouched.
+- Done: `./gradlew testDebugUnitTest --console=plain` passed.
+- Done: Full onboarding validated from Welcome through goal, income, fixed costs, allocation, plan preview, signup, trajectory, paywall, reminder setup, bank-sync skip, and Home.
+- Done: Blank and invalid validation states were checked for salary and fixed costs.
+- Done: Paywall checkout and restore paths were exercised. The Play Billing unavailable/error state now returns truthful in-app copy instead of implying Premium was activated or that purchase completion is still pending.
+- Done: Reminder permission deny and allow paths were exercised from onboarding and More.
+- Done: Plan, Strategy, Review, and More were exercised end to end, including smart-adjustment gates, goal/rule edit entry points, review submission/history/recommendation states, language/currency dialogs, legal/account rows, and sign-out confirmation.
+- Done: Compact-screen checks were run at `720x1280 / 360dpi`; key onboarding, Plan, Strategy, Review, and More surfaces stayed scrollable and reachable.
+- Evidence: screenshots, UI-tree dumps, summaries, and log captures are saved under `/tmp/myshare-phase6-qa-2026-05-18`.
+- Residual: More paywall checkout feedback on compact screens can push the `Start free trial` button slightly farther down, but it remains reachable after one extra scroll.
+- Residual: Logcat contains emulator/system noise, including a Bluetooth process abort outside `pt.ms.myshare`, Google Play/Firebase first-run warnings, and StrictMode stack traces around Firebase/Auth initialization. No `pt.ms.myshare` fatal crash or ANR was found during the pass.
 
 ### Automated Tests
 
@@ -453,3 +466,19 @@ Premium is ready when all of these are true:
 - Onboarding looks polished enough that the paywall feels earned.
 - The main tabs do not hide or clip important financial information.
 - A full emulator pass validates the end-to-end experience.
+
+## Phase 7: Premium Lifecycle And Downgrade Hardening
+
+Status after implementation pass on 2026-05-18:
+- Done: Entitlement is now modeled as `UNKNOWN`, `FREE`, `PRO`, and `GRACE_PERIOD` instead of only a raw boolean.
+- Done: Billing refresh runs on app resume and defers safely until the Google Play Billing client is connected.
+- Done: Server entitlement snapshots from Firestore can override local billing state, including expired, revoked, account-hold, and grace-period states.
+- Done: Losing Premium disables saved automation and hides automation as inactive in More.
+- Done: Extra goals and payday rules created during Premium remain visible after downgrade, but locked rows open the relevant Premium gate instead of edit screens.
+- Done: Direct add routes now block second goals/rules when Premium is inactive, so users cannot bypass the Strategy tab gates.
+- Done: Firebase `verifySubscription` now writes an explicit entitlement snapshot to the user document and `/users/{uid}/entitlements/current`.
+- Validated: focused premium lifecycle unit tests, full `testDebugUnitTest`, androidTest Kotlin compile, Firebase function syntax check, and emulator launch on `emulator-5554`.
+
+Residual:
+- A successful paid purchase, restore, grace-period, and account-hold sequence still needs a Play Console/internal-test setup with license testers and real subscription test cards.
+- Server-side real-time downgrade automation still depends on how Play subscription lifecycle events are delivered to Firebase. A future backend pass should add Real-time Developer Notifications or a scheduled revalidation job so expired/account-hold states update even if the user does not open the app.

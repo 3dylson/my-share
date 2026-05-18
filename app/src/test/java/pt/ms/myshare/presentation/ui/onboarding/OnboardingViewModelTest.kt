@@ -389,6 +389,32 @@ class OnboardingViewModelTest {
     }
 
     @Test
+    fun `completed purchase prompts anonymous user to secure access before entitlement refresh`() = runTest {
+        currentUserFlow.value = User(isAnonymous = true)
+        advanceUntilIdle()
+
+        purchaseEventsFlow.emit(BillingPurchaseEvent.Completed)
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.shouldSecurePremiumAccess)
+        assertEquals("paywall_billing_completed", viewModel.uiState.value.billingMessage)
+    }
+
+    @Test
+    fun `dismissed secure access prompt stays hidden during entitlement refresh`() = runTest {
+        currentUserFlow.value = User(isAnonymous = true)
+        isProFlow.value = true
+        advanceUntilIdle()
+
+        viewModel.dismissSecurePremiumAccessPrompt()
+        isProFlow.value = false
+        isProFlow.value = true
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.shouldSecurePremiumAccess)
+    }
+
+    @Test
     fun `premium linked user is not prompted to secure access`() = runTest {
         currentUserFlow.value = User(email = "user@example.com", isAnonymous = false)
         isProFlow.value = true

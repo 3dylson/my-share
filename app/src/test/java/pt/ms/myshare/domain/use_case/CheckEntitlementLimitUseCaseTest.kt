@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import pt.ms.myshare.domain.model.BillingFlowLaunchResult
 import pt.ms.myshare.domain.model.BillingPurchaseEvent
 import pt.ms.myshare.domain.model.AllocationPreset
+import pt.ms.myshare.domain.model.EntitlementState
 import pt.ms.myshare.domain.model.StoreProduct
 import pt.ms.myshare.domain.repository.EntitlementRepository
 
@@ -67,6 +68,26 @@ class CheckEntitlementLimitUseCaseTest {
     }
 
     @Test
+    fun `canAddMultipleRules allows first rule for free users`() = runTest {
+        fakeRepository.setProState(false)
+        assertTrue(useCase.canAddMultipleRules(0))
+    }
+
+    @Test
+    fun `canAddMultipleRules denies second rule for free users`() = runTest {
+        fakeRepository.setProState(false)
+        assertFalse(useCase.canAddMultipleRules(1))
+    }
+
+    @Test
+    fun `canAddMultipleRules allows unlimited rules for PRO users`() = runTest {
+        fakeRepository.setProState(true)
+        assertTrue(useCase.canAddMultipleRules(0))
+        assertTrue(useCase.canAddMultipleRules(1))
+        assertTrue(useCase.canAddMultipleRules(50))
+    }
+
+    @Test
     fun `canViewReviewHistoryDepth limits free users to 3`() = runTest {
         fakeRepository.setProState(false)
         assertTrue(useCase.canViewReviewHistoryDepth(0))
@@ -88,6 +109,8 @@ class CheckEntitlementLimitUseCaseTest {
 class FakeEntitlementRepository : EntitlementRepository {
     private val _isPro = MutableStateFlow(false)
     override val isPro = _isPro.asStateFlow()
+    private val _entitlementState = MutableStateFlow(EntitlementState.FREE)
+    override val entitlementState = _entitlementState.asStateFlow()
 
     private val _availableProducts = MutableStateFlow<List<StoreProduct>>(emptyList())
     override val availableProducts = _availableProducts.asStateFlow()
@@ -95,6 +118,7 @@ class FakeEntitlementRepository : EntitlementRepository {
 
     suspend fun setProState(value: Boolean) {
         _isPro.emit(value)
+        _entitlementState.emit(if (value) EntitlementState.PRO else EntitlementState.FREE)
     }
 
     override suspend fun checkActiveEntitlement() {}

@@ -18,6 +18,11 @@ class CheckEntitlementLimitUseCase @Inject constructor(
         return entitlementRepository.isPro.first()
     }
 
+    suspend fun canAddMultipleRules(currentCount: Int): Boolean {
+        if (currentCount == 0) return true
+        return entitlementRepository.isPro.first()
+    }
+
     suspend fun canViewReviewHistoryDepth(index: Int): Boolean {
         // Free tier can only see the 3 most recent reviews
         if (index < 3) return true

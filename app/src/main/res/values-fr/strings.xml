@@ -598,9 +598,11 @@
     <string name="onboarding_error_next_payday_format">Utilisez AAAA-MM-JJ pour le prochain jour de paie bihebdomadaire.</string>
     <string name="goal_add_error_missing">Cet objectif n\'est plus disponible.</string>
     <string name="goal_add_error_invalid_name_amount">Veuillez saisir un nom et un montant valides.</string>
+    <string name="goal_add_error_premium_required">Premium est nécessaire pour ajouter un autre objectif. Vos objectifs enregistrés restent protégés, et les objectifs supplémentaires se déverrouillent à nouveau quand Premium est actif.</string>
     <string name="rule_add_error_missing">Cette règle n\'est plus disponible.</string>
     <string name="rule_add_error_invalid_name_amount">Veuillez saisir un nom et un montant valides.</string>
     <string name="rule_add_error_exceeds_available">Cette règle dépasse le revenu disponible après les coûts fixes. Réduisez le montant ou ajustez une autre règle.</string>
+    <string name="rule_add_error_premium_required">Premium est nécessaire pour ajouter une autre règle de paie. Vos règles enregistrées restent protégées, et les règles supplémentaires se déverrouillent à nouveau quand Premium est actif.</string>
     <string name="rule_type_savings">Épargne</string>
     <string name="rule_type_investing">Investissement</string>
     <string name="rule_type_crypto">Cryptomonnaie</string>

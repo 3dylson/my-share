@@ -21,6 +21,7 @@ class BillingClientWrapper(context: Context) : PurchasesUpdatedListener {
         .setListener(this)
         .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
         .build()
+    private var isConnectionInProgress = false
 
     private val _availableProducts = MutableStateFlow<List<StoreProduct>>(emptyList())
     val availableProducts = _availableProducts.asStateFlow()
@@ -28,22 +29,38 @@ class BillingClientWrapper(context: Context) : PurchasesUpdatedListener {
     private val _purchases = MutableStateFlow<List<Purchase>>(emptyList())
     val purchases = _purchases.asStateFlow()
 
+    private val _hasLoadedActivePurchases = MutableStateFlow(false)
+    val hasLoadedActivePurchases = _hasLoadedActivePurchases.asStateFlow()
+
     private val _purchaseEvents = MutableSharedFlow<BillingPurchaseEvent>(extraBufferCapacity = 1)
     val purchaseEvents = _purchaseEvents.asSharedFlow()
 
     fun startBillingConnection() {
+        if (billingClient.isReady || isConnectionInProgress) {
+            Timber.d("Billing Client connection already active or in progress")
+            return
+        }
+        isConnectionInProgress = true
         billingClient.startConnection(object : BillingClientStateListener {
             override fun onBillingSetupFinished(billingResult: BillingResult) {
+                isConnectionInProgress = false
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                     Timber.d("Billing Client Connected")
                     queryProducts()
                     queryActivePurchases()
+                } else {
+                    Timber.e(
+                        "Billing Client setup failed code=%d message=%s",
+                        billingResult.responseCode,
+                        billingResult.debugMessage
+                    )
                 }
             }
 
             override fun onBillingServiceDisconnected() {
+                isConnectionInProgress = false
                 Timber.w("Billing Client Disconnected. Attempting to reconnect...")
-                // Retry connection logic could go here
+                startBillingConnection()
             }
         })
     }
@@ -76,6 +93,12 @@ class BillingClientWrapper(context: Context) : PurchasesUpdatedListener {
     }
 
     fun queryActivePurchases() {
+        if (!billingClient.isReady) {
+            Timber.d("Billing Client not ready. Active purchase refresh deferred until connection completes")
+            startBillingConnection()
+            return
+        }
+
         val params = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.SUBS)
             .build()
@@ -83,6 +106,14 @@ class BillingClientWrapper(context: Context) : PurchasesUpdatedListener {
         billingClient.queryPurchasesAsync(params) { billingResult, purchasesList ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                 _purchases.value = purchasesList
+                _hasLoadedActivePurchases.value = true
+                Timber.d("Active subscription purchases loaded count=%d", purchasesList.size)
+            } else {
+                Timber.e(
+                    "Active subscription purchase query failed code=%d message=%s",
+                    billingResult.responseCode,
+                    billingResult.debugMessage
+                )
             }
         }
     }

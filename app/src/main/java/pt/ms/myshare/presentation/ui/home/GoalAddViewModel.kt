@@ -14,6 +14,7 @@ import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.repository.UserPreferencesRepository
+import pt.ms.myshare.domain.use_case.CheckEntitlementLimitUseCase
 import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -39,6 +40,7 @@ data class GoalAddState(
 class GoalAddViewModel @Inject constructor(
     private val repository: PlannerRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
+    private val checkEntitlementLimitUseCase: CheckEntitlementLimitUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -110,6 +112,13 @@ class GoalAddViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            val isNewGoal = _state.value.goalId == null
+            if (isNewGoal && !checkEntitlementLimitUseCase.canAddMultipleGoals(repository.loadGoals().size)) {
+                _state.update { it.copy(error = "goal_add_error_premium_required") }
+                Timber.tag(TAG).w("Blocked extra goal save because Premium is inactive")
+                return@launch
+            }
+
             _state.update { it.copy(isLoading = true, error = null) }
             val finalGoal = Goal(
                 id = _state.value.goalId ?: UUID.randomUUID().toString(),

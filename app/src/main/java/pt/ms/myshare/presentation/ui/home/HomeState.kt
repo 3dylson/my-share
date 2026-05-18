@@ -43,7 +43,8 @@ data class GoalCardState(
     val progressLabelKey: String? = null,
     val progressLabelArgs: List<String> = emptyList(),
     val progressNote: String = "",
-    val progressNoteKey: String? = null
+    val progressNoteKey: String? = null,
+    val isLockedByEntitlement: Boolean = false
 )
 
 data class ReviewCardState(
@@ -72,7 +73,8 @@ data class RuleCardState(
     val typeLabel: String,
     val isPercentage: Boolean,
     val typeLabelKey: String? = null,
-    val nameKey: String? = null
+    val nameKey: String? = null,
+    val isLockedByEntitlement: Boolean = false
 )
 
 data class MoreCardState(
@@ -100,6 +102,7 @@ data class MoreCardState(
     val isPremium: Boolean = false,
     val userEmail: String? = null,
     val canConnectGoogle: Boolean = false,
+    val showPremiumAccountPrompt: Boolean = false,
     val isGoogleConnectionInProgress: Boolean = false,
     val googleConnectionMessage: String? = null,
     val googleConnectionError: String? = null,
@@ -142,6 +145,7 @@ data class HomeState(
     val reviewHistory: List<ReviewHistoryItemState> = emptyList(),
     val performanceStats: PerformanceStatsState = PerformanceStatsState(),
     val moreCard: MoreCardState = MoreCardState(),
+    val reviewSavedEventId: Long = 0L,
     val isLoading: Boolean = true,
     val emptyMessage: String? = null,
     val error: String? = null

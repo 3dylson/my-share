@@ -17,6 +17,7 @@ const fs = require("fs");
 const path = require("path");
 
 const RULES_PATH = path.join(__dirname, "../firestore.rules");
+const STORAGE_RULES_PATH = path.join(__dirname, "../storage.rules");
 let testEnv;
 
 beforeAll(async () => {
@@ -27,6 +28,11 @@ beforeAll(async () => {
       host: "localhost",
       port: 8080,
     },
+    storage: {
+      rules: fs.readFileSync(STORAGE_RULES_PATH, "utf8"),
+      host: "localhost",
+      port: 9199,
+    },
   });
 });
 
@@ -36,6 +42,7 @@ afterAll(async () => {
 
 afterEach(async () => {
   await testEnv.clearFirestore();
+  await testEnv.clearStorage();
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -53,9 +60,23 @@ function anonDb() {
   return testEnv.unauthenticatedContext().firestore();
 }
 
+function authedStorage(uid) {
+  return testEnv.authenticatedContext(uid).storage();
+}
+
+function anonStorage() {
+  return testEnv.unauthenticatedContext().storage();
+}
+
 async function seedUserDoc(uid) {
   await testEnv.withSecurityRulesDisabled(async (ctx) => {
     await ctx.firestore().collection("users").doc(uid).set({ created: true });
+  });
+}
+
+async function seedStorageObject(storagePath) {
+  await testEnv.withSecurityRulesDisabled(async (ctx) => {
+    await ctx.storage().ref(storagePath).putString("seed-data");
   });
 }
 
@@ -141,6 +162,38 @@ describe("Authenticated user — own document", () => {
         .collection("users")
         .doc(USER_A)
         .set({ languageTag: "pt-PT", currencyCode: "EUR", isPro: true }, { merge: true })
+    );
+  });
+
+  test("cannot create own user document with protected billing fields", async () => {
+    await assertFails(
+      authedDb(USER_A)
+        .collection("users")
+        .doc(USER_A)
+        .set({
+          languageTag: "pt-PT",
+          entitlementState: "PRO",
+          subscriptionState: "ACTIVE",
+        })
+    );
+  });
+
+  test.each([
+    ["entitlementState", "PRO"],
+    ["subscriptionState", "ACTIVE"],
+    ["purchaseToken", "fake-token"],
+    ["subscriptionId", "myshare_annual"],
+    ["expiryTimeMillis", 1842300000000],
+    ["paymentState", "RECEIVED"],
+    ["proExpiry", 1842300000000],
+    ["lastVerifiedAt", 1842300000000],
+  ])("cannot update protected billing field %s", async (fieldName, fieldValue) => {
+    await seedUserDoc(USER_A);
+    await assertFails(
+      authedDb(USER_A)
+        .collection("users")
+        .doc(USER_A)
+        .set({ [fieldName]: fieldValue }, { merge: true })
     );
   });
 
@@ -302,6 +355,45 @@ describe("Entitlements sub-collection", () => {
         .collection("entitlements")
         .doc("sub")
         .get()
+    );
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Storage — user-owned files only
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("Storage user files", () => {
+  test("user can write under own storage prefix", async () => {
+    await assertSucceeds(
+      authedStorage(USER_A).ref(`users/${USER_A}/avatar.txt`).putString("avatar")
+    );
+  });
+
+  test("user can read under own storage prefix", async () => {
+    const storagePath = `users/${USER_A}/exports/plan.txt`;
+    await seedStorageObject(storagePath);
+
+    await assertSucceeds(
+      authedStorage(USER_A).ref(storagePath).getDownloadURL()
+    );
+  });
+
+  test("unauthenticated client cannot write user storage files", async () => {
+    await assertFails(
+      anonStorage().ref(`users/${USER_A}/avatar.txt`).putString("avatar")
+    );
+  });
+
+  test("user cannot write another user's storage prefix", async () => {
+    await assertFails(
+      authedStorage(USER_B).ref(`users/${USER_A}/avatar.txt`).putString("avatar")
+    );
+  });
+
+  test("user cannot write outside user-owned storage paths", async () => {
+    await assertFails(
+      authedStorage(USER_A).ref("public/avatar.txt").putString("avatar")
     );
   });
 });

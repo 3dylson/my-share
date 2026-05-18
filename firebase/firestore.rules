@@ -1,6 +1,23 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    function protectedBillingFields() {
+      return [
+        'isPro',
+        'proExpiry',
+        'lastVerifiedAt',
+        'entitlementState',
+        'subscriptionState',
+        'purchaseToken',
+        'subscriptionId',
+        'expiryTimeMillis',
+        'paymentState'
+      ];
+    }
 
     match /app_config/android_update_policy {
       allow read: if true;
@@ -9,41 +26,44 @@ service cloud.firestore {
 
     // A user can only read/write their own document
     match /users/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId;
-      // Prevent clients from modifying billing status fields
-      allow write: if request.auth != null && request.auth.uid == userId 
-                   && (!request.resource.data.diff(resource == null ? {} : resource.data).affectedKeys().hasAny(['isPro', 'proExpiry', 'lastVerifiedAt']));
+      allow read: if isOwner(userId);
+      // Prevent clients from creating or modifying server-owned billing status fields.
+      allow create: if isOwner(userId)
+                    && !request.resource.data.keys().hasAny(protectedBillingFields());
+      allow update: if isOwner(userId)
+                    && !request.resource.data.diff(resource.data).affectedKeys().hasAny(protectedBillingFields());
+      allow delete: if false;
 
       // Entitlement snapshot — written by the server (Cloud Function) and
       // readable by the owning user only
       match /entitlements/{doc} {
-        allow read: if request.auth != null && request.auth.uid == userId;
+        allow read: if isOwner(userId);
         // Write is server-only (Cloud Function uses Admin SDK which bypasses rules)
         allow write: if false;
       }
 
       // Salary plans — owned by the user
       match /plans/{doc} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read, write: if isOwner(userId);
       }
 
       // Rules — owned by the user
       match /rules/{doc} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read, write: if isOwner(userId);
       }
 
       // Goals — owned by the user
       match /goals/{doc} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read, write: if isOwner(userId);
       }
 
       // Settings (including reminders and automation) — owned by the user
       match /settings/{doc} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read, write: if isOwner(userId);
       }
 
       match /reviews/{doc} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read, write: if isOwner(userId);
       }
     }
   }
