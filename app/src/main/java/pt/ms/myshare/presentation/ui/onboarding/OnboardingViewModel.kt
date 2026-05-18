@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 import pt.ms.myshare.domain.model.AllocationPreset
 import pt.ms.myshare.domain.model.AllocationStrategy
 import pt.ms.myshare.domain.model.BillingFlowLaunchResult
@@ -455,6 +456,7 @@ class OnboardingViewModel @Inject constructor(
 
     fun signInWithGoogle(idToken: String, onComplete: () -> Unit) {
         viewModelScope.launch {
+            state.update { it.copy(isSignupActionInProgress = true, error = null) }
             val result = authRepository.signInWithGoogle(idToken)
             
             if (result.isSuccess) {
@@ -465,15 +467,24 @@ class OnboardingViewModel @Inject constructor(
             } else {
                 FirebaseUtils.logEvent("login_failed")
                 Timber.tag(TAG).e(result.exceptionOrNull(), "Google sign-in failed")
-                state.update { it.copy(error = "error_authentication_failed") }
+                state.update {
+                    it.copy(
+                        isSignupActionInProgress = false,
+                        error = "error_authentication_failed"
+                    )
+                }
             }
         }
     }
 
     fun continueLocally(onComplete: () -> Unit) {
-        FirebaseUtils.logEvent("local_mode_selected")
-        Timber.tag(TAG).d("Continuing onboarding in local-only mode")
-        onComplete()
+        viewModelScope.launch {
+            state.update { it.copy(isSignupActionInProgress = true, error = null) }
+            FirebaseUtils.logEvent("local_mode_selected")
+            Timber.tag(TAG).d("Continuing onboarding in local-only mode")
+            yield()
+            onComplete()
+        }
     }
 
 

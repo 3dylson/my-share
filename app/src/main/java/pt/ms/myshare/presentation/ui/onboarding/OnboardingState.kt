@@ -43,6 +43,7 @@ data class OnboardingState(
     val reminderSkipped: Boolean = false,
     val bankSyncHandled: Boolean = false,
     val onboardingCompleted: Boolean = false,
+    val isSignupActionInProgress: Boolean = false,
     val isPremium: Boolean = false,
     val isAnonymousUser: Boolean = false,
     val shouldSecurePremiumAccess: Boolean = false,

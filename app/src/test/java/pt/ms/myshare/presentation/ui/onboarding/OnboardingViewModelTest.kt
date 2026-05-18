@@ -401,8 +401,21 @@ class OnboardingViewModelTest {
         viewModel.signInWithGoogle("google-token") { completed = true }
         advanceUntilIdle()
 
+        coVerify(timeout = 1_000) { plannerRepository.syncLocalStateIfAuthenticated() }
         assertTrue(completed)
-        coVerify { plannerRepository.syncLocalStateIfAuthenticated() }
+    }
+
+    @Test
+    fun `signInWithGoogle clears signup loading when authentication fails`() = runTest {
+        coEvery { authRepository.signInWithGoogle("google-token") } returns Result.failure(
+            IllegalStateException("auth failed")
+        )
+
+        viewModel.signInWithGoogle("google-token") {}
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isSignupActionInProgress)
+        assertEquals("error_authentication_failed", viewModel.uiState.value.error)
     }
 
     @Test
@@ -461,9 +474,9 @@ class OnboardingViewModelTest {
         viewModel.connectGoogleAccount("google-token")
         advanceUntilIdle()
 
+        coVerify(timeout = 1_000) { plannerRepository.syncLocalStateIfAuthenticated() }
         assertFalse(viewModel.uiState.value.shouldSecurePremiumAccess)
         assertEquals("home_more_account_connect_google_success", viewModel.uiState.value.googleConnectionMessage)
-        coVerify { plannerRepository.syncLocalStateIfAuthenticated() }
     }
 
     private fun previewResult(): PlanPreview = PlanPreview(

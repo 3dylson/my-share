@@ -38,6 +38,7 @@ import timber.log.Timber
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SignupScreen(
+    isSignupActionInProgress: Boolean,
     onSignup: (String) -> Unit,
     onContinueLocally: () -> Unit
 ) {
@@ -51,8 +52,11 @@ fun SignupScreen(
     }
     var googleSignInError by remember { mutableStateOf<String?>(null) }
     var googleSignInLoading by remember { mutableStateOf(false) }
+    var localContinueLoading by remember { mutableStateOf(false) }
 
     fun startGoogleSignIn() {
+        if (isSignupActionInProgress || googleSignInLoading) return
+        localContinueLoading = false
         coroutineScope.launch {
             googleSignInLoading = true
             googleSignInError = null
@@ -94,17 +98,31 @@ fun SignupScreen(
 
                     GoogleSignInButton(
                         text = stringResource(R.string.onboarding_signup_google),
-                        isLoading = googleSignInLoading,
+                        isLoading = googleSignInLoading || (isSignupActionInProgress && !localContinueLoading),
                         onClick = ::startGoogleSignIn
                     )
 
                     Spacer(Modifier.height(10.dp))
 
                     TextButton(
-                        onClick = onContinueLocally,
+                        onClick = {
+                            if (!isSignupActionInProgress && !googleSignInLoading) {
+                                localContinueLoading = true
+                                onContinueLocally()
+                            }
+                        },
+                        enabled = !isSignupActionInProgress && !googleSignInLoading,
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurfaceVariant)
                     ) {
+                        if (localContinueLoading || (isSignupActionInProgress && !googleSignInLoading)) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(Modifier.width(10.dp))
+                        }
                         Text(
                             stringResource(R.string.onboarding_signup_continue_without_sync),
                             style = MaterialTheme.typography.labelLarge,

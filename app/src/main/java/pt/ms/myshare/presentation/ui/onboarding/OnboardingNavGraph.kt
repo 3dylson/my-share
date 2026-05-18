@@ -138,6 +138,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
         composable(OnboardingRoute.Signup.route) {
             LaunchedEffect(Unit) { viewModel.logSignupStarted() }
             SignupScreen(
+                isSignupActionInProgress = state.isSignupActionInProgress,
                 onSignup = { idToken ->
                     viewModel.signInWithGoogle(idToken) {
                         navController.navigate(OnboardingRoute.Trajectory.route)

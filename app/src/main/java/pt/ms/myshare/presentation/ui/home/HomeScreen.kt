@@ -435,7 +435,6 @@ fun HomeScreen(
                 containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
                 tonalElevation = 8.dp,
                 modifier = Modifier
-                    .imePadding()
                     .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.95f))
             ) {
                 HomeDestination.entries.forEach { destination ->

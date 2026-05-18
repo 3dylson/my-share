@@ -116,22 +116,6 @@ fun RuleAddScreen(
                     containerColor = MaterialTheme.colorScheme.background
                 )
             )
-        },
-        bottomBar = {
-            if (!state.isMissingExistingRule) {
-                Surface(color = MaterialTheme.colorScheme.background) {
-                    PremiumButton(
-                        text = if (state.isLoading) stringResource(R.string.rule_add_button_loading) else if (isEditMode) stringResource(R.string.rule_add_button_edit) else stringResource(R.string.rule_add_button_new),
-                        onClick = onSave,
-                        enabled = !state.isLoading,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .imePadding()
-                            .navigationBarsPadding()
-                            .padding(horizontal = 24.dp, vertical = 16.dp)
-                    )
-                }
-            }
         }
     ) { innerPadding ->
         if (state.isMissingExistingRule) {
@@ -147,32 +131,37 @@ fun RuleAddScreen(
             return@Scaffold
         }
 
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .navigationBarsPadding()
-                .padding(horizontal = 24.dp)
-                .imeNestedScroll()
-                .imePadding()
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 112.dp)
+                    .imeNestedScroll()
+                    .imePadding()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(8.dp))
             
-            StrategyFormHeaderCard(
-                title = if (isEditMode) stringResource(R.string.rule_add_header_title_edit) else stringResource(R.string.rule_add_header_title_new),
-                body = stringResource(R.string.rule_add_info_body),
-                icon = Icons.Default.Settings
-            )
+                StrategyFormHeaderCard(
+                    title = if (isEditMode) stringResource(R.string.rule_add_header_title_edit) else stringResource(R.string.rule_add_header_title_new),
+                    body = stringResource(R.string.rule_add_info_body),
+                    icon = Icons.Default.Settings
+                )
 
-            PremiumTextField(
-                value = state.name,
-                onValueChange = onNameChanged,
-                label = stringResource(R.string.rule_add_label_name),
-                placeholder = stringResource(R.string.rule_add_hint_name)
-            )
+                PremiumTextField(
+                    value = state.name,
+                    onValueChange = onNameChanged,
+                    label = stringResource(R.string.rule_add_label_name),
+                    placeholder = stringResource(R.string.rule_add_hint_name)
+                )
 
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
@@ -269,7 +258,27 @@ fun RuleAddScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .imePadding()
+                    .navigationBarsPadding(),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                PremiumButton(
+                    text = if (state.isLoading) stringResource(R.string.rule_add_button_loading) else if (isEditMode) stringResource(R.string.rule_add_button_edit) else stringResource(R.string.rule_add_button_new),
+                    onClick = onSave,
+                    enabled = !state.isLoading,
+                    isLoading = state.isLoading,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 16.dp)
+                )
+            }
         }
     }
 }

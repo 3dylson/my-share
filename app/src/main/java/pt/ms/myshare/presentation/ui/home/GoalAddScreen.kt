@@ -2,6 +2,7 @@ package pt.ms.myshare.presentation.ui.home
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -14,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -107,22 +109,6 @@ fun GoalAddScreen(
                     containerColor = MaterialTheme.colorScheme.background
                 )
             )
-        },
-        bottomBar = {
-            if (!state.isMissingExistingGoal) {
-                Surface(color = MaterialTheme.colorScheme.background) {
-                    PremiumButton(
-                        text = if (state.isLoading) stringResource(R.string.goal_add_button_loading) else if (isEditMode) stringResource(R.string.goal_add_button_edit) else stringResource(R.string.goal_add_button_new),
-                        onClick = onSave,
-                        enabled = !state.isLoading,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .imePadding()
-                            .navigationBarsPadding()
-                            .padding(horizontal = 24.dp, vertical = 16.dp)
-                    )
-                }
-            }
         }
     ) { innerPadding ->
         if (state.isMissingExistingGoal) {
@@ -138,62 +124,88 @@ fun GoalAddScreen(
             return@Scaffold
         }
 
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .navigationBarsPadding()
-                .padding(horizontal = 24.dp)
-                .imeNestedScroll()
-                .imePadding()
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 112.dp)
+                    .imeNestedScroll()
+                    .imePadding()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(8.dp))
 
-            StrategyFormHeaderCard(
-                title = if (isEditMode) stringResource(R.string.goal_add_header_title_edit) else stringResource(R.string.goal_add_header_title_new),
-                body = if (isEditMode) stringResource(R.string.goal_add_info_body_edit) else stringResource(R.string.goal_add_info_body_new),
-                icon = Icons.Default.Flag
-            )
+                StrategyFormHeaderCard(
+                    title = if (isEditMode) stringResource(R.string.goal_add_header_title_edit) else stringResource(R.string.goal_add_header_title_new),
+                    body = if (isEditMode) stringResource(R.string.goal_add_info_body_edit) else stringResource(R.string.goal_add_info_body_new),
+                    icon = Icons.Default.Flag
+                )
 
-            PremiumTextField(
-                value = state.name,
-                onValueChange = onNameChanged,
-                label = stringResource(R.string.goal_add_label_name),
-                placeholder = stringResource(R.string.goal_add_hint_name)
-            )
+                PremiumTextField(
+                    value = state.name,
+                    onValueChange = onNameChanged,
+                    label = stringResource(R.string.goal_add_label_name),
+                    placeholder = stringResource(R.string.goal_add_hint_name)
+                )
 
-            PremiumTextField(
-                value = state.amount,
-                onValueChange = onAmountChanged,
-                label = stringResource(R.string.goal_add_label_amount),
-                placeholder = stringResource(R.string.goal_add_hint_amount),
-                prefix = {
+                PremiumTextField(
+                    value = state.amount,
+                    onValueChange = onAmountChanged,
+                    label = stringResource(R.string.goal_add_label_amount),
+                    placeholder = stringResource(R.string.goal_add_hint_amount),
+                    prefix = {
+                        Text(
+                            LocalizedAmountFormatter.currencySymbol(
+                                state.userPreferences.locale,
+                                state.userPreferences.currencyCode
+                            ),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+                )
+
+                if (state.error != null) {
+                    val errorText = remember(state.error) {
+                        val resId = context.resources.getIdentifier(state.error, "string", context.packageName)
+                        if (resId != 0) context.getString(resId) else state.error
+                    }
                     Text(
-                        LocalizedAmountFormatter.currencySymbol(
-                            state.userPreferences.locale,
-                            state.userPreferences.currencyCode
-                        ),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        text = errorText,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
-            )
 
-            if (state.error != null) {
-                val errorText = remember(state.error) {
-                    val resId = context.resources.getIdentifier(state.error, "string", context.packageName)
-                    if (resId != 0) context.getString(resId) else state.error
-                }
-                Text(
-                    text = errorText,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Spacer(modifier = Modifier.height(24.dp))
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .imePadding()
+                    .navigationBarsPadding(),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                PremiumButton(
+                    text = if (state.isLoading) stringResource(R.string.goal_add_button_loading) else if (isEditMode) stringResource(R.string.goal_add_button_edit) else stringResource(R.string.goal_add_button_new),
+                    onClick = onSave,
+                    enabled = !state.isLoading,
+                    isLoading = state.isLoading,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 16.dp)
+                )
+            }
         }
     }
 }

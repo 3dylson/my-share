@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import pt.ms.myshare.domain.model.AllocationPreset
@@ -113,8 +114,8 @@ class PlannerRepositoryImpl @Inject constructor(
         automationState.value = false
     }
 
-    override suspend fun syncFromFirestore() {
-        val user = firebaseAuth.currentUser ?: return
+    override suspend fun syncFromFirestore() = withContext(Dispatchers.IO) {
+        val user = firebaseAuth.currentUser ?: return@withContext
         Timber.tag(TAG).d("syncFromFirestore starting for user %s", user.uid)
         
         try {
@@ -169,8 +170,8 @@ class PlannerRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun syncLocalStateIfAuthenticated() {
-        val user = firebaseAuth.currentUser ?: return
+    override suspend fun syncLocalStateIfAuthenticated() = withContext(Dispatchers.IO) {
+        val user = firebaseAuth.currentUser ?: return@withContext
         Timber.tag(TAG).d("syncLocalStateIfAuthenticated starting for user %s", user.uid)
 
         try {
@@ -184,7 +185,7 @@ class PlannerRepositoryImpl @Inject constructor(
             if (remotePlan.exists()) {
                 Timber.tag(TAG).d("Remote plan exists for user %s. Keeping remote data as source of truth.", user.uid)
                 syncFromFirestore()
-                return
+                return@withContext
             }
 
             val localPlan = planState.value

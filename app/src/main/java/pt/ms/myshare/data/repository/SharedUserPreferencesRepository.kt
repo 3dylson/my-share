@@ -8,10 +8,12 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.domain.repository.UserPreferencesRepository
 import timber.log.Timber
@@ -33,7 +35,7 @@ class SharedUserPreferencesRepository @Inject constructor(
 
     override fun loadPreferences(): UserPreferences = preferencesState.value
 
-    override suspend fun savePreferences(preferences: UserPreferences) {
+    override suspend fun savePreferences(preferences: UserPreferences) = withContext(Dispatchers.IO) {
         val sanitized = UserPreferences.sanitize(
             languageTag = preferences.languageTag,
             currencyCode = preferences.currencyCode,
@@ -53,8 +55,8 @@ class SharedUserPreferencesRepository @Inject constructor(
         syncToFirestoreIfAuthenticated()
     }
 
-    override suspend fun syncFromFirestore() {
-        val user = firebaseAuth.currentUser ?: return
+    override suspend fun syncFromFirestore() = withContext(Dispatchers.IO) {
+        val user = firebaseAuth.currentUser ?: return@withContext
         try {
             Timber.tag(TAG).d("Syncing user preferences from Firestore")
             val snapshot = firestore.collection("users").document(user.uid).get().await()
@@ -63,7 +65,7 @@ class SharedUserPreferencesRepository @Inject constructor(
             if (remoteLanguage.isNullOrBlank() || remoteCurrency.isNullOrBlank()) {
                 Timber.tag(TAG).d("Remote preferences missing. Writing local preferences to Firestore")
                 syncToFirestoreIfAuthenticated()
-                return
+                return@withContext
             }
             val remote = UserPreferences.sanitize(remoteLanguage, remoteCurrency, countryIso = resolveCountryIso())
             writeLocal(remote)
@@ -74,8 +76,8 @@ class SharedUserPreferencesRepository @Inject constructor(
         }
     }
 
-    override suspend fun syncToFirestoreIfAuthenticated() {
-        val user = firebaseAuth.currentUser ?: return
+    override suspend fun syncToFirestoreIfAuthenticated() = withContext(Dispatchers.IO) {
+        val user = firebaseAuth.currentUser ?: return@withContext
         val preferences = preferencesState.value
         try {
             Timber.tag(TAG).d("Saving user preferences to Firestore language=%s currency=%s", preferences.languageTag, preferences.currencyCode)
