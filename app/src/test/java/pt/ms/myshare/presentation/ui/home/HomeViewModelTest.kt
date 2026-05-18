@@ -58,6 +58,7 @@ import io.mockk.every
 import io.mockk.coEvery
 import io.mockk.coVerify
 import kotlinx.coroutines.flow.flowOf
+import java.time.LocalDate
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
@@ -413,6 +414,36 @@ class HomeViewModelTest {
     }
 
     @Test
+    fun `free user review performance analytics stay locked`() = runTest {
+        seedPlanWithPerformanceReviews()
+        fakeEntitlementRepository.setEntitlementState(EntitlementState.FREE)
+        advanceUntilIdle()
+
+        val stats = viewModel.state.value.performanceStats
+
+        assertEquals(0, stats.healthScore)
+        assertEquals(0, stats.currentStreak)
+        assertEquals(BigDecimal.ZERO, stats.totalSavings)
+        assertTrue(stats.performanceTrend.isEmpty())
+        assertEquals(2, stats.totalReviews)
+    }
+
+    @Test
+    fun `premium user receives review performance analytics`() = runTest {
+        seedPlanWithPerformanceReviews()
+        fakeEntitlementRepository.setEntitlementState(EntitlementState.PRO)
+        advanceUntilIdle()
+
+        val stats = viewModel.state.value.performanceStats
+
+        assertEquals(50, stats.healthScore)
+        assertEquals(1, stats.currentStreak)
+        assertEquals(BigDecimal("50"), stats.totalSavings)
+        assertEquals(2, stats.performanceTrend.size)
+        assertEquals(2, stats.totalReviews)
+    }
+
+    @Test
     fun `premium user can apply payday recommendation to real rules`() = runTest {
         val currentPlan = SalaryPlan(
             focus = PlanningFocus.SAVE_WITHOUT_STRESS,
@@ -551,6 +582,39 @@ class HomeViewModelTest {
         assertEquals(
             "home_more_account_signout_error",
             viewModel.state.value.moreCard.logoutError
+        )
+    }
+
+    private suspend fun seedPlanWithPerformanceReviews() {
+        fakePlannerRepository.savePlan(
+            SalaryPlan(
+                focus = PlanningFocus.SAVE_WITHOUT_STRESS,
+                netIncomePerPayday = BigDecimal("1000"),
+                monthlyFixedCosts = BigDecimal("400"),
+                payFrequency = PayFrequency.MONTHLY,
+                monthlyPayday = 1,
+                preset = AllocationPreset.BALANCED
+            )
+        )
+        fakePlannerRepository.saveReview(
+            ManualReview(
+                id = "older-review",
+                actualFlexibleSpend = BigDecimal("350"),
+                actualGoalContribution = BigDecimal("80"),
+                plannedFlexibleSpend = BigDecimal("300"),
+                plannedGoalContribution = BigDecimal("100"),
+                createdAt = LocalDate.of(2026, 5, 1)
+            )
+        )
+        fakePlannerRepository.saveReview(
+            ManualReview(
+                id = "latest-review",
+                actualFlexibleSpend = BigDecimal("250"),
+                actualGoalContribution = BigDecimal("150"),
+                plannedFlexibleSpend = BigDecimal("300"),
+                plannedGoalContribution = BigDecimal("100"),
+                createdAt = LocalDate.of(2026, 5, 2)
+            )
         )
     }
 }

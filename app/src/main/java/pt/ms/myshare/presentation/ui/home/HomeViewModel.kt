@@ -276,6 +276,16 @@ class HomeViewModel @Inject constructor(
                     )
                 }
                 val reviewCard = buildReviewCard(updatedPlan, latestReview, preferences)
+                val performanceStats = if (isPremium) {
+                    planner.performanceStats.toState(planner.performanceTrend)
+                } else {
+                    PerformanceStatsState(totalReviews = planner.reviewHistory.size)
+                }
+                val coachingInsights = if (isPremium) {
+                    planner.coachingInsights.map { it.toState() }
+                } else {
+                    emptyList()
+                }
                 
                 val monthlyProduct = products.find { it.productId == PremiumSubscriptionProducts.MONTHLY_ID }
                 val annualProduct = products.find { it.productId == PremiumSubscriptionProducts.ANNUAL_ID }
@@ -350,9 +360,9 @@ class HomeViewModel @Inject constructor(
                     planCard = planCard,
                     goals = goalCards,
                     rules = ruleCards,
-                    performanceStats = planner.performanceStats.toState(planner.performanceTrend),
+                    performanceStats = performanceStats,
                     reviewCard = reviewCard.copy(
-                        coachingInsights = planner.coachingInsights.map { it.toState() },
+                        coachingInsights = coachingInsights,
                         paydayRecommendation = paydayRecommendation?.toState(preferences),
                         recommendationMessageKey = currentState.reviewCard.recommendationMessageKey
                     ),

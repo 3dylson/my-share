@@ -374,6 +374,7 @@ Status after More tab premium value-surface pass on 2026-05-18:
 - Done: Review was exercised before implementation by submitting an on-plan review and then an off-plan review. This exposed that the latest same-day review could be hidden behind the free history lock.
 - Done: Review history now shows the latest saved review first, review deltas use the saved planned-value snapshots, and free users see a locked `What Premium would adjust next` preview after a review.
 - Done: Review history lock copy now shows a concrete locked pattern preview instead of generic trajectory language.
+- Done: Review performance analytics are now Premium-only: free users see a locked trend preview from the latest check-in, while Premium users get score, streak, sparkline, savings, and coaching state.
 - Done: More now behaves like a control center first: profile, current weekly guide, priority move, rule count, review count, reminders, language, currency, and automation before checkout.
 - Done: More subscription copy now explains the Premium upgrade with the user's current weekly guide, priority move, saved rules, and review-based automation instead of opening with a generic pricing dump.
 - Done: Auto rules lock copy now points to review-based rule adjustments and opens the contextual adaptive-adjustment gate.

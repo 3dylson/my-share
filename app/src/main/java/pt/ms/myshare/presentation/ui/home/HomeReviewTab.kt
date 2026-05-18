@@ -62,75 +62,81 @@ fun LazyListScope.homeReviewTab(
     if (history.isNotEmpty()) {
         item {
             PremiumSectionHeader(title = stringResource(R.string.home_review_performance_title))
-            
-            if (performanceStats.performanceTrend.isNotEmpty()) {
-                PremiumSparkline(
-                    points = performanceStats.performanceTrend,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(110.dp)
-                        .padding(vertical = 12.dp)
-                )
-            }
-
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.18f),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.16f))
-            ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.home_review_score_label),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = stringResource(R.string.home_review_score_percent, performanceStats.healthScore),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Black,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Text(
-                            text = stringResource(R.string.home_review_score_count, performanceStats.totalReviews),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    
-                    Box(
+            if (isPremium) {
+                if (performanceStats.performanceTrend.isNotEmpty()) {
+                    PremiumSparkline(
+                        points = performanceStats.performanceTrend,
                         modifier = Modifier
-                            .width(1.dp)
-                            .height(40.dp)
-                            .align(Alignment.CenterVertically)
-                            .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.24f))
+                            .fillMaxWidth()
+                            .height(110.dp)
+                            .padding(vertical = 12.dp)
                     )
-                    
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.home_review_streak_label),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontWeight = FontWeight.Bold
+                }
+
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.18f),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.16f))
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.home_review_score_label),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = stringResource(R.string.home_review_score_percent, performanceStats.healthScore),
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Black,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = stringResource(R.string.home_review_score_count, performanceStats.totalReviews),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .width(1.dp)
+                                .height(40.dp)
+                                .align(Alignment.CenterVertically)
+                                .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.24f))
                         )
-                        Text(
-                            text = stringResource(R.string.home_review_streak_count, performanceStats.currentStreak),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Black,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.home_review_streak_label),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = stringResource(R.string.home_review_streak_count, performanceStats.currentStreak),
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Black,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
                     }
                 }
+            } else {
+                LockedPerformanceTrendCard(
+                    item = history.first(),
+                    onClick = onShowPaywall
+                )
             }
             Spacer(Modifier.height(16.dp))
         }
 
-        if (performanceStats.totalFlexSavingsLabel.isNotEmpty() && performanceStats.totalSavings > BigDecimal.ZERO) {
+        if (isPremium && performanceStats.totalFlexSavingsLabel.isNotEmpty() && performanceStats.totalSavings > BigDecimal.ZERO) {
             item {
                 PremiumBenefitCard(
                     title = stringResource(R.string.home_review_savings_title, performanceStats.totalFlexSavingsLabel),
@@ -698,6 +704,144 @@ private fun PaydayAdjustmentRecommendationCard(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun LockedPerformanceTrendCard(
+    item: ReviewHistoryItemState,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.24f)),
+        shadowElevation = 1.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MySharePrimary.copy(alpha = 0.12f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.padding(9.dp).size(20.dp)
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_review_performance_locked_label).uppercase(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MySharePrimary,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = stringResource(R.string.home_review_performance_locked_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = stringResource(R.string.home_review_performance_locked_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.18f),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
+            ) {
+                Row(
+                    modifier = Modifier.padding(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.BarChart,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Text(
+                        text = stringResource(
+                            R.string.home_review_performance_locked_latest,
+                            item.flexibleSpendLabel,
+                            item.goalContributionLabel
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 330.dp || LocalDensity.current.fontScale >= 1.3f
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ReviewPreviewPill(
+                            label = stringResource(R.string.home_review_performance_locked_free_label),
+                            body = stringResource(R.string.home_review_performance_locked_free_body),
+                            icon = Icons.Default.RadioButtonUnchecked,
+                            iconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        ReviewPreviewPill(
+                            label = stringResource(R.string.home_review_performance_locked_premium_label),
+                            body = stringResource(R.string.home_review_performance_locked_premium_body),
+                            icon = Icons.Default.CheckCircle,
+                            iconColor = MySharePrimary,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                } else {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ReviewPreviewPill(
+                            label = stringResource(R.string.home_review_performance_locked_free_label),
+                            body = stringResource(R.string.home_review_performance_locked_free_body),
+                            icon = Icons.Default.RadioButtonUnchecked,
+                            iconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1f)
+                        )
+                        ReviewPreviewPill(
+                            label = stringResource(R.string.home_review_performance_locked_premium_label),
+                            body = stringResource(R.string.home_review_performance_locked_premium_body),
+                            icon = Icons.Default.CheckCircle,
+                            iconColor = MySharePrimary,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+
+            Text(
+                text = stringResource(R.string.home_review_performance_locked_action),
+                style = MaterialTheme.typography.labelLarge,
+                color = MySharePrimary,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }

@@ -412,6 +412,15 @@
     <string name="home_review_score_count">%1$s reviews</string>
     <string name="home_review_savings_title">Excess savings: %1$s</string>
     <string name="home_review_savings_desc">Total flexible spend saved across reviews.</string>
+    <string name="home_review_performance_locked_label">Locked Premium trend</string>
+    <string name="home_review_performance_locked_title">Turn check-ins into a trend</string>
+    <string name="home_review_performance_locked_desc">Premium turns every saved check-in into a trust score, streak, savings signal, and next payday pattern.</string>
+    <string name="home_review_performance_locked_latest">Latest check-in: %1$s flexible, %2$s priority.</string>
+    <string name="home_review_performance_locked_free_label">Free</string>
+    <string name="home_review_performance_locked_free_body">Latest check-in only</string>
+    <string name="home_review_performance_locked_premium_label">Premium</string>
+    <string name="home_review_performance_locked_premium_body">Score, streak, trend, and savings</string>
+    <string name="home_review_performance_locked_action">Unlock performance insights</string>
     <string name="home_review_recommendation_label">Locked Premium preview</string>
     <string name="home_review_recommendation_title">What Premium would adjust next</string>
     <string name="home_review_recommendation_success_body">Your latest review stayed on plan. Premium can watch repeat surpluses and suggest when to move extra beyond the %1$s guide.</string>
