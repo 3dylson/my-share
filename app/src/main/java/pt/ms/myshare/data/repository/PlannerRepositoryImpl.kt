@@ -339,9 +339,9 @@ class PlannerRepositoryImpl @Inject constructor(
 
     override fun observeReviews(): Flow<List<ManualReview>> = reviewState.asStateFlow()
 
-    override fun observeLatestReview(): Flow<ManualReview?> = reviewState.asStateFlow().map { it.maxByOrNull { r -> r.createdAt } }
+    override fun observeLatestReview(): Flow<ManualReview?> = reviewState.asStateFlow().map { it.lastOrNull() }
 
-    override fun loadLatestReview(): ManualReview? = reviewState.value.maxByOrNull { it.createdAt }
+    override fun loadLatestReview(): ManualReview? = reviewState.value.lastOrNull()
 
     override suspend fun saveReview(review: ManualReview) {
         Timber.tag(TAG).d("saveReview actualFlexible=%s actualGoal=%s", review.actualFlexibleSpend, review.actualGoalContribution)

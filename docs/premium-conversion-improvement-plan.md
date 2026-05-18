@@ -365,12 +365,20 @@ Paywall:
 
 ## Phase 5: Main Tab Polish
 
-Status after Plan-tab premium preview pass on 2026-05-18:
+Status after More tab premium value-surface pass on 2026-05-18:
 - Done: Plan `Smart adjustments` now renders a locked adaptive-adjustment preview tied to the user's weekly guide and priority move instead of routing generically to More.
 - Done: The preview opens the contextual `SmartAutomation` Premium gate with concrete adaptive-adjustment copy.
 - Done: The allocation grid keeps two columns on normal-width phones and stacks only on genuinely narrow or large-font layouts, preventing the first viewport from cutting off money values.
-- Validated: normal and compact emulator passes captured screenshots and UI-tree summaries under `/tmp/myshare-main-tab-qa-2026-05-18`.
-- Pending: Strategy, Review, and More tab Premium value surfaces.
+- Done: Strategy `Add another goal` now renders a locked multi-goal payday split preview tied to the user's current priority move and first goal, then opens the contextual `MultipleGoals` gate.
+- Done: Strategy rules now label free rules as `Static manual rule` and show a locked adaptive-rules preview tied to the user's current rule before opening the contextual `MultipleRules` gate.
+- Done: Review was exercised before implementation by submitting an on-plan review and then an off-plan review. This exposed that the latest same-day review could be hidden behind the free history lock.
+- Done: Review history now shows the latest saved review first, review deltas use the saved planned-value snapshots, and free users see a locked `What Premium would adjust next` preview after a review.
+- Done: Review history lock copy now shows a concrete locked pattern preview instead of generic trajectory language.
+- Done: More now behaves like a control center first: profile, current weekly guide, priority move, rule count, review count, reminders, language, currency, and automation before checkout.
+- Done: More subscription copy now explains the Premium upgrade with the user's current weekly guide, priority move, saved rules, and review-based automation instead of opening with a generic pricing dump.
+- Done: Auto rules lock copy now points to review-based rule adjustments and opens the contextual adaptive-adjustment gate.
+- Validated: normal and compact emulator passes captured Plan and Strategy screenshots/UI-tree summaries under `/tmp/myshare-main-tab-qa-2026-05-18`, Review under `/tmp/myshare-review-qa-2026-05-18`, and More under `/tmp/myshare-more-qa-2026-05-18`.
+- Pending: Phase 6 full end-to-end verification pass.
 
 ### Plan
 
@@ -386,19 +394,19 @@ Status after Plan-tab premium preview pass on 2026-05-18:
 
 ### Review
 
-- Turn review submission into the main Premium conversion moment.
+- Completed: turn review submission into a stronger Premium conversion moment.
 - After saving, show:
   - performance update
-  - next recommendation
-  - locked apply action for free users
-- Make history lock more valuable by showing a locked insight preview.
+  - locked next-adjustment preview for free users
+  - latest review with saved planned-vs-actual deltas
+- Completed: make history lock more valuable by showing a locked insight preview.
 
 ### More
 
-- Keep account/settings first, subscription second.
-- Reduce repeated billing error surfaces.
-- Keep ad preferences and legal links reachable.
-- Make subscription management clear for free users without feeling like a paywall dump.
+- Completed: keep account/settings first, subscription second.
+- Completed: reduce the pricing-dump feeling by leading with a control-center summary and a concrete Premium automation preview.
+- Completed: keep ad preferences, legal links, Google connect, subscription management, and sign-out reachable.
+- Completed: make subscription management clear for free users without making the whole More tab feel like a paywall.
 
 ### Acceptance Criteria
 

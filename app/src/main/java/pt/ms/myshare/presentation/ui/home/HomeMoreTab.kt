@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.automirrored.filled.Rule
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -63,148 +64,11 @@ fun LazyListScope.homeMoreTab(
         )
     }
 
-    if (!state.isPremium) {
-        item {
-            Column(modifier = Modifier.padding(bottom = 20.dp)) {
-                PremiumSectionHeader(title = stringResource(R.string.home_more_premium_title))
-                val planOrder = if (state.pricingStrategy?.heroPlan == BillingPlan.ANNUAL) {
-                    listOf(BillingPlan.ANNUAL, BillingPlan.MONTHLY)
-                } else {
-                    listOf(BillingPlan.MONTHLY, BillingPlan.ANNUAL)
-                }
-                planOrder.forEachIndexed { index, plan ->
-                    CompactBillingPlanRow(
-                        title = stringResource(plan.moreTitleRes),
-                        price = when (plan) {
-                            BillingPlan.MONTHLY -> state.actualMonthlyPrice
-                            BillingPlan.ANNUAL -> state.actualAnnualPrice
-                        } ?: stringResource(R.string.paywall_price_loading),
-                        period = stringResource(plan.morePeriodRes),
-                        badge = when {
-                            plan == BillingPlan.ANNUAL -> stringResource(R.string.home_more_annual_badge)
-                            plan == state.pricingStrategy?.heroPlan -> stringResource(R.string.paywall_badge_easy_start)
-                            else -> null
-                        },
-                        comparisonPrice = if (plan == BillingPlan.ANNUAL) {
-                            state.annualMonthlyEquivalentPrice
-                        } else {
-                            null
-                        },
-                        savingsLabel = if (plan == BillingPlan.ANNUAL) {
-                            state.annualSavingsPrice?.let { stringResource(R.string.paywall_annual_savings_label, it) }
-                        } else {
-                            null
-                        },
-                        isSelected = state.selectedBillingPlan == plan,
-                        onClick = { onBillingPlanSelected(plan) }
-                    )
-                    if (index != planOrder.lastIndex) {
-                        Spacer(Modifier.height(10.dp))
-                    }
-                }
-                Spacer(Modifier.height(12.dp))
-                val selectedPrice = if (state.selectedBillingPlan == BillingPlan.ANNUAL) {
-                    state.actualAnnualPrice
-                } else {
-                    state.actualMonthlyPrice
-                }
-                val selectedPeriod = if (state.selectedBillingPlan == BillingPlan.ANNUAL) {
-                    stringResource(R.string.paywall_period_year)
-                } else {
-                    stringResource(R.string.paywall_period_month)
-                }
-                val selectedTrialDays = if (state.selectedBillingPlan == BillingPlan.ANNUAL) {
-                    state.actualAnnualTrialDays
-                } else {
-                    state.actualMonthlyTrialDays
-                }
-                val selectedPriceCurrencyCode = if (state.selectedBillingPlan == BillingPlan.ANNUAL) {
-                    state.actualAnnualPriceCurrencyCode
-                } else {
-                    state.actualMonthlyPriceCurrencyCode
-                }
-                val currencyMismatchNotice = selectedPriceCurrencyCode
-                    ?.takeUnless { it.equals(state.userPreferences.currencyCode, ignoreCase = true) }
-                    ?.let {
-                        stringResource(
-                            R.string.paywall_currency_mismatch_notice,
-                            state.userPreferences.currencyCode,
-                            it
-                        )
-                    }
-                val checkoutTerms = when {
-                    selectedPrice == null -> stringResource(R.string.paywall_footer_store_terms_unavailable)
-                    selectedTrialDays != null -> stringResource(
-                        R.string.paywall_footer_trial_terms,
-                        selectedTrialDays,
-                        selectedPrice,
-                        selectedPeriod
-                    )
-                    else -> stringResource(R.string.paywall_footer_no_trial_terms, selectedPrice, selectedPeriod)
-                }
-                Text(
-                    text = checkoutTerms,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
-                )
-                if (currencyMismatchNotice != null) {
-                    Text(
-                        text = currencyMismatchNotice,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
-                    )
-                }
-                Spacer(Modifier.height(10.dp))
-                val context = LocalContext.current
-                if (state.error != null && state.billingMessage == null) {
-                    val errorMessage = remember(state.error) {
-                        val resId = context.resources.getIdentifier(state.error, "string", context.packageName)
-                        if (resId != 0) context.getString(resId) else state.error
-                    }
-                    Text(
-                        text = errorMessage,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(bottom = 8.dp, start = 4.dp)
-                    )
-                }
-                if (state.billingMessage != null) {
-                    val billingMessage = remember(state.billingMessage) {
-                        val resId = context.resources.getIdentifier(state.billingMessage, "string", context.packageName)
-                        if (resId != 0) context.getString(resId) else state.billingMessage
-                    }
-                    PremiumInfoCard(
-                        title = billingMessage,
-                        body = stringResource(R.string.paywall_billing_status_body),
-                        icon = Icons.Default.Info,
-                        backgroundColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 10.dp)
-                    )
-                }
-                PremiumButton(
-                    text = if (state.isBillingActionInProgress) {
-                        stringResource(R.string.paywall_upgrade_loading)
-                    } else if (selectedPrice == null) {
-                        stringResource(R.string.paywall_price_loading)
-                    } else if (selectedTrialDays != null) {
-                        stringResource(R.string.paywall_start_trial_button)
-                    } else {
-                        stringResource(R.string.home_more_premium_button)
-                    },
-                    onClick = {
-                        if (!state.isBillingActionInProgress) {
-                            activity?.let { onUnlockPremium(it, "more_inline") }
-                        }
-                    },
-                    enabled = selectedPrice != null && !state.isBillingActionInProgress,
-                    isLoading = state.isBillingActionInProgress
-                )
-            }
-        }
+    item {
+        MoreRoutineSummaryCard(
+            state = state,
+            modifier = Modifier.padding(bottom = 20.dp)
+        )
     }
 
     item {
@@ -299,6 +163,18 @@ fun LazyListScope.homeMoreTab(
                         onShowAutomationLock()
                     }
                 }
+            )
+        }
+    }
+
+    if (!state.isPremium) {
+        item {
+            MorePremiumUpgradeSection(
+                state = state,
+                activity = activity,
+                onBillingPlanSelected = onBillingPlanSelected,
+                onUnlockPremium = onUnlockPremium,
+                modifier = Modifier.padding(bottom = 20.dp)
             )
         }
     }
@@ -409,6 +285,475 @@ fun LazyListScope.homeMoreTab(
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
             )
             Spacer(modifier = Modifier.height(32.dp))
+        }
+    }
+}
+
+@Composable
+private fun MoreRoutineSummaryCard(
+    state: MoreCardState,
+    modifier: Modifier = Modifier
+) {
+    val weeklyGuide = state.weeklyGuideLabel.ifBlank { stringResource(R.string.home_more_routine_not_set) }
+    val priorityMove = state.priorityMoveLabel.ifBlank { stringResource(R.string.home_more_routine_not_set) }
+    val body = if (state.isPremium) {
+        stringResource(R.string.home_more_routine_body_premium)
+    } else {
+        stringResource(R.string.home_more_routine_body_free)
+    }
+
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.16f)),
+        shadowElevation = 2.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = MySharePrimary.copy(alpha = 0.1f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Tune,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.padding(10.dp).size(22.dp)
+                    )
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.home_more_routine_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = body,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 300.dp
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        MoreRoutineMetric(
+                            label = stringResource(R.string.home_more_routine_weekly_label),
+                            value = weeklyGuide,
+                            icon = Icons.Default.Payments,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        MoreRoutineMetric(
+                            label = stringResource(R.string.home_more_routine_priority_label),
+                            value = priorityMove,
+                            icon = Icons.Default.Flag,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        MoreRoutineMetric(
+                            label = stringResource(R.string.home_more_routine_rules_label),
+                            value = state.ruleCount.toString(),
+                            icon = Icons.AutoMirrored.Filled.Rule,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        MoreRoutineMetric(
+                            label = stringResource(R.string.home_more_routine_reviews_label),
+                            value = state.reviewCount.toString(),
+                            icon = Icons.Default.History,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                } else {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            MoreRoutineMetric(
+                                label = stringResource(R.string.home_more_routine_weekly_label),
+                                value = weeklyGuide,
+                                icon = Icons.Default.Payments,
+                                modifier = Modifier.weight(1f)
+                            )
+                            MoreRoutineMetric(
+                                label = stringResource(R.string.home_more_routine_priority_label),
+                                value = priorityMove,
+                                icon = Icons.Default.Flag,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            MoreRoutineMetric(
+                                label = stringResource(R.string.home_more_routine_rules_label),
+                                value = state.ruleCount.toString(),
+                                icon = Icons.AutoMirrored.Filled.Rule,
+                                modifier = Modifier.weight(1f)
+                            )
+                            MoreRoutineMetric(
+                                label = stringResource(R.string.home_more_routine_reviews_label),
+                                value = state.reviewCount.toString(),
+                                icon = Icons.Default.History,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MoreRoutineMetric(
+    label: String,
+    value: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.heightIn(min = 70.dp),
+        shape = RoundedCornerShape(14.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.16f)
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MySharePrimary,
+                modifier = Modifier.size(18.dp)
+            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = label.uppercase(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Black,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun MorePremiumUpgradeSection(
+    state: MoreCardState,
+    activity: android.app.Activity?,
+    onBillingPlanSelected: (BillingPlan) -> Unit,
+    onUnlockPremium: (android.app.Activity, String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        PremiumSectionHeader(title = stringResource(R.string.home_more_subscription_title))
+        MorePremiumPreviewCard(state = state)
+        Spacer(Modifier.height(12.dp))
+
+        val planOrder = if (state.pricingStrategy?.heroPlan == BillingPlan.ANNUAL) {
+            listOf(BillingPlan.ANNUAL, BillingPlan.MONTHLY)
+        } else {
+            listOf(BillingPlan.MONTHLY, BillingPlan.ANNUAL)
+        }
+        planOrder.forEachIndexed { index, plan ->
+            CompactBillingPlanRow(
+                title = stringResource(plan.moreTitleRes),
+                price = when (plan) {
+                    BillingPlan.MONTHLY -> state.actualMonthlyPrice
+                    BillingPlan.ANNUAL -> state.actualAnnualPrice
+                } ?: stringResource(R.string.paywall_price_loading),
+                period = stringResource(plan.morePeriodRes),
+                badge = when {
+                    plan == BillingPlan.ANNUAL -> stringResource(R.string.home_more_annual_badge)
+                    plan == state.pricingStrategy?.heroPlan -> stringResource(R.string.paywall_badge_easy_start)
+                    else -> null
+                },
+                comparisonPrice = if (plan == BillingPlan.ANNUAL) {
+                    state.annualMonthlyEquivalentPrice
+                } else {
+                    null
+                },
+                savingsLabel = if (plan == BillingPlan.ANNUAL) {
+                    state.annualSavingsPrice?.let { stringResource(R.string.paywall_annual_savings_label, it) }
+                } else {
+                    null
+                },
+                isSelected = state.selectedBillingPlan == plan,
+                onClick = { onBillingPlanSelected(plan) }
+            )
+            if (index != planOrder.lastIndex) {
+                Spacer(Modifier.height(10.dp))
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+        val selectedPrice = if (state.selectedBillingPlan == BillingPlan.ANNUAL) {
+            state.actualAnnualPrice
+        } else {
+            state.actualMonthlyPrice
+        }
+        val selectedPeriod = if (state.selectedBillingPlan == BillingPlan.ANNUAL) {
+            stringResource(R.string.paywall_period_year)
+        } else {
+            stringResource(R.string.paywall_period_month)
+        }
+        val selectedTrialDays = if (state.selectedBillingPlan == BillingPlan.ANNUAL) {
+            state.actualAnnualTrialDays
+        } else {
+            state.actualMonthlyTrialDays
+        }
+        val selectedPriceCurrencyCode = if (state.selectedBillingPlan == BillingPlan.ANNUAL) {
+            state.actualAnnualPriceCurrencyCode
+        } else {
+            state.actualMonthlyPriceCurrencyCode
+        }
+        val currencyMismatchNotice = selectedPriceCurrencyCode
+            ?.takeUnless { it.equals(state.userPreferences.currencyCode, ignoreCase = true) }
+            ?.let {
+                stringResource(
+                    R.string.paywall_currency_mismatch_notice,
+                    state.userPreferences.currencyCode,
+                    it
+                )
+            }
+        val checkoutTerms = when {
+            selectedPrice == null -> stringResource(R.string.paywall_footer_store_terms_unavailable)
+            selectedTrialDays != null -> stringResource(
+                R.string.paywall_footer_trial_terms,
+                selectedTrialDays,
+                selectedPrice,
+                selectedPeriod
+            )
+            else -> stringResource(R.string.paywall_footer_no_trial_terms, selectedPrice, selectedPeriod)
+        }
+        Text(
+            text = checkoutTerms,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+        )
+        if (currencyMismatchNotice != null) {
+            Text(
+                text = currencyMismatchNotice,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+            )
+        }
+        Spacer(Modifier.height(10.dp))
+        val context = LocalContext.current
+        if (state.error != null && state.billingMessage == null) {
+            val errorMessage = remember(state.error) {
+                val resId = context.resources.getIdentifier(state.error, "string", context.packageName)
+                if (resId != 0) context.getString(resId) else state.error
+            }
+            Text(
+                text = errorMessage,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(bottom = 8.dp, start = 4.dp)
+            )
+        }
+        if (state.billingMessage != null) {
+            val billingMessage = remember(state.billingMessage) {
+                val resId = context.resources.getIdentifier(state.billingMessage, "string", context.packageName)
+                if (resId != 0) context.getString(resId) else state.billingMessage
+            }
+            PremiumInfoCard(
+                title = billingMessage,
+                body = stringResource(R.string.paywall_billing_status_body),
+                icon = Icons.Default.Info,
+                backgroundColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 10.dp)
+            )
+        }
+        PremiumButton(
+            text = if (state.isBillingActionInProgress) {
+                stringResource(R.string.paywall_upgrade_loading)
+            } else if (selectedPrice == null) {
+                stringResource(R.string.paywall_price_loading)
+            } else if (selectedTrialDays != null) {
+                stringResource(R.string.paywall_start_trial_button)
+            } else {
+                stringResource(R.string.home_more_premium_button)
+            },
+            onClick = {
+                if (!state.isBillingActionInProgress) {
+                    activity?.let { onUnlockPremium(it, "more_inline") }
+                }
+            },
+            enabled = selectedPrice != null && !state.isBillingActionInProgress,
+            isLoading = state.isBillingActionInProgress
+        )
+    }
+}
+
+@Composable
+private fun MorePremiumPreviewCard(
+    state: MoreCardState,
+    modifier: Modifier = Modifier
+) {
+    val hasPlanValues = state.weeklyGuideLabel.isNotBlank() && state.priorityMoveLabel.isNotBlank()
+    val body = if (hasPlanValues) {
+        stringResource(
+            R.string.home_more_premium_preview_body,
+            state.weeklyGuideLabel,
+            state.priorityMoveLabel,
+            state.ruleCount
+        )
+    } else {
+        stringResource(
+            R.string.home_more_premium_preview_body_generic,
+            state.ruleCount
+        )
+    }
+
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.16f),
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.2f))
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MySharePrimary.copy(alpha = 0.12f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AutoAwesome,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.padding(9.dp).size(20.dp)
+                    )
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.home_more_premium_preview_label).uppercase(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MySharePrimary,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = stringResource(R.string.home_more_premium_preview_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = body,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 300.dp
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        MorePremiumPreviewPill(
+                            label = stringResource(R.string.home_more_premium_preview_free_label),
+                            body = stringResource(R.string.home_more_premium_preview_free_body),
+                            icon = Icons.Default.RadioButtonUnchecked,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        MorePremiumPreviewPill(
+                            label = stringResource(R.string.home_more_premium_preview_paid_label),
+                            body = stringResource(R.string.home_more_premium_preview_paid_body),
+                            icon = Icons.Default.CheckCircle,
+                            iconColor = MySharePrimary,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                } else {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        MorePremiumPreviewPill(
+                            label = stringResource(R.string.home_more_premium_preview_free_label),
+                            body = stringResource(R.string.home_more_premium_preview_free_body),
+                            icon = Icons.Default.RadioButtonUnchecked,
+                            modifier = Modifier.weight(1f)
+                        )
+                        MorePremiumPreviewPill(
+                            label = stringResource(R.string.home_more_premium_preview_paid_label),
+                            body = stringResource(R.string.home_more_premium_preview_paid_body),
+                            icon = Icons.Default.CheckCircle,
+                            iconColor = MySharePrimary,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MorePremiumPreviewPill(
+    label: String,
+    body: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    modifier: Modifier = Modifier,
+    iconColor: Color? = null
+) {
+    val resolvedIconColor = iconColor ?: MaterialTheme.colorScheme.onSurfaceVariant
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.72f)
+    ) {
+        Row(
+            modifier = Modifier.padding(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = resolvedIconColor,
+                modifier = Modifier.size(16.dp)
+            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = resolvedIconColor,
+                    fontWeight = FontWeight.Black
+                )
+                Text(
+                    text = body,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 16.sp
+                )
+            }
         }
     }
 }

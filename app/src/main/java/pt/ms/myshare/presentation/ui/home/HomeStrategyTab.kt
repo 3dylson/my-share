@@ -10,7 +10,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoGraph
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.SettingsSuggest
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -38,6 +42,7 @@ import java.util.Locale
 fun LazyListScope.homeStrategyTab(
     goals: List<GoalCardState>,
     rules: List<RuleCardState>,
+    planCard: HomePlanCardState?,
     isPremium: Boolean,
     onAddNewGoal: () -> Unit,
     onEditGoal: (String) -> Unit,
@@ -107,22 +112,35 @@ fun LazyListScope.homeStrategyTab(
             Spacer(Modifier.height(16.dp))
         }
         item {
-            PremiumBenefitCard(
-                title = stringResource(R.string.home_strategy_goal_add_title),
-                description = if (isPremium || goals.isEmpty())
-                    stringResource(R.string.home_strategy_goal_add_desc)
-                else
-                    stringResource(R.string.home_strategy_goal_add_desc_premium),
-                icon = Icons.Default.Add,
-                onClick = {
-                    if (isPremium || goals.isEmpty()) {
-                        onAddNewGoal()
-                    } else {
-                        onShowPaywall(HomePremiumGate.MultipleGoals)
-                    }
-                },
-                modifier = Modifier
-            )
+            if (isPremium) {
+                PremiumBenefitCard(
+                    title = stringResource(R.string.home_strategy_goal_add_title),
+                    description = stringResource(R.string.home_strategy_goal_add_desc),
+                    icon = Icons.Default.Add,
+                    onClick = onAddNewGoal,
+                    modifier = Modifier
+                )
+            } else {
+                val context = LocalContext.current
+                LockedStrategyPreviewCard(
+                    title = stringResource(R.string.home_strategy_goal_preview_title),
+                    body = stringResource(
+                        R.string.home_strategy_goal_preview_body,
+                        planCard?.savingsLabel ?: stringResource(R.string.home_strategy_goal_preview_priority_fallback),
+                        localizedText(
+                            context = context,
+                            key = goals.first().goalNameKey,
+                            fallback = goals.first().goalName
+                        )
+                    ),
+                    freeLabel = stringResource(R.string.home_strategy_goal_preview_free_label),
+                    freeBody = stringResource(R.string.home_strategy_goal_preview_free_body),
+                    premiumLabel = stringResource(R.string.home_strategy_goal_preview_premium_label),
+                    premiumBody = stringResource(R.string.home_strategy_goal_preview_premium_body),
+                    action = stringResource(R.string.home_strategy_goal_preview_action),
+                    onClick = { onShowPaywall(HomePremiumGate.MultipleGoals) }
+                )
+            }
             Spacer(Modifier.height(32.dp))
         }
     }
@@ -164,28 +182,41 @@ fun LazyListScope.homeStrategyTab(
                 } else {
                     localizedTypeLabel
                 },
+                isPremium = isPremium,
                 onClick = { onEditRule(rule.id) },
                 modifier = Modifier
             )
             Spacer(Modifier.height(16.dp))
         }
         item {
-            PremiumBenefitCard(
-                title = stringResource(R.string.home_strategy_rule_add_title),
-                description = if (isPremium || rules.isEmpty()) 
-                    stringResource(R.string.home_strategy_rule_add_desc_free) 
-                else 
-                    stringResource(R.string.home_strategy_rule_add_desc_premium),
-                icon = Icons.Default.Add,
-                onClick = {
-                    if (isPremium || rules.isEmpty()) {
-                        onAddNewRule()
-                    } else {
-                        onShowPaywall(HomePremiumGate.MultipleRules)
-                    }
-                },
-                modifier = Modifier
-            )
+            if (isPremium) {
+                PremiumBenefitCard(
+                    title = stringResource(R.string.home_strategy_rule_add_title),
+                    description = stringResource(R.string.home_strategy_rule_add_desc_free),
+                    icon = Icons.Default.Add,
+                    onClick = onAddNewRule,
+                    modifier = Modifier
+                )
+            } else {
+                val context = LocalContext.current
+                LockedStrategyPreviewCard(
+                    title = stringResource(R.string.home_strategy_rule_preview_title),
+                    body = stringResource(
+                        R.string.home_strategy_rule_preview_body,
+                        localizedText(
+                            context = context,
+                            key = rules.first().nameKey,
+                            fallback = rules.first().name
+                        )
+                    ),
+                    freeLabel = stringResource(R.string.home_strategy_rule_preview_free_label),
+                    freeBody = stringResource(R.string.home_strategy_rule_preview_free_body),
+                    premiumLabel = stringResource(R.string.home_strategy_rule_preview_premium_label),
+                    premiumBody = stringResource(R.string.home_strategy_rule_preview_premium_body),
+                    action = stringResource(R.string.home_strategy_rule_preview_action),
+                    onClick = { onShowPaywall(HomePremiumGate.MultipleRules) }
+                )
+            }
         }
     }
 }
@@ -292,6 +323,7 @@ private fun CompactStrategyRuleCard(
     ruleName: String,
     amountLabel: String,
     typeLabel: String,
+    isPremium: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -336,6 +368,15 @@ private fun CompactStrategyRuleCard(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    if (!isPremium) {
+                        Text(
+                            text = stringResource(R.string.home_strategy_rule_static_badge).uppercase(),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MySharePrimary,
+                            fontWeight = FontWeight.Black,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
                     if (shouldStack) {
                         Text(
                             text = amountLabel,
@@ -354,6 +395,162 @@ private fun CompactStrategyRuleCard(
                         fontWeight = FontWeight.Black
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun LockedStrategyPreviewCard(
+    title: String,
+    body: String,
+    freeLabel: String,
+    freeBody: String,
+    premiumLabel: String,
+    premiumBody: String,
+    action: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.24f)),
+        shadowElevation = 1.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MySharePrimary.copy(alpha = 0.12f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.padding(9.dp).size(20.dp)
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_strategy_locked_preview_label).uppercase(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MySharePrimary,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = body,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 330.dp || LocalDensity.current.fontScale >= 1.3f
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        StrategyPreviewPill(
+                            label = freeLabel,
+                            body = freeBody,
+                            icon = Icons.Default.RadioButtonUnchecked,
+                            iconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        StrategyPreviewPill(
+                            label = premiumLabel,
+                            body = premiumBody,
+                            icon = Icons.Default.CheckCircle,
+                            iconColor = MySharePrimary,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                } else {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        StrategyPreviewPill(
+                            label = freeLabel,
+                            body = freeBody,
+                            icon = Icons.Default.RadioButtonUnchecked,
+                            iconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1f)
+                        )
+                        StrategyPreviewPill(
+                            label = premiumLabel,
+                            body = premiumBody,
+                            icon = Icons.Default.CheckCircle,
+                            iconColor = MySharePrimary,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+            Text(
+                text = action,
+                style = MaterialTheme.typography.labelLarge,
+                color = MySharePrimary,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Composable
+private fun StrategyPreviewPill(
+    label: String,
+    body: String,
+    icon: ImageVector,
+    iconColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.48f)
+    ) {
+        Row(
+            modifier = Modifier.padding(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = iconColor,
+                modifier = Modifier.size(16.dp)
+            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = iconColor,
+                    fontWeight = FontWeight.Black
+                )
+                Text(
+                    text = body,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }
@@ -391,6 +588,16 @@ private fun StrategyStatusChip(
             )
         }
     }
+}
+
+private fun localizedText(
+    context: android.content.Context,
+    key: String?,
+    fallback: String
+): String {
+    if (key == null) return fallback
+    val resId = context.resources.getIdentifier(key, "string", context.packageName)
+    return if (resId != 0) context.getString(resId) else fallback
 }
 
 @Composable

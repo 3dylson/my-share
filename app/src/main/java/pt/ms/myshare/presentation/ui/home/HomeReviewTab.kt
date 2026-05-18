@@ -2,6 +2,7 @@ package pt.ms.myshare.presentation.ui.home
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.graphics.vector.ImageVector
 
 /**
  * Responsibility: Renders the Manual Review form and historical performance records.
@@ -129,6 +131,16 @@ fun LazyListScope.homeReviewTab(
         }
     }
 
+    if (!isPremium && history.isNotEmpty()) {
+        item {
+            LockedReviewRecommendationCard(
+                item = history.first(),
+                onClick = onShowPaywall
+            )
+            Spacer(Modifier.height(16.dp))
+        }
+    }
+
     if (coachingInsights.isNotEmpty() && isPremium) {
         item {
             val context = LocalContext.current
@@ -209,16 +221,193 @@ fun LazyListScope.homeReviewTab(
         }
         if (!isPremium && history.size > 1) {
             item {
-                PremiumBenefitCard(
-                    title = stringResource(R.string.home_review_history_trajectory_title),
-                    description = stringResource(R.string.home_review_history_trajectory_desc),
-                    icon = Icons.Default.Lock,
+                LockedReviewHistoryPreviewCard(
+                    hiddenCount = history.size - visibleHistory.size,
                     onClick = onShowPaywall
                 )
                 Spacer(Modifier.height(8.dp))
             }
         }
     }
+}
+
+@Composable
+private fun LockedReviewRecommendationCard(
+    item: ReviewHistoryItemState,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val body = if (item.isPositive) {
+        stringResource(
+            R.string.home_review_recommendation_success_body,
+            item.plannedFlexibleLabel
+        )
+    } else {
+        stringResource(
+            R.string.home_review_recommendation_recovery_body,
+            item.plannedFlexibleLabel,
+            item.plannedGoalLabel
+        )
+    }
+
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.24f)),
+        shadowElevation = 1.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MySharePrimary.copy(alpha = 0.12f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.padding(9.dp).size(20.dp)
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_review_recommendation_label).uppercase(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MySharePrimary,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = stringResource(R.string.home_review_recommendation_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = body,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 330.dp || LocalDensity.current.fontScale >= 1.3f
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ReviewPreviewPill(
+                            label = stringResource(R.string.home_review_recommendation_free_label),
+                            body = stringResource(R.string.home_review_recommendation_free_body),
+                            icon = Icons.Default.RadioButtonUnchecked,
+                            iconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        ReviewPreviewPill(
+                            label = stringResource(R.string.home_review_recommendation_premium_label),
+                            body = stringResource(R.string.home_review_recommendation_premium_body),
+                            icon = Icons.Default.CheckCircle,
+                            iconColor = MySharePrimary,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                } else {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ReviewPreviewPill(
+                            label = stringResource(R.string.home_review_recommendation_free_label),
+                            body = stringResource(R.string.home_review_recommendation_free_body),
+                            icon = Icons.Default.RadioButtonUnchecked,
+                            iconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1f)
+                        )
+                        ReviewPreviewPill(
+                            label = stringResource(R.string.home_review_recommendation_premium_label),
+                            body = stringResource(R.string.home_review_recommendation_premium_body),
+                            icon = Icons.Default.CheckCircle,
+                            iconColor = MySharePrimary,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+            Text(
+                text = stringResource(R.string.home_review_recommendation_action),
+                style = MaterialTheme.typography.labelLarge,
+                color = MySharePrimary,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Composable
+private fun ReviewPreviewPill(
+    label: String,
+    body: String,
+    icon: ImageVector,
+    iconColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.48f)
+    ) {
+        Row(
+            modifier = Modifier.padding(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = iconColor,
+                modifier = Modifier.size(16.dp)
+            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = iconColor,
+                    fontWeight = FontWeight.Black
+                )
+                Text(
+                    text = body,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 16.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun LockedReviewHistoryPreviewCard(
+    hiddenCount: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    PremiumBenefitCard(
+        title = stringResource(R.string.home_review_history_locked_title, hiddenCount),
+        description = stringResource(R.string.home_review_history_locked_desc),
+        icon = Icons.Default.Lock,
+        onClick = onClick,
+        modifier = modifier
+    )
 }
 
 @Composable

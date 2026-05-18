@@ -35,4 +35,29 @@ class CreateReviewInsightUseCaseTest {
         assertEquals(BigDecimal("-50.00"), insight.flexibleSpendDelta)
         assertEquals(BigDecimal("30.00"), insight.goalContributionDelta)
     }
+
+    @Test
+    fun `uses review snapshots when calculating deltas`() {
+        val plan = SalaryPlan(
+            focus = PlanningFocus.SAVE_WITHOUT_STRESS,
+            netIncomePerPayday = BigDecimal("1000"),
+            monthlyFixedCosts = BigDecimal("400"),
+            payFrequency = PayFrequency.MONTHLY,
+            monthlyPayday = 5,
+            preset = AllocationPreset.BALANCED
+        )
+        val review = ManualReview(
+            actualFlexibleSpend = BigDecimal("850"),
+            actualGoalContribution = BigDecimal("50"),
+            plannedFlexibleSpend = BigDecimal("720"),
+            plannedGoalContribution = BigDecimal("180")
+        )
+
+        val insight = reviewInsightUseCase.execute(plan, review)
+
+        assertEquals(BigDecimal("130.00"), insight.flexibleSpendDelta)
+        assertEquals(BigDecimal("-130.00"), insight.goalContributionDelta)
+        assertEquals(BigDecimal("720"), insight.plannedFlexibleSpend)
+        assertEquals(BigDecimal("180"), insight.plannedGoalContribution)
+    }
 }

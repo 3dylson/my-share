@@ -285,6 +285,10 @@ class HomeViewModel @Inject constructor(
                     googleConnectionMessage = currentMore.googleConnectionMessage,
                     googleConnectionError = currentMore.googleConnectionError,
                     userPreferences = preferences,
+                    weeklyGuideLabel = planCard?.weeklySpendLabel.orEmpty(),
+                    priorityMoveLabel = planCard?.savingsLabel.orEmpty(),
+                    ruleCount = currentRules.size,
+                    reviewCount = planner.reviewHistory.size,
                     error = currentMore.error.takeUnless { shouldClearUnavailableMessage }
                 )
                 HomeState(
@@ -295,7 +299,7 @@ class HomeViewModel @Inject constructor(
                     rules = ruleCards,
                     performanceStats = planner.performanceStats.toState(planner.performanceTrend),
                     reviewCard = reviewCard.copy(coachingInsights = planner.coachingInsights.map { it.toState() }),
-                    reviewHistory = planner.reviewHistory.map { it.toState() },
+                    reviewHistory = planner.reviewHistory.asReversed().map { it.toState() },
                     moreCard = moreCard,
                     isLoading = false,
                     emptyMessage = emptyMessage,

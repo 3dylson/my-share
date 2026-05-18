@@ -486,6 +486,7 @@ fun HomeScreen(
                         homeStrategyTab(
                             goals = state.goals,
                             rules = state.rules,
+                            planCard = state.planCard,
                             isPremium = state.moreCard.isPremium,
                             onAddNewGoal = onAddNewGoal,
                             onEditGoal = onEditGoal,
