@@ -1,5 +1,7 @@
 package pt.ms.myshare.presentation.ui.home
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -7,9 +9,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.AutoGraph
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Payments
-import androidx.compose.material.icons.filled.PrecisionManufacturing
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material3.Icon
@@ -40,7 +44,7 @@ import pt.ms.myshare.presentation.ui.theme.MySharePositive
 fun LazyListScope.homePlanTab(
     planCard: HomePlanCardState?,
     isPremium: Boolean,
-    onDestinationSelected: (HomeDestination) -> Unit
+    onShowPaywall: (HomePremiumGate) -> Unit
 ) {
     planCard?.let { card ->
         item {
@@ -128,11 +132,166 @@ fun LazyListScope.homePlanTab(
         }
         if (!isPremium) {
             item {
-                PremiumBenefitCard(
-                    title = stringResource(R.string.home_plan_benefit_title),
-                    description = stringResource(R.string.home_plan_benefit_desc),
-                    icon = Icons.Default.PrecisionManufacturing,
-                    onClick = { onDestinationSelected(HomeDestination.MORE) }
+                LockedSmartAdjustmentPreviewCard(
+                    priorityMove = card.savingsLabel,
+                    weeklyGuide = card.weeklySpendLabel,
+                    onClick = { onShowPaywall(HomePremiumGate.SmartAutomation) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun LockedSmartAdjustmentPreviewCard(
+    priorityMove: String,
+    weeklyGuide: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.24f)),
+        shadowElevation = 1.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MySharePrimary.copy(alpha = 0.12f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.padding(9.dp).size(20.dp)
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_plan_smart_preview_label).uppercase(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MySharePrimary,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = stringResource(R.string.home_plan_smart_preview_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = stringResource(
+                            R.string.home_plan_smart_preview_body,
+                            priorityMove,
+                            weeklyGuide
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 330.dp || LocalDensity.current.fontScale >= 1.3f
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        SmartAdjustmentPill(
+                            label = stringResource(R.string.home_plan_smart_preview_free_label),
+                            body = stringResource(R.string.home_plan_smart_preview_free_body),
+                            icon = Icons.Default.RadioButtonUnchecked,
+                            iconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        SmartAdjustmentPill(
+                            label = stringResource(R.string.home_plan_smart_preview_premium_label),
+                            body = stringResource(R.string.home_plan_smart_preview_premium_body),
+                            icon = Icons.Default.CheckCircle,
+                            iconColor = MySharePrimary,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                } else {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        SmartAdjustmentPill(
+                            label = stringResource(R.string.home_plan_smart_preview_free_label),
+                            body = stringResource(R.string.home_plan_smart_preview_free_body),
+                            icon = Icons.Default.RadioButtonUnchecked,
+                            iconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1f)
+                        )
+                        SmartAdjustmentPill(
+                            label = stringResource(R.string.home_plan_smart_preview_premium_label),
+                            body = stringResource(R.string.home_plan_smart_preview_premium_body),
+                            icon = Icons.Default.CheckCircle,
+                            iconColor = MySharePrimary,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+            Text(
+                text = stringResource(R.string.home_plan_smart_preview_action),
+                style = MaterialTheme.typography.labelLarge,
+                color = MySharePrimary,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Composable
+private fun SmartAdjustmentPill(
+    label: String,
+    body: String,
+    icon: ImageVector,
+    iconColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.48f)
+    ) {
+        Row(
+            modifier = Modifier.padding(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = iconColor,
+                modifier = Modifier.size(16.dp)
+            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = iconColor,
+                    fontWeight = FontWeight.Black
+                )
+                Text(
+                    text = body,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 16.sp
                 )
             }
         }
@@ -256,7 +415,7 @@ private fun CompactAllocationGrid(
     ) {
         Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-                val shouldStack = maxWidth < 360.dp || LocalDensity.current.fontScale >= 1.3f
+                val shouldStack = maxWidth < 320.dp || LocalDensity.current.fontScale >= 1.3f
                 if (shouldStack) {
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         items.forEach { item ->
@@ -291,12 +450,12 @@ private fun AllocationGridCell(
     modifier: Modifier = Modifier
 ) {
     Surface(
-        modifier = modifier.heightIn(min = 82.dp),
+        modifier = modifier.heightIn(min = 76.dp),
         shape = RoundedCornerShape(14.dp),
         color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.22f)
     ) {
         Row(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier.padding(10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {

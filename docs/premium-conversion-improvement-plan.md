@@ -220,7 +220,8 @@ Status after onboarding value-ladder pass on 2026-05-18:
 - Done: Allocation now frames available money after essentials, shows a clearer allocated/remaining summary, supports percent/fixed planning with live equivalents, and adds a Premium refinement cue validated on normal and compact emulator viewports.
 - Done: Plan Preview is now the onboarding aha reveal: it leads with safe weekly spend, bills protected, priority move, ordered payday actions, goal path, and a static-vs-adaptive Premium teaser validated on normal and compact emulator viewports.
 - Done: Trajectory now makes the manual-to-adaptive bridge concrete with a locked Premium adjustment example based on the user's weekly guide and goal transfer, plus clearer adaptive-plan CTA copy validated on normal and compact emulator viewports.
-- Pending: Run a final onboarding-to-paywall QA pass, capture dated evidence, then move into main-tab Premium value surfaces.
+- Done: Final onboarding-to-paywall QA evidence pass captured normal and compact emulator screenshots/UI-tree summaries in `/tmp/myshare-onboarding-qa-2026-05-18` and summarized results in `docs/ui-ux-qa-notes-2026-05-18.md`.
+- Pending: Move into main-tab Premium value surfaces so the product keeps proving Premium after onboarding.
 
 ### Problems
 
@@ -363,6 +364,13 @@ Paywall:
 - Emulator screenshots are captured for each onboarding step.
 
 ## Phase 5: Main Tab Polish
+
+Status after Plan-tab premium preview pass on 2026-05-18:
+- Done: Plan `Smart adjustments` now renders a locked adaptive-adjustment preview tied to the user's weekly guide and priority move instead of routing generically to More.
+- Done: The preview opens the contextual `SmartAutomation` Premium gate with concrete adaptive-adjustment copy.
+- Done: The allocation grid keeps two columns on normal-width phones and stacks only on genuinely narrow or large-font layouts, preventing the first viewport from cutting off money values.
+- Validated: normal and compact emulator passes captured screenshots and UI-tree summaries under `/tmp/myshare-main-tab-qa-2026-05-18`.
+- Pending: Strategy, Review, and More tab Premium value surfaces.
 
 ### Plan
 

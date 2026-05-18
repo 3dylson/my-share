@@ -197,8 +197,8 @@
     <string name="premium_gate_rules_body">يفتح Premium قواعد التخصيص المتكررة المتعددة للمدخرات والاستثمار والديون والأولويات الأخرى.</string>
     <string name="premium_gate_review_title">انظر تاريخ المراجعة الكامل</string>
     <string name="premium_gate_review_body">يبقي Premium المخطط الزمني للأداء الكامل مرئيًا حتى تتمكن من اكتشاف أنماط الإنفاق بمرور الوقت.</string>
-    <string name="premium_gate_automation_title">قم بتشغيل الأتمتة الذكية</string>
-    <string name="premium_gate_automation_body">يمكن لبرنامج Premium تطبيق قواعد يوم الدفع المتكررة والمخازن المؤقتة القابلة للتكيف تلقائيًا بعد كل تسجيل وصول.</string>
+    <string name="premium_gate_automation_title">افتح التعديلات المتكيّفة</string>
+    <string name="premium_gate_automation_body">يقارن Premium المراجعات بدليلك الأسبوعي ويعرض ما يجب تغييره قبل يوم الدفع التالي.</string>
     <string name="onboarding_signup_title">قم بتأمين خطتك</string>
     <string name="onboarding_signup_subtitle">قم بتسجيل الدخول للحفاظ على مزامنة خطتك المالية بأمان.</string>
     <string name="onboarding_signup_google">تواصل مع جوجل</string>
@@ -318,8 +318,14 @@
     <string name="home_plan_label_fixed">ثابت</string>
     <string name="home_plan_label_flexible">مرنة</string>
     <string name="home_plan_label_investing">الاستثمار</string>
-    <string name="home_plan_benefit_title">تعديلات ذكية</string>
-    <string name="home_plan_benefit_desc">قم بالترقية لأتمتة القواعد المتكررة والمخازن المؤقتة التكيفية.</string>
+    <string name="home_plan_smart_preview_label">معاينة Premium مقفلة</string>
+    <string name="home_plan_smart_preview_title">ما الذي سيعدله Premium لاحقًا</string>
+    <string name="home_plan_smart_preview_body">بعد المراجعة، يمكن لـ Premium اقتراح ما إذا كان يجب تغيير حركة الأولوية %1$s مع حماية دليلك الأسبوعي %2$s.</string>
+    <string name="home_plan_smart_preview_free_label">يدوي</string>
+    <string name="home_plan_smart_preview_free_body">تحدّث هذا التقسيم بنفسك.</string>
+    <string name="home_plan_smart_preview_premium_label">مدفوع</string>
+    <string name="home_plan_smart_preview_premium_body">راجع مرة واحدة وشاهد التغيير التالي.</string>
+    <string name="home_plan_smart_preview_action">معاينة تعديل متكيّف</string>
     <string name="home_strategy_goals_title">الأهداف المالية</string>
     <string name="home_strategy_workspace_title">مساحة عمل الإستراتيجية</string>
     <string name="home_strategy_workspace_body">ابدأ بمعلم واحد وقاعدة يوم دفع واحدة. يمكنك تحسين كليهما عندما يصبح إيقاع أموالك أكثر وضوحًا.</string>

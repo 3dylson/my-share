@@ -197,8 +197,8 @@
     <string name="premium_gate_rules_body">Premium desbloquea múltiples reglas de asignación recurrente para ahorros, inversiones, deudas y otras prioridades.</string>
     <string name="premium_gate_review_title">Ver historial completo de reseñas</string>
     <string name="premium_gate_review_body">Premium mantiene visible su cronograma de desempeño completo para que pueda detectar patrones de gasto a lo largo del tiempo.</string>
-    <string name="premium_gate_automation_title">Active la automatización inteligente</string>
-    <string name="premium_gate_automation_body">Premium puede aplicar reglas de día de pago recurrentes y buffers adaptables automáticamente después de cada check-in.</string>
+    <string name="premium_gate_automation_title">Desbloquea ajustes adaptables</string>
+    <string name="premium_gate_automation_body">Premium compara las revisiones con tu guía semanal y muestra qué cambiar antes del próximo cobro.</string>
     <string name="onboarding_signup_title">Asegura tu plan</string>
     <string name="onboarding_signup_subtitle">Inicia sesión para mantener tu plan financiero sincronizado de forma segura.</string>
     <string name="onboarding_signup_google">Continuar con Google</string>
@@ -318,8 +318,14 @@
     <string name="home_plan_label_fixed">Fijo</string>
     <string name="home_plan_label_flexible">Flexibles</string>
     <string name="home_plan_label_investing">Invertir</string>
-    <string name="home_plan_benefit_title">Ajustes inteligentes</string>
-    <string name="home_plan_benefit_desc">Actualice para automatizar reglas recurrentes y buffers adaptables.</string>
+    <string name="home_plan_smart_preview_label">Vista Premium bloqueada</string>
+    <string name="home_plan_smart_preview_title">Qué ajustaría Premium después</string>
+    <string name="home_plan_smart_preview_body">Después de una revisión, Premium puede sugerir si el movimiento prioritario de %1$s debe cambiar mientras protege tu guía semanal de %2$s.</string>
+    <string name="home_plan_smart_preview_free_label">A mano</string>
+    <string name="home_plan_smart_preview_free_body">Actualizas esta división tú mismo.</string>
+    <string name="home_plan_smart_preview_premium_label">De pago</string>
+    <string name="home_plan_smart_preview_premium_body">Revisa una vez y mira el próximo cambio.</string>
+    <string name="home_plan_smart_preview_action">Ver ajuste adaptable</string>
     <string name="home_strategy_goals_title">Metas financieras</string>
     <string name="home_strategy_workspace_title">Espacio de trabajo de estrategia</string>
     <string name="home_strategy_workspace_body">Comience con un hito y una regla de día de pago. Puede perfeccionar ambos a medida que su ritmo monetario se vuelva más claro.</string>

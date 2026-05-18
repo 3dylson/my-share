@@ -231,8 +231,8 @@
     <string name="premium_gate_rules_body">Premium unlocks multiple recurring allocation rules for savings, investing, debt, and other priorities.</string>
     <string name="premium_gate_review_title">See full review history</string>
     <string name="premium_gate_review_body">Premium keeps your full performance timeline visible so you can spot spending patterns over time.</string>
-    <string name="premium_gate_automation_title">Turn on smart automation</string>
-    <string name="premium_gate_automation_body">Premium can apply recurring payday rules and adaptive buffers automatically after each check-in.</string>
+    <string name="premium_gate_automation_title">Unlock adaptive adjustments</string>
+    <string name="premium_gate_automation_body">Premium compares reviews with your weekly guide and shows what to change before the next payday.</string>
 
     <string name="onboarding_signup_title">Secure your plan</string>
     <string name="onboarding_signup_subtitle">Sign in to keep your financial plan synced safely.</string>
@@ -363,8 +363,14 @@
     <string name="home_plan_label_flexible">Flexible</string>
     <string name="home_plan_label_investing">Investing</string>
     <string name="home_plan_label_priority">Priority</string>
-    <string name="home_plan_benefit_title">Smart adjustments</string>
-    <string name="home_plan_benefit_desc">Upgrade to automate recurring rules and adaptive buffers.</string>
+    <string name="home_plan_smart_preview_label">Locked Premium preview</string>
+    <string name="home_plan_smart_preview_title">What Premium would adjust next</string>
+    <string name="home_plan_smart_preview_body">After a review, Premium can suggest whether the %1$s priority move should change while protecting your %2$s weekly guide.</string>
+    <string name="home_plan_smart_preview_free_label">Manual</string>
+    <string name="home_plan_smart_preview_free_body">You update this split yourself.</string>
+    <string name="home_plan_smart_preview_premium_label">Premium</string>
+    <string name="home_plan_smart_preview_premium_body">Review once, see the next change.</string>
+    <string name="home_plan_smart_preview_action">Preview adaptive adjustment</string>
     <string name="home_strategy_goals_title">Financial goals</string>
     <string name="home_strategy_workspace_title">Strategy workspace</string>
     <string name="home_strategy_workspace_body">Start with one milestone and one payday rule. You can refine both as your money rhythm becomes clearer.</string>

@@ -477,7 +477,9 @@ fun HomeScreen(
                         homePlanTab(
                             planCard = state.planCard,
                             isPremium = state.moreCard.isPremium,
-                            onDestinationSelected = onDestinationSelected
+                            onShowPaywall = { gate ->
+                                openPremiumGate(gate)
+                            }
                         )
                     }
                     HomeDestination.STRATEGY -> {

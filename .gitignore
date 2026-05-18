@@ -22,6 +22,7 @@ skills-lock.json
 /.kotlin
 /docs/*
 !/docs/ui-ux-qa-notes-2026-05-15.md
+!/docs/ui-ux-qa-notes-2026-05-18.md
 !/docs/premium-conversion-improvement-plan.md
 /firebase/tests/node_modules/
 /firebase/functions/node_modules/
