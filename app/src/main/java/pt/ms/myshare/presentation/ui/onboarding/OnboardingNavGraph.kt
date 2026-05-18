@@ -143,8 +143,8 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                         navController.navigate(OnboardingRoute.Trajectory.route)
                     }
                 },
-                onSignupAnonymously = {
-                    viewModel.signInAnonymously {
+                onContinueLocally = {
+                    viewModel.continueLocally {
                         navController.navigate(OnboardingRoute.Trajectory.route)
                     }
                 }

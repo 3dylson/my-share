@@ -42,4 +42,5 @@ interface PlannerRepository {
     suspend fun setOnboardingCompleted(completed: Boolean)
     
     suspend fun syncFromFirestore()
+    suspend fun syncLocalStateIfAuthenticated()
 }

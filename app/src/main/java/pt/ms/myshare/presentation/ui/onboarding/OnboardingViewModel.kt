@@ -394,7 +394,8 @@ class OnboardingViewModel @Inject constructor(
             val result = authRepository.connectGoogleAccount(idToken)
             result.fold(
                 onSuccess = { user ->
-                    userPreferencesRepository.syncToFirestoreIfAuthenticated()
+                    plannerRepository.syncLocalStateIfAuthenticated()
+                    userPreferencesRepository.syncFromFirestore()
                     state.update {
                         it.copy(
                             isAnonymousUser = user.isAnonymous,
@@ -457,7 +458,8 @@ class OnboardingViewModel @Inject constructor(
             val result = authRepository.signInWithGoogle(idToken)
             
             if (result.isSuccess) {
-                userPreferencesRepository.syncToFirestoreIfAuthenticated()
+                plannerRepository.syncLocalStateIfAuthenticated()
+                userPreferencesRepository.syncFromFirestore()
                 FirebaseUtils.logEvent("login_success")
                 onComplete()
             } else {
@@ -468,20 +470,10 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    fun signInAnonymously(onComplete: () -> Unit) {
-        viewModelScope.launch {
-            val result = authRepository.signInAnonymously()
-            
-            if (result.isSuccess) {
-                userPreferencesRepository.syncToFirestoreIfAuthenticated()
-                FirebaseUtils.logEvent("login_success_anonymous")
-                onComplete()
-            } else {
-                FirebaseUtils.logEvent("login_failed_anonymous")
-                Timber.tag(TAG).e(result.exceptionOrNull(), "Anonymous sign-in failed")
-                state.update { it.copy(error = "error_anonymous_login_failed") }
-            }
-        }
+    fun continueLocally(onComplete: () -> Unit) {
+        FirebaseUtils.logEvent("local_mode_selected")
+        Timber.tag(TAG).d("Continuing onboarding in local-only mode")
+        onComplete()
     }
 
 

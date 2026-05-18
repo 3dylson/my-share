@@ -45,23 +45,35 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun connectGoogleAccount(idToken: String): Result<User> {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        val previousUser = firebaseAuth.currentUser
         return try {
-            val credential = GoogleAuthProvider.getCredential(idToken, null)
-            val currentUser = firebaseAuth.currentUser
-            val authResult = if (currentUser == null) {
+            val authResult = if (previousUser == null) {
                 Timber.d("No Firebase user exists. Signing in with Google instead of linking.")
                 firebaseAuth.signInWithCredential(credential).await()
             } else {
-                Timber.d("Linking Google account to current Firebase user. anonymous=%s", currentUser.isAnonymous)
-                currentUser.linkWithCredential(credential).await()
+                Timber.d("Linking Google account to current Firebase user. anonymous=%s", previousUser.isAnonymous)
+                previousUser.linkWithCredential(credential).await()
             }
 
             Timber.d("Google account connected")
             authResult.user?.toDomainResult()
                 ?: Result.failure(Exception("Google account connected but user is null"))
         } catch (e: FirebaseAuthUserCollisionException) {
-            Timber.e(e, "Google account is already linked to another Firebase user")
-            Result.failure(e)
+            try {
+                Timber.e(e, "Google account is already linked to another Firebase user. Signing in to merge local state.")
+                val authResult = firebaseAuth.signInWithCredential(credential).await()
+                Timber.d(
+                    "Signed in existing Google account after link collision. previousUid=%s currentUid=%s",
+                    previousUser?.uid,
+                    authResult.user?.uid
+                )
+                authResult.user?.toDomainResult()
+                    ?: Result.failure(Exception("Google sign-in after link collision returned null user"))
+            } catch (signInError: Exception) {
+                Timber.e(signInError, "Google sign-in after account collision failed")
+                Result.failure(signInError)
+            }
         } catch (e: Exception) {
             Timber.e(e, "Google account connection failed")
             Result.failure(e)

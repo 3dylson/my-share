@@ -29,6 +29,7 @@ class FirebaseBillingAuthSession @Inject constructor(
     override suspend fun requireAuthenticatedSession(): Result<BillingAuthenticatedSession> {
         val existingUid = firebaseAuth.currentUser?.uid
         if (!existingUid.isNullOrBlank()) {
+            Timber.tag(TAG).d("Reusing existing Firebase billing session")
             return requireIdToken(existingUid)
         }
 

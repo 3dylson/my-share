@@ -380,6 +380,32 @@ class OnboardingViewModelTest {
     }
 
     @Test
+    fun `continueLocally proceeds without anonymous Firebase sign-in`() = runTest {
+        var completed = false
+
+        viewModel.continueLocally { completed = true }
+        advanceUntilIdle()
+
+        assertTrue(completed)
+        coVerify(exactly = 0) { authRepository.signInAnonymously() }
+        coVerify(exactly = 0) { authRepository.signInWithGoogle(any()) }
+    }
+
+    @Test
+    fun `signInWithGoogle syncs local planner state after account attachment`() = runTest {
+        coEvery { authRepository.signInWithGoogle("google-token") } returns Result.success(
+            User(email = "user@example.com", isAnonymous = false)
+        )
+        var completed = false
+
+        viewModel.signInWithGoogle("google-token") { completed = true }
+        advanceUntilIdle()
+
+        assertTrue(completed)
+        coVerify { plannerRepository.syncLocalStateIfAuthenticated() }
+    }
+
+    @Test
     fun `premium anonymous user is prompted to secure access`() = runTest {
         currentUserFlow.value = User(isAnonymous = true)
         isProFlow.value = true
@@ -437,6 +463,7 @@ class OnboardingViewModelTest {
 
         assertFalse(viewModel.uiState.value.shouldSecurePremiumAccess)
         assertEquals("home_more_account_connect_google_success", viewModel.uiState.value.googleConnectionMessage)
+        coVerify { plannerRepository.syncLocalStateIfAuthenticated() }
     }
 
     private fun previewResult(): PlanPreview = PlanPreview(

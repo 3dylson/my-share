@@ -367,6 +367,7 @@ class HomeViewModelTest {
             viewModel.state.value.moreCard.googleConnectionMessage
         )
         assertEquals(null, viewModel.state.value.moreCard.googleConnectionError)
+        assertEquals(1, fakePlannerRepository.syncLocalStateIfAuthenticatedCalls)
     }
 }
 
@@ -379,6 +380,7 @@ class FakePlannerRepository : PlannerRepository {
     private val reminderFlow = MutableStateFlow(ReminderConfiguration(false, 9, 0, ReminderCadence.PAYDAY))
     private val automationFlow = MutableStateFlow(false)
     private var isOnboardingCompletedState = false
+    var syncLocalStateIfAuthenticatedCalls = 0
 
     override fun observePlan(): MutableStateFlow<SalaryPlan?> = planFlow
     override suspend fun savePlan(plan: SalaryPlan) { planFlow.emit(plan) }
@@ -426,6 +428,9 @@ class FakePlannerRepository : PlannerRepository {
     override fun loadPlan(): pt.ms.myshare.domain.model.SalaryPlan? = planFlow.value
     override suspend fun clearPlan() { planFlow.emit(null) }
     override suspend fun syncFromFirestore() {}
+    override suspend fun syncLocalStateIfAuthenticated() {
+        syncLocalStateIfAuthenticatedCalls += 1
+    }
 }
 
 class TestFakeEntitlementRepository : EntitlementRepository {

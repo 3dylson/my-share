@@ -636,7 +636,8 @@ class HomeViewModel @Inject constructor(
             val result = authRepository.connectGoogleAccount(idToken)
             result.fold(
                 onSuccess = { user ->
-                    viewModelScope.launch { userPreferencesRepository.syncToFirestoreIfAuthenticated() }
+                    plannerRepository.syncLocalStateIfAuthenticated()
+                    userPreferencesRepository.syncFromFirestore()
                     uiState.update {
                         it.copy(
                             moreCard = it.moreCard.copy(

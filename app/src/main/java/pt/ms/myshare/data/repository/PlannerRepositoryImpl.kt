@@ -169,6 +169,136 @@ class PlannerRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun syncLocalStateIfAuthenticated() {
+        val user = firebaseAuth.currentUser ?: return
+        Timber.tag(TAG).d("syncLocalStateIfAuthenticated starting for user %s", user.uid)
+
+        try {
+            val remotePlan = firestore.collection("users")
+                .document(user.uid)
+                .collection("plans")
+                .document("current")
+                .get()
+                .await()
+
+            if (remotePlan.exists()) {
+                Timber.tag(TAG).d("Remote plan exists for user %s. Keeping remote data as source of truth.", user.uid)
+                syncFromFirestore()
+                return
+            }
+
+            val localPlan = planState.value
+            if (localPlan == null) {
+                Timber.tag(TAG).d("No local plan to sync for user %s", user.uid)
+            } else {
+                uploadPlan(user.uid, localPlan)
+            }
+
+            ruleState.value.forEach { uploadRule(user.uid, it) }
+            goalState.value.forEach { uploadGoal(user.uid, it) }
+            reviewState.value.forEach { uploadReview(user.uid, it) }
+            uploadReminder(user.uid, reminderState.value)
+            uploadAutomation(user.uid, automationState.value)
+            uploadOnboardingState(user.uid, isOnboardingCompleted())
+            Timber.tag(TAG).d(
+                "Local planner state synced for user %s planPresent=%s rules=%d goals=%d reviews=%d",
+                user.uid,
+                localPlan != null,
+                ruleState.value.size,
+                goalState.value.size,
+                reviewState.value.size
+            )
+        } catch (e: Exception) {
+            Timber.tag(TAG).e(e, "syncLocalStateIfAuthenticated failed")
+        }
+    }
+
+    private suspend fun uploadPlan(uid: String, plan: SalaryPlan) {
+        val data = hashMapOf(
+            "focus" to plan.focus.name,
+            "netIncomePerPayday" to plan.netIncomePerPayday.toPlainString(),
+            "monthlyFixedCosts" to plan.monthlyFixedCosts.toPlainString(),
+            "payFrequency" to plan.payFrequency.name,
+            "monthlyPayday" to (plan.monthlyPayday ?: 1),
+            "nextBiweeklyPaydayText" to (plan.nextBiweeklyPayday?.toString() ?: ""),
+            "preset" to plan.preset.name,
+            "strategy" to plan.strategy.name,
+            "customStrategyName" to plan.customStrategyName.orEmpty(),
+            "createdAtDate" to plan.createdAt.toString()
+        )
+        firestore.collection("users").document(uid).collection("plans").document("current")
+            .set(data)
+            .await()
+    }
+
+    private suspend fun uploadRule(uid: String, rule: PaydayRule) {
+        val data = hashMapOf(
+            "id" to rule.id,
+            "name" to rule.name,
+            "amount" to rule.amount.toPlainString(),
+            "isPercentage" to rule.isPercentage,
+            "type" to rule.type.name,
+            "createdAtDate" to rule.createdAt.toString()
+        )
+        firestore.collection("users").document(uid)
+            .collection("rules").document(rule.id).set(data)
+            .await()
+    }
+
+    private suspend fun uploadGoal(uid: String, goal: Goal) {
+        val data = hashMapOf(
+            "id" to goal.id,
+            "targetAmount" to goal.targetAmount.toPlainString(),
+            "currentProgress" to goal.currentProgress.toPlainString(),
+            "type" to goal.type.name,
+            "name" to goal.name,
+            "createdAtDate" to goal.createdAt.toString(),
+            "isCompleted" to goal.isCompleted
+        )
+        firestore.collection("users").document(uid)
+            .collection("goals").document(goal.id).set(data)
+            .await()
+    }
+
+    private suspend fun uploadReview(uid: String, review: ManualReview) {
+        val data = hashMapOf(
+            "id" to review.id,
+            "actualFlexibleSpend" to review.actualFlexibleSpend.toPlainString(),
+            "actualGoalContribution" to review.actualGoalContribution.toPlainString(),
+            "plannedFlexibleSpend" to review.plannedFlexibleSpend?.toPlainString(),
+            "plannedGoalContribution" to review.plannedGoalContribution?.toPlainString(),
+            "createdAtDate" to review.createdAt.toString(),
+            "paydayDate" to (review.paydayDate?.toString() ?: "")
+        )
+        firestore.collection("users").document(uid)
+            .collection("reviews").document(review.id).set(data)
+            .await()
+    }
+
+    private suspend fun uploadReminder(uid: String, config: ReminderConfiguration) {
+        val data = hashMapOf(
+            "enabled" to config.enabled,
+            "hourOfDay" to config.hourOfDay,
+            "minute" to config.minute,
+            "cadence" to config.cadence.name
+        )
+        firestore.collection("users").document(uid).collection("settings").document("reminders")
+            .set(data)
+            .await()
+    }
+
+    private suspend fun uploadAutomation(uid: String, enabled: Boolean) {
+        firestore.collection("users").document(uid).collection("settings").document("automation")
+            .set(hashMapOf("automationEnabled" to enabled))
+            .await()
+    }
+
+    private suspend fun uploadOnboardingState(uid: String, completed: Boolean) {
+        firestore.collection("users").document(uid)
+            .set(hashMapOf("onboardingCompleted" to completed), com.google.firebase.firestore.SetOptions.merge())
+            .await()
+    }
+
     private suspend fun syncRulesFromFirestore(uid: String) {
         try {
             val rulesSnapshot = firestore.collection("users").document(uid).collection("rules").get().await()
