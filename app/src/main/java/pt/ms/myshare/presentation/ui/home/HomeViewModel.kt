@@ -15,6 +15,7 @@ import pt.ms.myshare.domain.model.BillingFlowLaunchResult
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.BillingPurchaseEvent
 import pt.ms.myshare.domain.model.PaydayRule
+import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendation
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.ReviewInsight
 import pt.ms.myshare.domain.model.Goal
@@ -28,7 +29,9 @@ import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.repository.UserPreferencesRepository
+import pt.ms.myshare.domain.use_case.AdjustGoalProgressForReviewCorrectionUseCase
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
+import pt.ms.myshare.domain.use_case.CreatePaydayAdjustmentRecommendationUseCase
 import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
 import pt.ms.myshare.domain.use_case.EnforcePremiumDowngradeUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
@@ -58,11 +61,13 @@ class HomeViewModel @Inject constructor(
     private val entitlementRepository: EntitlementRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase,
+    private val createPaydayAdjustmentRecommendationUseCase: CreatePaydayAdjustmentRecommendationUseCase,
     private val createReviewInsightUseCase: CreateReviewInsightUseCase,
     private val enforcePremiumDowngradeUseCase: EnforcePremiumDowngradeUseCase,
     private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase,
     private val getReviewHistoryUseCase: GetReviewHistoryUseCase,
     private val updateGoalProgressUseCase: UpdateGoalProgressUseCase,
+    private val adjustGoalProgressForReviewCorrectionUseCase: AdjustGoalProgressForReviewCorrectionUseCase,
     private val getPerformanceStatsUseCase: GetPerformanceStatsUseCase,
     private val getCoachingInsightsUseCase: GetCoachingInsightsUseCase,
     private val reminderWorkScheduler: ReminderWorkScheduler,
@@ -74,6 +79,8 @@ class HomeViewModel @Inject constructor(
 
     private var availableStoreProducts: List<pt.ms.myshare.domain.model.StoreProduct> = emptyList()
     private var currentPlan: SalaryPlan? = null
+    private var currentReviews: List<ManualReview> = emptyList()
+    private var currentPaydayRecommendation: PaydayAdjustmentRecommendation? = null
     private var nextReviewSavedEventId = 0L
 
     private var currentPreferences = userPreferencesRepository.loadPreferences()
@@ -246,9 +253,14 @@ class HomeViewModel @Inject constructor(
                 val latestReview = planner.latestReview
                 val reminder = planner.reminder
                 val automation = planner.automation
+                currentReviews = planner.reviewHistory
                 
                 val updatedPlan = plan?.copy(rules = currentRules)
                 currentPlan = updatedPlan
+                val paydayRecommendation = updatedPlan?.let {
+                    createPaydayAdjustmentRecommendationUseCase.execute(it, planner.reviewHistory)
+                }
+                currentPaydayRecommendation = paydayRecommendation
 
                 val emptyMessage = if (updatedPlan == null) "home_empty_build_plan_first" else null
                 val primaryGoal = goals.firstOrNull()
@@ -339,7 +351,11 @@ class HomeViewModel @Inject constructor(
                     goals = goalCards,
                     rules = ruleCards,
                     performanceStats = planner.performanceStats.toState(planner.performanceTrend),
-                    reviewCard = reviewCard.copy(coachingInsights = planner.coachingInsights.map { it.toState() }),
+                    reviewCard = reviewCard.copy(
+                        coachingInsights = planner.coachingInsights.map { it.toState() },
+                        paydayRecommendation = paydayRecommendation?.toState(preferences),
+                        recommendationMessageKey = currentState.reviewCard.recommendationMessageKey
+                    ),
                     reviewHistory = planner.reviewHistory.asReversed().map { it.toState() },
                     moreCard = moreCard,
                     reviewSavedEventId = currentState.reviewSavedEventId,
@@ -523,6 +539,90 @@ class HomeViewModel @Inject constructor(
             
             FirebaseUtils.logEvent("weekly_checkin_completed")
             Timber.tag(TAG).d("Review saved with snapshots. planFlex=%s planPriority=%s", preview.flexibleSpendPerPayday, preview.priorityContributionPerPayday)
+        }
+    }
+
+    fun updateReview(
+        reviewId: String,
+        flexibleSpend: String,
+        goalContribution: String
+    ): Boolean {
+        val originalReview = currentReviews.firstOrNull { it.id == reviewId }
+        if (originalReview == null) {
+            Timber.tag(TAG).d("Review update ignored; review not found. reviewId=%s", reviewId)
+            return false
+        }
+
+        val actualFlexible = LocalizedAmountFormatter.parseAmount(flexibleSpend, currentPreferences.locale)
+        val actualGoal = LocalizedAmountFormatter.parseAmount(goalContribution, currentPreferences.locale)
+        if (actualFlexible == null || actualGoal == null) {
+            Timber.tag(TAG).d("Review update rejected; invalid amounts. reviewId=%s", reviewId)
+            return false
+        }
+
+        viewModelScope.launch {
+            val updatedReview = originalReview.copy(
+                actualFlexibleSpend = actualFlexible,
+                actualGoalContribution = actualGoal
+            )
+            plannerRepository.updateReview(updatedReview)
+            adjustGoalProgressForReviewCorrectionUseCase.execute(
+                actualGoal.subtract(originalReview.actualGoalContribution)
+            )
+            FirebaseUtils.logEvent("review_updated")
+            Timber.tag(TAG).d("Review updated. reviewId=%s", reviewId)
+        }
+        return true
+    }
+
+    fun deleteReview(reviewId: String) {
+        val review = currentReviews.firstOrNull { it.id == reviewId }
+        if (review == null) {
+            Timber.tag(TAG).d("Review delete ignored; review not found. reviewId=%s", reviewId)
+            return
+        }
+
+        viewModelScope.launch {
+            plannerRepository.deleteReview(reviewId)
+            adjustGoalProgressForReviewCorrectionUseCase.execute(review.actualGoalContribution.negate())
+            FirebaseUtils.logEvent("review_deleted")
+            Timber.tag(TAG).d("Review deleted. reviewId=%s", reviewId)
+        }
+    }
+
+    fun applyPaydayRecommendation() {
+        val recommendation = currentPaydayRecommendation
+        if (recommendation == null || !recommendation.isApplyable) {
+            Timber.tag(TAG).d("Payday recommendation apply ignored. recommendationAvailable=%s", recommendation != null)
+            return
+        }
+        if (!uiState.value.moreCard.isPremium) {
+            Timber.tag(TAG).d("Payday recommendation apply blocked for free user")
+            return
+        }
+
+        viewModelScope.launch {
+            recommendation.suggestedRules.forEach { rule ->
+                plannerRepository.saveRule(rule)
+            }
+            uiState.update {
+                it.copy(
+                    reviewCard = it.reviewCard.copy(
+                        recommendationMessageKey = "home_review_recommendation_applied_feedback"
+                    )
+                )
+            }
+            FirebaseUtils.logEvent("premium_payday_adjustment_applied", android.os.Bundle().apply {
+                putString("direction", recommendation.direction.name.lowercase(Locale.US))
+                putInt("review_count", recommendation.analyzedReviewCount)
+                putString("adjustment_amount", recommendation.adjustmentAmount.toPlainString())
+            })
+            Timber.tag(TAG).d(
+                "Premium payday recommendation applied. direction=%s rules=%d adjustment=%s",
+                recommendation.direction,
+                recommendation.suggestedRules.size,
+                recommendation.adjustmentAmount
+            )
         }
     }
 
@@ -909,9 +1009,25 @@ class HomeViewModel @Inject constructor(
         )
     }
 
+    private fun PaydayAdjustmentRecommendation.toState(preferences: UserPreferences): PaydayAdjustmentRecommendationState {
+        val currencyFormat = currencyFormat(preferences)
+        return PaydayAdjustmentRecommendationState(
+            direction = direction,
+            analyzedReviewCount = analyzedReviewCount,
+            currentFlexibleSpendLabel = currencyFormat.format(currentFlexibleSpend),
+            recommendedFlexibleSpendLabel = currencyFormat.format(recommendedFlexibleSpend),
+            currentPriorityContributionLabel = currencyFormat.format(currentPriorityContribution),
+            recommendedPriorityContributionLabel = currencyFormat.format(recommendedPriorityContribution),
+            adjustmentAmountLabel = currencyFormat.format(adjustmentAmount),
+            confidencePercent = confidencePercent,
+            isApplyable = isApplyable
+        )
+    }
+
     private fun ManualReview.toState(): ReviewHistoryItemState {
         val currencyFormat = currencyFormat(currentPreferences)
         val dateFormatter = DateTimeFormatter.ofPattern("d MMM", currentPreferences.locale)
+        val monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy", currentPreferences.locale)
         val flexTarget = plannedFlexibleSpend ?: BigDecimal.ZERO
         val flexDelta = actualFlexibleSpend.subtract(flexTarget)
         val goalTarget = plannedGoalContribution ?: BigDecimal.ZERO
@@ -920,10 +1036,13 @@ class HomeViewModel @Inject constructor(
         return ReviewHistoryItemState(
             id = id,
             dateLabel = createdAt.format(dateFormatter),
+            monthLabel = createdAt.format(monthFormatter),
             flexibleSpendLabel = currencyFormat.format(actualFlexibleSpend),
             plannedFlexibleLabel = currencyFormat.format(flexTarget),
+            editableFlexibleSpend = LocalizedAmountFormatter.formatEditableAmount(actualFlexibleSpend, currentPreferences.locale),
             goalContributionLabel = currencyFormat.format(actualGoalContribution),
             plannedGoalLabel = currencyFormat.format(goalTarget),
+            editableGoalContribution = LocalizedAmountFormatter.formatEditableAmount(actualGoalContribution, currentPreferences.locale),
             flexibleDeltaLabel = (if (flexDelta > BigDecimal.ZERO) "+" else "") + currencyFormat.format(flexDelta),
             goalDeltaLabel = (if (goalDelta > BigDecimal.ZERO) "+" else "") + currencyFormat.format(goalDelta),
             isPositive = flexDelta <= BigDecimal.ZERO && goalDelta >= BigDecimal.ZERO

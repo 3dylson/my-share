@@ -504,10 +504,34 @@ class PlannerRepositoryImpl @Inject constructor(
         Timber.tag(TAG).d("saveReview actualFlexible=%s actualGoal=%s", review.actualFlexibleSpend, review.actualGoalContribution)
         syncReviewToFirestore(review)
         
-        // Update local state
         val currentReviews = reviewState.value.toMutableList()
-        currentReviews.add(review)
+        val existingIndex = currentReviews.indexOfFirst { it.id == review.id }
+        if (existingIndex >= 0) {
+            currentReviews[existingIndex] = review
+        } else {
+            currentReviews.add(review)
+        }
         reviewState.value = currentReviews
+    }
+
+    override suspend fun updateReview(review: ManualReview) {
+        Timber.tag(TAG).d("updateReview id=%s actualFlexible=%s actualGoal=%s", review.id, review.actualFlexibleSpend, review.actualGoalContribution)
+        saveReview(review)
+    }
+
+    override suspend fun deleteReview(reviewId: String) {
+        Timber.tag(TAG).d("deleteReview id=%s", reviewId)
+        reviewState.value = reviewState.value.filterNot { it.id == reviewId }
+
+        val user = firebaseAuth.currentUser ?: return
+        coroutineScope.launch {
+            try {
+                firestore.collection("users").document(user.uid)
+                    .collection("reviews").document(reviewId).delete()
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e, "Failed to delete review from Firestore")
+            }
+        }
     }
 
     private fun syncReviewToFirestore(review: ManualReview) {

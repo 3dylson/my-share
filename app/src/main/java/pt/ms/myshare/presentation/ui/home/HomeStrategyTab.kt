@@ -77,8 +77,21 @@ fun LazyListScope.homeStrategyTab(
             )
         }
     } else {
+        val visibleGoals = if (isPremium) goals else goals.take(1)
+        if (isPremium) {
+            item {
+                PremiumBenefitCard(
+                    title = stringResource(R.string.home_strategy_goal_add_title),
+                    description = stringResource(R.string.home_strategy_goal_add_desc),
+                    icon = Icons.Default.Add,
+                    onClick = onAddNewGoal,
+                    modifier = Modifier
+                )
+                Spacer(Modifier.height(16.dp))
+            }
+        }
         items(
-            items = goals,
+            items = visibleGoals,
             key = { it.id }
         ) { goal ->
             val context = LocalContext.current
@@ -118,15 +131,22 @@ fun LazyListScope.homeStrategyTab(
             )
             Spacer(Modifier.height(16.dp))
         }
+        if (!isPremium && goals.size > visibleGoals.size) {
+            item {
+                LockedStrategyHiddenItemsCard(
+                    title = stringResource(
+                        R.string.home_strategy_goal_locked_hidden_title,
+                        goals.size - visibleGoals.size
+                    ),
+                    body = stringResource(R.string.home_strategy_goal_locked_hidden_desc),
+                    onClick = { onShowPaywall(HomePremiumGate.MultipleGoals) }
+                )
+                Spacer(Modifier.height(16.dp))
+            }
+        }
         item {
             if (isPremium) {
-                PremiumBenefitCard(
-                    title = stringResource(R.string.home_strategy_goal_add_title),
-                    description = stringResource(R.string.home_strategy_goal_add_desc),
-                    icon = Icons.Default.Add,
-                    onClick = onAddNewGoal,
-                    modifier = Modifier
-                )
+                Spacer(Modifier.height(16.dp))
             } else {
                 val context = LocalContext.current
                 LockedStrategyPreviewCard(
@@ -147,8 +167,8 @@ fun LazyListScope.homeStrategyTab(
                     action = stringResource(R.string.home_strategy_goal_preview_action),
                     onClick = { onShowPaywall(HomePremiumGate.MultipleGoals) }
                 )
+                Spacer(Modifier.height(32.dp))
             }
-            Spacer(Modifier.height(32.dp))
         }
     }
 
@@ -168,8 +188,21 @@ fun LazyListScope.homeStrategyTab(
             )
         }
     } else {
+        val visibleRules = if (isPremium) rules else rules.take(1)
+        if (isPremium) {
+            item {
+                PremiumBenefitCard(
+                    title = stringResource(R.string.home_strategy_rule_add_title),
+                    description = stringResource(R.string.home_strategy_rule_add_desc_free),
+                    icon = Icons.Default.Add,
+                    onClick = onAddNewRule,
+                    modifier = Modifier
+                )
+                Spacer(Modifier.height(16.dp))
+            }
+        }
         items(
-            items = rules,
+            items = visibleRules,
             key = { it.id }
         ) { rule ->
             val context = LocalContext.current
@@ -202,15 +235,22 @@ fun LazyListScope.homeStrategyTab(
             )
             Spacer(Modifier.height(16.dp))
         }
+        if (!isPremium && rules.size > visibleRules.size) {
+            item {
+                LockedStrategyHiddenItemsCard(
+                    title = stringResource(
+                        R.string.home_strategy_rule_locked_hidden_title,
+                        rules.size - visibleRules.size
+                    ),
+                    body = stringResource(R.string.home_strategy_rule_locked_hidden_desc),
+                    onClick = { onShowPaywall(HomePremiumGate.MultipleRules) }
+                )
+                Spacer(Modifier.height(16.dp))
+            }
+        }
         item {
             if (isPremium) {
-                PremiumBenefitCard(
-                    title = stringResource(R.string.home_strategy_rule_add_title),
-                    description = stringResource(R.string.home_strategy_rule_add_desc_free),
-                    icon = Icons.Default.Add,
-                    onClick = onAddNewRule,
-                    modifier = Modifier
-                )
+                Spacer(Modifier.height(16.dp))
             } else {
                 val context = LocalContext.current
                 LockedStrategyPreviewCard(
@@ -233,6 +273,22 @@ fun LazyListScope.homeStrategyTab(
             }
         }
     }
+}
+
+@Composable
+private fun LockedStrategyHiddenItemsCard(
+    title: String,
+    body: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    PremiumBenefitCard(
+        title = title,
+        description = body,
+        icon = Icons.Default.Lock,
+        onClick = onClick,
+        modifier = modifier
+    )
 }
 
 @Composable

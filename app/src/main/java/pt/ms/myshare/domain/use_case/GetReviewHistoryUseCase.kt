@@ -46,6 +46,7 @@ class GetReviewHistoryUseCase @Inject constructor(
     ): ReviewHistoryItemState {
         val currencyFormatter = NumberFormat.getCurrencyInstance(locale).apply { this.currency = currency }
         val dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy", locale)
+        val monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy", locale)
 
         val dateLabel = review.createdAt.format(dateFormatter)
 
@@ -67,10 +68,13 @@ class GetReviewHistoryUseCase @Inject constructor(
         return ReviewHistoryItemState(
             id = review.id,
             dateLabel = dateLabel,
+            monthLabel = review.createdAt.format(monthFormatter),
             flexibleSpendLabel = currencyFormatter.format(review.actualFlexibleSpend),
             plannedFlexibleLabel = currencyFormatter.format(blueprintFlexible),
+            editableFlexibleSpend = review.actualFlexibleSpend.stripTrailingZeros().toPlainString(),
             goalContributionLabel = currencyFormatter.format(review.actualGoalContribution),
             plannedGoalLabel = currencyFormatter.format(blueprintGoal),
+            editableGoalContribution = review.actualGoalContribution.stripTrailingZeros().toPlainString(),
             flexibleDeltaLabel = formatDelta(flexibleDelta, currencyFormatter),
             goalDeltaLabel = formatDelta(goalDelta, currencyFormatter),
             isPositive = isPositiveValue

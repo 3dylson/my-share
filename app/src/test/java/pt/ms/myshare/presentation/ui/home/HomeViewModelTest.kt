@@ -24,6 +24,7 @@ import pt.ms.myshare.domain.model.BillingPurchaseEvent
 import pt.ms.myshare.domain.model.EntitlementState
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.PaydayRule
+import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
 import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
@@ -34,12 +35,14 @@ import pt.ms.myshare.domain.model.StoreProduct
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
+import pt.ms.myshare.domain.use_case.CreatePaydayAdjustmentRecommendationUseCase
 import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
 import pt.ms.myshare.domain.use_case.EnforcePremiumDowngradeUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
 import java.math.BigDecimal
 
 import pt.ms.myshare.domain.repository.AuthRepository
+import pt.ms.myshare.domain.use_case.AdjustGoalProgressForReviewCorrectionUseCase
 import pt.ms.myshare.domain.use_case.GetReviewHistoryUseCase
 import pt.ms.myshare.domain.use_case.UpdateGoalProgressUseCase
 import pt.ms.myshare.domain.use_case.GetPerformanceStatsUseCase
@@ -88,11 +91,19 @@ class HomeViewModelTest {
             entitlementRepository = fakeEntitlementRepository,
             userPreferencesRepository = TestUserPreferencesRepository(),
             calculatePlanPreviewUseCase = calculatePlanPreviewUseCase,
+            createPaydayAdjustmentRecommendationUseCase = CreatePaydayAdjustmentRecommendationUseCase(
+                calculatePlanPreviewUseCase,
+                ResolveAllocationStrategyRulesUseCase()
+            ),
             createReviewInsightUseCase = CreateReviewInsightUseCase(calculatePlanPreviewUseCase),
             enforcePremiumDowngradeUseCase = EnforcePremiumDowngradeUseCase(fakePlannerRepository),
             resolvePricingStrategyUseCase = ResolvePricingStrategyUseCase(),
             getReviewHistoryUseCase = mockGetReviewHistoryUseCase,
             updateGoalProgressUseCase = mockUpdateGoalProgressUseCase,
+            adjustGoalProgressForReviewCorrectionUseCase = AdjustGoalProgressForReviewCorrectionUseCase(
+                fakePlannerRepository,
+                fakeEntitlementRepository
+            ),
             getPerformanceStatsUseCase = GetPerformanceStatsUseCase(fakePlannerRepository),
             getCoachingInsightsUseCase = GetCoachingInsightsUseCase(calculatePlanPreviewUseCase),
             reminderWorkScheduler = mockReminderWorkScheduler,
@@ -159,6 +170,63 @@ class HomeViewModelTest {
         val error = viewModel.state.value.reviewCard.error
         assertTrue(error != null)
         assertEquals("home_review_error_invalid_amounts", error)
+    }
+
+    @Test
+    fun `updateReview replaces review and adjusts goal progress delta`() = runTest {
+        val currentPlan = SalaryPlan(
+            focus = PlanningFocus.SAVE_WITHOUT_STRESS,
+            netIncomePerPayday = BigDecimal("1000"),
+            monthlyFixedCosts = BigDecimal("400"),
+            payFrequency = PayFrequency.MONTHLY,
+            monthlyPayday = 1,
+            preset = AllocationPreset.BALANCED
+        )
+        fakePlannerRepository.savePlan(currentPlan)
+        fakePlannerRepository.saveGoal(
+            Goal(id = "goal-1", name = "Savings", targetAmount = BigDecimal("500"), currentProgress = BigDecimal("100"))
+        )
+        fakePlannerRepository.saveReview(
+            ManualReview(
+                id = "review-1",
+                actualFlexibleSpend = BigDecimal("200"),
+                actualGoalContribution = BigDecimal("100"),
+                plannedFlexibleSpend = BigDecimal("300"),
+                plannedGoalContribution = BigDecimal("100")
+            )
+        )
+        advanceUntilIdle()
+
+        val accepted = viewModel.updateReview("review-1", "180", "40")
+        advanceUntilIdle()
+
+        assertTrue(accepted)
+        assertEquals(BigDecimal("180"), fakePlannerRepository.reviews().first().actualFlexibleSpend)
+        assertEquals(BigDecimal("40"), fakePlannerRepository.reviews().first().actualGoalContribution)
+        assertEquals(BigDecimal("40"), fakePlannerRepository.loadGoals().first().currentProgress)
+    }
+
+    @Test
+    fun `deleteReview removes review and reverses goal contribution`() = runTest {
+        fakePlannerRepository.saveGoal(
+            Goal(id = "goal-1", name = "Savings", targetAmount = BigDecimal("500"), currentProgress = BigDecimal("100"))
+        )
+        fakePlannerRepository.saveReview(
+            ManualReview(
+                id = "review-1",
+                actualFlexibleSpend = BigDecimal("200"),
+                actualGoalContribution = BigDecimal("100"),
+                plannedFlexibleSpend = BigDecimal("300"),
+                plannedGoalContribution = BigDecimal("100")
+            )
+        )
+        advanceUntilIdle()
+
+        viewModel.deleteReview("review-1")
+        advanceUntilIdle()
+
+        assertTrue(fakePlannerRepository.reviews().isEmpty())
+        assertEquals(BigDecimal.ZERO, fakePlannerRepository.loadGoals().first().currentProgress)
     }
 
     @Test
@@ -345,6 +413,43 @@ class HomeViewModelTest {
     }
 
     @Test
+    fun `premium user can apply payday recommendation to real rules`() = runTest {
+        val currentPlan = SalaryPlan(
+            focus = PlanningFocus.SAVE_WITHOUT_STRESS,
+            netIncomePerPayday = BigDecimal("1000"),
+            monthlyFixedCosts = BigDecimal("400"),
+            payFrequency = PayFrequency.MONTHLY,
+            monthlyPayday = 1,
+            preset = AllocationPreset.BALANCED
+        )
+        fakeEntitlementRepository.setPro(true)
+        fakePlannerRepository.savePlan(currentPlan)
+        fakePlannerRepository.saveReview(
+            ManualReview(
+                actualFlexibleSpend = BigDecimal("220"),
+                actualGoalContribution = BigDecimal("310"),
+                plannedFlexibleSpend = BigDecimal("300"),
+                plannedGoalContribution = BigDecimal("300")
+            )
+        )
+        advanceUntilIdle()
+
+        assertEquals(
+            PaydayAdjustmentRecommendationDirection.MOVE_MORE_TO_PRIORITY,
+            viewModel.state.value.reviewCard.paydayRecommendation?.direction
+        )
+
+        viewModel.applyPaydayRecommendation()
+        advanceUntilIdle()
+
+        assertTrue(fakePlannerRepository.loadRules().isNotEmpty())
+        assertEquals(
+            "home_review_recommendation_applied_feedback",
+            viewModel.state.value.reviewCard.recommendationMessageKey
+        )
+    }
+
+    @Test
     fun `grace period keeps premium automation available`() = runTest {
         fakeEntitlementRepository.setEntitlementState(EntitlementState.GRACE_PERIOD)
         fakePlannerRepository.saveAutomationEnabled(true)
@@ -475,9 +580,14 @@ class FakePlannerRepository : PlannerRepository {
     }
     
     override fun observeGoals(): Flow<List<Goal>> = goalsFlow.asStateFlow()
-    override suspend fun saveGoal(goal: Goal) { 
+    override suspend fun saveGoal(goal: Goal) {
         val current = goalsFlow.value.toMutableList()
-        current.add(goal)
+        val existingIndex = current.indexOfFirst { it.id == goal.id }
+        if (existingIndex >= 0) {
+            current[existingIndex] = goal
+        } else {
+            current.add(goal)
+        }
         goalsFlow.emit(current)
     }
     override fun loadGoals(): List<Goal> = goalsFlow.value
@@ -486,14 +596,28 @@ class FakePlannerRepository : PlannerRepository {
     }
 
     override fun observeLatestReview(): MutableStateFlow<ManualReview?> = reviewFlow
-    override suspend fun saveReview(review: ManualReview) { 
-        reviewFlow.emit(review) 
+    override suspend fun saveReview(review: ManualReview) {
         val current = reviewsFlow.value.toMutableList()
-        current.add(review)
+        val existingIndex = current.indexOfFirst { it.id == review.id }
+        if (existingIndex >= 0) {
+            current[existingIndex] = review
+        } else {
+            current.add(review)
+        }
+        reviewFlow.emit(current.lastOrNull())
         reviewsFlow.emit(current)
+    }
+    override suspend fun updateReview(review: ManualReview) {
+        saveReview(review)
+    }
+    override suspend fun deleteReview(reviewId: String) {
+        val updated = reviewsFlow.value.filterNot { it.id == reviewId }
+        reviewsFlow.emit(updated)
+        reviewFlow.emit(updated.lastOrNull())
     }
     override fun loadLatestReview(): ManualReview? = reviewFlow.value
     override fun observeReviews(): Flow<List<ManualReview>> = reviewsFlow.asStateFlow()
+    fun reviews(): List<ManualReview> = reviewsFlow.value
     
     override fun observeReminderConfiguration(): MutableStateFlow<ReminderConfiguration> = reminderFlow
     override suspend fun saveReminderConfiguration(config: ReminderConfiguration) { reminderFlow.emit(config) }

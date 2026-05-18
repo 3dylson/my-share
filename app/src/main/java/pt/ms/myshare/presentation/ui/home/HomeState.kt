@@ -2,6 +2,7 @@ package pt.ms.myshare.presentation.ui.home
 
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.ManualReview
+import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
 import pt.ms.myshare.domain.model.PricingStrategy
 import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.domain.model.ReviewInsight
@@ -55,8 +56,22 @@ data class ReviewCardState(
     val goalContributionMax: Float = 5000f,
     val insight: ReviewInsight? = null,
     val coachingInsights: List<ReviewInsightState> = emptyList(),
+    val paydayRecommendation: PaydayAdjustmentRecommendationState? = null,
+    val recommendationMessageKey: String? = null,
     val savedReviewDate: String? = null,
     val error: String? = null
+)
+
+data class PaydayAdjustmentRecommendationState(
+    val direction: PaydayAdjustmentRecommendationDirection,
+    val analyzedReviewCount: Int,
+    val currentFlexibleSpendLabel: String,
+    val recommendedFlexibleSpendLabel: String,
+    val currentPriorityContributionLabel: String,
+    val recommendedPriorityContributionLabel: String,
+    val adjustmentAmountLabel: String,
+    val confidencePercent: Int,
+    val isApplyable: Boolean
 )
 
 data class ReviewInsightState(
@@ -122,10 +137,13 @@ data class MoreCardState(
 data class ReviewHistoryItemState(
     val id: String,
     val dateLabel: String,
+    val monthLabel: String = "",
     val flexibleSpendLabel: String,
-    val plannedFlexibleLabel: String = "", // Added for snapshots
+    val plannedFlexibleLabel: String = "",
+    val editableFlexibleSpend: String = "",
     val goalContributionLabel: String,
-    val plannedGoalLabel: String = "", // Added for snapshots
+    val plannedGoalLabel: String = "",
+    val editableGoalContribution: String = "",
     val flexibleDeltaLabel: String,
     val goalDeltaLabel: String,
     val isPositive: Boolean

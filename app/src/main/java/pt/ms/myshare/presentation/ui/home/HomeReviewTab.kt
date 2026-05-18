@@ -4,7 +4,9 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -17,14 +19,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.*
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.ms.myshare.R
+import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.theme.*
 import java.math.BigDecimal
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.KeyboardType
@@ -43,9 +50,14 @@ fun LazyListScope.homeReviewTab(
     onFlexibleSpendChanged: (String) -> Unit,
     onGoalContributionChanged: (String) -> Unit,
     onSaveReview: () -> Unit,
-    onShowPaywall: () -> Unit
+    onShowPaywall: () -> Unit,
+    onOpenFullHistory: () -> Unit,
+    onEditReview: (ReviewHistoryItemState) -> Unit,
+    onDeleteReview: (ReviewHistoryItemState) -> Unit,
+    onApplyPaydayRecommendation: () -> Unit
 ) {
     val coachingInsights = state.coachingInsights
+    val paydayRecommendation = state.paydayRecommendation
     
     if (history.isNotEmpty()) {
         item {
@@ -131,7 +143,23 @@ fun LazyListScope.homeReviewTab(
         }
     }
 
-    if (!isPremium && history.isNotEmpty()) {
+    if (paydayRecommendation != null) {
+        item {
+            if (isPremium) {
+                PaydayAdjustmentRecommendationCard(
+                    recommendation = paydayRecommendation,
+                    messageKey = state.recommendationMessageKey,
+                    onApply = onApplyPaydayRecommendation
+                )
+            } else {
+                LockedPaydayRecommendationCard(
+                    recommendation = paydayRecommendation,
+                    onClick = onShowPaywall
+                )
+            }
+            Spacer(Modifier.height(16.dp))
+        }
+    } else if (!isPremium && history.isNotEmpty()) {
         item {
             LockedReviewRecommendationCard(
                 item = history.first(),
@@ -211,15 +239,31 @@ fun LazyListScope.homeReviewTab(
             )
         }
     } else {
-        // Show history. If not premium, only show the first item and then a lock.
-        val visibleHistory = if (isPremium) history else history.take(1)
-        visibleHistory.forEach { item ->
-            item(key = item.id) {
-                CompactReviewHistoryCard(item = item)
+        val visibleHistory = if (isPremium) {
+            history.take(PREMIUM_INLINE_HISTORY_LIMIT)
+        } else {
+            history.take(1)
+        }
+        visibleHistory.forEach { historyItem ->
+            item(key = historyItem.id) {
+                CompactReviewHistoryCard(
+                    item = historyItem,
+                    onEdit = { onEditReview(historyItem) },
+                    onDelete = { onDeleteReview(historyItem) }
+                )
                 Spacer(Modifier.height(12.dp))
             }
         }
-        if (!isPremium && history.size > 1) {
+        if (isPremium && history.size > visibleHistory.size) {
+            item {
+                ReviewHistoryTimelinePreviewCard(
+                    hiddenCount = history.size - visibleHistory.size,
+                    totalCount = history.size,
+                    onClick = onOpenFullHistory
+                )
+                Spacer(Modifier.height(8.dp))
+            }
+        } else if (!isPremium && history.size > 1) {
             item {
                 LockedReviewHistoryPreviewCard(
                     hiddenCount = history.size - visibleHistory.size,
@@ -228,6 +272,652 @@ fun LazyListScope.homeReviewTab(
                 Spacer(Modifier.height(8.dp))
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ReviewHistoryTimelineBottomSheet(
+    history: List<ReviewHistoryItemState>,
+    onDismissRequest: () -> Unit,
+    onEditReview: (ReviewHistoryItemState) -> Unit,
+    onDeleteReview: (ReviewHistoryItemState) -> Unit,
+    modifier: Modifier = Modifier,
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+) {
+    val groupedHistory = remember(history) {
+        history.groupBy { it.monthLabel.ifBlank { it.dateLabel } }
+    }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.surface,
+        dragHandle = { BottomSheetDefaults.DragHandle() }
+    ) {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.88f)
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = MySharePrimary.copy(alpha = 0.12f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.QueryStats,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.padding(10.dp).size(22.dp)
+                    )
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.home_review_history_sheet_title),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = stringResource(R.string.home_review_history_sheet_desc, history.size),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(bottom = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                groupedHistory.forEach { (month, itemsForMonth) ->
+                    item(key = "month-$month") {
+                        Text(
+                            text = month.uppercase(),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MySharePrimary,
+                            fontWeight = FontWeight.Black,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                    items(
+                        items = itemsForMonth,
+                        key = { item -> "timeline-${item.id}" }
+                    ) { item ->
+                        ReviewTimelineRow(
+                            item = item,
+                            onEdit = {
+                                onDismissRequest()
+                                onEditReview(item)
+                            },
+                            onDelete = { onDeleteReview(item) }
+                        )
+                    }
+                }
+            }
+
+            TextButton(
+                onClick = onDismissRequest,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.home_review_history_sheet_close),
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ReviewCorrectionBottomSheet(
+    item: ReviewHistoryItemState,
+    currencySymbol: String,
+    onDismissRequest: () -> Unit,
+    onSave: (String, String) -> Boolean,
+    modifier: Modifier = Modifier,
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+) {
+    var flexibleSpend by remember(item.id) { mutableStateOf(item.editableFlexibleSpend) }
+    var goalContribution by remember(item.id) { mutableStateOf(item.editableGoalContribution) }
+    var showValidationError by remember(item.id) { mutableStateOf(false) }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.surface,
+        dragHandle = { BottomSheetDefaults.DragHandle() }
+    ) {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = MySharePrimary.copy(alpha = 0.12f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.padding(10.dp).size(22.dp)
+                    )
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.home_review_edit_title, item.dateLabel),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = stringResource(R.string.home_review_edit_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 360.dp || LocalDensity.current.fontScale >= 1.25f
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        ReviewAmountField(
+                            label = stringResource(R.string.home_review_input_flex_exact),
+                            value = flexibleSpend,
+                            currencySymbol = currencySymbol,
+                            onValueChange = {
+                                flexibleSpend = it
+                                showValidationError = false
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        ReviewAmountField(
+                            label = stringResource(R.string.home_review_input_goal_exact),
+                            value = goalContribution,
+                            currencySymbol = currencySymbol,
+                            onValueChange = {
+                                goalContribution = it
+                                showValidationError = false
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                } else {
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        ReviewAmountField(
+                            label = stringResource(R.string.home_review_input_flex_exact),
+                            value = flexibleSpend,
+                            currencySymbol = currencySymbol,
+                            onValueChange = {
+                                flexibleSpend = it
+                                showValidationError = false
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
+                        ReviewAmountField(
+                            label = stringResource(R.string.home_review_input_goal_exact),
+                            value = goalContribution,
+                            currencySymbol = currencySymbol,
+                            onValueChange = {
+                                goalContribution = it
+                                showValidationError = false
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+
+            if (showValidationError) {
+                Text(
+                    text = stringResource(R.string.home_review_error_invalid_amounts),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 360.dp || LocalDensity.current.fontScale >= 1.25f
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(
+                            onClick = {
+                                if (onSave(flexibleSpend, goalContribution)) {
+                                    onDismissRequest()
+                                } else {
+                                    showValidationError = true
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(14.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.home_review_edit_save),
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        TextButton(
+                            onClick = onDismissRequest,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(stringResource(R.string.dialog_cancel))
+                        }
+                    }
+                } else {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TextButton(
+                            onClick = onDismissRequest,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(stringResource(R.string.dialog_cancel))
+                        }
+                        Button(
+                            onClick = {
+                                if (onSave(flexibleSpend, goalContribution)) {
+                                    onDismissRequest()
+                                } else {
+                                    showValidationError = true
+                                }
+                            },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(14.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.home_review_edit_save),
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PaydayAdjustmentRecommendationCard(
+    recommendation: PaydayAdjustmentRecommendationState,
+    messageKey: String?,
+    onApply: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val message = remember(messageKey) {
+        messageKey?.let {
+            val resId = context.resources.getIdentifier(it, "string", context.packageName)
+            if (resId != 0) context.getString(resId) else it
+        }
+    }
+    val title = recommendationTitle(recommendation.direction)
+    val body = recommendationBody(recommendation)
+
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.20f),
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.28f)),
+        shadowElevation = 1.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MySharePrimary.copy(alpha = 0.14f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AutoAwesome,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.padding(9.dp).size(20.dp)
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_review_recommendation_premium_unlocked_label).uppercase(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MySharePrimary,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = body,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+
+            RecommendationMetricsGrid(recommendation)
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(999.dp),
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.70f),
+                    border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.16f))
+                ) {
+                    Text(
+                        text = stringResource(
+                            R.string.home_review_recommendation_confidence,
+                            recommendation.confidencePercent
+                        ),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MySharePrimary,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Text(
+                    text = stringResource(
+                        R.string.home_review_recommendation_review_count,
+                        recommendation.analyzedReviewCount
+                    ),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            if (message != null) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        tint = MySharePositive,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+
+            if (recommendation.isApplyable) {
+                Button(
+                    onClick = onApply,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Tune,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.home_review_recommendation_apply),
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun LockedPaydayRecommendationCard(
+    recommendation: PaydayAdjustmentRecommendationState,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.24f)),
+        shadowElevation = 1.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            val lockedBody = if (recommendation.direction == PaydayAdjustmentRecommendationDirection.KEEP_PLAN) {
+                stringResource(
+                    R.string.home_review_recommendation_locked_keep_body,
+                    recommendation.currentFlexibleSpendLabel,
+                    recommendation.currentPriorityContributionLabel
+                )
+            } else {
+                stringResource(
+                    R.string.home_review_recommendation_locked_specific_body,
+                    recommendation.recommendedFlexibleSpendLabel,
+                    recommendation.recommendedPriorityContributionLabel
+                )
+            }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MySharePrimary.copy(alpha = 0.12f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.padding(9.dp).size(20.dp)
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_review_recommendation_label).uppercase(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MySharePrimary,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = recommendationTitle(recommendation.direction),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = lockedBody,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+            RecommendationMetricsGrid(recommendation)
+            Text(
+                text = stringResource(R.string.home_review_recommendation_action),
+                style = MaterialTheme.typography.labelLarge,
+                color = MySharePrimary,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Composable
+private fun RecommendationMetricsGrid(recommendation: PaydayAdjustmentRecommendationState) {
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val shouldStack = maxWidth < 340.dp || LocalDensity.current.fontScale >= 1.25f
+        val metrics = listOf(
+            Triple(
+                stringResource(R.string.home_review_recommendation_current_flex),
+                recommendation.currentFlexibleSpendLabel,
+                Icons.Default.RadioButtonUnchecked
+            ),
+            Triple(
+                stringResource(R.string.home_review_recommendation_next_flex),
+                recommendation.recommendedFlexibleSpendLabel,
+                Icons.Default.CheckCircle
+            ),
+            Triple(
+                stringResource(R.string.home_review_recommendation_current_priority),
+                recommendation.currentPriorityContributionLabel,
+                Icons.Default.Flag
+            ),
+            Triple(
+                stringResource(R.string.home_review_recommendation_next_priority),
+                recommendation.recommendedPriorityContributionLabel,
+                Icons.Default.Savings
+            )
+        )
+
+        if (shouldStack) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                metrics.forEach { metric ->
+                    RecommendationMetricPill(
+                        label = metric.first,
+                        value = metric.second,
+                        icon = metric.third,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        } else {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                metrics.chunked(2).forEach { rowMetrics ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        rowMetrics.forEach { metric ->
+                            RecommendationMetricPill(
+                                label = metric.first,
+                                value = metric.second,
+                                icon = metric.third,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RecommendationMetricPill(
+    label: String,
+    value: String,
+    icon: ImageVector,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.76f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.14f))
+    ) {
+        Row(
+            modifier = Modifier.padding(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MySharePrimary,
+                modifier = Modifier.size(16.dp)
+            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Black
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun recommendationTitle(direction: PaydayAdjustmentRecommendationDirection): String {
+    return when (direction) {
+        PaydayAdjustmentRecommendationDirection.MOVE_MORE_TO_PRIORITY ->
+            stringResource(R.string.home_review_recommendation_move_title)
+        PaydayAdjustmentRecommendationDirection.RESTORE_FLEXIBLE_BUFFER ->
+            stringResource(R.string.home_review_recommendation_restore_title)
+        PaydayAdjustmentRecommendationDirection.KEEP_PLAN ->
+            stringResource(R.string.home_review_recommendation_keep_title)
+    }
+}
+
+@Composable
+private fun recommendationBody(recommendation: PaydayAdjustmentRecommendationState): String {
+    return when (recommendation.direction) {
+        PaydayAdjustmentRecommendationDirection.MOVE_MORE_TO_PRIORITY -> stringResource(
+            R.string.home_review_recommendation_move_body,
+            recommendation.recommendedFlexibleSpendLabel,
+            recommendation.adjustmentAmountLabel,
+            recommendation.recommendedPriorityContributionLabel
+        )
+        PaydayAdjustmentRecommendationDirection.RESTORE_FLEXIBLE_BUFFER -> stringResource(
+            R.string.home_review_recommendation_restore_body,
+            recommendation.currentFlexibleSpendLabel,
+            recommendation.adjustmentAmountLabel,
+            recommendation.recommendedPriorityContributionLabel
+        )
+        PaydayAdjustmentRecommendationDirection.KEEP_PLAN -> stringResource(
+            R.string.home_review_recommendation_keep_body,
+            recommendation.currentFlexibleSpendLabel,
+            recommendation.currentPriorityContributionLabel
+        )
     }
 }
 
@@ -401,8 +1091,14 @@ private fun LockedReviewHistoryPreviewCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val title = if (hiddenCount == 1) {
+        stringResource(R.string.home_review_history_locked_title_single)
+    } else {
+        stringResource(R.string.home_review_history_locked_title, hiddenCount)
+    }
+
     PremiumBenefitCard(
-        title = stringResource(R.string.home_review_history_locked_title, hiddenCount),
+        title = title,
         description = stringResource(R.string.home_review_history_locked_desc),
         icon = Icons.Default.Lock,
         onClick = onClick,
@@ -411,8 +1107,76 @@ private fun LockedReviewHistoryPreviewCard(
 }
 
 @Composable
+private fun ReviewHistoryTimelinePreviewCard(
+    hiddenCount: Int,
+    totalCount: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val title = if (hiddenCount == 1) {
+        stringResource(R.string.home_review_history_archive_title_single)
+    } else {
+        stringResource(R.string.home_review_history_archive_title, hiddenCount)
+    }
+
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(18.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.18f),
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.20f))
+    ) {
+        Row(
+            modifier = Modifier.padding(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = MySharePrimary.copy(alpha = 0.12f)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.QueryStats,
+                    contentDescription = null,
+                    tint = MySharePrimary,
+                    modifier = Modifier.padding(9.dp).size(20.dp)
+                )
+            }
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Black,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = stringResource(R.string.home_review_history_archive_desc, totalCount),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 18.sp
+                )
+            }
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = null,
+                tint = MySharePrimary,
+                modifier = Modifier.size(22.dp)
+            )
+        }
+    }
+}
+
+@Composable
 private fun CompactReviewHistoryCard(
     item: ReviewHistoryItemState,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val accentColor = if (item.isPositive) MySharePositive else MaterialTheme.colorScheme.error
@@ -460,6 +1224,10 @@ private fun CompactReviewHistoryCard(
                         modifier = Modifier.padding(10.dp).size(20.dp)
                     )
                 }
+                ReviewHistoryActionMenu(
+                    onEdit = onEdit,
+                    onDelete = onDelete
+                )
             }
 
             BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
@@ -494,6 +1262,215 @@ private fun CompactReviewHistoryCard(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ReviewTimelineRow(
+    item: ReviewHistoryItemState,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val accentColor = if (item.isPositive) MySharePositive else MaterialTheme.colorScheme.error
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.36f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f))
+    ) {
+        Column(
+            modifier = Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(999.dp),
+                    color = accentColor.copy(alpha = 0.12f)
+                ) {
+                    Icon(
+                        imageVector = if (item.isPositive) {
+                            Icons.AutoMirrored.Filled.TrendingDown
+                        } else {
+                            Icons.AutoMirrored.Filled.TrendingUp
+                        },
+                        contentDescription = null,
+                        tint = accentColor,
+                        modifier = Modifier.padding(8.dp).size(18.dp)
+                    )
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = item.dateLabel,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = if (item.isPositive) {
+                            stringResource(R.string.home_review_history_on_plan)
+                        } else {
+                            stringResource(R.string.home_review_history_needs_attention)
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                ReviewHistoryActionMenu(
+                    onEdit = onEdit,
+                    onDelete = onDelete
+                )
+            }
+
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 330.dp || LocalDensity.current.fontScale >= 1.25f
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        TimelineHistoryMetric(
+                            label = stringResource(R.string.home_review_history_flex_label),
+                            value = item.flexibleSpendLabel,
+                            support = stringResource(
+                                R.string.home_review_history_target_delta,
+                                item.plannedFlexibleLabel,
+                                item.flexibleDeltaLabel
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        TimelineHistoryMetric(
+                            label = stringResource(R.string.home_review_history_goal),
+                            value = item.goalContributionLabel,
+                            support = stringResource(
+                                R.string.home_review_history_target_delta,
+                                item.plannedGoalLabel,
+                                item.goalDeltaLabel
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                } else {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        TimelineHistoryMetric(
+                            label = stringResource(R.string.home_review_history_flex_label),
+                            value = item.flexibleSpendLabel,
+                            support = stringResource(
+                                R.string.home_review_history_target_delta,
+                                item.plannedFlexibleLabel,
+                                item.flexibleDeltaLabel
+                            ),
+                            modifier = Modifier.weight(1f)
+                        )
+                        TimelineHistoryMetric(
+                            label = stringResource(R.string.home_review_history_goal),
+                            value = item.goalContributionLabel,
+                            support = stringResource(
+                                R.string.home_review_history_target_delta,
+                                item.plannedGoalLabel,
+                                item.goalDeltaLabel
+                            ),
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TimelineHistoryMetric(
+    label: String,
+    value: String,
+    support: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        Text(
+            text = label.uppercase(),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.Black,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Text(
+            text = support,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Composable
+private fun ReviewHistoryActionMenu(
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box(modifier = modifier) {
+        IconButton(onClick = { expanded = true }) {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = stringResource(R.string.home_review_history_actions),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.home_review_history_edit)) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = null
+                    )
+                },
+                onClick = {
+                    expanded = false
+                    onEdit()
+                }
+            )
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = stringResource(R.string.home_review_history_delete),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                },
+                onClick = {
+                    expanded = false
+                    onDelete()
+                }
+            )
         }
     }
 }
@@ -536,6 +1513,8 @@ private fun CompactHistoryMetric(
         }
     }
 }
+
+private const val PREMIUM_INLINE_HISTORY_LIMIT = 3
 
 @Composable
 private fun ReviewAmountField(

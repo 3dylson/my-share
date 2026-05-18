@@ -30,6 +30,8 @@ interface PlannerRepository {
     fun observeLatestReview(): Flow<ManualReview?>
     fun loadLatestReview(): ManualReview?
     suspend fun saveReview(review: ManualReview)
+    suspend fun updateReview(review: ManualReview)
+    suspend fun deleteReview(reviewId: String)
 
     fun observeReminderConfiguration(): Flow<ReminderConfiguration>
     fun loadReminderConfiguration(): ReminderConfiguration

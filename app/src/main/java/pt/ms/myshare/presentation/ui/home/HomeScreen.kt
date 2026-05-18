@@ -91,6 +91,9 @@ fun HomeRoute(
         onGoogleConnectionCredentialError = viewModel::setGoogleConnectionCredentialError,
         onDismissPremiumAccountPrompt = viewModel::dismissPremiumAccountPrompt,
         onReviewSavedFeedbackShown = viewModel::clearReviewSavedFeedback,
+        onApplyPaydayRecommendation = viewModel::applyPaydayRecommendation,
+        onUpdateReview = viewModel::updateReview,
+        onDeleteReview = viewModel::deleteReview,
         onLanguageSelected = viewModel::updateLanguage,
         onCurrencySelected = viewModel::updateCurrency,
         onLogout = {
@@ -128,6 +131,9 @@ fun HomeScreen(
     onGoogleConnectionCredentialError: (String) -> Unit,
     onDismissPremiumAccountPrompt: () -> Unit,
     onReviewSavedFeedbackShown: (Long) -> Unit,
+    onApplyPaydayRecommendation: () -> Unit,
+    onUpdateReview: (String, String, String) -> Boolean,
+    onDeleteReview: (String) -> Unit,
     onLanguageSelected: (String) -> Unit,
     onCurrencySelected: (String) -> Unit,
     onLogout: () -> Unit,
@@ -158,6 +164,9 @@ fun HomeScreen(
     var showAccountDetailsDialog by remember { mutableStateOf(false) }
     var showLanguagePicker by remember { mutableStateOf(false) }
     var showCurrencyPicker by remember { mutableStateOf(false) }
+    var showReviewHistoryTimeline by remember { mutableStateOf(false) }
+    var reviewBeingEdited by remember { mutableStateOf<ReviewHistoryItemState?>(null) }
+    var reviewPendingDelete by remember { mutableStateOf<ReviewHistoryItemState?>(null) }
     var isGoogleCredentialRequestInProgress by remember { mutableStateOf(false) }
     var pendingReminderSelection by remember { mutableStateOf<ReminderSettingsSelection?>(null) }
     val clearFocusOnScrollConnection = rememberKeyboardDismissOnScrollConnection()
@@ -228,6 +237,51 @@ fun HomeScreen(
                 onPremiumGateUpgradeClicked(premiumGate)
                 activity?.let { onUnlockPremium(it, premiumGate.analyticsName) }
             }
+        )
+    }
+
+    if (showReviewHistoryTimeline) {
+        ReviewHistoryTimelineBottomSheet(
+            history = state.reviewHistory,
+            onDismissRequest = { showReviewHistoryTimeline = false },
+            onEditReview = { review ->
+                showReviewHistoryTimeline = false
+                reviewBeingEdited = review
+            },
+            onDeleteReview = { review ->
+                showReviewHistoryTimeline = false
+                reviewPendingDelete = review
+            }
+        )
+    }
+
+    reviewBeingEdited?.let { review ->
+        ReviewCorrectionBottomSheet(
+            item = review,
+            currencySymbol = state.reviewCard.currencySymbol,
+            onDismissRequest = { reviewBeingEdited = null },
+            onSave = { flexibleSpend, goalContribution ->
+                onUpdateReview(review.id, flexibleSpend, goalContribution)
+            }
+        )
+    }
+
+    reviewPendingDelete?.let { review ->
+        MyShareAlertDialog(
+            onDismissRequest = { reviewPendingDelete = null },
+            icon = Icons.Default.Delete,
+            iconTint = MaterialTheme.colorScheme.error,
+            title = stringResource(R.string.home_review_delete_title),
+            message = stringResource(R.string.home_review_delete_desc, review.dateLabel),
+            confirmText = stringResource(R.string.home_review_delete_confirm),
+            onConfirm = {
+                Timber.tag("HomeScreen").d("Review delete confirmed: %s", review.id)
+                reviewPendingDelete = null
+                onDeleteReview(review.id)
+            },
+            dismissText = stringResource(R.string.dialog_cancel),
+            onDismiss = { reviewPendingDelete = null },
+            actionStyle = MyShareDialogActionStyle.Destructive
         )
     }
 
@@ -535,7 +589,17 @@ fun HomeScreen(
                             },
                             onShowPaywall = {
                                 openPremiumGate(HomePremiumGate.ReviewHistory)
-                            }
+                            },
+                            onOpenFullHistory = {
+                                showReviewHistoryTimeline = true
+                            },
+                            onEditReview = { review ->
+                                reviewBeingEdited = review
+                            },
+                            onDeleteReview = { review ->
+                                reviewPendingDelete = review
+                            },
+                            onApplyPaydayRecommendation = onApplyPaydayRecommendation
                         )
                     }
                     HomeDestination.MORE -> {
@@ -667,6 +731,9 @@ private fun HomeScreenPreview() {
             onGoogleConnectionCredentialError = { _ -> },
             onDismissPremiumAccountPrompt = {},
             onReviewSavedFeedbackShown = { _ -> },
+            onApplyPaydayRecommendation = {},
+            onUpdateReview = { _, _, _ -> true },
+            onDeleteReview = { _ -> },
             onLanguageSelected = { _ -> },
             onCurrencySelected = { _ -> },
             onLogout = {},
