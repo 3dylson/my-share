@@ -1535,18 +1535,24 @@ private fun MorePremiumPreviewCard(
     modifier: Modifier = Modifier
 ) {
     val hasPlanValues = state.weeklyGuideLabel.isNotBlank() && state.priorityMoveLabel.isNotBlank()
-    val body = if (hasPlanValues) {
-        stringResource(
-            R.string.home_more_premium_preview_body,
+    val hasReviews = state.reviewCount > 0
+    val body = when {
+        hasPlanValues && hasReviews -> stringResource(
+            R.string.home_more_premium_preview_body_with_reviews,
+            state.reviewCount,
             state.weeklyGuideLabel,
-            state.priorityMoveLabel,
-            state.ruleCount
+            state.priorityMoveLabel
         )
-    } else {
-        stringResource(
-            R.string.home_more_premium_preview_body_generic,
-            state.ruleCount
+        hasPlanValues -> stringResource(
+            R.string.home_more_premium_preview_body_first_review,
+            state.weeklyGuideLabel,
+            state.priorityMoveLabel
         )
+        hasReviews -> stringResource(
+            R.string.home_more_premium_preview_body_reviews_generic,
+            state.reviewCount
+        )
+        else -> stringResource(R.string.home_more_premium_preview_body_generic)
     }
 
     Surface(
@@ -1596,6 +1602,12 @@ private fun MorePremiumPreviewCard(
                 }
             }
 
+            MorePremiumSignalStrip(
+                state = state,
+                hasPlanValues = hasPlanValues,
+                hasReviews = hasReviews
+            )
+
             BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
                 val shouldStack = maxWidth < 300.dp
                 if (shouldStack) {
@@ -1631,6 +1643,123 @@ private fun MorePremiumPreviewCard(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MorePremiumSignalStrip(
+    state: MoreCardState,
+    hasPlanValues: Boolean,
+    hasReviews: Boolean,
+    modifier: Modifier = Modifier
+) {
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+        val shouldStack = maxWidth < 340.dp || LocalDensity.current.fontScale >= 1.25f
+        if (shouldStack) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                MorePremiumSignalPill(
+                    label = stringResource(R.string.home_more_premium_preview_signal_reviews),
+                    value = if (hasReviews) {
+                        stringResource(R.string.home_more_premium_preview_signal_reviews_ready, state.reviewCount)
+                    } else {
+                        stringResource(R.string.home_more_premium_preview_signal_reviews_waiting)
+                    },
+                    icon = Icons.Default.History,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                MorePremiumSignalPill(
+                    label = stringResource(R.string.home_more_premium_preview_signal_plan),
+                    value = if (hasPlanValues) {
+                        state.weeklyGuideLabel
+                    } else {
+                        stringResource(R.string.home_more_routine_not_set)
+                    },
+                    icon = Icons.Default.Payments,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                MorePremiumSignalPill(
+                    label = stringResource(R.string.home_more_premium_preview_signal_rules),
+                    value = stringResource(R.string.home_more_premium_preview_signal_rules_count, state.ruleCount),
+                    icon = Icons.AutoMirrored.Filled.Rule,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        } else {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                MorePremiumSignalPill(
+                    label = stringResource(R.string.home_more_premium_preview_signal_reviews),
+                    value = if (hasReviews) {
+                        stringResource(R.string.home_more_premium_preview_signal_reviews_ready, state.reviewCount)
+                    } else {
+                        stringResource(R.string.home_more_premium_preview_signal_reviews_waiting)
+                    },
+                    icon = Icons.Default.History,
+                    modifier = Modifier.weight(1f)
+                )
+                MorePremiumSignalPill(
+                    label = stringResource(R.string.home_more_premium_preview_signal_plan),
+                    value = if (hasPlanValues) {
+                        state.weeklyGuideLabel
+                    } else {
+                        stringResource(R.string.home_more_routine_not_set)
+                    },
+                    icon = Icons.Default.Payments,
+                    modifier = Modifier.weight(1f)
+                )
+                MorePremiumSignalPill(
+                    label = stringResource(R.string.home_more_premium_preview_signal_rules),
+                    value = stringResource(R.string.home_more_premium_preview_signal_rules_count, state.ruleCount),
+                    icon = Icons.AutoMirrored.Filled.Rule,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun MorePremiumSignalPill(
+    label: String,
+    value: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.heightIn(min = 64.dp),
+        shape = RoundedCornerShape(14.dp),
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.72f),
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.12f))
+    ) {
+        Row(
+            modifier = Modifier.padding(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MySharePrimary,
+                modifier = Modifier.size(16.dp)
+            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = label.uppercase(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Black,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
         }
     }

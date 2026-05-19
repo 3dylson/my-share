@@ -580,6 +580,13 @@ Status after first-review Premium proof implementation pass on 2026-05-19:
 - Tested: full `testDebugUnitTest`.
 - Validated: debug build, debug install on `emulator-5554`, compact `720x1280 / 360dpi` Review proof card, CTA-to-first-review Premium sheet, no app fatal crash in logcat, and emulator restored to `1080x2400 / 420dpi`.
 
+Status after More inline Premium autopilot proof implementation pass on 2026-05-19:
+- Done: The More inline upgrade card now sells `Premium payday autopilot` instead of generic automation, with copy that adapts for users with no reviews, saved reviews, plan values, or missing plan values.
+- Done: Free users now see concrete Premium signals in More: review readiness, current weekly guide, and watched rule count.
+- Done: The free-vs-paid comparison copy was rewritten to focus on manual adjustment versus each review pointing to the next move.
+- Tested: full `testDebugUnitTest`, including localized string parity.
+- Validated: debug build, debug install on `emulator-5554`, compact `720x1280 / 360dpi` More upgrade card top and scrolled states, no app fatal crash in logcat, and emulator restored to `1080x2400 / 420dpi`.
+
 Next:
 - Continue the next Premium product slice while keeping compact-screen validation in every pass.
 - Continue validating compact-screen layouts when new Premium controls are added.
