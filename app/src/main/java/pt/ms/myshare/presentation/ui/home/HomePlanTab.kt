@@ -70,19 +70,12 @@ fun LazyListScope.homePlanTab(
             BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
                 val shouldStack = maxWidth < 360.dp || LocalDensity.current.fontScale >= 1.3f
                 if (shouldStack) {
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        CompactPlanMetric(
-                            label = stringResource(R.string.home_plan_label_income),
-                            value = card.incomeLabel,
-                            icon = Icons.Default.Payments
-                        )
-                        CompactPlanMetric(
-                            label = stringResource(R.string.home_plan_label_weekly),
-                            value = card.weeklySpendLabel,
-                            icon = Icons.Default.AccountBalanceWallet,
-                            accentColor = MySharePositive
-                        )
-                    }
+                    CompactPlanMetricsPanel(
+                        incomeLabel = stringResource(R.string.home_plan_label_income),
+                        incomeValue = card.incomeLabel,
+                        weeklyLabel = stringResource(R.string.home_plan_label_weekly),
+                        weeklyValue = card.weeklySpendLabel
+                    )
                 } else {
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         CompactPlanMetric(
@@ -346,6 +339,90 @@ private fun CompactPaydaySummary(
 }
 
 @Composable
+private fun CompactPlanMetricsPanel(
+    incomeLabel: String,
+    incomeValue: String,
+    weeklyLabel: String,
+    weeklyValue: String,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.24f)),
+        shadowElevation = 1.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            CompactPlanMetricRow(
+                label = incomeLabel,
+                value = incomeValue,
+                icon = Icons.Default.Payments
+            )
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
+            ) {
+                Spacer(modifier = Modifier.height(1.dp))
+            }
+            CompactPlanMetricRow(
+                label = weeklyLabel,
+                value = weeklyValue,
+                icon = Icons.Default.AccountBalanceWallet,
+                accentColor = MySharePositive
+            )
+        }
+    }
+}
+
+@Composable
+private fun CompactPlanMetricRow(
+    label: String,
+    value: String,
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+    accentColor: Color = MySharePrimary
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = 58.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = accentColor.copy(alpha = 0.12f)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = accentColor,
+                modifier = Modifier.padding(8.dp).size(20.dp)
+            )
+        }
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = label.uppercase(),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Black,
+                modifier = Modifier.padding(top = 2.dp)
+            )
+        }
+    }
+}
+
+@Composable
 private fun CompactPlanMetric(
     label: String,
     value: String,
@@ -419,7 +496,10 @@ private fun CompactAllocationGrid(
                 if (shouldStack) {
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         items.forEach { item ->
-                            AllocationGridCell(item = item)
+                            AllocationGridCell(
+                                item = item,
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         }
                     }
                 } else {

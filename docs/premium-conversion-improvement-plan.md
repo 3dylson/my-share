@@ -509,7 +509,20 @@ Status after Smart Adjustments control-center pass on 2026-05-18:
 - Done: `Enable watch` and `Pause watch` control the existing Premium automation state from the card.
 - Validated: focused `HomeViewModelTest` coverage, localization string parity, release build install on `emulator-5554`, normal-screen More card, Review handoff, automation toggle, and compact `720x1280 / 360dpi` layout. The temporary Firestore Premium snapshot used for this UI validation was restored to `FREE`.
 
+Status after Premium scheduled check-in pass on 2026-05-19:
+- Done: Added a domain-level Premium check-in planner that calculates ready, overdue, scheduled, and reviewed states from the user's payday cadence, latest review, reminders, and automation state.
+- Done: Premium users now see a check-in card in Review so the manual form is framed as the next guided payday review instead of a blank input surface.
+- Done: More Smart Adjustments now shows the next check-in state and changes the primary action to `Start check-in` when a payday review is due.
+- Done: Reminder setup is reachable from the Premium check-in card when reminders are off, while recommendations still require explicit review and approval before rules change.
+- Validated: focused Premium check-in and HomeViewModel tests, full `testDebugUnitTest`, release build, normal emulator Review/More check-in surfaces, compact `720x1280 / 360dpi` Review/More layouts, and More-to-Review handoff. The temporary Firestore Premium snapshot used for validation was restored to `FREE`.
+
+Status after Premium advanced-account Strategy pass on 2026-05-19:
+- Done: Premium Strategy now keeps long goal and rule collections scan-friendly by showing the first three items inline and moving the full editable list into dedicated bottom sheets.
+- Done: The compact top bar now keeps Premium as a small icon badge instead of pushing the badge onto a second line on small phones.
+- Done: Compact Plan metrics now render as one aligned metrics panel, so income and weekly guide no longer look like misplaced cards on small screens.
+- Done: New goal/rule copy was softened from technical `stack/archive` language to user-facing labels like `Your goals`, `See every rule`, and `All your goals`.
+- Validated: `testDebugUnitTest`, release build, release install on `emulator-5554`, normal Strategy goal/rule list and bottom sheets, compact `720x1280 / 360dpi` Plan header/metrics, Strategy summaries, and goal/rule bottom sheets. Temporary Firestore Premium multi-goal/rule QA data was restored to its previous state, and the emulator was restored to `1080x2400 / 420dpi`.
+
 Next:
-- Deepen the real Premium value so applied recommendations can become scheduled payday check-ins, not only visible control-center status.
-- Add tighter premium empty states for users with many goals, rules, and reviews so advanced accounts stay scan-friendly.
+- Continue the next Premium product slice while keeping compact-screen validation in every pass.
 - Continue validating compact-screen layouts when new Premium controls are added.

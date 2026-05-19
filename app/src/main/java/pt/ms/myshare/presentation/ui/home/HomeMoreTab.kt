@@ -27,6 +27,7 @@ import pt.ms.myshare.BuildConfig
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
+import pt.ms.myshare.domain.model.PremiumCheckInStatus
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.preferences.currencyLabel
 import pt.ms.myshare.presentation.ui.preferences.languageLabel
@@ -515,6 +516,12 @@ private fun SmartAdjustmentControlCard(
     } else {
         stringResource(R.string.home_more_smart_adjustments_enable)
     }
+    val reviewActionEnabled = smartAdjustment.hasRecommendation || state.premiumCheckIn?.isDue == true
+    val reviewActionLabel = if (state.premiumCheckIn?.isDue == true) {
+        stringResource(R.string.home_more_smart_checkin_start)
+    } else {
+        stringResource(R.string.home_more_smart_adjustments_review)
+    }
 
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -580,6 +587,10 @@ private fun SmartAdjustmentControlCard(
 
             SmartAdjustmentSignalGrid(smartAdjustment = smartAdjustment)
 
+            state.premiumCheckIn?.let { checkIn ->
+                PremiumCheckInCompactSummary(checkIn = checkIn)
+            }
+
             if (smartAdjustment.lastActionMessageKey != null) {
                 SmartAdjustmentLastAction(messageKey = smartAdjustment.lastActionMessageKey)
             }
@@ -589,7 +600,8 @@ private fun SmartAdjustmentControlCard(
                 if (shouldStack) {
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         SmartAdjustmentReviewButton(
-                            enabled = smartAdjustment.hasRecommendation,
+                            label = reviewActionLabel,
+                            enabled = reviewActionEnabled,
                             onClick = onOpenReview,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -611,12 +623,83 @@ private fun SmartAdjustmentControlCard(
                             Text(text = actionLabel, fontWeight = FontWeight.Bold)
                         }
                         SmartAdjustmentReviewButton(
-                            enabled = smartAdjustment.hasRecommendation,
+                            label = reviewActionLabel,
+                            enabled = reviewActionEnabled,
                             onClick = onOpenReview,
                             modifier = Modifier.weight(1f)
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PremiumCheckInCompactSummary(
+    checkIn: PremiumCheckInState,
+    modifier: Modifier = Modifier
+) {
+    val relativeLabel = checkIn.relativeLabel()
+    val title = when (checkIn.status) {
+        PremiumCheckInStatus.READY_NOW -> stringResource(R.string.home_more_smart_checkin_ready)
+        PremiumCheckInStatus.OVERDUE -> stringResource(R.string.home_more_smart_checkin_overdue)
+        PremiumCheckInStatus.SCHEDULED -> stringResource(R.string.home_more_smart_checkin_scheduled)
+        PremiumCheckInStatus.REVIEWED -> stringResource(R.string.home_more_smart_checkin_reviewed)
+    }
+    val body = when (checkIn.status) {
+        PremiumCheckInStatus.READY_NOW -> stringResource(R.string.home_more_smart_checkin_ready_body)
+        PremiumCheckInStatus.OVERDUE -> stringResource(R.string.home_more_smart_checkin_overdue_body, checkIn.checkInDateLabel)
+        PremiumCheckInStatus.SCHEDULED -> stringResource(R.string.home_more_smart_checkin_scheduled_body, checkIn.checkInDateLabel)
+        PremiumCheckInStatus.REVIEWED -> stringResource(R.string.home_more_smart_checkin_reviewed_body, checkIn.checkInDateLabel)
+    }
+
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.72f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f))
+    ) {
+        Row(
+            modifier = Modifier.padding(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Icon(
+                imageVector = if (checkIn.isDue) Icons.Default.PlayCircle else Icons.Default.EventAvailable,
+                contentDescription = null,
+                tint = if (checkIn.isDue) MySharePrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(18.dp)
+            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Black,
+                        modifier = Modifier.weight(1f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    SmartAdjustmentStatusPill(
+                        text = relativeLabel,
+                        isActive = checkIn.isDue
+                    )
+                }
+                Text(
+                    text = body,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 18.sp
+                )
             }
         }
     }
@@ -823,6 +906,7 @@ private fun SmartAdjustmentLastAction(
 
 @Composable
 private fun SmartAdjustmentReviewButton(
+    label: String,
     enabled: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -840,9 +924,22 @@ private fun SmartAdjustmentReviewButton(
         )
         Spacer(Modifier.width(8.dp))
         Text(
-            text = stringResource(R.string.home_more_smart_adjustments_review),
+            text = label,
             fontWeight = FontWeight.Bold
         )
+    }
+}
+
+@Composable
+private fun PremiumCheckInState.relativeLabel(): String {
+    val context = LocalContext.current
+    return remember(relativeLabelKey, relativeLabelArgs) {
+        val resId = context.resources.getIdentifier(relativeLabelKey, "string", context.packageName)
+        if (resId != 0) {
+            context.getString(resId, *relativeLabelArgs.toTypedArray())
+        } else {
+            relativeLabelKey
+        }
     }
 }
 

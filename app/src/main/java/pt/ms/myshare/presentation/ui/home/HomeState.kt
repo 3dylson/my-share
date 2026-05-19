@@ -3,6 +3,7 @@ package pt.ms.myshare.presentation.ui.home
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
+import pt.ms.myshare.domain.model.PremiumCheckInStatus
 import pt.ms.myshare.domain.model.PricingStrategy
 import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.domain.model.ReviewInsight
@@ -57,6 +58,7 @@ data class ReviewCardState(
     val insight: ReviewInsight? = null,
     val coachingInsights: List<ReviewInsightState> = emptyList(),
     val paydayRecommendation: PaydayAdjustmentRecommendationState? = null,
+    val premiumCheckIn: PremiumCheckInState? = null,
     val recommendationMessageKey: String? = null,
     val savedReviewDate: String? = null,
     val error: String? = null
@@ -129,6 +131,7 @@ data class MoreCardState(
     val ruleCount: Int = 0,
     val reviewCount: Int = 0,
     val smartAdjustment: SmartAdjustmentControlState = SmartAdjustmentControlState(),
+    val premiumCheckIn: PremiumCheckInState? = null,
     val error: String? = null
 ) {
     val requiresPremiumAccountProtectionBeforeLogout: Boolean
@@ -148,6 +151,16 @@ data class SmartAdjustmentControlState(
     val confidencePercent: Int = 0,
     val analyzedReviewCount: Int = 0,
     val lastActionMessageKey: String? = null
+)
+
+data class PremiumCheckInState(
+    val status: PremiumCheckInStatus,
+    val checkInDateLabel: String,
+    val relativeLabelKey: String,
+    val relativeLabelArgs: List<String> = emptyList(),
+    val reminderEnabled: Boolean,
+    val automationEnabled: Boolean,
+    val isDue: Boolean
 )
 
 data class ReviewHistoryItemState(

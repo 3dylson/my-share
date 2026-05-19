@@ -168,6 +168,8 @@ fun HomeScreen(
     var showLanguagePicker by remember { mutableStateOf(false) }
     var showCurrencyPicker by remember { mutableStateOf(false) }
     var showReviewHistoryTimeline by remember { mutableStateOf(false) }
+    var showStrategyGoalArchive by remember { mutableStateOf(false) }
+    var showStrategyRuleArchive by remember { mutableStateOf(false) }
     var recommendationPendingApply by remember { mutableStateOf<PaydayAdjustmentRecommendationState?>(null) }
     var showRecommendationAppliedSheet by remember { mutableStateOf(false) }
     var reviewBeingEdited by remember { mutableStateOf<ReviewHistoryItemState?>(null) }
@@ -274,6 +276,28 @@ fun HomeScreen(
             onDeleteReview = { review ->
                 showReviewHistoryTimeline = false
                 reviewPendingDelete = review
+            }
+        )
+    }
+
+    if (showStrategyGoalArchive) {
+        StrategyGoalArchiveBottomSheet(
+            goals = state.goals,
+            onDismissRequest = { showStrategyGoalArchive = false },
+            onEditGoal = { goalId ->
+                showStrategyGoalArchive = false
+                onEditGoal(goalId)
+            }
+        )
+    }
+
+    if (showStrategyRuleArchive) {
+        StrategyRuleArchiveBottomSheet(
+            rules = state.rules,
+            onDismissRequest = { showStrategyRuleArchive = false },
+            onEditRule = { ruleId ->
+                showStrategyRuleArchive = false
+                onEditRule(ruleId)
             }
         )
     }
@@ -495,38 +519,19 @@ fun HomeScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp, vertical = 10.dp)
                 ) {
-                    val shouldStackHeader = maxWidth < 360.dp || LocalDensity.current.fontScale >= 1.3f
-                    val premiumBadge: @Composable (() -> Unit) = {
-                        if (state.moreCard.isPremium) {
-                            AssistChip(
-                                onClick = {},
-                                enabled = false,
-                                label = { Text(text = stringResource(R.string.premium_badge), maxLines = 1) },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.WorkspacePremium,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                }
-                            )
-                        }
-                    }
-                    if (shouldStackHeader) {
-                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                            HomeTopBarTitle(selectedDestination = state.selectedDestination)
-                            premiumBadge()
-                        }
-                    } else {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            HomeTopBarTitle(
-                                selectedDestination = state.selectedDestination,
-                                modifier = Modifier.weight(1f)
-                            )
-                            premiumBadge()
-                        }
+                    val useCompactPremiumBadge = maxWidth < 360.dp || LocalDensity.current.fontScale >= 1.3f
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        HomeTopBarTitle(
+                            selectedDestination = state.selectedDestination,
+                            modifier = Modifier.weight(1f)
+                        )
+                        HomePremiumStatusBadge(
+                            isPremium = state.moreCard.isPremium,
+                            compact = useCompactPremiumBadge
+                        )
                     }
                 }
             }
@@ -626,6 +631,14 @@ fun HomeScreen(
                             onEditGoal = onEditGoal,
                             onAddNewRule = onAddNewRule,
                             onEditRule = onEditRule,
+                            onOpenGoalArchive = {
+                                Timber.tag("HomeScreen").d("Strategy goal archive opened")
+                                showStrategyGoalArchive = true
+                            },
+                            onOpenRuleArchive = {
+                                Timber.tag("HomeScreen").d("Strategy rule archive opened")
+                                showStrategyRuleArchive = true
+                            },
                             onShowPaywall = { gate ->
                                 openPremiumGate(gate)
                             }
@@ -655,6 +668,10 @@ fun HomeScreen(
                             },
                             onDeleteReview = { review ->
                                 reviewPendingDelete = review
+                            },
+                            onConfigureReminder = {
+                                Timber.tag("HomeScreen").d("Reminder settings opened from Premium check-in")
+                                showReminderSettingsDialog = true
                             },
                             onApplyPaydayRecommendation = {
                                 state.reviewCard.paydayRecommendation?.let { recommendation ->
@@ -734,6 +751,47 @@ private fun HomeTopBarTitle(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = FontWeight.SemiBold,
             maxLines = 2
+        )
+    }
+}
+
+@Composable
+private fun HomePremiumStatusBadge(
+    isPremium: Boolean,
+    compact: Boolean,
+    modifier: Modifier = Modifier
+) {
+    if (!isPremium) return
+
+    if (compact) {
+        Surface(
+            modifier = modifier.size(42.dp),
+            shape = MaterialTheme.shapes.medium,
+            color = MySharePrimary.copy(alpha = 0.12f),
+            border = androidx.compose.foundation.BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.3f))
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    imageVector = Icons.Default.WorkspacePremium,
+                    contentDescription = stringResource(R.string.premium_badge),
+                    tint = MySharePrimary,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+    } else {
+        AssistChip(
+            modifier = modifier,
+            onClick = {},
+            enabled = false,
+            label = { Text(text = stringResource(R.string.premium_badge), maxLines = 1) },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.WorkspacePremium,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
         )
     }
 }

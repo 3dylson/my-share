@@ -17,6 +17,8 @@ import pt.ms.myshare.domain.model.BillingPurchaseEvent
 import pt.ms.myshare.domain.model.PaydayRule
 import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendation
 import pt.ms.myshare.domain.model.ManualReview
+import pt.ms.myshare.domain.model.PremiumCheckInPlan
+import pt.ms.myshare.domain.model.PremiumCheckInStatus
 import pt.ms.myshare.domain.model.ReviewInsight
 import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
@@ -32,6 +34,7 @@ import pt.ms.myshare.domain.repository.UserPreferencesRepository
 import pt.ms.myshare.domain.use_case.AdjustGoalProgressForReviewCorrectionUseCase
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.CreatePaydayAdjustmentRecommendationUseCase
+import pt.ms.myshare.domain.use_case.CreatePremiumCheckInPlanUseCase
 import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
 import pt.ms.myshare.domain.use_case.EnforcePremiumDowngradeUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
@@ -50,7 +53,9 @@ import pt.ms.myshare.utils.logs.FirebaseUtils
 import timber.log.Timber
 import java.math.BigDecimal
 import java.text.NumberFormat
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.Locale
 import javax.inject.Inject
 
@@ -62,6 +67,7 @@ class HomeViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     private val calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase,
     private val createPaydayAdjustmentRecommendationUseCase: CreatePaydayAdjustmentRecommendationUseCase,
+    private val createPremiumCheckInPlanUseCase: CreatePremiumCheckInPlanUseCase,
     private val createReviewInsightUseCase: CreateReviewInsightUseCase,
     private val enforcePremiumDowngradeUseCase: EnforcePremiumDowngradeUseCase,
     private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase,
@@ -262,6 +268,14 @@ class HomeViewModel @Inject constructor(
                     createPaydayAdjustmentRecommendationUseCase.execute(it, planner.reviewHistory)
                 }
                 currentPaydayRecommendation = paydayRecommendation
+                val premiumCheckIn = updatedPlan?.let {
+                    createPremiumCheckInPlanUseCase.execute(
+                        plan = it,
+                        latestReview = latestReview,
+                        reminderConfiguration = reminder,
+                        automationEnabled = automation && isPremium
+                    ).toState(preferences)
+                }
 
                 val emptyMessage = if (updatedPlan == null) "home_empty_build_plan_first" else null
                 val primaryGoal = goals.firstOrNull()
@@ -359,6 +373,7 @@ class HomeViewModel @Inject constructor(
                         hasPlan = updatedPlan != null,
                         messageKey = recommendationMessageKey
                     ),
+                    premiumCheckIn = premiumCheckIn.takeIf { isPremium },
                     error = currentMore.error.takeUnless { shouldClearUnavailableMessage }
                 )
                 HomeState(
@@ -371,6 +386,7 @@ class HomeViewModel @Inject constructor(
                     reviewCard = reviewCard.copy(
                         coachingInsights = coachingInsights,
                         paydayRecommendation = paydayRecommendationState,
+                        premiumCheckIn = premiumCheckIn.takeIf { isPremium },
                         recommendationMessageKey = recommendationMessageKey
                     ),
                     reviewHistory = planner.reviewHistory.asReversed().map { it.toState() },
@@ -1079,6 +1095,32 @@ class HomeViewModel @Inject constructor(
             supportingText = supportingText,
             type = type,
             actionLabel = actionLabel
+        )
+    }
+
+    private fun PremiumCheckInPlan.toState(preferences: UserPreferences): PremiumCheckInState {
+        val today = LocalDate.now()
+        val dateFormatter = DateTimeFormatter.ofPattern("d MMM", preferences.locale)
+        val daysUntil = ChronoUnit.DAYS.between(today, checkInDate)
+        val relative = when {
+            status == PremiumCheckInStatus.READY_NOW -> "home_premium_checkin_relative_today" to emptyList()
+            status == PremiumCheckInStatus.OVERDUE -> {
+                val daysLate = daysUntil.unaryMinus().coerceAtLeast(1)
+                "home_premium_checkin_relative_overdue" to listOf(daysLate.toString())
+            }
+            daysUntil == 1L -> "home_premium_checkin_relative_tomorrow" to emptyList()
+            daysUntil > 1L -> "home_premium_checkin_relative_in_days" to listOf(daysUntil.toString())
+            else -> "home_premium_checkin_relative_today" to emptyList()
+        }
+
+        return PremiumCheckInState(
+            status = status,
+            checkInDateLabel = checkInDate.format(dateFormatter),
+            relativeLabelKey = relative.first,
+            relativeLabelArgs = relative.second,
+            reminderEnabled = reminderEnabled,
+            automationEnabled = automationEnabled,
+            isDue = isDue
         )
     }
 

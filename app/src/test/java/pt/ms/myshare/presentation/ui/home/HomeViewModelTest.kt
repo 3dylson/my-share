@@ -27,6 +27,7 @@ import pt.ms.myshare.domain.model.PaydayRule
 import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
 import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.domain.model.PlanningFocus
+import pt.ms.myshare.domain.model.PremiumCheckInStatus
 import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
 import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.domain.model.ReminderConfiguration
@@ -36,6 +37,7 @@ import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.CreatePaydayAdjustmentRecommendationUseCase
+import pt.ms.myshare.domain.use_case.CreatePremiumCheckInPlanUseCase
 import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
 import pt.ms.myshare.domain.use_case.EnforcePremiumDowngradeUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
@@ -96,6 +98,7 @@ class HomeViewModelTest {
                 calculatePlanPreviewUseCase,
                 ResolveAllocationStrategyRulesUseCase()
             ),
+            createPremiumCheckInPlanUseCase = CreatePremiumCheckInPlanUseCase(),
             createReviewInsightUseCase = CreateReviewInsightUseCase(calculatePlanPreviewUseCase),
             enforcePremiumDowngradeUseCase = EnforcePremiumDowngradeUseCase(fakePlannerRepository),
             resolvePricingStrategyUseCase = ResolvePricingStrategyUseCase(),
@@ -481,6 +484,32 @@ class HomeViewModelTest {
         assertTrue(smartAdjustment.recommendedPriorityContributionLabel.isNotBlank())
         assertEquals(62, smartAdjustment.confidencePercent)
         assertEquals(1, smartAdjustment.analyzedReviewCount)
+    }
+
+    @Test
+    fun `premium user sees due check in on payday`() = runTest {
+        val today = LocalDate.now()
+        val currentPlan = SalaryPlan(
+            focus = PlanningFocus.SAVE_WITHOUT_STRESS,
+            netIncomePerPayday = BigDecimal("1000"),
+            monthlyFixedCosts = BigDecimal("400"),
+            payFrequency = PayFrequency.BIWEEKLY,
+            nextBiweeklyPayday = today,
+            preset = AllocationPreset.BALANCED,
+            createdAt = today.minusMonths(1)
+        )
+        fakeEntitlementRepository.setPro(true)
+        fakePlannerRepository.saveAutomationEnabled(true)
+        fakePlannerRepository.savePlan(currentPlan)
+        advanceUntilIdle()
+
+        val reviewCheckIn = viewModel.state.value.reviewCard.premiumCheckIn
+        val moreCheckIn = viewModel.state.value.moreCard.premiumCheckIn
+
+        assertEquals(PremiumCheckInStatus.READY_NOW, reviewCheckIn?.status)
+        assertEquals(PremiumCheckInStatus.READY_NOW, moreCheckIn?.status)
+        assertTrue(reviewCheckIn?.isDue == true)
+        assertTrue(moreCheckIn?.automationEnabled == true)
     }
 
     @Test

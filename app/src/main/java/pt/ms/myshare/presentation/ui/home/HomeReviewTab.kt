@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
+import pt.ms.myshare.domain.model.PremiumCheckInStatus
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.theme.*
 import java.math.BigDecimal
@@ -54,10 +55,22 @@ fun LazyListScope.homeReviewTab(
     onOpenFullHistory: () -> Unit,
     onEditReview: (ReviewHistoryItemState) -> Unit,
     onDeleteReview: (ReviewHistoryItemState) -> Unit,
+    onConfigureReminder: () -> Unit,
     onApplyPaydayRecommendation: () -> Unit
 ) {
     val coachingInsights = state.coachingInsights
     val paydayRecommendation = state.paydayRecommendation
+    val premiumCheckIn = state.premiumCheckIn
+
+    if (isPremium && premiumCheckIn != null) {
+        item {
+            PremiumCheckInReviewCard(
+                checkIn = premiumCheckIn,
+                onConfigureReminder = onConfigureReminder
+            )
+            Spacer(Modifier.height(16.dp))
+        }
+    }
     
     if (history.isNotEmpty()) {
         item {
@@ -277,6 +290,220 @@ fun LazyListScope.homeReviewTab(
                 )
                 Spacer(Modifier.height(8.dp))
             }
+        }
+    }
+}
+
+@Composable
+private fun PremiumCheckInReviewCard(
+    checkIn: PremiumCheckInState,
+    onConfigureReminder: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val relativeLabel = checkIn.relativeLabel()
+    val title = when (checkIn.status) {
+        PremiumCheckInStatus.READY_NOW -> stringResource(R.string.home_review_checkin_title_ready)
+        PremiumCheckInStatus.OVERDUE -> stringResource(R.string.home_review_checkin_title_overdue)
+        PremiumCheckInStatus.SCHEDULED -> stringResource(R.string.home_review_checkin_title_scheduled)
+        PremiumCheckInStatus.REVIEWED -> stringResource(R.string.home_review_checkin_title_reviewed)
+    }
+    val body = when (checkIn.status) {
+        PremiumCheckInStatus.READY_NOW -> stringResource(R.string.home_review_checkin_body_ready)
+        PremiumCheckInStatus.OVERDUE -> stringResource(R.string.home_review_checkin_body_overdue, checkIn.checkInDateLabel)
+        PremiumCheckInStatus.SCHEDULED -> stringResource(R.string.home_review_checkin_body_scheduled, checkIn.checkInDateLabel)
+        PremiumCheckInStatus.REVIEWED -> stringResource(R.string.home_review_checkin_body_reviewed, checkIn.checkInDateLabel)
+    }
+
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.18f),
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.22f)),
+        shadowElevation = 1.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MySharePrimary.copy(alpha = 0.13f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.EventAvailable,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.padding(9.dp).size(20.dp)
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_review_checkin_label).uppercase(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MySharePrimary,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = body,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 340.dp || LocalDensity.current.fontScale >= 1.25f
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        PremiumCheckInStatusPill(
+                            label = relativeLabel,
+                            isDue = checkIn.isDue,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        PremiumCheckInReminderAction(
+                            reminderEnabled = checkIn.reminderEnabled,
+                            onConfigureReminder = onConfigureReminder,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                } else {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        PremiumCheckInStatusPill(
+                            label = relativeLabel,
+                            isDue = checkIn.isDue,
+                            modifier = Modifier.weight(1f)
+                        )
+                        PremiumCheckInReminderAction(
+                            reminderEnabled = checkIn.reminderEnabled,
+                            onConfigureReminder = onConfigureReminder,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PremiumCheckInReminderAction(
+    reminderEnabled: Boolean,
+    onConfigureReminder: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    if (reminderEnabled) {
+        Surface(
+            modifier = modifier.heightIn(min = 42.dp),
+            shape = RoundedCornerShape(999.dp),
+            color = MySharePositive.copy(alpha = 0.12f),
+            border = BorderStroke(1.dp, MySharePositive.copy(alpha = 0.24f))
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 9.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.NotificationsActive,
+                    contentDescription = null,
+                    tint = MySharePositive,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(Modifier.width(6.dp))
+                Text(
+                    text = stringResource(R.string.home_review_checkin_reminder_on),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MySharePositive,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    } else {
+        OutlinedButton(
+            onClick = onConfigureReminder,
+            modifier = modifier.heightIn(min = 42.dp),
+            shape = RoundedCornerShape(999.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Notifications,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(Modifier.width(6.dp))
+            Text(
+                text = stringResource(R.string.home_review_checkin_set_reminder),
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+private fun PremiumCheckInStatusPill(
+    label: String,
+    isDue: Boolean,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.heightIn(min = 42.dp),
+        shape = RoundedCornerShape(999.dp),
+        color = if (isDue) MySharePrimary.copy(alpha = 0.14f) else MaterialTheme.colorScheme.surface.copy(alpha = 0.72f),
+        border = BorderStroke(1.dp, if (isDue) MySharePrimary.copy(alpha = 0.28f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.18f))
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 9.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = if (isDue) Icons.Default.PlayCircle else Icons.Default.Schedule,
+                contentDescription = null,
+                tint = if (isDue) MySharePrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(Modifier.width(6.dp))
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = if (isDue) MySharePrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+private fun PremiumCheckInState.relativeLabel(): String {
+    val context = LocalContext.current
+    return remember(relativeLabelKey, relativeLabelArgs) {
+        val resId = context.resources.getIdentifier(relativeLabelKey, "string", context.packageName)
+        if (resId != 0) {
+            context.getString(resId, *relativeLabelArgs.toTypedArray())
+        } else {
+            relativeLabelKey
         }
     }
 }

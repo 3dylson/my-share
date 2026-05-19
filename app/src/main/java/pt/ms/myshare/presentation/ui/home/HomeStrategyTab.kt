@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,8 +18,14 @@ import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.SettingsSuggest
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +55,8 @@ fun LazyListScope.homeStrategyTab(
     onEditGoal: (String) -> Unit,
     onAddNewRule: () -> Unit,
     onEditRule: (String) -> Unit,
+    onOpenGoalArchive: () -> Unit,
+    onOpenRuleArchive: () -> Unit,
     onShowPaywall: (HomePremiumGate) -> Unit
 ) {
     if (goals.isEmpty() && rules.isEmpty()) {
@@ -77,8 +86,31 @@ fun LazyListScope.homeStrategyTab(
             )
         }
     } else {
-        val visibleGoals = if (isPremium) goals else goals.take(1)
+        val visibleGoals = goals.take(
+            StrategyCollectionLayoutPolicy.visibleCount(
+                totalCount = goals.size,
+                isPremium = isPremium
+            )
+        )
         if (isPremium) {
+            if (goals.size > 1) {
+                item {
+                    StrategyCollectionSummaryCard(
+                        title = stringResource(R.string.home_strategy_goal_stack_title),
+                        body = stringResource(
+                            R.string.home_strategy_goal_stack_body,
+                            goals.size,
+                            visibleGoals.size
+                        ),
+                        metricLabel = stringResource(R.string.home_strategy_goal_stack_metric),
+                        metricValue = goals.size.toString(),
+                        action = stringResource(R.string.home_strategy_goal_stack_action),
+                        icon = Icons.Default.Flag,
+                        onClick = onOpenGoalArchive
+                    )
+                    Spacer(Modifier.height(16.dp))
+                }
+            }
             item {
                 PremiumBenefitCard(
                     title = stringResource(R.string.home_strategy_goal_add_title),
@@ -144,6 +176,20 @@ fun LazyListScope.homeStrategyTab(
                 Spacer(Modifier.height(16.dp))
             }
         }
+        if (StrategyCollectionLayoutPolicy.shouldShowPremiumArchive(goals.size, isPremium)) {
+            item {
+                StrategyArchivePreviewCard(
+                    title = hiddenGoalArchiveTitle(
+                        hiddenCount = StrategyCollectionLayoutPolicy.hiddenCount(goals.size, isPremium)
+                    ),
+                    body = stringResource(R.string.home_strategy_goal_archive_body),
+                    action = stringResource(R.string.home_strategy_goal_stack_action),
+                    icon = Icons.Default.Flag,
+                    onClick = onOpenGoalArchive
+                )
+                Spacer(Modifier.height(16.dp))
+            }
+        }
         item {
             if (isPremium) {
                 Spacer(Modifier.height(16.dp))
@@ -188,8 +234,31 @@ fun LazyListScope.homeStrategyTab(
             )
         }
     } else {
-        val visibleRules = if (isPremium) rules else rules.take(1)
+        val visibleRules = rules.take(
+            StrategyCollectionLayoutPolicy.visibleCount(
+                totalCount = rules.size,
+                isPremium = isPremium
+            )
+        )
         if (isPremium) {
+            if (rules.size > 1) {
+                item {
+                    StrategyCollectionSummaryCard(
+                        title = stringResource(R.string.home_strategy_rule_stack_title),
+                        body = stringResource(
+                            R.string.home_strategy_rule_stack_body,
+                            rules.size,
+                            visibleRules.size
+                        ),
+                        metricLabel = stringResource(R.string.home_strategy_rule_stack_metric),
+                        metricValue = rules.size.toString(),
+                        action = stringResource(R.string.home_strategy_rule_stack_action),
+                        icon = Icons.Default.SettingsSuggest,
+                        onClick = onOpenRuleArchive
+                    )
+                    Spacer(Modifier.height(16.dp))
+                }
+            }
             item {
                 PremiumBenefitCard(
                     title = stringResource(R.string.home_strategy_rule_add_title),
@@ -248,6 +317,20 @@ fun LazyListScope.homeStrategyTab(
                 Spacer(Modifier.height(16.dp))
             }
         }
+        if (StrategyCollectionLayoutPolicy.shouldShowPremiumArchive(rules.size, isPremium)) {
+            item {
+                StrategyArchivePreviewCard(
+                    title = hiddenRuleArchiveTitle(
+                        hiddenCount = StrategyCollectionLayoutPolicy.hiddenCount(rules.size, isPremium)
+                    ),
+                    body = stringResource(R.string.home_strategy_rule_archive_body),
+                    action = stringResource(R.string.home_strategy_rule_stack_action),
+                    icon = Icons.Default.SettingsSuggest,
+                    onClick = onOpenRuleArchive
+                )
+                Spacer(Modifier.height(16.dp))
+            }
+        }
         item {
             if (isPremium) {
                 Spacer(Modifier.height(16.dp))
@@ -269,6 +352,589 @@ fun LazyListScope.homeStrategyTab(
                     premiumBody = stringResource(R.string.home_strategy_rule_preview_premium_body),
                     action = stringResource(R.string.home_strategy_rule_preview_action),
                     onClick = { onShowPaywall(HomePremiumGate.MultipleRules) }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun StrategyGoalArchiveBottomSheet(
+    goals: List<GoalCardState>,
+    onDismissRequest: () -> Unit,
+    onEditGoal: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+) {
+    val context = LocalContext.current
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.surface,
+        dragHandle = { BottomSheetDefaults.DragHandle() }
+    ) {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.94f)
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            StrategyArchiveSheetHeader(
+                title = stringResource(R.string.home_strategy_goal_sheet_title),
+                body = stringResource(R.string.home_strategy_goal_sheet_body, goals.size),
+                icon = Icons.Default.Flag
+            )
+
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(bottom = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(
+                    items = goals,
+                    key = { goal -> "goal-archive-${goal.id}" }
+                ) { goal ->
+                    StrategyGoalArchiveRow(
+                        goal = goal,
+                        goalName = localizedText(context, goal.goalNameKey, goal.goalName),
+                        progressLabel = localizedFormattedText(
+                            context = context,
+                            key = goal.progressLabelKey,
+                            args = goal.progressLabelArgs,
+                            fallback = goal.progressLabel
+                        ),
+                        targetDateLabel = localizedFormattedText(
+                            context = context,
+                            key = goal.targetDateKey,
+                            args = goal.targetDateArgs,
+                            fallback = goal.targetDateLabel
+                        ),
+                        onClick = {
+                            onDismissRequest()
+                            onEditGoal(goal.id)
+                        }
+                    )
+                }
+            }
+
+            TextButton(
+                onClick = onDismissRequest,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.home_strategy_archive_sheet_close),
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun StrategyRuleArchiveBottomSheet(
+    rules: List<RuleCardState>,
+    onDismissRequest: () -> Unit,
+    onEditRule: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+) {
+    val context = LocalContext.current
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.surface,
+        dragHandle = { BottomSheetDefaults.DragHandle() }
+    ) {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.94f)
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            StrategyArchiveSheetHeader(
+                title = stringResource(R.string.home_strategy_rule_sheet_title),
+                body = stringResource(R.string.home_strategy_rule_sheet_body, rules.size),
+                icon = Icons.Default.SettingsSuggest
+            )
+
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(bottom = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(
+                    items = rules,
+                    key = { rule -> "rule-archive-${rule.id}" }
+                ) { rule ->
+                    val typeLabel = localizedText(context, rule.typeLabelKey, rule.typeLabel)
+                    StrategyRuleArchiveRow(
+                        rule = rule,
+                        ruleName = localizedText(context, rule.nameKey, rule.name),
+                        typeLabel = if (rule.name.equals(rule.typeLabel, ignoreCase = true)) {
+                            context.getString(R.string.home_strategy_rule_card_subtitle)
+                        } else {
+                            typeLabel
+                        },
+                        onClick = {
+                            onDismissRequest()
+                            onEditRule(rule.id)
+                        }
+                    )
+                }
+            }
+
+            TextButton(
+                onClick = onDismissRequest,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.home_strategy_archive_sheet_close),
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun StrategyArchiveSheetHeader(
+    title: String,
+    body: String,
+    icon: ImageVector,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Surface(
+            shape = RoundedCornerShape(14.dp),
+            color = MySharePrimary.copy(alpha = 0.12f)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MySharePrimary,
+                modifier = Modifier.padding(10.dp).size(22.dp)
+            )
+        }
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Black
+            )
+            Text(
+                text = body,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun StrategyGoalArchiveRow(
+    goal: GoalCardState,
+    goalName: String,
+    progressLabel: String,
+    targetDateLabel: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.36f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f))
+    ) {
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            val useCompactRow = maxWidth < 360.dp || LocalDensity.current.fontScale >= 1.25f
+            if (useCompactRow) {
+                Column(
+                    modifier = Modifier.padding(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        StrategyArchiveRowIcon(
+                            icon = Icons.Default.Flag,
+                            compact = true
+                        )
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(1.dp)
+                        ) {
+                            Text(
+                                text = goalName,
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.Black,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                text = goal.goalAmountLabel,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontWeight = FontWeight.SemiBold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                        Text(
+                            text = NumberFormat.getPercentInstance(Locale.getDefault()).format(goal.progress),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MySharePrimary,
+                            fontWeight = FontWeight.Black
+                        )
+                    }
+                    Text(
+                        text = "$progressLabel / $targetDateLabel",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            } else {
+                Row(
+                    modifier = Modifier.padding(14.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    StrategyArchiveRowIcon(icon = Icons.Default.Flag)
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(3.dp)
+                    ) {
+                        Text(
+                            text = goalName,
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontWeight = FontWeight.Black,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = goal.goalAmountLabel,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            text = "$progressLabel / $targetDateLabel",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    Text(
+                        text = NumberFormat.getPercentInstance(Locale.getDefault()).format(goal.progress),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MySharePrimary,
+                        fontWeight = FontWeight.Black
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StrategyArchiveRowIcon(
+    icon: ImageVector,
+    compact: Boolean = false,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(12.dp),
+        color = MySharePrimary.copy(alpha = 0.1f)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MySharePrimary,
+            modifier = Modifier
+                .padding(if (compact) 7.dp else 9.dp)
+                .size(if (compact) 18.dp else 20.dp)
+        )
+    }
+}
+
+@Composable
+private fun StrategyRuleArchiveRow(
+    rule: RuleCardState,
+    ruleName: String,
+    typeLabel: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.36f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f))
+    ) {
+        Row(
+            modifier = Modifier.padding(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            StrategyArchiveRowIcon(icon = Icons.Default.SettingsSuggest)
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(3.dp)
+            ) {
+                Text(
+                    text = ruleName,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Black,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = typeLabel,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Text(
+                text = rule.amountLabel,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Black,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+private fun StrategyCollectionSummaryCard(
+    title: String,
+    body: String,
+    metricLabel: String,
+    metricValue: String,
+    action: String,
+    icon: ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.16f),
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.18f))
+    ) {
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            val shouldStack = maxWidth < 340.dp || LocalDensity.current.fontScale >= 1.25f
+            if (shouldStack) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    StrategyCollectionSummaryHeader(
+                        title = title,
+                        body = body,
+                        icon = icon
+                    )
+                    StrategyCollectionSummaryMetric(
+                        label = metricLabel,
+                        value = metricValue,
+                        action = action,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            } else {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    StrategyCollectionSummaryHeader(
+                        title = title,
+                        body = body,
+                        icon = icon,
+                        modifier = Modifier.weight(1f)
+                    )
+                    StrategyCollectionSummaryMetric(
+                        label = metricLabel,
+                        value = metricValue,
+                        action = action,
+                        modifier = Modifier.widthIn(min = 132.dp, max = 172.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StrategyCollectionSummaryHeader(
+    title: String,
+    body: String,
+    icon: ImageVector,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = MySharePrimary.copy(alpha = 0.12f)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MySharePrimary,
+                modifier = Modifier.padding(9.dp).size(20.dp)
+            )
+        }
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Black,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = body,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun StrategyCollectionSummaryMetric(
+    label: String,
+    value: String,
+    action: String,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.72f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f))
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            Text(
+                text = label.uppercase(),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Black
+            )
+            Text(
+                text = action,
+                style = MaterialTheme.typography.labelMedium,
+                color = MySharePrimary,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+private fun StrategyArchivePreviewCard(
+    title: String,
+    body: String,
+    action: String,
+    icon: ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(18.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.18f))
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = MySharePrimary.copy(alpha = 0.1f)
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MySharePrimary,
+                    modifier = Modifier.padding(9.dp).size(20.dp)
+                )
+            }
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Black
+                )
+                Text(
+                    text = body,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = action,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MySharePrimary,
+                    fontWeight = FontWeight.Bold
                 )
             }
         }
@@ -688,6 +1354,35 @@ private fun localizedText(
     if (key == null) return fallback
     val resId = context.resources.getIdentifier(key, "string", context.packageName)
     return if (resId != 0) context.getString(resId) else fallback
+}
+
+private fun localizedFormattedText(
+    context: android.content.Context,
+    key: String?,
+    args: List<String>,
+    fallback: String
+): String {
+    if (key == null) return fallback
+    val resId = context.resources.getIdentifier(key, "string", context.packageName)
+    return if (resId != 0) context.getString(resId, *args.toTypedArray()) else fallback
+}
+
+@Composable
+private fun hiddenGoalArchiveTitle(hiddenCount: Int): String {
+    return if (hiddenCount == 1) {
+        stringResource(R.string.home_strategy_goal_archive_title_single)
+    } else {
+        stringResource(R.string.home_strategy_goal_archive_title, hiddenCount)
+    }
+}
+
+@Composable
+private fun hiddenRuleArchiveTitle(hiddenCount: Int): String {
+    return if (hiddenCount == 1) {
+        stringResource(R.string.home_strategy_rule_archive_title_single)
+    } else {
+        stringResource(R.string.home_strategy_rule_archive_title, hiddenCount)
+    }
 }
 
 @Composable
