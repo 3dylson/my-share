@@ -19,6 +19,7 @@ import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendation
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.PremiumCheckInPlan
 import pt.ms.myshare.domain.model.PremiumCheckInStatus
+import pt.ms.myshare.domain.model.PremiumGoalPaydaySplit
 import pt.ms.myshare.domain.model.ReviewInsight
 import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
@@ -35,6 +36,7 @@ import pt.ms.myshare.domain.use_case.AdjustGoalProgressForReviewCorrectionUseCas
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.CreatePaydayAdjustmentRecommendationUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumCheckInPlanUseCase
+import pt.ms.myshare.domain.use_case.CreatePremiumGoalPaydaySplitUseCase
 import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
 import pt.ms.myshare.domain.use_case.EnforcePremiumDowngradeUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
@@ -68,6 +70,7 @@ class HomeViewModel @Inject constructor(
     private val calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase,
     private val createPaydayAdjustmentRecommendationUseCase: CreatePaydayAdjustmentRecommendationUseCase,
     private val createPremiumCheckInPlanUseCase: CreatePremiumCheckInPlanUseCase,
+    private val createPremiumGoalPaydaySplitUseCase: CreatePremiumGoalPaydaySplitUseCase,
     private val createReviewInsightUseCase: CreateReviewInsightUseCase,
     private val enforcePremiumDowngradeUseCase: EnforcePremiumDowngradeUseCase,
     private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase,
@@ -280,6 +283,22 @@ class HomeViewModel @Inject constructor(
                 val emptyMessage = if (updatedPlan == null) "home_empty_build_plan_first" else null
                 val primaryGoal = goals.firstOrNull()
                 val planCard = updatedPlan?.let { buildPlanCard(it, primaryGoal?.targetAmount ?: BigDecimal.ZERO, preferences) }
+                val goalPaydaySplit = if (isPremium && updatedPlan != null) {
+                    val priorityPreview = calculatePlanPreviewUseCase.execute(updatedPlan, BigDecimal.ZERO)
+                    createPremiumGoalPaydaySplitUseCase
+                        .execute(goals, priorityPreview.priorityContributionPerPayday)
+                        ?.toState(goals, preferences)
+                } else {
+                    null
+                }
+                goalPaydaySplit?.let {
+                    Timber.tag(TAG).d(
+                        "Premium goal payday split ready. goalCount=%d visible=%d hidden=%d",
+                        it.goalCount,
+                        it.visibleItems.size,
+                        it.hiddenGoalCount
+                    )
+                }
                 val goalCards = goals.mapIndexed { index, goal ->
                     buildGoalCard(goal, updatedPlan, preferences).copy(
                         isLockedByEntitlement = !isPremium && index > 0
@@ -380,6 +399,7 @@ class HomeViewModel @Inject constructor(
                     selectedDestination = currentState.selectedDestination,
                     plan = updatedPlan,
                     planCard = planCard,
+                    goalPaydaySplit = goalPaydaySplit,
                     goals = goalCards,
                     rules = ruleCards,
                     performanceStats = performanceStats,
@@ -1124,6 +1144,31 @@ class HomeViewModel @Inject constructor(
         )
     }
 
+    private fun PremiumGoalPaydaySplit.toState(
+        goals: List<Goal>,
+        preferences: UserPreferences
+    ): GoalPaydaySplitCardState {
+        val currencyFormat = currencyFormat(preferences)
+        val goalsById = goals.associateBy { it.id }
+        val visibleItems = items.take(SPLIT_VISIBLE_GOAL_COUNT).mapNotNull { item ->
+            val goal = goalsById[item.goalId] ?: return@mapNotNull null
+            GoalPaydaySplitItemState(
+                goalId = goal.id,
+                goalName = goal.name,
+                goalNameKey = goal.defaultNameKey,
+                amountLabel = currencyFormat.format(item.amount),
+                shareLabel = LocalizedAmountFormatter.formatPercentage(item.sharePercent, preferences.locale)
+            )
+        }
+
+        return GoalPaydaySplitCardState(
+            totalMoveLabel = currencyFormat.format(totalMove),
+            goalCount = items.size,
+            visibleItems = visibleItems,
+            hiddenGoalCount = (items.size - visibleItems.size).coerceAtLeast(0)
+        )
+    }
+
     private fun PaydayAdjustmentRecommendation.toState(preferences: UserPreferences): PaydayAdjustmentRecommendationState {
         val currencyFormat = currencyFormat(preferences)
         return PaydayAdjustmentRecommendationState(
@@ -1209,6 +1254,7 @@ class HomeViewModel @Inject constructor(
 
     private companion object {
         const val TAG = "HomeViewModel"
+        const val SPLIT_VISIBLE_GOAL_COUNT = 3
     }
     }
 

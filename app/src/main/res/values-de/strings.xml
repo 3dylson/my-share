@@ -333,6 +333,11 @@
     <string name="home_strategy_goal_empty_desc">Definieren Sie, wofür Sie sparen.</string>
     <string name="home_strategy_goal_add_title">Fügen Sie ein weiteres Ziel hinzu</string>
     <string name="home_strategy_goal_add_desc">Schaffen Sie einen weiteren finanziellen Meilenstein.</string>
+    <string name="home_strategy_goal_split_title">Aufteilung am nächsten Zahltag</string>
+    <string name="home_strategy_goal_split_body">Dein nächster Prioritätsschritt von %1$s kann %2$d Ziele voranbringen.</string>
+    <string name="home_strategy_goal_split_total_label">Gesamtschritt</string>
+    <string name="home_strategy_goal_split_hidden_single">1 weiteres Ziel enthalten</string>
+    <string name="home_strategy_goal_split_hidden">%1$d weitere Ziele enthalten</string>
     <string name="home_strategy_goal_stack_title">Deine Ziele</string>
     <string name="home_strategy_goal_stack_body">Du hast %1$d aktive Ziele. Wir zeigen hier %2$d, damit die Seite leicht zu überblicken bleibt.</string>
     <string name="home_strategy_goal_stack_metric">Ziele</string>

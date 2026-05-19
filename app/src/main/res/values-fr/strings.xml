@@ -333,6 +333,11 @@
     <string name="home_strategy_goal_empty_desc">Définissez ce pour quoi vous épargnez.</string>
     <string name="home_strategy_goal_add_title">Ajouter un autre objectif</string>
     <string name="home_strategy_goal_add_desc">Créez une autre étape financière.</string>
+    <string name="home_strategy_goal_split_title">Répartition de la prochaine paie</string>
+    <string name="home_strategy_goal_split_body">Votre prochaine action prioritaire de %1$s peut faire avancer %2$d objectifs.</string>
+    <string name="home_strategy_goal_split_total_label">Action totale</string>
+    <string name="home_strategy_goal_split_hidden_single">1 objectif de plus inclus</string>
+    <string name="home_strategy_goal_split_hidden">%1$d objectifs de plus inclus</string>
     <string name="home_strategy_goal_stack_title">Vos objectifs</string>
     <string name="home_strategy_goal_stack_body">Vous avez %1$d objectifs actifs. Nous en affichons %2$d ici pour garder la page facile à parcourir.</string>
     <string name="home_strategy_goal_stack_metric">Objectifs</string>

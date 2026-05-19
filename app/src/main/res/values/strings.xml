@@ -378,6 +378,11 @@
     <string name="home_strategy_goal_empty_desc">Define what you are saving for.</string>
     <string name="home_strategy_goal_add_title">Add another goal</string>
     <string name="home_strategy_goal_add_desc">Create another financial milestone.</string>
+    <string name="home_strategy_goal_split_title">Next payday split</string>
+    <string name="home_strategy_goal_split_body">Your next %1$s priority move can move %2$d goals forward.</string>
+    <string name="home_strategy_goal_split_total_label">Total move</string>
+    <string name="home_strategy_goal_split_hidden_single">1 more goal included</string>
+    <string name="home_strategy_goal_split_hidden">%1$d more goals included</string>
     <string name="home_strategy_goal_stack_title">Your goals</string>
     <string name="home_strategy_goal_stack_body">You have %1$d active goals. We show %2$d here so the page stays easy to scan.</string>
     <string name="home_strategy_goal_stack_metric">Goals</string>

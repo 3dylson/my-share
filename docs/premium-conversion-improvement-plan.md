@@ -523,6 +523,13 @@ Status after Premium advanced-account Strategy pass on 2026-05-19:
 - Done: New goal/rule copy was softened from technical `stack/archive` language to user-facing labels like `Your goals`, `See every rule`, and `All your goals`.
 - Validated: `testDebugUnitTest`, release build, release install on `emulator-5554`, normal Strategy goal/rule list and bottom sheets, compact `720x1280 / 360dpi` Plan header/metrics, Strategy summaries, and goal/rule bottom sheets. Temporary Firestore Premium multi-goal/rule QA data was restored to its previous state, and the emulator was restored to `1080x2400 / 420dpi`.
 
+Status after Premium multi-goal payday split implementation pass on 2026-05-19:
+- Done: Added a domain-level Premium payday split that turns the user's next priority move into a deterministic multi-goal split.
+- Done: Premium Strategy now replaces the generic multi-goal summary with a concrete `Next payday split` card when the user has a plan, a positive priority move, and multiple active goals.
+- Done: The split card keeps long goal lists scan-friendly by showing the first three split rows inline and routing the full list to `See every goal`.
+- Tested: focused split use-case coverage, HomeViewModel state coverage, and full `testDebugUnitTest`.
+- Validated: release build, release install on `emulator-5554`, normal Strategy split card, normal all-goals sheet, compact `720x1280 / 360dpi` split card top and scrolled states, and compact all-goals sheet. Temporary Firestore Premium goal data was restored to the previous `FREE` state, and the emulator was restored to `1080x2400 / 420dpi`.
+
 Next:
 - Continue the next Premium product slice while keeping compact-screen validation in every pass.
 - Continue validating compact-screen layouts when new Premium controls are added.

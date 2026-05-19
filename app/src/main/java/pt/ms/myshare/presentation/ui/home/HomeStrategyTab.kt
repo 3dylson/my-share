@@ -50,6 +50,7 @@ fun LazyListScope.homeStrategyTab(
     goals: List<GoalCardState>,
     rules: List<RuleCardState>,
     planCard: HomePlanCardState?,
+    goalPaydaySplit: GoalPaydaySplitCardState?,
     isPremium: Boolean,
     onAddNewGoal: () -> Unit,
     onEditGoal: (String) -> Unit,
@@ -93,7 +94,15 @@ fun LazyListScope.homeStrategyTab(
             )
         )
         if (isPremium) {
-            if (goals.size > 1) {
+            if (goalPaydaySplit != null) {
+                item {
+                    GoalPaydaySplitCard(
+                        state = goalPaydaySplit,
+                        onClick = onOpenGoalArchive
+                    )
+                    Spacer(Modifier.height(16.dp))
+                }
+            } else if (goals.size > 1) {
                 item {
                     StrategyCollectionSummaryCard(
                         title = stringResource(R.string.home_strategy_goal_stack_title),
@@ -734,6 +743,254 @@ private fun StrategyRuleArchiveRow(
 }
 
 @Composable
+private fun GoalPaydaySplitCard(
+    state: GoalPaydaySplitCardState,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.18f),
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.22f)),
+        shadowElevation = 1.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 340.dp || LocalDensity.current.fontScale >= 1.25f
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        GoalPaydaySplitHeader(state)
+                        GoalPaydaySplitTotal(
+                            totalMoveLabel = state.totalMoveLabel,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                } else {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(14.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        GoalPaydaySplitHeader(
+                            state = state,
+                            modifier = Modifier.weight(1f)
+                        )
+                        GoalPaydaySplitTotal(
+                            totalMoveLabel = state.totalMoveLabel,
+                            modifier = Modifier.widthIn(min = 128.dp, max = 164.dp)
+                        )
+                    }
+                }
+            }
+
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                state.visibleItems.forEach { item ->
+                    GoalPaydaySplitRow(item = item)
+                }
+                if (state.hiddenGoalCount > 0) {
+                    Text(
+                        text = hiddenGoalSplitText(state.hiddenGoalCount),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+
+            Text(
+                text = stringResource(R.string.home_strategy_goal_stack_action),
+                style = MaterialTheme.typography.labelLarge,
+                color = MySharePrimary,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Composable
+private fun GoalPaydaySplitHeader(
+    state: GoalPaydaySplitCardState,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = MySharePrimary.copy(alpha = 0.12f)
+        ) {
+            Icon(
+                imageVector = Icons.Default.AutoGraph,
+                contentDescription = null,
+                tint = MySharePrimary,
+                modifier = Modifier.padding(9.dp).size(20.dp)
+            )
+        }
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.home_strategy_goal_split_title),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Black,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = stringResource(
+                    R.string.home_strategy_goal_split_body,
+                    state.totalMoveLabel,
+                    state.goalCount
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun GoalPaydaySplitTotal(
+    totalMoveLabel: String,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.76f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f))
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.home_strategy_goal_split_total_label).uppercase(),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = totalMoveLabel,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Black,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+private fun GoalPaydaySplitRow(
+    item: GoalPaydaySplitItemState,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val goalName = localizedText(context, item.goalNameKey, item.goalName)
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.56f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.1f))
+    ) {
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            val shouldStack = maxWidth < 300.dp || LocalDensity.current.fontScale >= 1.3f
+            if (shouldStack) {
+                Column(
+                    modifier = Modifier.padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    GoalPaydaySplitRowLabel(
+                        goalName = goalName,
+                        shareLabel = item.shareLabel
+                    )
+                    Text(
+                        text = item.amountLabel,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Black,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            } else {
+                Row(
+                    modifier = Modifier.padding(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    GoalPaydaySplitRowLabel(
+                        goalName = goalName,
+                        shareLabel = item.shareLabel,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = item.amountLabel,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Black,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun GoalPaydaySplitRowLabel(
+    goalName: String,
+    shareLabel: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Default.Flag,
+            contentDescription = null,
+            tint = MySharePrimary,
+            modifier = Modifier.size(16.dp)
+        )
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(1.dp)
+        ) {
+            Text(
+                text = goalName,
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Black,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = shareLabel,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+    }
+}
+
+@Composable
 private fun StrategyCollectionSummaryCard(
     title: String,
     body: String,
@@ -1365,6 +1622,15 @@ private fun localizedFormattedText(
     if (key == null) return fallback
     val resId = context.resources.getIdentifier(key, "string", context.packageName)
     return if (resId != 0) context.getString(resId, *args.toTypedArray()) else fallback
+}
+
+@Composable
+private fun hiddenGoalSplitText(hiddenCount: Int): String {
+    return if (hiddenCount == 1) {
+        stringResource(R.string.home_strategy_goal_split_hidden_single)
+    } else {
+        stringResource(R.string.home_strategy_goal_split_hidden, hiddenCount)
+    }
 }
 
 @Composable

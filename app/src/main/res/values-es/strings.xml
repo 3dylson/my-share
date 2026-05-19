@@ -333,6 +333,11 @@
     <string name="home_strategy_goal_empty_desc">Define para qué estás ahorrando.</string>
     <string name="home_strategy_goal_add_title">Añadir otro objetivo</string>
     <string name="home_strategy_goal_add_desc">Crea otro hito financiero.</string>
+    <string name="home_strategy_goal_split_title">Reparto del próximo cobro</string>
+    <string name="home_strategy_goal_split_body">Tu próximo movimiento prioritario de %1$s puede impulsar %2$d metas.</string>
+    <string name="home_strategy_goal_split_total_label">Movimiento total</string>
+    <string name="home_strategy_goal_split_hidden_single">1 meta más incluida</string>
+    <string name="home_strategy_goal_split_hidden">%1$d metas más incluidas</string>
     <string name="home_strategy_goal_stack_title">Tus objetivos</string>
     <string name="home_strategy_goal_stack_body">Tienes %1$d objetivos activos. Mostramos %2$d aquí para que la página sea fácil de revisar.</string>
     <string name="home_strategy_goal_stack_metric">Objetivos</string>

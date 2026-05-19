@@ -25,6 +25,7 @@ import pt.ms.myshare.domain.model.EntitlementState
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.PaydayRule
 import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
+import pt.ms.myshare.domain.model.PaydayRuleType
 import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.domain.model.PremiumCheckInStatus
@@ -38,6 +39,7 @@ import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.CreatePaydayAdjustmentRecommendationUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumCheckInPlanUseCase
+import pt.ms.myshare.domain.use_case.CreatePremiumGoalPaydaySplitUseCase
 import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
 import pt.ms.myshare.domain.use_case.EnforcePremiumDowngradeUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
@@ -99,6 +101,7 @@ class HomeViewModelTest {
                 ResolveAllocationStrategyRulesUseCase()
             ),
             createPremiumCheckInPlanUseCase = CreatePremiumCheckInPlanUseCase(),
+            createPremiumGoalPaydaySplitUseCase = CreatePremiumGoalPaydaySplitUseCase(),
             createReviewInsightUseCase = CreateReviewInsightUseCase(calculatePlanPreviewUseCase),
             enforcePremiumDowngradeUseCase = EnforcePremiumDowngradeUseCase(fakePlannerRepository),
             resolvePricingStrategyUseCase = ResolvePricingStrategyUseCase(),
@@ -444,6 +447,50 @@ class HomeViewModelTest {
         assertEquals(BigDecimal("50"), stats.totalSavings)
         assertEquals(2, stats.performanceTrend.size)
         assertEquals(2, stats.totalReviews)
+    }
+
+    @Test
+    fun `premium user sees next payday split across multiple active goals`() = runTest {
+        fakePlannerRepository.savePlan(
+            SalaryPlan(
+                focus = PlanningFocus.SAVE_WITHOUT_STRESS,
+                netIncomePerPayday = BigDecimal("1500"),
+                monthlyFixedCosts = BigDecimal("600"),
+                payFrequency = PayFrequency.MONTHLY,
+                monthlyPayday = 1,
+                preset = AllocationPreset.BALANCED
+            )
+        )
+        fakePlannerRepository.saveRule(
+            PaydayRule(
+                id = "rule-1",
+                name = "Savings",
+                amount = BigDecimal("300"),
+                isPercentage = false,
+                type = PaydayRuleType.SAVINGS
+            )
+        )
+        listOf(
+            Goal(id = "goal-1", name = "Emergency fund", targetAmount = BigDecimal("3000")),
+            Goal(id = "goal-2", name = "Investing base", targetAmount = BigDecimal("2000")),
+            Goal(id = "goal-3", name = "Holiday", targetAmount = BigDecimal("1200")),
+            Goal(id = "goal-4", name = "New laptop", targetAmount = BigDecimal("1600"))
+        ).forEach { goal ->
+            fakePlannerRepository.saveGoal(goal)
+        }
+        advanceUntilIdle()
+
+        assertEquals(null, viewModel.state.value.goalPaydaySplit)
+
+        fakeEntitlementRepository.setPro(true)
+        advanceUntilIdle()
+
+        val split = viewModel.state.value.goalPaydaySplit
+        assertEquals(4, split?.goalCount)
+        assertEquals(3, split?.visibleItems?.size)
+        assertEquals(1, split?.hiddenGoalCount)
+        assertEquals("goal-1", split?.visibleItems?.first()?.goalId)
+        assertTrue(split?.totalMoveLabel?.isNotBlank() == true)
     }
 
     @Test

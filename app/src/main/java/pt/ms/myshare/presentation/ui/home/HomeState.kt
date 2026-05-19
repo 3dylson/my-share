@@ -49,6 +49,21 @@ data class GoalCardState(
     val isLockedByEntitlement: Boolean = false
 )
 
+data class GoalPaydaySplitCardState(
+    val totalMoveLabel: String,
+    val goalCount: Int,
+    val visibleItems: List<GoalPaydaySplitItemState>,
+    val hiddenGoalCount: Int = 0
+)
+
+data class GoalPaydaySplitItemState(
+    val goalId: String,
+    val goalName: String,
+    val goalNameKey: String? = null,
+    val amountLabel: String,
+    val shareLabel: String
+)
+
 data class ReviewCardState(
     val actualFlexibleSpend: String = "",
     val actualGoalContribution: String = "",
@@ -191,6 +206,7 @@ data class HomeState(
     val selectedDestination: HomeDestination = HomeDestination.PLAN,
     val plan: SalaryPlan? = null,
     val planCard: HomePlanCardState? = null,
+    val goalPaydaySplit: GoalPaydaySplitCardState? = null,
     val rules: List<RuleCardState> = emptyList(),
     val goals: List<GoalCardState> = emptyList(),
     val reviewCard: ReviewCardState = ReviewCardState(),

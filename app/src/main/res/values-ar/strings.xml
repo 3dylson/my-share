@@ -333,6 +333,11 @@
     <string name="home_strategy_goal_empty_desc">حدد ما تقوم بالادخار من أجله.</string>
     <string name="home_strategy_goal_add_title">إضافة هدف آخر</string>
     <string name="home_strategy_goal_add_desc">إنشاء معلم مالي آخر.</string>
+    <string name="home_strategy_goal_split_title">تقسيم يوم الدفع التالي</string>
+    <string name="home_strategy_goal_split_body">يمكن لحركة الأولوية التالية بقيمة %1$s أن تدفع %2$d أهداف إلى الأمام.</string>
+    <string name="home_strategy_goal_split_total_label">إجمالي الحركة</string>
+    <string name="home_strategy_goal_split_hidden_single">هدف إضافي واحد مشمول</string>
+    <string name="home_strategy_goal_split_hidden">%1$d أهداف إضافية مشمولة</string>
     <string name="home_strategy_goal_stack_title">أهدافك</string>
     <string name="home_strategy_goal_stack_body">لديك %1$d أهداف نشطة. نعرض %2$d هنا حتى تبقى الصفحة سهلة القراءة.</string>
     <string name="home_strategy_goal_stack_metric">الأهداف</string>

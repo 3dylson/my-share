@@ -334,6 +334,11 @@
     <string name="home_strategy_goal_empty_desc">Defina para que está a poupar.</string>
     <string name="home_strategy_goal_add_title">Adicionar outra meta</string>
     <string name="home_strategy_goal_add_desc">Crie outro marco financeiro.</string>
+    <string name="home_strategy_goal_split_title">Divisão do próximo pagamento</string>
+    <string name="home_strategy_goal_split_body">O próximo movimento prioritário de %1$s pode fazer avançar %2$d objetivos.</string>
+    <string name="home_strategy_goal_split_total_label">Movimento total</string>
+    <string name="home_strategy_goal_split_hidden_single">Mais 1 objetivo incluído</string>
+    <string name="home_strategy_goal_split_hidden">Mais %1$d objetivos incluídos</string>
     <string name="home_strategy_goal_stack_title">Os teus objetivos</string>
     <string name="home_strategy_goal_stack_body">Tens %1$d objetivos ativos. Mostramos %2$d aqui para a página continuar fácil de ler.</string>
     <string name="home_strategy_goal_stack_metric">Objetivos</string>
