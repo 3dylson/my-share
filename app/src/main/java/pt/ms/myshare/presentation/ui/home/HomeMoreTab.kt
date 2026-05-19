@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -83,6 +84,7 @@ fun LazyListScope.homeMoreTab(
             SmartAdjustmentControlCard(
                 state = state,
                 onToggleAutomation = onToggleAutomation,
+                onConfigureReminder = onConfigureReminder,
                 onOpenReview = onOpenReview,
                 modifier = Modifier.padding(bottom = 20.dp)
             )
@@ -503,10 +505,13 @@ private fun MoreRoutineMetric(
 private fun SmartAdjustmentControlCard(
     state: MoreCardState,
     onToggleAutomation: (Boolean) -> Unit,
+    onConfigureReminder: () -> Unit,
     onOpenReview: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val smartAdjustment = state.smartAdjustment
+    val checkIn = state.premiumCheckIn
+    val isOverdueRecovery = checkIn?.status == PremiumCheckInStatus.OVERDUE
     val statusText = when {
         state.automationEnabled -> stringResource(R.string.home_more_smart_adjustments_status_watching)
         else -> stringResource(R.string.home_more_smart_adjustments_status_paused)
@@ -527,11 +532,15 @@ private fun SmartAdjustmentControlCard(
     }
     val actionLabel = if (state.automationEnabled) {
         stringResource(R.string.home_more_smart_adjustments_pause)
+    } else if (isOverdueRecovery) {
+        stringResource(R.string.home_more_smart_adjustments_resume)
     } else {
         stringResource(R.string.home_more_smart_adjustments_enable)
     }
-    val reviewActionEnabled = smartAdjustment.hasRecommendation || state.premiumCheckIn?.isDue == true
-    val reviewActionLabel = if (state.premiumCheckIn?.isDue == true) {
+    val reviewActionEnabled = smartAdjustment.hasRecommendation || checkIn?.isDue == true
+    val reviewActionLabel = if (isOverdueRecovery) {
+        stringResource(R.string.home_premium_checkin_action_catch_up)
+    } else if (checkIn?.isDue == true) {
         stringResource(R.string.home_more_smart_checkin_start)
     } else {
         stringResource(R.string.home_more_smart_adjustments_review)
@@ -601,8 +610,29 @@ private fun SmartAdjustmentControlCard(
 
             SmartAdjustmentSignalGrid(smartAdjustment = smartAdjustment)
 
-            state.premiumCheckIn?.let { checkIn ->
+            checkIn?.let {
                 PremiumCheckInCompactSummary(checkIn = checkIn)
+            }
+
+            if (isOverdueRecovery && checkIn?.reminderEnabled == false) {
+                OutlinedButton(
+                    onClick = onConfigureReminder,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Notifications,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.home_more_smart_checkin_turn_reminders_on),
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
 
             if (smartAdjustment.lastActionMessageKey != null) {
@@ -1060,24 +1090,42 @@ private fun PremiumCheckInCompactSummary(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.Black,
-                        modifier = Modifier.weight(1f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    SmartAdjustmentStatusPill(
-                        text = relativeLabel,
-                        isActive = checkIn.isDue
-                    )
+                BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                    val shouldStackHeader = maxWidth < 270.dp || LocalDensity.current.fontScale >= 1.25f
+                    if (shouldStackHeader) {
+                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Text(
+                                text = title,
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.Black
+                            )
+                            SmartAdjustmentStatusPill(
+                                text = relativeLabel,
+                                isActive = checkIn.isDue
+                            )
+                        }
+                    } else {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = title,
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.Black,
+                                modifier = Modifier.weight(1f),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            SmartAdjustmentStatusPill(
+                                text = relativeLabel,
+                                isActive = checkIn.isDue
+                            )
+                        }
+                    }
                 }
                 Text(
                     text = body,

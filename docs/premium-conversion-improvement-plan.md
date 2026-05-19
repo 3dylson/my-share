@@ -566,6 +566,13 @@ Status after Premium adjustment history implementation pass on 2026-05-19:
 - Tested: focused HomeViewModel coverage for newest-first history and free-user gating, plus full `testDebugUnitTest`.
 - Validated: release build, release install on `emulator-5554`, compact `720x1280 / 360dpi` More memory card history action, compact adjustment history sheet top and scrolled undone record, no app fatal crash in logcat, temporary Firestore Premium history data restored to the previous state, and emulator restored to `1080x2400 / 420dpi`.
 
+Status after Premium missed-check-in recovery implementation pass on 2026-05-19:
+- Done: Overdue Premium check-ins now use stronger recovery copy that explains Premium is waiting on the missed review before it can adjust the next payday.
+- Done: More now changes the overdue primary action to `Catch up now`, shows `Resume watch` when automation is paused, and offers `Turn reminders on` when reminders are off.
+- Done: The compact More recovery summary now stacks the title and late badge so small screens do not truncate the check-in state.
+- Tested: focused HomeViewModel coverage for missed-review overdue state with paused automation and reminders off, plus full `testDebugUnitTest`.
+- Validated: release build, release install on `emulator-5554`, compact `720x1280 / 360dpi` Review overdue card, compact More recovery card/actions, no app fatal crash in logcat, temporary Firestore Premium missed-check-in data restored to the previous state, and emulator restored to `1080x2400 / 420dpi`.
+
 Next:
 - Continue the next Premium product slice while keeping compact-screen validation in every pass.
 - Continue validating compact-screen layouts when new Premium controls are added.

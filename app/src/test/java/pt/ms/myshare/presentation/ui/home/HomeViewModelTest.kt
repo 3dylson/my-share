@@ -667,6 +667,37 @@ class HomeViewModelTest {
     }
 
     @Test
+    fun `premium user sees overdue recovery when payday review is missed`() = runTest {
+        val today = LocalDate.now()
+        val missedPayday = today.minusDays(7).dayOfMonth.coerceIn(1, 28)
+        val currentPlan = SalaryPlan(
+            focus = PlanningFocus.SAVE_WITHOUT_STRESS,
+            netIncomePerPayday = BigDecimal("1000"),
+            monthlyFixedCosts = BigDecimal("400"),
+            payFrequency = PayFrequency.MONTHLY,
+            monthlyPayday = missedPayday,
+            preset = AllocationPreset.BALANCED,
+            createdAt = today.minusMonths(2)
+        )
+        fakeEntitlementRepository.setPro(true)
+        fakePlannerRepository.saveAutomationEnabled(false)
+        fakePlannerRepository.saveReminderConfiguration(
+            ReminderConfiguration(enabled = false, cadence = ReminderCadence.PAYDAY)
+        )
+        fakePlannerRepository.savePlan(currentPlan)
+        advanceUntilIdle()
+
+        val reviewCheckIn = viewModel.state.value.reviewCard.premiumCheckIn
+        val moreCheckIn = viewModel.state.value.moreCard.premiumCheckIn
+
+        assertEquals(PremiumCheckInStatus.OVERDUE, reviewCheckIn?.status)
+        assertEquals(PremiumCheckInStatus.OVERDUE, moreCheckIn?.status)
+        assertTrue(reviewCheckIn?.isDue == true)
+        assertEquals(false, moreCheckIn?.automationEnabled)
+        assertEquals(false, moreCheckIn?.reminderEnabled)
+    }
+
+    @Test
     fun `premium user can apply payday recommendation to real rules`() = runTest {
         val currentPlan = SalaryPlan(
             focus = PlanningFocus.SAVE_WITHOUT_STRESS,
