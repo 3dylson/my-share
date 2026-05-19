@@ -72,6 +72,7 @@ data class ReviewCardState(
     val flexibleSpendMax: Float = 5000f,
     val goalContributionMax: Float = 5000f,
     val insight: ReviewInsight? = null,
+    val premiumReviewResult: PremiumReviewResultState? = null,
     val coachingSummary: PremiumReviewCoachingSummaryState? = null,
     val coachingInsights: List<ReviewInsightState> = emptyList(),
     val paydayRecommendation: PaydayAdjustmentRecommendationState? = null,
@@ -111,6 +112,13 @@ data class PremiumReviewCoachingMetricState(
     val labelKey: String,
     val valueLabel: String,
     val isPositive: Boolean
+)
+
+data class PremiumReviewResultState(
+    val savedReviewDateLabel: String,
+    val totalReviews: Int,
+    val coachingSummary: PremiumReviewCoachingSummaryState?,
+    val recommendation: PaydayAdjustmentRecommendationState?
 )
 
 data class RuleCardState(

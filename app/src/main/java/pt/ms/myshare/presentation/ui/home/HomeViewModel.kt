@@ -381,6 +381,18 @@ class HomeViewModel @Inject constructor(
                     currentMore.billingMessage == BillingStatusMessageKeys.PRODUCTS_UNAVAILABLE && selectedProductAvailable
 
                 val paydayRecommendationState = paydayRecommendation?.toState(preferences)
+                val premiumReviewResult = if (isPremium && latestReview != null) {
+                    PremiumReviewResultState(
+                        savedReviewDateLabel = latestReview.createdAt.format(
+                            DateTimeFormatter.ofPattern("d MMM", preferences.locale)
+                        ),
+                        totalReviews = planner.reviewHistory.size,
+                        coachingSummary = coachingSummary,
+                        recommendation = paydayRecommendationState
+                    )
+                } else {
+                    null
+                }
                 val recommendationMessageKey = currentState.reviewCard.recommendationMessageKey
                 val moreCard = MoreCardState(
                     reminderEnabled = reminder.enabled,
@@ -444,6 +456,7 @@ class HomeViewModel @Inject constructor(
                     rules = ruleCards,
                     performanceStats = performanceStats,
                     reviewCard = reviewCard.copy(
+                        premiumReviewResult = premiumReviewResult,
                         coachingSummary = coachingSummary,
                         coachingInsights = coachingInsights,
                         paydayRecommendation = paydayRecommendationState,

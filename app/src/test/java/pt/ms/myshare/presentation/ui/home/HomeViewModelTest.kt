@@ -408,6 +408,33 @@ class HomeViewModelTest {
     }
 
     @Test
+    fun `premium saveReview prepares post review result`() = runTest {
+        val currentPlan = SalaryPlan(
+            focus = PlanningFocus.SAVE_WITHOUT_STRESS,
+            netIncomePerPayday = BigDecimal("1000"),
+            monthlyFixedCosts = BigDecimal("400"),
+            payFrequency = PayFrequency.MONTHLY,
+            monthlyPayday = 1,
+            preset = AllocationPreset.BALANCED
+        )
+        fakeEntitlementRepository.setPro(true)
+        fakePlannerRepository.savePlan(currentPlan)
+        advanceUntilIdle()
+
+        viewModel.onFlexibleSpendChanged("240")
+        viewModel.onGoalContributionChanged("170")
+        viewModel.saveReview()
+        advanceUntilIdle()
+
+        val result = viewModel.state.value.reviewCard.premiumReviewResult
+
+        assertTrue(viewModel.state.value.reviewSavedEventId > 0L)
+        assertEquals(1, result?.totalReviews)
+        assertTrue(result?.savedReviewDateLabel?.isNotBlank() == true)
+        assertTrue(result?.recommendation != null)
+    }
+
+    @Test
     fun `downgrade to free disables premium automation and locks more card`() = runTest {
         fakeEntitlementRepository.setEntitlementState(EntitlementState.PRO)
         fakePlannerRepository.saveAutomationEnabled(true)

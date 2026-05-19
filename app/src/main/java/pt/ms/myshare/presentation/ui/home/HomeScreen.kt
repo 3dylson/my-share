@@ -170,6 +170,7 @@ fun HomeScreen(
     var showReviewHistoryTimeline by remember { mutableStateOf(false) }
     var showStrategyGoalArchive by remember { mutableStateOf(false) }
     var showStrategyRuleArchive by remember { mutableStateOf(false) }
+    var showPremiumReviewResultSheet by remember { mutableStateOf(false) }
     var recommendationPendingApply by remember { mutableStateOf<PaydayAdjustmentRecommendationState?>(null) }
     var showRecommendationAppliedSheet by remember { mutableStateOf(false) }
     var reviewBeingEdited by remember { mutableStateOf<ReviewHistoryItemState?>(null) }
@@ -243,10 +244,15 @@ fun HomeScreen(
         val eventId = state.reviewSavedEventId
         if (eventId > 0L) {
             onReviewSavedFeedbackShown(eventId)
-            snackbarHostState.showSnackbar(
-                message = reviewSavedMessage,
-                duration = SnackbarDuration.Short
-            )
+            if (state.moreCard.isPremium) {
+                showPremiumReviewResultSheet = true
+                Timber.tag("HomeScreen").d("Premium review result sheet opened after saved review")
+            } else {
+                snackbarHostState.showSnackbar(
+                    message = reviewSavedMessage,
+                    duration = SnackbarDuration.Short
+                )
+            }
         }
     }
 
@@ -278,6 +284,20 @@ fun HomeScreen(
                 reviewPendingDelete = review
             }
         )
+    }
+
+    if (showPremiumReviewResultSheet) {
+        state.reviewCard.premiumReviewResult?.let { result ->
+            PremiumReviewResultBottomSheet(
+                result = result,
+                onDismissRequest = { showPremiumReviewResultSheet = false },
+                onReviewAdjustment = { recommendation ->
+                    showPremiumReviewResultSheet = false
+                    recommendationPendingApply = recommendation
+                    Timber.tag("HomeScreen").d("Recommendation confirmation opened from Premium review result")
+                }
+            )
+        }
     }
 
     if (showStrategyGoalArchive) {
