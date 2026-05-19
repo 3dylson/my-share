@@ -195,6 +195,8 @@
     <string name="premium_gate_rules_body">يتيح Premium عمل عدة قواعد معًا للادخار والاستثمار والديون والاحتياطات بعد كل مراجعة.</string>
     <string name="premium_gate_review_title">انظر تاريخ المراجعة الكامل</string>
     <string name="premium_gate_review_body">يبقي Premium المخطط الزمني للأداء الكامل مرئيًا حتى تتمكن من اكتشاف أنماط الإنفاق بمرور الوقت.</string>
+    <string name="premium_gate_first_review_title">حوّل أول مراجعة إلى خطوتك التالية</string>
+    <string name="premium_gate_first_review_body">ابدأ Premium لمقارنة كل يوم دفع بدليلك، واكتشاف الانحراف مبكرًا، ورؤية التعديل قبل يوم الدفع التالي.</string>
     <string name="premium_gate_automation_title">افتح التعديلات المتكيّفة</string>
     <string name="premium_gate_automation_body">يقارن Premium المراجعات بدليلك الأسبوعي ويعرض ما يجب تغييره قبل يوم الدفع التالي.</string>
     <string name="onboarding_signup_title">قم بتأمين خطتك</string>
@@ -476,6 +478,18 @@
     <string name="home_review_result_priority">أولوية</string>
     <string name="home_review_result_review_adjustment">مراجعة التعديل</string>
     <string name="home_review_result_done">تم</string>
+    <string name="home_review_first_premium_label">أول مراجعة Premium</string>
+    <string name="home_review_first_premium_title_locked">يمكن لأول مراجعة أن تفتح الخطوة التالية</string>
+    <string name="home_review_first_premium_title_unlocked">ابدأ أول تسجيل وصول Premium</string>
+    <string name="home_review_first_premium_desc_locked">احفظ ما حدث في يوم الدفع هذا. يقارنه Premium بدليلك ويعرض ما يجب تعديله بعد ذلك.</string>
+    <string name="home_review_first_premium_desc_unlocked">أدخل يوم الدفع هذا أدناه. سيحوّل Premium أول تسجيل وصول إلى دليل أوضح للخطوة التالية.</string>
+    <string name="home_review_first_premium_step_review">راجع</string>
+    <string name="home_review_first_premium_step_review_desc">احفظ القيم الفعلية.</string>
+    <string name="home_review_first_premium_step_learn">تعلّم</string>
+    <string name="home_review_first_premium_step_learn_desc">اكتشف ما تغيّر.</string>
+    <string name="home_review_first_premium_step_adjust">عدّل</string>
+    <string name="home_review_first_premium_step_adjust_desc">اضبط الدليل التالي.</string>
+    <string name="home_review_first_premium_action">عرض تجربة Premium</string>
     <string name="home_review_manual_title">تسجيل الوصول ليوم الدفع</string>
     <string name="home_review_manual_desc">أدخل القيم الفعلية الدقيقة حتى يظل دليلك التالي صادقًا.</string>
     <string name="home_review_input_flex_exact">مرنة الفعلية</string>

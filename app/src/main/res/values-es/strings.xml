@@ -195,6 +195,8 @@
     <string name="premium_gate_rules_body">Premium permite que varias reglas trabajen juntas para ahorro, inversión, deuda y reservas después de cada revisión.</string>
     <string name="premium_gate_review_title">Ver historial completo de reseñas</string>
     <string name="premium_gate_review_body">Premium mantiene visible su cronograma de desempeño completo para que pueda detectar patrones de gasto a lo largo del tiempo.</string>
+    <string name="premium_gate_first_review_title">Convierte la primera revisión en tu próximo movimiento</string>
+    <string name="premium_gate_first_review_body">Inicia Premium para comparar cada cobro con tu guía, detectar desvíos pronto y ver el ajuste antes del próximo cobro.</string>
     <string name="premium_gate_automation_title">Desbloquea ajustes adaptables</string>
     <string name="premium_gate_automation_body">Premium compara las revisiones con tu guía semanal y muestra qué cambiar antes del próximo cobro.</string>
     <string name="onboarding_signup_title">Asegura tu plan</string>
@@ -476,6 +478,18 @@
     <string name="home_review_result_priority">Prioridad</string>
     <string name="home_review_result_review_adjustment">Revisar ajuste</string>
     <string name="home_review_result_done">Listo</string>
+    <string name="home_review_first_premium_label">Primera revisión Premium</string>
+    <string name="home_review_first_premium_title_locked">Tu primera revisión puede desbloquear el próximo movimiento</string>
+    <string name="home_review_first_premium_title_unlocked">Empieza el primer check-in Premium</string>
+    <string name="home_review_first_premium_desc_locked">Guarda lo que pasó en este cobro. Premium lo compara con tu guía y muestra qué ajustar después.</string>
+    <string name="home_review_first_premium_desc_unlocked">Completa este cobro abajo. Premium convertirá el primer check-in en una próxima guía más clara.</string>
+    <string name="home_review_first_premium_step_review">Revisar</string>
+    <string name="home_review_first_premium_step_review_desc">Guarda los importes reales.</string>
+    <string name="home_review_first_premium_step_learn">Aprender</string>
+    <string name="home_review_first_premium_step_learn_desc">Detecta qué cambió.</string>
+    <string name="home_review_first_premium_step_adjust">Ajustar</string>
+    <string name="home_review_first_premium_step_adjust_desc">Define la próxima guía.</string>
+    <string name="home_review_first_premium_action">Ver prueba Premium</string>
     <string name="home_review_manual_title">check-in de día de pago</string>
     <string name="home_review_manual_desc">Ingrese datos reales exactos para que su próxima guía sea honesta.</string>
     <string name="home_review_input_flex_exact">Real flexible</string>

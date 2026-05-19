@@ -195,6 +195,8 @@
     <string name="premium_gate_rules_body">Premium lässt mehrere Regeln nach jeder Prüfung für Sparen, Investieren, Schulden und Puffer zusammenarbeiten.</string>
     <string name="premium_gate_review_title">Sehen Sie sich den vollständigen Bewertungsverlauf an</string>
     <string name="premium_gate_review_body">Premium sorgt dafür, dass Ihr gesamter Leistungsverlauf sichtbar ist, sodass Sie Ausgabenmuster im Laufe der Zeit erkennen können.</string>
+    <string name="premium_gate_first_review_title">Machen Sie aus der ersten Prüfung den nächsten Schritt</string>
+    <string name="premium_gate_first_review_body">Starten Sie Premium, um jeden Zahltag mit Ihrem Leitfaden zu vergleichen, Abweichungen früh zu erkennen und die nächste Anpassung zu sehen.</string>
     <string name="premium_gate_automation_title">Adaptive Anpassungen freischalten</string>
     <string name="premium_gate_automation_body">Premium vergleicht Prüfungen mit deinem Wochenleitwert und zeigt, was vor dem nächsten Zahltag zu ändern ist.</string>
     <string name="onboarding_signup_title">Sichern Sie sich Ihren Plan</string>
@@ -476,6 +478,18 @@
     <string name="home_review_result_priority">Priorität</string>
     <string name="home_review_result_review_adjustment">Anpassung prüfen</string>
     <string name="home_review_result_done">Fertig</string>
+    <string name="home_review_first_premium_label">Erste Premium-Prüfung</string>
+    <string name="home_review_first_premium_title_locked">Ihre erste Prüfung kann den nächsten Schritt freischalten</string>
+    <string name="home_review_first_premium_title_unlocked">Starten Sie den ersten Premium-Check-in</string>
+    <string name="home_review_first_premium_desc_locked">Speichern Sie, was an diesem Zahltag passiert ist. Premium vergleicht es mit Ihrem Leitfaden und zeigt die nächste Anpassung.</string>
+    <string name="home_review_first_premium_desc_unlocked">Füllen Sie diesen Zahltag unten aus. Premium macht aus dem ersten Check-in einen klareren nächsten Leitfaden.</string>
+    <string name="home_review_first_premium_step_review">Prüfen</string>
+    <string name="home_review_first_premium_step_review_desc">Ist-Werte speichern.</string>
+    <string name="home_review_first_premium_step_learn">Lernen</string>
+    <string name="home_review_first_premium_step_learn_desc">Sehen, was sich änderte.</string>
+    <string name="home_review_first_premium_step_adjust">Anpassen</string>
+    <string name="home_review_first_premium_step_adjust_desc">Nächsten Leitfaden setzen.</string>
+    <string name="home_review_first_premium_action">Premium-Test ansehen</string>
     <string name="home_review_manual_title">Check-in am Zahltag</string>
     <string name="home_review_manual_desc">Geben Sie genaue Ist-Werte ein, damit Ihr nächster Reiseführer ehrlich bleibt.</string>
     <string name="home_review_input_flex_exact">Flexibel aktuell</string>

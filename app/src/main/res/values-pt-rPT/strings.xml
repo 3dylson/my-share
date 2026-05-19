@@ -196,6 +196,8 @@
     <string name="premium_gate_rules_body">O Premium permite que várias regras trabalhem juntas para poupança, investimento, dívida e reservas depois de cada revisão.</string>
     <string name="premium_gate_review_title">Veja o histórico completo de avaliações</string>
     <string name="premium_gate_review_body">O Premium mantém todo o seu cronograma de desempenho visível para que possa identificar padrões de gastos ao longo do tempo.</string>
+    <string name="premium_gate_first_review_title">Transforme a primeira revisão no próximo passo</string>
+    <string name="premium_gate_first_review_body">Inicie o Premium para comparar cada pagamento com o seu guia, detetar desvios cedo e ver o ajuste a fazer antes do próximo pagamento.</string>
     <string name="premium_gate_automation_title">Desbloquear ajustes adaptáveis</string>
     <string name="premium_gate_automation_body">O Premium compara revisões com o teu guia semanal e mostra o que mudar antes do próximo pagamento.</string>
     <string name="onboarding_signup_title">Garanta o seu plano</string>
@@ -477,6 +479,18 @@
     <string name="home_review_result_priority">Prioridade</string>
     <string name="home_review_result_review_adjustment">Rever ajuste</string>
     <string name="home_review_result_done">Concluído</string>
+    <string name="home_review_first_premium_label">Primeira revisão Premium</string>
+    <string name="home_review_first_premium_title_locked">A primeira revisão pode desbloquear o próximo passo</string>
+    <string name="home_review_first_premium_title_unlocked">Comece o primeiro check-in Premium</string>
+    <string name="home_review_first_premium_desc_locked">Guarde o que aconteceu neste pagamento. O Premium compara com o guia e mostra o que ajustar a seguir.</string>
+    <string name="home_review_first_premium_desc_unlocked">Preencha este pagamento abaixo. O Premium transforma o primeiro check-in num próximo guia mais claro.</string>
+    <string name="home_review_first_premium_step_review">Rever</string>
+    <string name="home_review_first_premium_step_review_desc">Guarde os valores reais.</string>
+    <string name="home_review_first_premium_step_learn">Aprender</string>
+    <string name="home_review_first_premium_step_learn_desc">Veja o que mudou.</string>
+    <string name="home_review_first_premium_step_adjust">Ajustar</string>
+    <string name="home_review_first_premium_step_adjust_desc">Defina o próximo guia.</string>
+    <string name="home_review_first_premium_action">Ver teste Premium</string>
     <string name="home_review_manual_title">Check-in no dia de pagamento</string>
     <string name="home_review_manual_desc">Introduza dados reais exatos para que o seu próximo guia permaneça honesto.</string>
     <string name="home_review_input_flex_exact">Real flexível</string>

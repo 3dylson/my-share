@@ -690,6 +690,9 @@ fun HomeScreen(
                             onShowPaywall = {
                                 openPremiumGate(HomePremiumGate.ReviewHistory)
                             },
+                            onShowFirstReviewPaywall = {
+                                openPremiumGate(HomePremiumGate.FirstReview)
+                            },
                             onOpenFullHistory = {
                                 showReviewHistoryTimeline = true
                             },

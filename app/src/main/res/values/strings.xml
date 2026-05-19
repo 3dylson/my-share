@@ -229,6 +229,8 @@
     <string name="premium_gate_rules_body">Premium lets multiple rules work together for savings, investing, debt, and buffers after each review.</string>
     <string name="premium_gate_review_title">See full review history</string>
     <string name="premium_gate_review_body">Premium keeps your full performance timeline visible so you can spot spending patterns over time.</string>
+    <string name="premium_gate_first_review_title">Turn the first review into your next move</string>
+    <string name="premium_gate_first_review_body">Start Premium to compare each payday with your guide, catch drift early, and see the adjustment to make before the next payday.</string>
     <string name="premium_gate_automation_title">Unlock adaptive adjustments</string>
     <string name="premium_gate_automation_body">Premium compares reviews with your weekly guide and shows what to change before the next payday.</string>
 
@@ -521,6 +523,18 @@
     <string name="home_review_result_priority">Priority</string>
     <string name="home_review_result_review_adjustment">Review adjustment</string>
     <string name="home_review_result_done">Done</string>
+    <string name="home_review_first_premium_label">First Premium review</string>
+    <string name="home_review_first_premium_title_locked">Your first review can unlock the next move</string>
+    <string name="home_review_first_premium_title_unlocked">Start the first Premium check-in</string>
+    <string name="home_review_first_premium_desc_locked">Save what happened this payday. Premium can compare it with your guide and show what to adjust next.</string>
+    <string name="home_review_first_premium_desc_unlocked">Enter this payday below. Premium will turn the first check-in into a clearer next guide.</string>
+    <string name="home_review_first_premium_step_review">Review</string>
+    <string name="home_review_first_premium_step_review_desc">Save actual spending.</string>
+    <string name="home_review_first_premium_step_learn">Learn</string>
+    <string name="home_review_first_premium_step_learn_desc">Spot what changed.</string>
+    <string name="home_review_first_premium_step_adjust">Adjust</string>
+    <string name="home_review_first_premium_step_adjust_desc">Set the next guide.</string>
+    <string name="home_review_first_premium_action">See Premium trial</string>
     <string name="home_review_manual_title">Payday check-in</string>
     <string name="home_review_manual_desc">Enter exact actuals so your next guide stays honest.</string>
     <string name="home_review_input_flex_exact">Flexible actual</string>

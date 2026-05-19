@@ -573,6 +573,13 @@ Status after Premium missed-check-in recovery implementation pass on 2026-05-19:
 - Tested: focused HomeViewModel coverage for missed-review overdue state with paused automation and reminders off, plus full `testDebugUnitTest`.
 - Validated: release build, release install on `emulator-5554`, compact `720x1280 / 360dpi` Review overdue card, compact More recovery card/actions, no app fatal crash in logcat, temporary Firestore Premium missed-check-in data restored to the previous state, and emulator restored to `1080x2400 / 420dpi`.
 
+Status after first-review Premium proof implementation pass on 2026-05-19:
+- Done: Review now shows a first-review Premium proof card when the user has no review history and no active Premium check-in card, so the empty state explains the next value moment before the user submits actuals.
+- Done: The proof card uses compact-friendly stacked steps for `Review`, `Learn`, and `Adjust`, with a dedicated first-review Premium gate instead of reusing the full-history upsell.
+- Done: First-review gate copy now focuses on comparing the next payday with the user's guide, catching drift early, and showing the next adjustment.
+- Tested: full `testDebugUnitTest`.
+- Validated: debug build, debug install on `emulator-5554`, compact `720x1280 / 360dpi` Review proof card, CTA-to-first-review Premium sheet, no app fatal crash in logcat, and emulator restored to `1080x2400 / 420dpi`.
+
 Next:
 - Continue the next Premium product slice while keeping compact-screen validation in every pass.
 - Continue validating compact-screen layouts when new Premium controls are added.

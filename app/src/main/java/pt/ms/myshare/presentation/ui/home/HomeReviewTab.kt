@@ -52,6 +52,7 @@ fun LazyListScope.homeReviewTab(
     onGoalContributionChanged: (String) -> Unit,
     onSaveReview: () -> Unit,
     onShowPaywall: () -> Unit,
+    onShowFirstReviewPaywall: () -> Unit,
     onOpenFullHistory: () -> Unit,
     onEditReview: (ReviewHistoryItemState) -> Unit,
     onDeleteReview: (ReviewHistoryItemState) -> Unit,
@@ -230,6 +231,16 @@ fun LazyListScope.homeReviewTab(
         }
     }
 
+    if (history.isEmpty() && paydayRecommendation == null && (!isPremium || premiumCheckIn == null)) {
+        item {
+            FirstReviewPremiumProofCard(
+                isPremium = isPremium,
+                onShowPaywall = onShowFirstReviewPaywall
+            )
+            Spacer(Modifier.height(16.dp))
+        }
+    }
+
     item {
         val context = LocalContext.current
         val errorMessage = remember(state.error) {
@@ -294,6 +305,142 @@ fun LazyListScope.homeReviewTab(
                     onClick = onShowPaywall
                 )
                 Spacer(Modifier.height(8.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun FirstReviewPremiumProofCard(
+    isPremium: Boolean,
+    onShowPaywall: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val title = if (isPremium) {
+        stringResource(R.string.home_review_first_premium_title_unlocked)
+    } else {
+        stringResource(R.string.home_review_first_premium_title_locked)
+    }
+    val description = if (isPremium) {
+        stringResource(R.string.home_review_first_premium_desc_unlocked)
+    } else {
+        stringResource(R.string.home_review_first_premium_desc_locked)
+    }
+
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.24f)),
+        shadowElevation = 1.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MySharePrimary.copy(alpha = 0.12f)
+                ) {
+                    Icon(
+                        imageVector = if (isPremium) Icons.Default.AutoAwesome else Icons.Default.Lock,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.padding(9.dp).size(20.dp)
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_review_first_premium_label).uppercase(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MySharePrimary,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 340.dp || LocalDensity.current.fontScale >= 1.25f
+                val steps = listOf(
+                    Triple(
+                        stringResource(R.string.home_review_first_premium_step_review),
+                        stringResource(R.string.home_review_first_premium_step_review_desc),
+                        Icons.Default.EditNote
+                    ),
+                    Triple(
+                        stringResource(R.string.home_review_first_premium_step_learn),
+                        stringResource(R.string.home_review_first_premium_step_learn_desc),
+                        Icons.Default.QueryStats
+                    ),
+                    Triple(
+                        stringResource(R.string.home_review_first_premium_step_adjust),
+                        stringResource(R.string.home_review_first_premium_step_adjust_desc),
+                        Icons.Default.Tune
+                    )
+                )
+
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        steps.forEach { step ->
+                            ReviewPreviewPill(
+                                label = step.first,
+                                body = step.second,
+                                icon = step.third,
+                                iconColor = MySharePrimary,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                } else {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        steps.forEach { step ->
+                            ReviewPreviewPill(
+                                label = step.first,
+                                body = step.second,
+                                icon = step.third,
+                                iconColor = MySharePrimary,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                }
+            }
+
+            if (!isPremium) {
+                TextButton(
+                    onClick = onShowPaywall,
+                    modifier = Modifier.align(Alignment.Start)
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_review_first_premium_action),
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
         }
     }

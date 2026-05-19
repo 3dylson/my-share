@@ -28,6 +28,11 @@ enum class HomePremiumGate(
         bodyRes = R.string.premium_gate_review_body,
         analyticsName = "review_history"
     ),
+    FirstReview(
+        titleRes = R.string.premium_gate_first_review_title,
+        bodyRes = R.string.premium_gate_first_review_body,
+        analyticsName = "first_review"
+    ),
     SmartAutomation(
         titleRes = R.string.premium_gate_automation_title,
         bodyRes = R.string.premium_gate_automation_body,
