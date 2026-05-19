@@ -555,6 +555,9 @@
     <string name="home_more_adjustment_memory_priority">أولوية</string>
     <string name="home_more_adjustment_memory_change">%1$s إلى %2$s</string>
     <string name="home_more_adjustment_memory_rules">%1$d قاعدة حدّثها Premium</string>
+    <string name="home_more_adjustment_memory_history_action">عرض سجل التعديلات</string>
+    <string name="home_more_adjustment_history_title">سجل التعديلات</string>
+    <string name="home_more_adjustment_history_body">اطلع على ما غيّره Premium بعد كل مراجعة، بما في ذلك التراجعات، حتى تبقى خطتك واضحة وموثوقة.</string>
     <string name="home_more_smart_checkin_start">بدء المتابعة</string>
     <string name="home_more_smart_checkin_ready">المتابعة جاهزة</string>
     <string name="home_more_smart_checkin_overdue">المتابعة بانتظارك</string>

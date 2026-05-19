@@ -189,6 +189,7 @@ data class MoreCardState(
     val reviewCount: Int = 0,
     val smartAdjustment: SmartAdjustmentControlState = SmartAdjustmentControlState(),
     val adjustmentMemory: PremiumAdjustmentMemoryState? = null,
+    val adjustmentHistory: List<PremiumAdjustmentMemoryState> = emptyList(),
     val premiumCheckIn: PremiumCheckInState? = null,
     val error: String? = null
 ) {
@@ -197,6 +198,7 @@ data class MoreCardState(
 }
 
 data class PremiumAdjustmentMemoryState(
+    val id: String,
     val dateLabel: String,
     val direction: PaydayAdjustmentRecommendationDirection,
     val status: PremiumAdjustmentStatus,

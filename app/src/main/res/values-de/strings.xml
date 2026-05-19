@@ -555,6 +555,9 @@
     <string name="home_more_adjustment_memory_priority">Priorität</string>
     <string name="home_more_adjustment_memory_change">%1$s zu %2$s</string>
     <string name="home_more_adjustment_memory_rules">%1$d Regel(n) von Premium aktualisiert</string>
+    <string name="home_more_adjustment_memory_history_action">Anpassungsverlauf ansehen</string>
+    <string name="home_more_adjustment_history_title">Anpassungsverlauf</string>
+    <string name="home_more_adjustment_history_body">Sehen Sie, was Premium nach jeder Prüfung geändert hat, einschließlich Rücknahmen, damit Ihr Plan nachvollziehbar bleibt.</string>
     <string name="home_more_smart_checkin_start">Check-in starten</string>
     <string name="home_more_smart_checkin_ready">Check-in bereit</string>
     <string name="home_more_smart_checkin_overdue">Check-in wartet</string>

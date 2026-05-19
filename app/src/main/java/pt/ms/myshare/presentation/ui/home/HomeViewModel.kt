@@ -332,6 +332,9 @@ class HomeViewModel @Inject constructor(
                     )
                 }
                 val latestAdjustment = planner.adjustments.maxByOrNull { it.createdAt }
+                val adjustmentHistory = planner.adjustments
+                    .sortedByDescending { it.createdAt }
+                    .take(PREMIUM_ADJUSTMENT_HISTORY_LIMIT)
                 val latestAppliedAdjustment = planner.adjustments
                     .filter { it.status == PremiumAdjustmentStatus.APPLIED }
                     .maxByOrNull { it.createdAt }
@@ -455,6 +458,10 @@ class HomeViewModel @Inject constructor(
                         messageKey = recommendationMessageKey
                     ),
                     adjustmentMemory = latestAdjustment?.takeIf { isPremium }?.toMemoryState(preferences),
+                    adjustmentHistory = adjustmentHistory
+                        .takeIf { isPremium }
+                        ?.map { it.toMemoryState(preferences) }
+                        .orEmpty(),
                     premiumCheckIn = premiumCheckIn.takeIf { isPremium },
                     error = currentMore.error.takeUnless { shouldClearUnavailableMessage }
                 )
@@ -1339,6 +1346,7 @@ class HomeViewModel @Inject constructor(
     private fun PremiumAdjustmentRecord.toMemoryState(preferences: UserPreferences): PremiumAdjustmentMemoryState {
         val currencyFormat = currencyFormat(preferences)
         return PremiumAdjustmentMemoryState(
+            id = id,
             dateLabel = createdAt.format(DateTimeFormatter.ofPattern("d MMM", preferences.locale)),
             direction = direction,
             status = status,
@@ -1423,6 +1431,7 @@ class HomeViewModel @Inject constructor(
         const val TAG = "HomeViewModel"
         const val SPLIT_VISIBLE_GOAL_COUNT = 3
         const val MIX_VISIBLE_RULE_COUNT = 3
+        const val PREMIUM_ADJUSTMENT_HISTORY_LIMIT = 8
     }
     }
 

@@ -600,6 +600,9 @@
     <string name="home_more_adjustment_memory_priority">Priority</string>
     <string name="home_more_adjustment_memory_change">%1$s to %2$s</string>
     <string name="home_more_adjustment_memory_rules">%1$d rule(s) updated by Premium</string>
+    <string name="home_more_adjustment_memory_history_action">See adjustment history</string>
+    <string name="home_more_adjustment_history_title">Adjustment history</string>
+    <string name="home_more_adjustment_history_body">See what Premium changed after each check-in, including reversals, so your plan stays easy to trust.</string>
     <string name="home_more_smart_checkin_start">Start check-in</string>
     <string name="home_more_smart_checkin_ready">Check-in ready</string>
     <string name="home_more_smart_checkin_overdue">Check-in waiting</string>

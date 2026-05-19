@@ -170,6 +170,7 @@ fun HomeScreen(
     var showReviewHistoryTimeline by remember { mutableStateOf(false) }
     var showStrategyGoalArchive by remember { mutableStateOf(false) }
     var showStrategyRuleArchive by remember { mutableStateOf(false) }
+    var showPremiumAdjustmentHistory by remember { mutableStateOf(false) }
     var showPremiumReviewResultSheet by remember { mutableStateOf(false) }
     var recommendationPendingApply by remember { mutableStateOf<PaydayAdjustmentRecommendationState?>(null) }
     var showRecommendationAppliedSheet by remember { mutableStateOf(false) }
@@ -319,6 +320,13 @@ fun HomeScreen(
                 showStrategyRuleArchive = false
                 onEditRule(ruleId)
             }
+        )
+    }
+
+    if (showPremiumAdjustmentHistory) {
+        PremiumAdjustmentHistoryBottomSheet(
+            history = state.moreCard.adjustmentHistory,
+            onDismissRequest = { showPremiumAdjustmentHistory = false }
         )
     }
 
@@ -730,6 +738,10 @@ fun HomeScreen(
                             onShowAccountDetails = {
                                 Timber.tag("HomeScreen").d("Account details opened from More tab")
                                 showAccountDetailsDialog = true
+                            },
+                            onOpenAdjustmentHistory = {
+                                Timber.tag("HomeScreen").d("Premium adjustment history opened")
+                                showPremiumAdjustmentHistory = true
                             },
                             onOpenReview = {
                                 Timber.tag("HomeScreen").d("Smart adjustment review opened from More tab")

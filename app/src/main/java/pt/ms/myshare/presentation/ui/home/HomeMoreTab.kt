@@ -4,6 +4,8 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
@@ -51,6 +53,7 @@ fun LazyListScope.homeMoreTab(
     onShowCurrencyPicker: () -> Unit,
     onShowAutomationLock: () -> Unit,
     onShowAccountDetails: () -> Unit,
+    onOpenAdjustmentHistory: () -> Unit,
     onOpenReview: () -> Unit,
     isGoogleCredentialRequestInProgress: Boolean,
     onConnectGoogle: () -> Unit,
@@ -88,6 +91,8 @@ fun LazyListScope.homeMoreTab(
             item {
                 PremiumAdjustmentMemoryCard(
                     memory = memory,
+                    historyCount = state.adjustmentHistory.size,
+                    onOpenHistory = onOpenAdjustmentHistory,
                     modifier = Modifier.padding(bottom = 20.dp)
                 )
             }
@@ -647,6 +652,8 @@ private fun SmartAdjustmentControlCard(
 @Composable
 private fun PremiumAdjustmentMemoryCard(
     memory: PremiumAdjustmentMemoryState,
+    historyCount: Int,
+    onOpenHistory: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val title = when (memory.status) {
@@ -777,6 +784,195 @@ private fun PremiumAdjustmentMemoryCard(
                 }
             }
 
+            Text(
+                text = stringResource(R.string.home_more_adjustment_memory_rules, memory.affectedRuleCount),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.Bold
+            )
+            if (historyCount > 1) {
+                OutlinedButton(
+                    onClick = onOpenHistory,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.History,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.home_more_adjustment_memory_history_action),
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PremiumAdjustmentHistoryBottomSheet(
+    history: List<PremiumAdjustmentMemoryState>,
+    onDismissRequest: () -> Unit,
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.background,
+        dragHandle = { BottomSheetDefaults.DragHandle() }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.home_more_adjustment_history_title),
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Black
+            )
+            Text(
+                text = stringResource(R.string.home_more_adjustment_history_body),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                lineHeight = 20.sp
+            )
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 560.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(bottom = 8.dp)
+            ) {
+                items(
+                    items = history,
+                    key = { it.id }
+                ) { memory ->
+                    PremiumAdjustmentHistoryRow(memory = memory)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PremiumAdjustmentHistoryRow(
+    memory: PremiumAdjustmentMemoryState,
+    modifier: Modifier = Modifier
+) {
+    val title = when (memory.status) {
+        PremiumAdjustmentStatus.APPLIED -> stringResource(R.string.home_more_adjustment_memory_title)
+        PremiumAdjustmentStatus.UNDONE -> stringResource(R.string.home_more_adjustment_memory_title_undone)
+    }
+    val body = when (memory.status) {
+        PremiumAdjustmentStatus.UNDONE -> stringResource(
+            R.string.home_more_adjustment_memory_body_undone,
+            memory.adjustmentAmountLabel
+        )
+        PremiumAdjustmentStatus.APPLIED -> when (memory.direction) {
+            PaydayAdjustmentRecommendationDirection.MOVE_MORE_TO_PRIORITY -> stringResource(
+                R.string.home_more_adjustment_memory_body_move,
+                memory.dateLabel,
+                memory.adjustmentAmountLabel
+            )
+            PaydayAdjustmentRecommendationDirection.RESTORE_FLEXIBLE_BUFFER -> stringResource(
+                R.string.home_more_adjustment_memory_body_restore,
+                memory.dateLabel,
+                memory.adjustmentAmountLabel
+            )
+            PaydayAdjustmentRecommendationDirection.KEEP_PLAN -> stringResource(
+                R.string.home_more_adjustment_memory_body_keep,
+                memory.dateLabel
+            )
+        }
+    }
+    val statusLabel = when (memory.status) {
+        PremiumAdjustmentStatus.APPLIED -> stringResource(R.string.home_more_adjustment_memory_status_applied)
+        PremiumAdjustmentStatus.UNDONE -> stringResource(R.string.home_more_adjustment_memory_status_undone)
+    }
+
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.14f))
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = memory.dateLabel,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MySharePositive,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                SmartAdjustmentStatusPill(
+                    text = statusLabel,
+                    isActive = memory.status == PremiumAdjustmentStatus.APPLIED
+                )
+            }
+            Text(
+                text = body,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                lineHeight = 18.sp
+            )
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 300.dp
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        PremiumAdjustmentMemoryMetric(
+                            label = stringResource(R.string.home_more_adjustment_memory_flexible),
+                            beforeLabel = memory.previousFlexibleSpendLabel,
+                            afterLabel = memory.recommendedFlexibleSpendLabel,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        PremiumAdjustmentMemoryMetric(
+                            label = stringResource(R.string.home_more_adjustment_memory_priority),
+                            beforeLabel = memory.previousPriorityContributionLabel,
+                            afterLabel = memory.recommendedPriorityContributionLabel,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                } else {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        PremiumAdjustmentMemoryMetric(
+                            label = stringResource(R.string.home_more_adjustment_memory_flexible),
+                            beforeLabel = memory.previousFlexibleSpendLabel,
+                            afterLabel = memory.recommendedFlexibleSpendLabel,
+                            modifier = Modifier.weight(1f)
+                        )
+                        PremiumAdjustmentMemoryMetric(
+                            label = stringResource(R.string.home_more_adjustment_memory_priority),
+                            beforeLabel = memory.previousPriorityContributionLabel,
+                            afterLabel = memory.recommendedPriorityContributionLabel,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
             Text(
                 text = stringResource(R.string.home_more_adjustment_memory_rules, memory.affectedRuleCount),
                 style = MaterialTheme.typography.labelMedium,

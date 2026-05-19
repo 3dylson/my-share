@@ -559,6 +559,13 @@ Status after Premium adjustment memory implementation pass on 2026-05-19:
 - Tested: focused HomeViewModel coverage for adjustment memory, full `testDebugUnitTest`, and Firebase rules tests for the new `adjustments` subcollection.
 - Validated: release build, Firestore rules deployment, normal Premium apply-to-memory flow, normal and compact `720x1280 / 360dpi` More memory card, compact Strategy adjusted badge, no app fatal crash in logcat, temporary Firestore Premium adjustment data restored to the previous state, and emulator restored to `1080x2400 / 420dpi`.
 
+Status after Premium adjustment history implementation pass on 2026-05-19:
+- Done: More now exposes `See adjustment history` from the Premium memory card when more than one Premium adjustment exists.
+- Done: Premium users get a dedicated adjustment history sheet with newest-first applied and undone records, each showing the plain-language change, before/after guide values, and affected rule count.
+- Done: Free users still do not receive adjustment memory or history state, keeping the value Premium-only.
+- Tested: focused HomeViewModel coverage for newest-first history and free-user gating, plus full `testDebugUnitTest`.
+- Validated: release build, release install on `emulator-5554`, compact `720x1280 / 360dpi` More memory card history action, compact adjustment history sheet top and scrolled undone record, no app fatal crash in logcat, temporary Firestore Premium history data restored to the previous state, and emulator restored to `1080x2400 / 420dpi`.
+
 Next:
 - Continue the next Premium product slice while keeping compact-screen validation in every pass.
 - Continue validating compact-screen layouts when new Premium controls are added.

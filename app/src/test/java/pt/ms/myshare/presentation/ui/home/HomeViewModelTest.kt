@@ -755,6 +755,50 @@ class HomeViewModelTest {
     }
 
     @Test
+    fun `premium user sees adjustment history newest first`() = runTest {
+        fakeEntitlementRepository.setPro(true)
+        fakePlannerRepository.savePremiumAdjustmentRecord(
+            premiumAdjustmentRecord(
+                id = "older-adjustment",
+                createdAt = LocalDate.of(2026, 5, 1),
+                adjustmentAmount = BigDecimal("25")
+            )
+        )
+        fakePlannerRepository.savePremiumAdjustmentRecord(
+            premiumAdjustmentRecord(
+                id = "newer-adjustment",
+                createdAt = LocalDate.of(2026, 5, 18),
+                adjustmentAmount = BigDecimal("45"),
+                status = PremiumAdjustmentStatus.UNDONE
+            )
+        )
+        advanceUntilIdle()
+
+        val history = viewModel.state.value.moreCard.adjustmentHistory
+
+        assertEquals(2, history.size)
+        assertEquals("newer-adjustment", history.first().id)
+        assertEquals(PremiumAdjustmentStatus.UNDONE, history.first().status)
+        assertEquals("older-adjustment", history.last().id)
+        assertEquals("newer-adjustment", viewModel.state.value.moreCard.adjustmentMemory?.id)
+    }
+
+    @Test
+    fun `free user does not see premium adjustment history`() = runTest {
+        fakeEntitlementRepository.setPro(false)
+        fakePlannerRepository.savePremiumAdjustmentRecord(
+            premiumAdjustmentRecord(
+                id = "hidden-adjustment",
+                createdAt = LocalDate.of(2026, 5, 18)
+            )
+        )
+        advanceUntilIdle()
+
+        assertTrue(viewModel.state.value.moreCard.adjustmentHistory.isEmpty())
+        assertEquals(null, viewModel.state.value.moreCard.adjustmentMemory)
+    }
+
+    @Test
     fun `grace period keeps premium automation available`() = runTest {
         fakeEntitlementRepository.setEntitlementState(EntitlementState.GRACE_PERIOD)
         fakePlannerRepository.saveAutomationEnabled(true)
@@ -889,6 +933,28 @@ class HomeViewModelTest {
                 plannedGoalContribution = BigDecimal("100"),
                 createdAt = LocalDate.of(2026, 5, 2)
             )
+        )
+    }
+
+    private fun premiumAdjustmentRecord(
+        id: String,
+        createdAt: LocalDate,
+        adjustmentAmount: BigDecimal = BigDecimal("25"),
+        status: PremiumAdjustmentStatus = PremiumAdjustmentStatus.APPLIED
+    ): PremiumAdjustmentRecord {
+        return PremiumAdjustmentRecord(
+            id = id,
+            direction = PaydayAdjustmentRecommendationDirection.MOVE_MORE_TO_PRIORITY,
+            status = status,
+            adjustmentAmount = adjustmentAmount,
+            previousFlexibleSpend = BigDecimal("300"),
+            recommendedFlexibleSpend = BigDecimal("275"),
+            previousPriorityContribution = BigDecimal("100"),
+            recommendedPriorityContribution = BigDecimal("125"),
+            confidencePercent = 62,
+            analyzedReviewCount = 1,
+            affectedRuleIds = listOf("rule-1"),
+            createdAt = createdAt
         )
     }
 }
