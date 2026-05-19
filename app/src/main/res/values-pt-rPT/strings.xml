@@ -325,6 +325,16 @@
     <string name="home_plan_smart_preview_premium_label">Pago</string>
     <string name="home_plan_smart_preview_premium_body">Revê uma vez e vê a próxima mudança.</string>
     <string name="home_plan_smart_preview_action">Ver ajuste adaptável</string>
+    <string name="home_plan_premium_brief_label">Premium a trabalhar</string>
+    <string name="home_plan_premium_brief_title">Este plano está a ser acompanhado</string>
+    <string name="home_plan_premium_brief_body_pending">O Premium encontrou um próximo guia de %1$s para gastos e %2$s para o movimento prioritário. Revê antes de mudar algo.</string>
+    <string name="home_plan_premium_brief_body_steady">O guia semanal de %1$s e o movimento prioritário de %2$s ainda parecem certos.</string>
+    <string name="home_plan_premium_brief_body_waiting">Regista cada revisão de pagamento e o Premium mostra o próximo movimento para este plano.</string>
+    <string name="home_plan_premium_brief_checkin_label">Próxima revisão</string>
+    <string name="home_plan_premium_brief_checkin_waiting">Depois do pagamento</string>
+    <string name="home_plan_premium_brief_watch_label">Acompanhamento</string>
+    <string name="home_plan_premium_brief_watch_active">Ligado</string>
+    <string name="home_plan_premium_brief_watch_paused">Pausado</string>
     <string name="home_strategy_goals_title">Metas financeiras</string>
     <string name="home_strategy_workspace_title">Espaço de trabalho de estratégia</string>
     <string name="home_strategy_workspace_body">Comece com um marco e uma regra de pagamento. Pode refinar ambos à medida que o seu ritmo monetário se torna mais claro.</string>

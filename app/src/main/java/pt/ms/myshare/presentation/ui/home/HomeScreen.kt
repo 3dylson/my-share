@@ -644,6 +644,8 @@ fun HomeScreen(
                         homePlanTab(
                             planCard = state.planCard,
                             isPremium = state.moreCard.isPremium,
+                            smartAdjustment = state.moreCard.smartAdjustment,
+                            premiumCheckIn = state.moreCard.premiumCheckIn,
                             onShowPaywall = { gate ->
                                 openPremiumGate(gate)
                             }

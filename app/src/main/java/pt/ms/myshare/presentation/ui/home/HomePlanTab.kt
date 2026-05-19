@@ -9,10 +9,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.AutoGraph
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.EventAvailable
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.ShoppingBag
@@ -30,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.ms.myshare.R
@@ -44,6 +48,8 @@ import pt.ms.myshare.presentation.ui.theme.MySharePositive
 fun LazyListScope.homePlanTab(
     planCard: HomePlanCardState?,
     isPremium: Boolean,
+    smartAdjustment: SmartAdjustmentControlState,
+    premiumCheckIn: PremiumCheckInState?,
     onShowPaywall: (HomePremiumGate) -> Unit
 ) {
     planCard?.let { card ->
@@ -131,6 +137,186 @@ fun LazyListScope.homePlanTab(
                     onClick = { onShowPaywall(HomePremiumGate.SmartAutomation) }
                 )
             }
+        } else {
+            item {
+                PremiumPlanBriefCard(
+                    smartAdjustment = smartAdjustment,
+                    premiumCheckIn = premiumCheckIn
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PremiumPlanBriefCard(
+    smartAdjustment: SmartAdjustmentControlState,
+    premiumCheckIn: PremiumCheckInState?,
+    modifier: Modifier = Modifier
+) {
+    val body = when {
+        smartAdjustment.isApplyable -> stringResource(
+            R.string.home_plan_premium_brief_body_pending,
+            smartAdjustment.recommendedFlexibleSpendLabel,
+            smartAdjustment.recommendedPriorityContributionLabel
+        )
+        smartAdjustment.hasRecommendation -> stringResource(
+            R.string.home_plan_premium_brief_body_steady,
+            smartAdjustment.currentFlexibleSpendLabel,
+            smartAdjustment.currentPriorityContributionLabel
+        )
+        else -> stringResource(R.string.home_plan_premium_brief_body_waiting)
+    }
+    val checkInLabel = premiumCheckIn?.relativeLabel()
+        ?: stringResource(R.string.home_plan_premium_brief_checkin_waiting)
+    val watchLabel = if (premiumCheckIn?.automationEnabled == false) {
+        stringResource(R.string.home_plan_premium_brief_watch_paused)
+    } else {
+        stringResource(R.string.home_plan_premium_brief_watch_active)
+    }
+
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.16f),
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.22f)),
+        shadowElevation = 1.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = MySharePrimary.copy(alpha = 0.13f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AutoAwesome,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.padding(10.dp).size(22.dp)
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_plan_premium_brief_label).uppercase(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MySharePrimary,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = stringResource(R.string.home_plan_premium_brief_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = body,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 330.dp || LocalDensity.current.fontScale >= 1.3f
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        PremiumPlanBriefSignal(
+                            label = stringResource(R.string.home_plan_premium_brief_checkin_label),
+                            value = checkInLabel,
+                            icon = if (premiumCheckIn?.isDue == true) Icons.Default.PlayCircle else Icons.Default.EventAvailable,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        PremiumPlanBriefSignal(
+                            label = stringResource(R.string.home_plan_premium_brief_watch_label),
+                            value = watchLabel,
+                            icon = Icons.Default.CheckCircle,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                } else {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        PremiumPlanBriefSignal(
+                            label = stringResource(R.string.home_plan_premium_brief_checkin_label),
+                            value = checkInLabel,
+                            icon = if (premiumCheckIn?.isDue == true) Icons.Default.PlayCircle else Icons.Default.EventAvailable,
+                            modifier = Modifier.weight(1f)
+                        )
+                        PremiumPlanBriefSignal(
+                            label = stringResource(R.string.home_plan_premium_brief_watch_label),
+                            value = watchLabel,
+                            icon = Icons.Default.CheckCircle,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PremiumPlanBriefSignal(
+    label: String,
+    value: String,
+    icon: ImageVector,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(14.dp),
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.72f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f))
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MySharePrimary,
+                modifier = Modifier.size(18.dp)
+            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = label.uppercase(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PremiumCheckInState.relativeLabel(): String {
+    val context = LocalContext.current
+    return remember(relativeLabelKey, relativeLabelArgs) {
+        val resId = context.resources.getIdentifier(relativeLabelKey, "string", context.packageName)
+        if (resId != 0) {
+            context.getString(resId, *relativeLabelArgs.toTypedArray())
+        } else {
+            relativeLabelKey
         }
     }
 }

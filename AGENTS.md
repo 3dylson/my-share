@@ -46,3 +46,12 @@ When working on this project, adhere strictly to the following guidelines and pr
 - **Concurrency:** Use Kotlin Coroutines and Flows for all asynchronous operations.
 - **Dependency Injection:** Use Dagger Hilt.
 - **Security:** Do not bypass security systems (e.g., App Check, Firebase rules) for convenience. Validate all critical state (like subscription status) via backend Cloud Functions.
+
+## Product Experience Bar
+- During validation, fix issues as soon as they are found, then resume the test from the interrupted flow.
+- The app must be understandable for users with no financial literacy. Use plain, outcome-first copy and avoid technical wording.
+- Premium should feel necessary because it clearly improves the user's payday decisions, not because the free path feels punished.
+- Onboarding is the primary conversion moment. Protect the aha moment: show a concrete plan from the user's own numbers before asking for Premium.
+- Use tasteful upsell, retention, gamification, and small relevant animations where they make the experience clearer or more motivating.
+- Preserve the premium look and feel across screen sizes. Always consider scalability, screen affordance, scrolling, keyboard behavior, and compact phones.
+- Keep the app consistent, avoid repeated information on the same screen, and make every Premium surface answer what Premium will do next for this user's plan.

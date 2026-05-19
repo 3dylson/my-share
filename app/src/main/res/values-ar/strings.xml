@@ -324,6 +324,16 @@
     <string name="home_plan_smart_preview_premium_label">مدفوع</string>
     <string name="home_plan_smart_preview_premium_body">راجع مرة واحدة وشاهد التغيير التالي.</string>
     <string name="home_plan_smart_preview_action">معاينة تعديل متكيّف</string>
+    <string name="home_plan_premium_brief_label">Premium يعمل</string>
+    <string name="home_plan_premium_brief_title">تتم متابعة هذه الخطة</string>
+    <string name="home_plan_premium_brief_body_pending">وجد Premium دليلًا تاليًا بقيمة %1$s للإنفاق و%2$s لحركة الأولوية. راجعه قبل تغيير أي شيء.</string>
+    <string name="home_plan_premium_brief_body_steady">دليلك الأسبوعي %1$s وحركة الأولوية %2$s ما زالا مناسبين.</string>
+    <string name="home_plan_premium_brief_body_waiting">سجّل كل مراجعة يوم دفع وسيعرض Premium الحركة التالية لهذه الخطة.</string>
+    <string name="home_plan_premium_brief_checkin_label">المراجعة التالية</string>
+    <string name="home_plan_premium_brief_checkin_waiting">بعد يوم الدفع</string>
+    <string name="home_plan_premium_brief_watch_label">متابعة الخطة</string>
+    <string name="home_plan_premium_brief_watch_active">مفعّلة</string>
+    <string name="home_plan_premium_brief_watch_paused">متوقفة</string>
     <string name="home_strategy_goals_title">الأهداف المالية</string>
     <string name="home_strategy_workspace_title">مساحة عمل الإستراتيجية</string>
     <string name="home_strategy_workspace_body">ابدأ بمعلم واحد وقاعدة يوم دفع واحدة. يمكنك تحسين كليهما عندما يصبح إيقاع أموالك أكثر وضوحًا.</string>
