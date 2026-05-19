@@ -76,10 +76,6 @@
     <string name="onboarding_trajectory_adjustment_free_body">احتفظ بتقسيم اليوم حتى تغيّره.</string>
     <string name="onboarding_trajectory_adjustment_premium_label">ذاكرة Premium</string>
     <string name="onboarding_trajectory_adjustment_premium_body">مراجعات وسجل وتعافٍ من المراجعات الفائتة.</string>
-    <string name="onboarding_banksync_title">التخطيط اليدوي جاهز</string>
-    <string name="onboarding_banksync_subtitle">ستأتي مزامنة البنك لاحقًا. تعمل خطة يوم الدفع الخاصة بك الآن مع عمليات تسجيل الوصول اليدوية والتذكيرات والقواعد الواضحة.</string>
-    <string name="onboarding_banksync_link">أعلمني عندما يكون جاهزًا</string>
-    <string name="onboarding_banksync_skip">المتابعة إلى الصفحة الرئيسية</string>
     <string name="onboarding_reminder_title">البقاء على المسار الصحيح</string>
     <string name="onboarding_reminder_subtitle">إن عمليات تسجيل الوصول المتسقة هي المفتاح لبناء الثروة. سنرسل لك دفعة لطيفة لمساعدتك في متابعة خطتك.</string>
     <string name="onboarding_reminder_cadence_payday_desc">كن متوافقًا مع خطتك في كل حدث يتعلق بالدخل.</string>
@@ -302,8 +298,6 @@
     <string name="onboarding_trajectory_goal_pending">المسار معلق</string>
     <string name="onboarding_trajectory_intensity_title">كثافة المساهمة</string>
     <string name="onboarding_trajectory_intensity_desc">كم من كل يوم دفع يذهب نحو مستقبلك.</string>
-    <string name="onboarding_banksync_interest_title">الفائدة مسجلة</string>
-    <string name="onboarding_banksync_interest_body">لقد حفظنا اهتمامك على هذا الجهاز وسنستخدم تحديثات التطبيق للإعلان عن المزامنة المصرفية عندما تكون جاهزة.</string>
     <string name="onboarding_reminder_error_permission">مطلوب إذن الإخطار للتذكير.</string>
     <string name="onboarding_reminder_cadence_payday">كل يوم دفع</string>
     <string name="onboarding_reminder_cadence_weekly">مراجعة أسبوعية</string>

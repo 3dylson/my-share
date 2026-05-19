@@ -530,7 +530,7 @@ fun PremiumPaywallCard(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top
             ) {
                 Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
                     Text(
@@ -547,39 +547,36 @@ fun PremiumPaywallCard(
                         )
                     }
                 }
-                if (badge != null || isSelected) {
-                    Column(
-                        horizontalAlignment = Alignment.End,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        if (badge != null) {
-                            Surface(
-                                color = MySharePrimary,
-                                shape = RoundedCornerShape(8.dp)
-                            ) {
-                                Text(
-                                    text = badge,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = Color.White,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-                        if (isSelected) {
-                            Icon(
-                                imageVector = Icons.Default.CheckCircle,
-                                contentDescription = stringResource(R.string.content_description_selected),
-                                tint = MySharePrimary,
-                                modifier = Modifier.size(24.dp)
+                when {
+                    badge != null -> {
+                        Surface(
+                            color = MySharePrimary,
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = badge,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                     }
+                    isSelected -> {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = stringResource(R.string.content_description_selected),
+                            tint = MySharePrimary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(12.dp))
-            
+
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp),

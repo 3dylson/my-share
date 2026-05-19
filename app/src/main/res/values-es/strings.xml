@@ -76,10 +76,6 @@
     <string name="onboarding_trajectory_adjustment_free_body">Mantén la división de hoy hasta cambiarla.</string>
     <string name="onboarding_trajectory_adjustment_premium_label">Memoria Premium</string>
     <string name="onboarding_trajectory_adjustment_premium_body">Revisiones, historial y recuperación de controles perdidos.</string>
-    <string name="onboarding_banksync_title">La planificación manual está lista</string>
-    <string name="onboarding_banksync_subtitle">La sincronización bancaria llegará más tarde. Su plan de día de pago funciona ahora con registros manuales, recordatorios y reglas claras.</string>
-    <string name="onboarding_banksync_link">Notificarme cuando esté listo</string>
-    <string name="onboarding_banksync_skip">Continuar a Inicio</string>
     <string name="onboarding_reminder_title">Mantente en el camino</string>
     <string name="onboarding_reminder_subtitle">Los controles constantes son la clave para generar riqueza. Le enviaremos un suave empujón para ayudarle a seguir su plan.</string>
     <string name="onboarding_reminder_cadence_payday_desc">Manténgase alineado con su plan en cada evento de ingresos.</string>
@@ -302,8 +298,6 @@
     <string name="onboarding_trajectory_goal_pending">Camino pendiente</string>
     <string name="onboarding_trajectory_intensity_title">Intensidad de contribución</string>
     <string name="onboarding_trajectory_intensity_desc">Cuánto de cada día de pago se destina a su futuro.</string>
-    <string name="onboarding_banksync_interest_title">Interés registrado</string>
-    <string name="onboarding_banksync_interest_body">Guardamos su interés en este dispositivo y usaremos actualizaciones de la aplicación para anunciar la sincronización bancaria cuando esté lista.</string>
     <string name="onboarding_reminder_error_permission">Se requiere permiso de notificación para los recordatorios.</string>
     <string name="onboarding_reminder_cadence_payday">cada día de pago</string>
     <string name="onboarding_reminder_cadence_weekly">revisión semanal</string>

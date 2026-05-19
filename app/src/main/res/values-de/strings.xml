@@ -76,10 +76,6 @@
     <string name="onboarding_trajectory_adjustment_free_body">Behalte die heutige Aufteilung, bis du sie änderst.</string>
     <string name="onboarding_trajectory_adjustment_premium_label">Premium-Gedächtnis</string>
     <string name="onboarding_trajectory_adjustment_premium_body">Bewertungen, Verlauf und Erholung nach verpassten Check-ins.</string>
-    <string name="onboarding_banksync_title">Die manuelle Planung ist fertig</string>
-    <string name="onboarding_banksync_subtitle">Die Banksynchronisierung folgt später. Ihr Zahltagplan funktioniert jetzt mit manuellen Check-ins, Erinnerungen und klaren Regeln.</string>
-    <string name="onboarding_banksync_link">Benachrichtigen Sie mich, wenn es fertig ist</string>
-    <string name="onboarding_banksync_skip">Weiter zur Startseite</string>
     <string name="onboarding_reminder_title">Bleiben Sie auf dem richtigen Weg</string>
     <string name="onboarding_reminder_subtitle">Konsequente Check-ins sind der Schlüssel zum Vermögensaufbau. Wir senden Ihnen einen sanften Anstoß, um Ihnen bei der Umsetzung Ihres Plans zu helfen.</string>
     <string name="onboarding_reminder_cadence_payday_desc">Halten Sie sich bei jeder Einkommensveranstaltung an Ihren Plan.</string>
@@ -302,8 +298,6 @@
     <string name="onboarding_trajectory_goal_pending">Pfad ausstehend</string>
     <string name="onboarding_trajectory_intensity_title">Beitragsintensität</string>
     <string name="onboarding_trajectory_intensity_desc">Wie viel von jedem Zahltag geht an Ihre Zukunft?</string>
-    <string name="onboarding_banksync_interest_title">Interesse angemeldet</string>
-    <string name="onboarding_banksync_interest_body">Wir haben Ihr Interesse an diesem Gerät gespeichert und werden App-Updates verwenden, um die Banksynchronisierung anzukündigen, sobald es bereit ist.</string>
     <string name="onboarding_reminder_error_permission">Für Erinnerungen ist eine Benachrichtigungserlaubnis erforderlich.</string>
     <string name="onboarding_reminder_cadence_payday">An jedem Zahltag</string>
     <string name="onboarding_reminder_cadence_weekly">Wöchentlicher Rückblick</string>

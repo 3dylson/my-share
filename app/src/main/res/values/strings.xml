@@ -88,10 +88,6 @@
     <string name="onboarding_trajectory_adjustment_premium_body">Reviews, history, and missed-check-in recovery.</string>
 
     <!-- Bank Sync Screen -->
-    <string name="onboarding_banksync_title">Manual planning is ready</string>
-    <string name="onboarding_banksync_subtitle">Bank sync is coming later. Your payday plan works now with manual check-ins, reminders, and clear rules.</string>
-    <string name="onboarding_banksync_link">Notify Me When It\'s Ready</string>
-    <string name="onboarding_banksync_skip">Continue to Home</string>
 
     <!-- Reminder Setup Screen -->
     <string name="onboarding_reminder_title">Stay on track</string>
@@ -345,8 +341,6 @@
     <string name="onboarding_trajectory_intensity_desc">How much of each payday goes toward future you.</string>
     <string name="onboarding_trajectory_flexible_title">Priority transfer</string>
     <string name="onboarding_trajectory_flexible_desc">This strategy keeps the remaining payday money flexible.</string>
-    <string name="onboarding_banksync_interest_title">Interest registered</string>
-    <string name="onboarding_banksync_interest_body">We saved your interest on this device and will use app updates to announce bank sync when it is ready.</string>
     <string name="onboarding_reminder_error_permission">Notification permission is required for reminders.</string>
     <string name="onboarding_reminder_cadence_payday">Every payday</string>
     <string name="onboarding_reminder_cadence_weekly">Weekly review</string>

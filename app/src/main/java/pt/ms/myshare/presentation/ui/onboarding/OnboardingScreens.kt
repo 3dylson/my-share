@@ -518,22 +518,22 @@ private fun PaywallHeroCard(
     compactHeight: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val cardPadding = if (compactHeight) 16.dp else 22.dp
+    val cardPadding = if (compactHeight) 12.dp else 22.dp
     val iconPadding = if (compactHeight) 9.dp else 12.dp
     val iconSize = if (compactHeight) 22.dp else 28.dp
-    val verticalSpacing = if (compactHeight) 10.dp else 14.dp
+    val verticalSpacing = if (compactHeight) 8.dp else 14.dp
     val headlineStyle = if (compactHeight) {
         MaterialTheme.typography.titleLarge
     } else {
         MaterialTheme.typography.headlineMedium
     }
-    val headlineLineHeight = if (compactHeight) 27.sp else 34.sp
+    val headlineLineHeight = if (compactHeight) 26.sp else 34.sp
     val bodyStyle = if (compactHeight) {
         MaterialTheme.typography.bodySmall
     } else {
         MaterialTheme.typography.bodyMedium
     }
-    val bodyLineHeight = if (compactHeight) 18.sp else 21.sp
+    val bodyLineHeight = if (compactHeight) 17.sp else 21.sp
 
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -589,8 +589,8 @@ private fun PaywallHeroCard(
                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.78f),
                 textAlign = TextAlign.Center,
                 lineHeight = bodyLineHeight,
-                modifier = Modifier.fillMaxWidth().padding(top = if (compactHeight) 6.dp else 8.dp),
-                maxLines = if (compactHeight) 2 else Int.MAX_VALUE,
+                modifier = Modifier.fillMaxWidth().padding(top = if (compactHeight) 4.dp else 8.dp),
+                maxLines = if (compactHeight) 1 else Int.MAX_VALUE,
                 overflow = TextOverflow.Ellipsis
             )
         }

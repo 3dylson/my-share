@@ -76,10 +76,6 @@
     <string name="onboarding_trajectory_adjustment_free_body">Gardez la répartition du jour jusqu’à la modifier.</string>
     <string name="onboarding_trajectory_adjustment_premium_label">Mémoire Premium</string>
     <string name="onboarding_trajectory_adjustment_premium_body">Bilans, historique et récupération des bilans manqués.</string>
-    <string name="onboarding_banksync_title">La planification manuelle est prête</string>
-    <string name="onboarding_banksync_subtitle">La synchronisation bancaire arrive plus tard. Votre plan de dépannage fonctionne désormais avec des enregistrements manuels, des rappels et des règles claires.</string>
-    <string name="onboarding_banksync_link">Prévenez-moi quand c\'est prêt</string>
-    <string name="onboarding_banksync_skip">Continuer vers l\'accueil</string>
     <string name="onboarding_reminder_title">Restez sur la bonne voie</string>
     <string name="onboarding_reminder_subtitle">Des enregistrements cohérents sont la clé pour créer de la richesse. Nous vous enverrons un léger coup de pouce pour vous aider à suivre votre plan.</string>
     <string name="onboarding_reminder_cadence_payday_desc">Restez aligné sur votre plan à chaque événement de revenus.</string>
@@ -302,8 +298,6 @@
     <string name="onboarding_trajectory_goal_pending">Chemin en attente</string>
     <string name="onboarding_trajectory_intensity_title">Intensité des contributions</string>
     <string name="onboarding_trajectory_intensity_desc">Quelle part de chaque salaire va à votre avenir.</string>
-    <string name="onboarding_banksync_interest_title">Intérêts enregistrés</string>
-    <string name="onboarding_banksync_interest_body">Nous avons enregistré votre intérêt pour cet appareil et utiliserons les mises à jour de l\'application pour annoncer la synchronisation bancaire lorsqu\'elle sera prête.</string>
     <string name="onboarding_reminder_error_permission">Une autorisation de notification est requise pour les rappels.</string>
     <string name="onboarding_reminder_cadence_payday">Chaque jour de paie</string>
     <string name="onboarding_reminder_cadence_weekly">Revue hebdomadaire</string>

@@ -77,10 +77,6 @@
     <string name="onboarding_trajectory_adjustment_free_body">Mantém a divisão de hoje até a mudares.</string>
     <string name="onboarding_trajectory_adjustment_premium_label">Memória Premium</string>
     <string name="onboarding_trajectory_adjustment_premium_body">Revisões, histórico e recuperação de check-ins perdidos.</string>
-    <string name="onboarding_banksync_title">Plano manual pronto</string>
-    <string name="onboarding_banksync_subtitle">A sincronização bancária chega mais tarde. O teu plano de pagamento já funciona com revisões manuais, lembretes e regras claras.</string>
-    <string name="onboarding_banksync_link">Avisar quando estiver pronta</string>
-    <string name="onboarding_banksync_skip">Continuar para o início</string>
     <string name="onboarding_reminder_title">Continua no caminho</string>
     <string name="onboarding_reminder_subtitle">Revisões consistentes ajudam a construir património. Enviamos um lembrete discreto para te ajudar a seguir o plano.</string>
     <string name="onboarding_reminder_cadence_payday_desc">Mantém o plano alinhado em cada entrada de rendimento.</string>
@@ -303,8 +299,6 @@
     <string name="onboarding_trajectory_goal_pending">Caminho pendente</string>
     <string name="onboarding_trajectory_intensity_title">Intensidade de contribuição</string>
     <string name="onboarding_trajectory_intensity_desc">Quanto de cada dia de pagamento vai para si no futuro.</string>
-    <string name="onboarding_banksync_interest_title">Juros registados</string>
-    <string name="onboarding_banksync_interest_body">Guardámos o seu interesse neste dispositivo e utilizaremos as atualizações da aplicação para anunciar a sincronização bancária quando estiver pronta.</string>
     <string name="onboarding_reminder_error_permission">A permissão de notificação é necessária para lembretes.</string>
     <string name="onboarding_reminder_cadence_payday">Todo o dia de pagamento</string>
     <string name="onboarding_reminder_cadence_weekly">Revisão semanal</string>
