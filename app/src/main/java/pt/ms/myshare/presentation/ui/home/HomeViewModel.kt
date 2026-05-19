@@ -152,6 +152,11 @@ class HomeViewModel @Inject constructor(
             entitlementRepository.purchaseEvents.collect { event ->
                 val messageKey = BillingStatusMessageMapper.fromPurchaseEvent(event)
                 var shouldLogAccountPrompt = false
+                if (event == BillingPurchaseEvent.Completed) {
+                    plannerRepository.saveAutomationEnabled(true)
+                    Timber.tag(TAG).d("Premium watch enabled after completed purchase")
+                    FirebaseUtils.logEvent("premium_watch_enabled_after_purchase")
+                }
                 uiState.update {
                     val shouldShowAccountPrompt = event == BillingPurchaseEvent.Completed &&
                         it.moreCard.userEmail.isNullOrBlank() &&

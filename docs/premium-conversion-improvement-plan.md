@@ -610,6 +610,12 @@ Status after Premium Plan proof implementation pass on 2026-05-19:
 - Tested: full `testDebugUnitTest` and debug build.
 - Validated: debug install on `emulator-5554`, Google Play test subscription completion, server entitlement snapshot `PRO`, server acknowledgement, compact `720x1280 / 360dpi` Premium Plan proof card, paused-state card-to-More handoff, no app fatal crash or ANR in logcat, and emulator restored to `1080x2400 / 420dpi`.
 
+Status after Premium watch activation pass on 2026-05-19:
+- Done: A completed Premium purchase now enables the Premium watch automatically so the paid product starts delivering value immediately instead of landing in a paused state.
+- Done: The post-purchase account-protection prompt is preserved, and Premium still only recommends changes until the user explicitly approves an adjustment.
+- Tested: HomeViewModel purchase-completion coverage now verifies the watch setting is saved and visible after Premium activation, plus full `testDebugUnitTest` and debug build.
+- Validated: debug install on `emulator-5554`, compact `720x1280 / 360dpi` paused Plan-to-More path, manual watch enable in More, compact active Plan proof card, no app fatal crash or ANR in logcat, and emulator restored to `1080x2400 / 420dpi`.
+
 Next:
 - Continue the next Premium product slice while keeping compact-screen validation in every pass.
 - Continue validating compact-screen layouts when new Premium controls are added.

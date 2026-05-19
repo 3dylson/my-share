@@ -361,11 +361,14 @@ class HomeViewModelTest {
     @Test
     fun `purchase completed asks local user to connect Google account`() = runTest {
         advanceUntilIdle()
+        fakeEntitlementRepository.setPro(true)
 
         fakeEntitlementRepository.emitPurchaseEvent(BillingPurchaseEvent.Completed)
         advanceUntilIdle()
 
         assertTrue(viewModel.state.value.moreCard.showPremiumAccountPrompt)
+        assertTrue(fakePlannerRepository.automationEnabled())
+        assertTrue(viewModel.state.value.moreCard.automationEnabled)
         assertEquals(
             "paywall_billing_completed",
             viewModel.state.value.moreCard.billingMessage
