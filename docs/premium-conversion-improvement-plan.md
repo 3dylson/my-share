@@ -622,6 +622,12 @@ Status after Premium watch waiting-state copy pass on 2026-05-19:
 - Tested: full `testDebugUnitTest` and debug build.
 - Validated: debug install on `emulator-5554`, compact `720x1280 / 360dpi` More waiting state, no app fatal crash or ANR in logcat, and emulator restored to `1080x2400 / 420dpi`.
 
+Status after Premium card shadow cleanup pass on 2026-05-19:
+- Done: Removed Compose elevation from the Plan and More Premium cards so dark-mode rounded cards no longer render a square shadow block behind the content.
+- Done: Kept the Premium border and tonal container treatment, preserving the premium feel without the visual artifact.
+- Tested: full `testDebugUnitTest` and debug build.
+- Validated: debug install on `emulator-5554`, compact `720x1280 / 360dpi` active Premium More watch card, active Premium Plan proof card, Google Play test purchase state still active, and no app fatal crash or ANR in logcat.
+
 Next:
 - Continue the next Premium product slice while keeping compact-screen validation in every pass.
 - Continue validating compact-screen layouts when new Premium controls are added.

@@ -192,8 +192,7 @@ private fun PremiumPlanBriefCard(
             .clickable(enabled = !isWatching) { onOpenPremiumControls() },
         shape = RoundedCornerShape(20.dp),
         color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.16f),
-        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.22f)),
-        shadowElevation = 1.dp
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.22f))
     ) {
         Column(
             modifier = Modifier.padding(16.dp),

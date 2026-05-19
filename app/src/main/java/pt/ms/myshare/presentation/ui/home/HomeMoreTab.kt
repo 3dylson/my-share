@@ -552,8 +552,7 @@ private fun SmartAdjustmentControlCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
         color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.18f),
-        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.22f)),
-        shadowElevation = 2.dp
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.22f))
     ) {
         Column(
             modifier = Modifier.padding(18.dp),
