@@ -464,6 +464,14 @@
     <string name="home_review_coaching_metric_buffer">متوسط المتبقي</string>
     <string name="home_review_coaching_metric_extra">متوسط الزيادة للأهداف</string>
     <string name="home_review_coaching_metric_hit_rate">أيام الدفع على المسار</string>
+    <string name="home_review_momentum_label">زخم Premium</string>
+    <string name="home_review_momentum_headline_starting">ابنِ سلسلة مراجعاتك</string>
+    <string name="home_review_momentum_headline_building">Premium يتعلم نمطك</string>
+    <string name="home_review_momentum_headline_streaking">سلسلة مراجعاتك تعمل</string>
+    <string name="home_review_momentum_body">بقي %1$d للوصول إلى %2$d مراجعات. المزيد من المراجعات يساعد Premium على اكتشاف خطوة يوم الدفع التالية مبكرًا.</string>
+    <string name="home_review_momentum_reviews">%1$d مراجعات</string>
+    <string name="home_review_momentum_streak">سلسلة %1$d يوم</string>
+    <string name="home_review_momentum_next">هدف %1$d مراجعات</string>
     <string name="home_review_result_label">مراجعة Premium</string>
     <string name="home_review_result_title">تم حفظ المراجعة</string>
     <string name="home_review_result_desc">حدّث Premium خطتك من مراجعة %1$s ولديه الآن %2$d مراجعات للتعلم منها.</string>

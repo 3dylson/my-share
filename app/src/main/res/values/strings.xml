@@ -509,6 +509,14 @@
     <string name="home_review_coaching_metric_buffer">Avg left over</string>
     <string name="home_review_coaching_metric_extra">Avg extra to goals</string>
     <string name="home_review_coaching_metric_hit_rate">Paydays on track</string>
+    <string name="home_review_momentum_label">Premium momentum</string>
+    <string name="home_review_momentum_headline_starting">Build your review streak</string>
+    <string name="home_review_momentum_headline_building">Premium is learning your pattern</string>
+    <string name="home_review_momentum_headline_streaking">Your review streak is working</string>
+    <string name="home_review_momentum_body">%1$d more to reach %2$d reviews. More reviews help Premium spot the next payday move sooner.</string>
+    <string name="home_review_momentum_reviews">%1$d reviews</string>
+    <string name="home_review_momentum_streak">%1$d day streak</string>
+    <string name="home_review_momentum_next">%1$d review goal</string>
     <string name="home_review_result_label">Premium check-in</string>
     <string name="home_review_result_title">Check-in saved</string>
     <string name="home_review_result_desc">Premium refreshed your plan from the %1$s review and now has %2$d check-ins to learn from.</string>

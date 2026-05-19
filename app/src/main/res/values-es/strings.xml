@@ -464,6 +464,14 @@
     <string name="home_review_coaching_metric_buffer">Prom. sin gastar</string>
     <string name="home_review_coaching_metric_extra">Prom. extra a metas</string>
     <string name="home_review_coaching_metric_hit_rate">Cobros en camino</string>
+    <string name="home_review_momentum_label">Impulso Premium</string>
+    <string name="home_review_momentum_headline_starting">Construye tu racha de revisiones</string>
+    <string name="home_review_momentum_headline_building">Premium está aprendiendo tu patrón</string>
+    <string name="home_review_momentum_headline_streaking">Tu racha de revisiones está funcionando</string>
+    <string name="home_review_momentum_body">Faltan %1$d para llegar a %2$d revisiones. Más revisiones ayudan a Premium a detectar antes el próximo paso del cobro.</string>
+    <string name="home_review_momentum_reviews">%1$d revisiones</string>
+    <string name="home_review_momentum_streak">Racha de %1$d día(s)</string>
+    <string name="home_review_momentum_next">Meta de %1$d revisiones</string>
     <string name="home_review_result_label">Revisión Premium</string>
     <string name="home_review_result_title">Revisión guardada</string>
     <string name="home_review_result_desc">Premium actualizó tu plan con la revisión del %1$s y ahora tiene %2$d revisiones para aprender.</string>

@@ -25,6 +25,7 @@ import pt.ms.myshare.domain.model.PremiumGoalPaydaySplit
 import pt.ms.myshare.domain.model.PremiumReviewCoachingMetric
 import pt.ms.myshare.domain.model.PremiumReviewCoachingMetricType
 import pt.ms.myshare.domain.model.PremiumReviewCoachingSummary
+import pt.ms.myshare.domain.model.PremiumReviewMomentum
 import pt.ms.myshare.domain.model.PremiumRulePaydayMix
 import pt.ms.myshare.domain.model.ReviewInsight
 import pt.ms.myshare.domain.model.Goal
@@ -45,6 +46,7 @@ import pt.ms.myshare.domain.use_case.CreatePremiumCheckInPlanUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumGoalPaydaySplitUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumRulePaydayMixUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumReviewCoachingSummaryUseCase
+import pt.ms.myshare.domain.use_case.CreatePremiumReviewMomentumUseCase
 import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
 import pt.ms.myshare.domain.use_case.EnforcePremiumDowngradeUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
@@ -81,6 +83,7 @@ class HomeViewModel @Inject constructor(
     private val createPremiumGoalPaydaySplitUseCase: CreatePremiumGoalPaydaySplitUseCase,
     private val createPremiumRulePaydayMixUseCase: CreatePremiumRulePaydayMixUseCase,
     private val createPremiumReviewCoachingSummaryUseCase: CreatePremiumReviewCoachingSummaryUseCase,
+    private val createPremiumReviewMomentumUseCase: CreatePremiumReviewMomentumUseCase,
     private val createReviewInsightUseCase: CreateReviewInsightUseCase,
     private val enforcePremiumDowngradeUseCase: EnforcePremiumDowngradeUseCase,
     private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase,
@@ -366,6 +369,16 @@ class HomeViewModel @Inject constructor(
                 } else {
                     null
                 }
+                val premiumMomentum = if (isPremium) {
+                    createPremiumReviewMomentumUseCase
+                        .execute(
+                            totalReviews = performanceStats.totalReviews,
+                            currentStreak = performanceStats.currentStreak
+                        )
+                        ?.toState()
+                } else {
+                    null
+                }
                 coachingSummary?.let {
                     Timber.tag(TAG).d(
                         "Premium review coaching summary ready. status=%s metrics=%d",
@@ -477,6 +490,7 @@ class HomeViewModel @Inject constructor(
                     reviewCard = reviewCard.copy(
                         premiumReviewResult = premiumReviewResult,
                         coachingSummary = coachingSummary,
+                        premiumMomentum = premiumMomentum,
                         coachingInsights = coachingInsights,
                         paydayRecommendation = paydayRecommendationState,
                         premiumCheckIn = premiumCheckIn.takeIf { isPremium },
@@ -1356,6 +1370,17 @@ class HomeViewModel @Inject constructor(
             previousPriorityContributionLabel = currencyFormat.format(previousPriorityContribution),
             recommendedPriorityContributionLabel = currencyFormat.format(recommendedPriorityContribution),
             affectedRuleCount = affectedRuleIds.size
+        )
+    }
+
+    private fun PremiumReviewMomentum.toState(): PremiumReviewMomentumState {
+        return PremiumReviewMomentumState(
+            status = status,
+            totalReviews = totalReviews,
+            currentStreak = currentStreak,
+            nextMilestone = nextMilestone,
+            reviewsUntilNextMilestone = reviewsUntilNextMilestone,
+            progress = progress
         )
     }
 

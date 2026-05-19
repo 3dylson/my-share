@@ -44,6 +44,7 @@ import pt.ms.myshare.domain.use_case.CreatePremiumCheckInPlanUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumGoalPaydaySplitUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumRulePaydayMixUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumReviewCoachingSummaryUseCase
+import pt.ms.myshare.domain.use_case.CreatePremiumReviewMomentumUseCase
 import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
 import pt.ms.myshare.domain.use_case.EnforcePremiumDowngradeUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
@@ -109,6 +110,7 @@ class HomeViewModelTest {
             createPremiumGoalPaydaySplitUseCase = CreatePremiumGoalPaydaySplitUseCase(),
             createPremiumRulePaydayMixUseCase = CreatePremiumRulePaydayMixUseCase(),
             createPremiumReviewCoachingSummaryUseCase = CreatePremiumReviewCoachingSummaryUseCase(calculatePlanPreviewUseCase),
+            createPremiumReviewMomentumUseCase = CreatePremiumReviewMomentumUseCase(),
             createReviewInsightUseCase = CreateReviewInsightUseCase(calculatePlanPreviewUseCase),
             enforcePremiumDowngradeUseCase = EnforcePremiumDowngradeUseCase(fakePlannerRepository),
             resolvePricingStrategyUseCase = ResolvePricingStrategyUseCase(),
@@ -495,6 +497,30 @@ class HomeViewModelTest {
         assertEquals(PremiumReviewCoachingStatus.STEADY, summary?.status)
         assertEquals("home_review_coaching_summary_headline_steady", summary?.headlineKey)
         assertTrue(summary?.metrics?.isNotEmpty() == true)
+    }
+
+    @Test
+    fun `premium user receives review momentum milestone`() = runTest {
+        seedPlanWithPerformanceReviews()
+        fakeEntitlementRepository.setEntitlementState(EntitlementState.PRO)
+        advanceUntilIdle()
+
+        val momentum = viewModel.state.value.reviewCard.premiumMomentum
+
+        assertEquals(2, momentum?.totalReviews)
+        assertEquals(1, momentum?.currentStreak)
+        assertEquals(3, momentum?.nextMilestone)
+        assertEquals(1, momentum?.reviewsUntilNextMilestone)
+        assertTrue(momentum != null && momentum.progress in 0.66f..0.67f)
+    }
+
+    @Test
+    fun `free user does not receive review momentum milestone`() = runTest {
+        seedPlanWithPerformanceReviews()
+        fakeEntitlementRepository.setEntitlementState(EntitlementState.FREE)
+        advanceUntilIdle()
+
+        assertEquals(null, viewModel.state.value.reviewCard.premiumMomentum)
     }
 
     @Test

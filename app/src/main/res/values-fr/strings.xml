@@ -464,6 +464,14 @@
     <string name="home_review_coaching_metric_buffer">Moy. restant</string>
     <string name="home_review_coaching_metric_extra">Moy. extra objectifs</string>
     <string name="home_review_coaching_metric_hit_rate">Paies sur la bonne voie</string>
+    <string name="home_review_momentum_label">Élan Premium</string>
+    <string name="home_review_momentum_headline_starting">Construisez votre série de bilans</string>
+    <string name="home_review_momentum_headline_building">Premium apprend votre rythme</string>
+    <string name="home_review_momentum_headline_streaking">Votre série de bilans fonctionne</string>
+    <string name="home_review_momentum_body">Plus que %1$d pour atteindre %2$d bilans. Plus de bilans aident Premium à repérer plus tôt le prochain geste de paie.</string>
+    <string name="home_review_momentum_reviews">%1$d bilans</string>
+    <string name="home_review_momentum_streak">Série de %1$d jour(s)</string>
+    <string name="home_review_momentum_next">Objectif %1$d bilans</string>
     <string name="home_review_result_label">Bilan Premium</string>
     <string name="home_review_result_title">Bilan enregistré</string>
     <string name="home_review_result_desc">Premium a actualisé votre plan avec le bilan du %1$s et dispose maintenant de %2$d bilans pour apprendre.</string>

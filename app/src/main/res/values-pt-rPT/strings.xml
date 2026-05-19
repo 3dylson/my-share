@@ -465,6 +465,14 @@
     <string name="home_review_coaching_metric_buffer">Média por gastar</string>
     <string name="home_review_coaching_metric_extra">Média extra para objetivos</string>
     <string name="home_review_coaching_metric_hit_rate">Dias no caminho certo</string>
+    <string name="home_review_momentum_label">Ritmo Premium</string>
+    <string name="home_review_momentum_headline_starting">Cria a tua sequência de revisões</string>
+    <string name="home_review_momentum_headline_building">O Premium está a aprender o teu padrão</string>
+    <string name="home_review_momentum_headline_streaking">A tua sequência de revisões está a funcionar</string>
+    <string name="home_review_momentum_body">Faltam %1$d para chegar a %2$d revisões. Mais revisões ajudam o Premium a encontrar o próximo passo do pagamento mais cedo.</string>
+    <string name="home_review_momentum_reviews">%1$d revisões</string>
+    <string name="home_review_momentum_streak">Sequência de %1$d dia(s)</string>
+    <string name="home_review_momentum_next">Meta de %1$d revisões</string>
     <string name="home_review_result_label">Check-in Premium</string>
     <string name="home_review_result_title">Check-in guardado</string>
     <string name="home_review_result_desc">O Premium atualizou o seu plano com a revisão de %1$s e agora tem %2$d check-ins para aprender.</string>

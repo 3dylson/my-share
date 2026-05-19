@@ -464,6 +464,14 @@
     <string name="home_review_coaching_metric_buffer">Ø übrig</string>
     <string name="home_review_coaching_metric_extra">Ø extra für Ziele</string>
     <string name="home_review_coaching_metric_hit_rate">Zahltage im Plan</string>
+    <string name="home_review_momentum_label">Premium-Schwung</string>
+    <string name="home_review_momentum_headline_starting">Baue deine Check-in-Serie auf</string>
+    <string name="home_review_momentum_headline_building">Premium lernt dein Muster</string>
+    <string name="home_review_momentum_headline_streaking">Deine Check-in-Serie wirkt</string>
+    <string name="home_review_momentum_body">Noch %1$d bis zu %2$d Check-ins. Mehr Check-ins helfen Premium, den nächsten Zahltag-Schritt früher zu erkennen.</string>
+    <string name="home_review_momentum_reviews">%1$d Check-ins</string>
+    <string name="home_review_momentum_streak">%1$d-Tage-Serie</string>
+    <string name="home_review_momentum_next">Ziel: %1$d Check-ins</string>
     <string name="home_review_result_label">Premium-Check-in</string>
     <string name="home_review_result_title">Check-in gespeichert</string>
     <string name="home_review_result_desc">Premium hat Ihren Plan mit dem Check-in vom %1$s aktualisiert und lernt jetzt aus %2$d Check-ins.</string>

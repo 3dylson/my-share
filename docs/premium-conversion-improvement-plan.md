@@ -595,6 +595,13 @@ Status after onboarding/paywall conversion polish pass on 2026-05-19:
 - Tested: full `testDebugUnitTest` and debug build.
 - Validated: debug install on `emulator-5554`, fresh compact onboarding through Welcome, Goal, Salary, Fixed Costs, Plan Preview, Signup, Trajectory, Paywall, Reminder skip, and Home Plan at `720x1280 / 360dpi`. Paywall plan cards remain reachable, the annual badge does not overlap the selected state, Home core metrics stay aligned, no app fatal crash or ANR appeared in logcat, and the emulator was restored to `1080x2400 / 420dpi`.
 
+Status after Premium review momentum implementation pass on 2026-05-19:
+- Done: Added a domain-level Premium review momentum use case that turns total reviews and current streak into the next review milestone.
+- Done: Premium Review now shows a compact momentum card with a progress bar, review count, streak, and next milestone so the check-in habit feels like visible progress instead of raw data entry.
+- Done: The momentum card stacks its chips on compact screens and uses simple retention-focused copy rather than technical analytics language.
+- Tested: focused review-momentum use-case coverage, HomeViewModel Premium/free gating coverage, full `testDebugUnitTest`, and debug build.
+- Validated: debug install on `emulator-5554`, compact `720x1280 / 360dpi` Review route stability, no app fatal crash or ANR in logcat, and emulator restored to `1080x2400 / 420dpi`.
+
 Next:
 - Continue the next Premium product slice while keeping compact-screen validation in every pass.
 - Continue validating compact-screen layouts when new Premium controls are added.

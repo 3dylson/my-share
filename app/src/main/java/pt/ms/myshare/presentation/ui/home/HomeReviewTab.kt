@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.*
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
 import pt.ms.myshare.domain.model.PremiumCheckInStatus
+import pt.ms.myshare.domain.model.PremiumReviewMomentumStatus
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.theme.*
 import java.math.BigDecimal
@@ -63,6 +65,7 @@ fun LazyListScope.homeReviewTab(
     val coachingSummary = state.coachingSummary
     val paydayRecommendation = state.paydayRecommendation
     val premiumCheckIn = state.premiumCheckIn
+    val premiumMomentum = state.premiumMomentum
 
     if (isPremium && premiumCheckIn != null) {
         item {
@@ -141,6 +144,10 @@ fun LazyListScope.homeReviewTab(
                             )
                         }
                     }
+                }
+                if (premiumMomentum != null) {
+                    Spacer(Modifier.height(12.dp))
+                    PremiumReviewMomentumCard(momentum = premiumMomentum)
                 }
             } else {
                 LockedPerformanceTrendCard(
@@ -306,6 +313,166 @@ fun LazyListScope.homeReviewTab(
                 )
                 Spacer(Modifier.height(8.dp))
             }
+        }
+    }
+}
+
+@Composable
+private fun PremiumReviewMomentumCard(
+    momentum: PremiumReviewMomentumState,
+    modifier: Modifier = Modifier
+) {
+    val headline = when (momentum.status) {
+        PremiumReviewMomentumStatus.STARTING -> stringResource(R.string.home_review_momentum_headline_starting)
+        PremiumReviewMomentumStatus.BUILDING -> stringResource(R.string.home_review_momentum_headline_building)
+        PremiumReviewMomentumStatus.STREAKING -> stringResource(R.string.home_review_momentum_headline_streaking)
+    }
+
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.22f)),
+        shadowElevation = 1.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MySharePrimary.copy(alpha = 0.12f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.EmojiEvents,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.padding(8.dp).size(18.dp)
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_review_momentum_label).uppercase(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MySharePrimary,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = headline,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = stringResource(
+                            R.string.home_review_momentum_body,
+                            momentum.reviewsUntilNextMilestone,
+                            momentum.nextMilestone
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+
+            LinearProgressIndicator(
+                progress = { momentum.progress },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(8.dp)
+                    .clip(RoundedCornerShape(999.dp)),
+                color = MySharePrimary,
+                trackColor = MySharePrimary.copy(alpha = 0.12f)
+            )
+
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 340.dp || LocalDensity.current.fontScale >= 1.25f
+                val chips = listOf(
+                    Triple(
+                        stringResource(R.string.home_review_momentum_reviews, momentum.totalReviews),
+                        Icons.Default.CheckCircle,
+                        MySharePrimary
+                    ),
+                    Triple(
+                        stringResource(R.string.home_review_momentum_streak, momentum.currentStreak),
+                        Icons.Default.LocalFireDepartment,
+                        MySharePositive
+                    ),
+                    Triple(
+                        stringResource(R.string.home_review_momentum_next, momentum.nextMilestone),
+                        Icons.Default.Flag,
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                )
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        chips.forEach { chip ->
+                            PremiumMomentumChip(
+                                label = chip.first,
+                                icon = chip.second,
+                                iconColor = chip.third,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                } else {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        chips.forEach { chip ->
+                            PremiumMomentumChip(
+                                label = chip.first,
+                                icon = chip.second,
+                                iconColor = chip.third,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PremiumMomentumChip(
+    label: String,
+    icon: ImageVector,
+    iconColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.heightIn(min = 40.dp),
+        shape = RoundedCornerShape(999.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.42f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.14f))
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 9.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = iconColor,
+                modifier = Modifier.size(15.dp)
+            )
+            Spacer(Modifier.width(6.dp))
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }

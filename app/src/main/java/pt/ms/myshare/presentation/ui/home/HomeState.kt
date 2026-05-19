@@ -6,6 +6,7 @@ import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
 import pt.ms.myshare.domain.model.PremiumCheckInStatus
 import pt.ms.myshare.domain.model.PremiumAdjustmentStatus
 import pt.ms.myshare.domain.model.PremiumReviewCoachingStatus
+import pt.ms.myshare.domain.model.PremiumReviewMomentumStatus
 import pt.ms.myshare.domain.model.PricingStrategy
 import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.domain.model.ReviewInsight
@@ -75,6 +76,7 @@ data class ReviewCardState(
     val insight: ReviewInsight? = null,
     val premiumReviewResult: PremiumReviewResultState? = null,
     val coachingSummary: PremiumReviewCoachingSummaryState? = null,
+    val premiumMomentum: PremiumReviewMomentumState? = null,
     val coachingInsights: List<ReviewInsightState> = emptyList(),
     val paydayRecommendation: PaydayAdjustmentRecommendationState? = null,
     val premiumCheckIn: PremiumCheckInState? = null,
@@ -113,6 +115,15 @@ data class PremiumReviewCoachingMetricState(
     val labelKey: String,
     val valueLabel: String,
     val isPositive: Boolean
+)
+
+data class PremiumReviewMomentumState(
+    val status: PremiumReviewMomentumStatus,
+    val totalReviews: Int,
+    val currentStreak: Int,
+    val nextMilestone: Int,
+    val reviewsUntilNextMilestone: Int,
+    val progress: Float
 )
 
 data class PremiumReviewResultState(
