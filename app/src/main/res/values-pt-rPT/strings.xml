@@ -435,7 +435,7 @@
     <string name="home_review_checkin_title_reviewed">Este dia de pagamento está coberto</string>
     <string name="home_review_checkin_body_ready">Introduz abaixo o que aconteceu. O Premium compara com o guia ativo antes de sugerir a próxima mudança.</string>
     <string name="home_review_checkin_body_overdue">%1$s era o check-in planeado. O Premium está à espera desta revisão antes de ajustar o próximo pagamento.</string>
-    <string name="home_review_checkin_body_scheduled">O Premium vai rever este plano novamente em %1$s. Mantém o lembrete ativo para não depender da memória.</string>
+    <string name="home_review_checkin_body_scheduled">O Premium vai rever este plano novamente em %1$s. Mantém o lembrete ativo para ser fácil lembrar a próxima revisão.</string>
     <string name="home_review_checkin_body_reviewed">Este dia de pagamento já tem uma revisão guardada. O Premium volta a acompanhar o plano em %1$s.</string>
     <string name="home_review_checkin_reminder_on">Lembrete ativo</string>
     <string name="home_review_checkin_set_reminder">Definir lembrete</string>

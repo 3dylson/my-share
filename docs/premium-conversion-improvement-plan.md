@@ -640,6 +640,12 @@ Status after Review Premium elevation cleanup pass on 2026-05-19:
 - Tested: full `testDebugUnitTest` and debug build.
 - Validated: debug install on `emulator-5554`, compact `720x1280 / 360dpi` Review Premium check-in card, no app fatal crash or ANR in logcat, and emulator restored to `1080x2400 / 420dpi`.
 
+Status after Home card consistency pass on 2026-05-19:
+- Done: Removed shadow elevation from bordered Home cards where dark-mode rendering could create square blocks behind rounded corners, while keeping depth where it still reads cleanly, such as the solid payday summary.
+- Done: Polished the scheduled Premium check-in copy from memory-dependent wording to a friendlier reminder-focused message across supported languages.
+- Tested: full `testDebugUnitTest` and debug build.
+- Validated: debug install on `emulator-5554`, compact `720x1280 / 360dpi` Plan, Strategy, Review, and More tabs, updated Review check-in copy, no app fatal crash or ANR in logcat, and emulator restored to `1080x2400 / 420dpi`.
+
 Next:
 - Continue the next Premium product slice while keeping compact-screen validation in every pass.
 - Continue validating compact-screen layouts when new Premium controls are added.

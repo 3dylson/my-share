@@ -434,7 +434,7 @@
     <string name="home_review_checkin_title_reviewed">Dieser Zahltag ist abgedeckt</string>
     <string name="home_review_checkin_body_ready">Trage unten ein, was passiert ist. Premium vergleicht es mit dem aktiven Leitwert, bevor die nächste Änderung vorgeschlagen wird.</string>
     <string name="home_review_checkin_body_overdue">%1$s war der geplante Check-in. Premium wartet auf diese Prüfung, bevor der nächste Zahltag angepasst werden kann.</string>
-    <string name="home_review_checkin_body_scheduled">Premium prüft diesen Plan am %1$s erneut. Lass die Erinnerung aktiv, damit die Routine nicht vom Gedächtnis abhängt.</string>
+    <string name="home_review_checkin_body_scheduled">Premium prüft diesen Plan am %1$s erneut. Lass die Erinnerung aktiv, damit du dich leicht an die nächste Überprüfung erinnerst.</string>
     <string name="home_review_checkin_body_reviewed">Dieser Zahltag hat eine gespeicherte Prüfung. Premium beobachtet den Plan wieder am %1$s.</string>
     <string name="home_review_checkin_reminder_on">Erinnerung aktiv</string>
     <string name="home_review_checkin_set_reminder">Erinnerung setzen</string>

@@ -434,7 +434,7 @@
     <string name="home_review_checkin_title_reviewed">Este día de pago está cubierto</string>
     <string name="home_review_checkin_body_ready">Introduce abajo lo que ocurrió. Premium lo comparará con la guía activa antes de sugerir el próximo cambio.</string>
     <string name="home_review_checkin_body_overdue">%1$s era el check-in previsto. Premium está esperando esta revisión antes de ajustar tu próximo cobro.</string>
-    <string name="home_review_checkin_body_scheduled">Premium revisará este plan otra vez el %1$s. Mantén el recordatorio activo para no depender de la memoria.</string>
+    <string name="home_review_checkin_body_scheduled">Premium revisará este plan otra vez el %1$s. Mantén el recordatorio activo para recordar fácilmente la próxima revisión.</string>
     <string name="home_review_checkin_body_reviewed">Este día de pago ya tiene una revisión guardada. Premium volverá a observar el plan el %1$s.</string>
     <string name="home_review_checkin_reminder_on">Recordatorio activo</string>
     <string name="home_review_checkin_set_reminder">Configurar recordatorio</string>

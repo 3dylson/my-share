@@ -434,7 +434,7 @@
     <string name="home_review_checkin_title_reviewed">تمت تغطية يوم الدفع هذا</string>
     <string name="home_review_checkin_body_ready">أدخل أدناه ما حدث فعليًا. سيقارنه Premium بالدليل النشط قبل اقتراح التغيير التالي.</string>
     <string name="home_review_checkin_body_overdue">كان %1$s هو تسجيل المتابعة المخطط. ينتظر Premium هذه المراجعة قبل أن يتمكن من تعديل يوم الدفع التالي.</string>
-    <string name="home_review_checkin_body_scheduled">سيراجع Premium هذه الخطة مرة أخرى في %1$s. أبقِ التذكير مفعّلًا حتى لا يعتمد الأمر على الذاكرة.</string>
+    <string name="home_review_checkin_body_scheduled">سيراجع Premium هذه الخطة مرة أخرى في %1$s. أبقِ التذكير مفعّلًا لتسهيل تذكّر المراجعة التالية.</string>
     <string name="home_review_checkin_body_reviewed">يوم الدفع هذا لديه مراجعة محفوظة. سيراقب Premium الخطة مرة أخرى في %1$s.</string>
     <string name="home_review_checkin_reminder_on">التذكير مفعّل</string>
     <string name="home_review_checkin_set_reminder">ضبط التذكير</string>

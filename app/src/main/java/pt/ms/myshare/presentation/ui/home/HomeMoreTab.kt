@@ -352,8 +352,7 @@ private fun MoreRoutineSummaryCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
         color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.16f)),
-        shadowElevation = 2.dp
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.16f))
     ) {
         Column(
             modifier = Modifier.padding(18.dp),
@@ -722,8 +721,7 @@ private fun PremiumAdjustmentMemoryCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
         color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MySharePositive.copy(alpha = 0.2f)),
-        shadowElevation = 1.dp
+        border = BorderStroke(1.dp, MySharePositive.copy(alpha = 0.2f))
     ) {
         Column(
             modifier = Modifier.padding(18.dp),

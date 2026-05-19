@@ -434,7 +434,7 @@
     <string name="home_review_checkin_title_reviewed">Cette paie est couverte</string>
     <string name="home_review_checkin_body_ready">Indiquez ci-dessous ce qui s’est passé. Premium comparera avec le guide actif avant de suggérer le prochain changement.</string>
     <string name="home_review_checkin_body_overdue">%1$s était le check-in prévu. Premium attend ce bilan avant d’ajuster votre prochaine paie.</string>
-    <string name="home_review_checkin_body_scheduled">Premium vérifiera de nouveau ce plan le %1$s. Gardez le rappel actif pour ne pas dépendre de la mémoire.</string>
+    <string name="home_review_checkin_body_scheduled">Premium vérifiera de nouveau ce plan le %1$s. Gardez le rappel actif pour vous souvenir facilement du prochain bilan.</string>
     <string name="home_review_checkin_body_reviewed">Cette paie a déjà un bilan enregistré. Premium surveillera de nouveau le plan le %1$s.</string>
     <string name="home_review_checkin_reminder_on">Rappel actif</string>
     <string name="home_review_checkin_set_reminder">Définir un rappel</string>

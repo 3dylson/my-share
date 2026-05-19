@@ -479,7 +479,7 @@
     <string name="home_review_checkin_title_reviewed">This payday is covered</string>
     <string name="home_review_checkin_body_ready">Enter what actually happened below. Premium will compare it with the active guide before suggesting the next change.</string>
     <string name="home_review_checkin_body_overdue">%1$s was the planned check-in. Premium is waiting on this review before it can adjust your next payday.</string>
-    <string name="home_review_checkin_body_scheduled">Premium will check this plan again on %1$s. Keep the reminder on so the habit does not depend on memory.</string>
+    <string name="home_review_checkin_body_scheduled">Premium will check this plan again on %1$s. Keep the reminder on so the next review is easy to remember.</string>
     <string name="home_review_checkin_body_reviewed">This payday has a saved review. Premium will watch the plan again on %1$s.</string>
     <string name="home_review_checkin_reminder_on">Reminder on</string>
     <string name="home_review_checkin_set_reminder">Set reminder</string>
