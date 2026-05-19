@@ -388,7 +388,7 @@
     <string name="home_strategy_goal_empty_title">Set your sights</string>
     <string name="home_strategy_goal_empty_desc">Define what you are saving for.</string>
     <string name="home_strategy_goal_add_title">Add another goal</string>
-    <string name="home_strategy_goal_add_desc">Create another financial milestone.</string>
+    <string name="home_strategy_goal_add_desc">Add another goal for payday to support.</string>
     <string name="home_strategy_goal_split_title">Next payday split</string>
     <string name="home_strategy_goal_split_body">Your next %1$s priority move can move %2$d goals forward.</string>
     <string name="home_strategy_goal_split_total_label">Total move</string>
@@ -447,7 +447,7 @@
     <string name="home_strategy_rule_preview_action">See Premium rules</string>
     <string name="home_strategy_rule_locked_hidden_title">%1$d extra Premium rule(s) locked</string>
     <string name="home_strategy_rule_locked_hidden_desc">Your saved rules stay safe. Premium unlocks every rule and keeps them coordinated after reviews.</string>
-    <string name="home_review_performance_title">Performance insights</string>
+    <string name="home_review_performance_title">Payday patterns</string>
     <string name="home_review_score_label">Trust score</string>
     <string name="home_review_score_percent">%1$d%%</string>
     <string name="home_review_streak_count">%1$d day streak</string>
@@ -557,12 +557,12 @@
     <string name="home_review_first_premium_step_adjust_desc">Set the next guide.</string>
     <string name="home_review_first_premium_action">See Premium trial</string>
     <string name="home_review_manual_title">Payday check-in</string>
-    <string name="home_review_manual_desc">Enter exact actuals so your next guide stays honest.</string>
+    <string name="home_review_manual_desc">Enter what you spent and saved so the next guide stays useful.</string>
     <string name="home_review_input_flex_exact">Flexible actual</string>
     <string name="home_review_input_goal_exact">Goal actual</string>
     <string name="home_review_submit">Submit review</string>
-    <string name="home_review_saved_feedback">Review saved. Performance insights updated.</string>
-    <string name="home_review_history_title">Historical performance</string>
+    <string name="home_review_saved_feedback">Review saved. Your payday picture is updated.</string>
+    <string name="home_review_history_title">Payday history</string>
     <string name="home_review_empty_history_title">No history yet</string>
     <string name="home_review_empty_history_desc">Complete your first review to build a timeline.</string>
     <string name="home_review_history_flex_label">Flexible</string>
@@ -590,9 +590,9 @@
     <string name="home_review_delete_confirm">Delete review</string>
     <string name="home_more_guest">Local plan</string>
     <string name="home_more_premium_title">Start Premium</string>
-    <string name="home_more_routine_title">Payday control center</string>
-    <string name="home_more_routine_body_free">Your settings keep the manual plan usable. Premium can take over the adjustment work when you are ready.</string>
-    <string name="home_more_routine_body_premium">Premium is active. Keep reminders, preferences, and subscription controls here.</string>
+    <string name="home_more_routine_title">Payday settings</string>
+    <string name="home_more_routine_body_free">Your settings keep the manual plan easy to follow. Premium can help choose the next changes when you are ready.</string>
+    <string name="home_more_routine_body_premium">Premium is active. Manage reminders, preferences, and subscription here.</string>
     <string name="home_more_routine_weekly_label">Weekly guide</string>
     <string name="home_more_routine_priority_label">Priority move</string>
     <string name="home_more_routine_rules_label">Rules</string>

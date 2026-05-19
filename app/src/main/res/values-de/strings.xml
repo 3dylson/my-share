@@ -343,7 +343,7 @@
     <string name="home_strategy_goal_empty_title">Setzen Sie Ihre Ziele</string>
     <string name="home_strategy_goal_empty_desc">Definieren Sie, wofür Sie sparen.</string>
     <string name="home_strategy_goal_add_title">Fügen Sie ein weiteres Ziel hinzu</string>
-    <string name="home_strategy_goal_add_desc">Schaffen Sie einen weiteren finanziellen Meilenstein.</string>
+    <string name="home_strategy_goal_add_desc">Füge ein weiteres Ziel hinzu, das der Zahltag unterstützen soll.</string>
     <string name="home_strategy_goal_split_title">Aufteilung am nächsten Zahltag</string>
     <string name="home_strategy_goal_split_body">Dein nächster Prioritätsschritt von %1$s kann %2$d Ziele voranbringen.</string>
     <string name="home_strategy_goal_split_total_label">Gesamtschritt</string>
@@ -402,7 +402,7 @@
     <string name="home_strategy_rule_preview_action">Adaptive Regeln ansehen</string>
     <string name="home_strategy_rule_locked_hidden_title">%1$d zusätzliche Premium-Regel(n) gesperrt</string>
     <string name="home_strategy_rule_locked_hidden_desc">Deine gespeicherten Regeln bleiben sicher. Premium entsperrt alle Regeln und hält sie nach Prüfungen koordiniert.</string>
-    <string name="home_review_performance_title">Einblicke in die Leistung</string>
+    <string name="home_review_performance_title">Zahltag-Muster</string>
     <string name="home_review_score_label">Vertrauenswert</string>
     <string name="home_review_score_percent">%1$d%%</string>
     <string name="home_review_streak_count">%1$d Tagessträhne</string>
@@ -512,12 +512,12 @@
     <string name="home_review_first_premium_step_adjust_desc">Nächsten Leitfaden setzen.</string>
     <string name="home_review_first_premium_action">Premium-Test ansehen</string>
     <string name="home_review_manual_title">Check-in am Zahltag</string>
-    <string name="home_review_manual_desc">Geben Sie genaue Ist-Werte ein, damit Ihr nächster Reiseführer ehrlich bleibt.</string>
+    <string name="home_review_manual_desc">Gib ein, was du ausgegeben und gespart hast, damit der nächste Leitwert nützlich bleibt.</string>
     <string name="home_review_input_flex_exact">Flexibel aktuell</string>
     <string name="home_review_input_goal_exact">Ziel tatsächlich</string>
     <string name="home_review_submit">Bewertung abgeben</string>
-    <string name="home_review_saved_feedback">Bewertung gespeichert. Leistungseinblicke aktualisiert.</string>
-    <string name="home_review_history_title">Historische Leistung</string>
+    <string name="home_review_saved_feedback">Überprüfung gespeichert. Dein Zahltag-Bild ist aktualisiert.</string>
+    <string name="home_review_history_title">Zahltag-Verlauf</string>
     <string name="home_review_empty_history_title">Noch keine Geschichte</string>
     <string name="home_review_empty_history_desc">Füllen Sie Ihre erste Überprüfung aus, um einen Zeitplan zu erstellen.</string>
     <string name="home_review_history_flex_label">Flexibel</string>
@@ -545,9 +545,9 @@
     <string name="home_review_delete_confirm">Prüfung löschen</string>
     <string name="home_more_guest">Lokaler Plan</string>
     <string name="home_more_premium_title">Premium starten</string>
-    <string name="home_more_routine_title">Zahltag-Kontrollzentrum</string>
-    <string name="home_more_routine_body_free">Deine Einstellungen halten den manuellen Plan nutzbar. Das Abo kann die Anpassungen übernehmen, sobald du bereit bist.</string>
-    <string name="home_more_routine_body_premium">Das Abo ist aktiv. Erinnerungen, Einstellungen und Abosteuerung bleiben hier.</string>
+    <string name="home_more_routine_title">Zahltag-Einstellungen</string>
+    <string name="home_more_routine_body_free">Deine Einstellungen halten den manuellen Plan leicht nachvollziehbar. Premium kann dir helfen, die nächsten Änderungen zu wählen, sobald du bereit bist.</string>
+    <string name="home_more_routine_body_premium">Premium ist aktiv. Verwalte hier Erinnerungen, Einstellungen und Abo.</string>
     <string name="home_more_routine_weekly_label">Wochenleitwert</string>
     <string name="home_more_routine_priority_label">Prioritätsschritt</string>
     <string name="home_more_routine_rules_label">Regeln</string>

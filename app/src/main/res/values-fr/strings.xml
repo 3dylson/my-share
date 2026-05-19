@@ -343,7 +343,7 @@
     <string name="home_strategy_goal_empty_title">Fixez votre mire</string>
     <string name="home_strategy_goal_empty_desc">Définissez ce pour quoi vous épargnez.</string>
     <string name="home_strategy_goal_add_title">Ajouter un autre objectif</string>
-    <string name="home_strategy_goal_add_desc">Créez une autre étape financière.</string>
+    <string name="home_strategy_goal_add_desc">Ajoute un autre objectif à soutenir à la paie.</string>
     <string name="home_strategy_goal_split_title">Répartition de la prochaine paie</string>
     <string name="home_strategy_goal_split_body">Votre prochaine action prioritaire de %1$s peut faire avancer %2$d objectifs.</string>
     <string name="home_strategy_goal_split_total_label">Action totale</string>
@@ -402,7 +402,7 @@
     <string name="home_strategy_rule_preview_action">Voir les règles adaptatives</string>
     <string name="home_strategy_rule_locked_hidden_title">%1$d règle(s) Premium supplémentaires verrouillées</string>
     <string name="home_strategy_rule_locked_hidden_desc">Vos règles enregistrées restent protégées. Premium déverrouille toutes les règles et les garde coordonnées après les bilans.</string>
-    <string name="home_review_performance_title">Informations sur les performances</string>
+    <string name="home_review_performance_title">Habitudes de paie</string>
     <string name="home_review_score_label">Score de confiance</string>
     <string name="home_review_score_percent">%1$d%%</string>
     <string name="home_review_streak_count">%1$d jours consécutifs</string>
@@ -512,12 +512,12 @@
     <string name="home_review_first_premium_step_adjust_desc">Fixez le prochain guide.</string>
     <string name="home_review_first_premium_action">Voir l’essai Premium</string>
     <string name="home_review_manual_title">Enregistrement sur salaire</string>
-    <string name="home_review_manual_desc">Entrez les chiffres exacts pour que votre prochain guide reste honnête.</string>
+    <string name="home_review_manual_desc">Indique ce que tu as dépensé et mis de côté pour garder le prochain guide utile.</string>
     <string name="home_review_input_flex_exact">Réel flexible</string>
     <string name="home_review_input_goal_exact">Objectif réel</string>
     <string name="home_review_submit">Envoyer l\'avis</string>
-    <string name="home_review_saved_feedback">Avis enregistré. Informations sur les performances mises à jour.</string>
-    <string name="home_review_history_title">Performance historique</string>
+    <string name="home_review_saved_feedback">Bilan enregistré. Ta vue de paie est à jour.</string>
+    <string name="home_review_history_title">Historique de paie</string>
     <string name="home_review_empty_history_title">Pas encore d\'historique</string>
     <string name="home_review_empty_history_desc">Terminez votre première révision pour établir une chronologie.</string>
     <string name="home_review_history_flex_label">Dépenses flexibles</string>
@@ -545,9 +545,9 @@
     <string name="home_review_delete_confirm">Supprimer le bilan</string>
     <string name="home_more_guest">Plan local</string>
     <string name="home_more_premium_title">Débloquer Premium</string>
-    <string name="home_more_routine_title">Centre de contrôle de paie</string>
-    <string name="home_more_routine_body_free">Vos réglages gardent le plan manuel utile. L’abonnement peut prendre en charge les ajustements quand vous êtes prêt.</string>
-    <string name="home_more_routine_body_premium">L’abonnement est actif. Gardez ici rappels, préférences et gestion de l’abonnement.</string>
+    <string name="home_more_routine_title">Réglages de paie</string>
+    <string name="home_more_routine_body_free">Tes réglages gardent le plan manuel facile à suivre. Premium peut aider à choisir les prochains changements quand tu es prêt.</string>
+    <string name="home_more_routine_body_premium">Premium est actif. Gérez ici les rappels, préférences et l’abonnement.</string>
     <string name="home_more_routine_weekly_label">Guide hebdomadaire</string>
     <string name="home_more_routine_priority_label">Action prioritaire</string>
     <string name="home_more_routine_rules_label">Règles</string>

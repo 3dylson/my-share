@@ -343,7 +343,7 @@
     <string name="home_strategy_goal_empty_title">Establece tus miras</string>
     <string name="home_strategy_goal_empty_desc">Define para qué estás ahorrando.</string>
     <string name="home_strategy_goal_add_title">Añadir otro objetivo</string>
-    <string name="home_strategy_goal_add_desc">Crea otro hito financiero.</string>
+    <string name="home_strategy_goal_add_desc">Añade otra meta para que el cobro la apoye.</string>
     <string name="home_strategy_goal_split_title">Reparto del próximo cobro</string>
     <string name="home_strategy_goal_split_body">Tu próximo movimiento prioritario de %1$s puede impulsar %2$d metas.</string>
     <string name="home_strategy_goal_split_total_label">Movimiento total</string>
@@ -402,7 +402,7 @@
     <string name="home_strategy_rule_preview_action">Ver reglas adaptables</string>
     <string name="home_strategy_rule_locked_hidden_title">%1$d regla(s) Premium extra bloqueadas</string>
     <string name="home_strategy_rule_locked_hidden_desc">Tus reglas guardadas siguen seguras. Premium desbloquea todas las reglas y las mantiene coordinadas después de las revisiones.</string>
-    <string name="home_review_performance_title">Información sobre el rendimiento</string>
+    <string name="home_review_performance_title">Patrones de cobro</string>
     <string name="home_review_score_label">Puntuación de confianza</string>
     <string name="home_review_score_percent">%1$d%%</string>
     <string name="home_review_streak_count">Racha de %1$d días</string>
@@ -512,12 +512,12 @@
     <string name="home_review_first_premium_step_adjust_desc">Define la próxima guía.</string>
     <string name="home_review_first_premium_action">Ver prueba Premium</string>
     <string name="home_review_manual_title">check-in de día de pago</string>
-    <string name="home_review_manual_desc">Ingrese datos reales exactos para que su próxima guía sea honesta.</string>
+    <string name="home_review_manual_desc">Ingresa lo que gastaste y ahorraste para que la próxima guía siga siendo útil.</string>
     <string name="home_review_input_flex_exact">Real flexible</string>
     <string name="home_review_input_goal_exact">Objetivo real</string>
     <string name="home_review_submit">Enviar reseña</string>
-    <string name="home_review_saved_feedback">Revisión guardada. Información sobre el rendimiento actualizada.</string>
-    <string name="home_review_history_title">Desempeño histórico</string>
+    <string name="home_review_saved_feedback">Revisión guardada. Tu panorama de cobro está actualizado.</string>
+    <string name="home_review_history_title">Historial de cobros</string>
     <string name="home_review_empty_history_title">Aún no hay historial</string>
     <string name="home_review_empty_history_desc">Complete su primera revisión para crear una línea de tiempo.</string>
     <string name="home_review_history_flex_label">Flexibles</string>
@@ -545,9 +545,9 @@
     <string name="home_review_delete_confirm">Eliminar revisión</string>
     <string name="home_more_guest">Plan local</string>
     <string name="home_more_premium_title">Iniciar Premium</string>
-    <string name="home_more_routine_title">Centro de control de cobro</string>
-    <string name="home_more_routine_body_free">Tus ajustes mantienen útil el plan manual. El plan de pago puede encargarse de los cambios cuando estés listo.</string>
-    <string name="home_more_routine_body_premium">El plan de pago está activo. Mantén aquí recordatorios, preferencias y controles de suscripción.</string>
+    <string name="home_more_routine_title">Ajustes de cobro</string>
+    <string name="home_more_routine_body_free">Tus ajustes mantienen fácil de seguir el plan manual. Premium puede ayudarte a elegir los próximos cambios cuando estés listo.</string>
+    <string name="home_more_routine_body_premium">Premium está activo. Gestiona aquí recordatorios, preferencias y suscripción.</string>
     <string name="home_more_routine_weekly_label">Guía semanal</string>
     <string name="home_more_routine_priority_label">Movimiento prioritario</string>
     <string name="home_more_routine_rules_label">Reglas</string>

@@ -343,7 +343,7 @@
     <string name="home_strategy_goal_empty_title">تعيين مشاهد الخاص بك</string>
     <string name="home_strategy_goal_empty_desc">حدد ما تقوم بالادخار من أجله.</string>
     <string name="home_strategy_goal_add_title">إضافة هدف آخر</string>
-    <string name="home_strategy_goal_add_desc">إنشاء معلم مالي آخر.</string>
+    <string name="home_strategy_goal_add_desc">أضف هدفًا آخر ليدعمه يوم الدفع.</string>
     <string name="home_strategy_goal_split_title">تقسيم يوم الدفع التالي</string>
     <string name="home_strategy_goal_split_body">يمكن لحركة الأولوية التالية بقيمة %1$s أن تدفع %2$d أهداف إلى الأمام.</string>
     <string name="home_strategy_goal_split_total_label">إجمالي الحركة</string>
@@ -402,7 +402,7 @@
     <string name="home_strategy_rule_preview_action">معاينة قواعد متكيّفة</string>
     <string name="home_strategy_rule_locked_hidden_title">%1$d قاعدة Premium إضافية مقفلة</string>
     <string name="home_strategy_rule_locked_hidden_desc">تبقى قواعدك المحفوظة آمنة. يفتح Premium كل القواعد ويحافظ على تنسيقها بعد المراجعات.</string>
-    <string name="home_review_performance_title">رؤى الأداء</string>
+    <string name="home_review_performance_title">أنماط يوم الدفع</string>
     <string name="home_review_score_label">درجة الثقة</string>
     <string name="home_review_score_percent">%1$d%%</string>
     <string name="home_review_streak_count">%1$d يوم متتالي</string>
@@ -512,12 +512,12 @@
     <string name="home_review_first_premium_step_adjust_desc">اضبط الدليل التالي.</string>
     <string name="home_review_first_premium_action">عرض تجربة Premium</string>
     <string name="home_review_manual_title">تسجيل الوصول ليوم الدفع</string>
-    <string name="home_review_manual_desc">أدخل القيم الفعلية الدقيقة حتى يظل دليلك التالي صادقًا.</string>
+    <string name="home_review_manual_desc">أدخل ما أنفقته وادخرته حتى يبقى الدليل التالي مفيدًا.</string>
     <string name="home_review_input_flex_exact">مرنة الفعلية</string>
     <string name="home_review_input_goal_exact">الهدف الفعلي</string>
     <string name="home_review_submit">إرسال المراجعة</string>
-    <string name="home_review_saved_feedback">تم حفظ المراجعة. تم تحديث رؤى الأداء.</string>
-    <string name="home_review_history_title">الأداء التاريخي</string>
+    <string name="home_review_saved_feedback">تم حفظ المراجعة. تم تحديث صورة يوم الدفع لديك.</string>
+    <string name="home_review_history_title">سجل يوم الدفع</string>
     <string name="home_review_empty_history_title">لا يوجد تاريخ بعد</string>
     <string name="home_review_empty_history_desc">أكمل مراجعتك الأولى لإنشاء جدول زمني.</string>
     <string name="home_review_history_flex_label">مرنة</string>
@@ -545,9 +545,9 @@
     <string name="home_review_delete_confirm">حذف المراجعة</string>
     <string name="home_more_guest">خطة محلية</string>
     <string name="home_more_premium_title">افتح Premium</string>
-    <string name="home_more_routine_title">مركز التحكم بيوم الدفع</string>
-    <string name="home_more_routine_body_free">تحافظ إعداداتك على فائدة الخطة اليدوية. يمكن للخطة المدفوعة تولي التعديلات عندما تكون جاهزًا.</string>
-    <string name="home_more_routine_body_premium">الخطة المدفوعة نشطة. احتفظ هنا بالتذكيرات والتفضيلات وإدارة الاشتراك.</string>
+    <string name="home_more_routine_title">إعدادات يوم الدفع</string>
+    <string name="home_more_routine_body_free">تحافظ إعداداتك على سهولة اتباع الخطة اليدوية. يمكن لـ Premium مساعدتك في اختيار التغييرات التالية عندما تكون جاهزًا.</string>
+    <string name="home_more_routine_body_premium">Premium نشط. أدِر هنا التذكيرات والتفضيلات والاشتراك.</string>
     <string name="home_more_routine_weekly_label">الدليل الأسبوعي</string>
     <string name="home_more_routine_priority_label">حركة الأولوية</string>
     <string name="home_more_routine_rules_label">القواعد</string>
