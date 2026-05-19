@@ -634,6 +634,12 @@ Status after Home top-bar duplication cleanup pass on 2026-05-19:
 - Tested: full `testDebugUnitTest` and debug build.
 - Validated: debug install on `emulator-5554`, compact `720x1280 / 360dpi` Plan and More tabs, no repeated selected-tab label in the top bar, no app fatal crash or ANR in logcat, and emulator restored to `1080x2400 / 420dpi`.
 
+Status after Review Premium elevation cleanup pass on 2026-05-19:
+- Done: Removed Compose elevation from the Review Premium check-in card shown in validation, eliminating the square shadow block behind the rounded card.
+- Done: Removed the same tinted Premium-container elevation pattern from related Premium recommendation, coaching, goal split, and rule mix cards so the artifact does not reappear on nearby Premium value surfaces.
+- Tested: full `testDebugUnitTest` and debug build.
+- Validated: debug install on `emulator-5554`, compact `720x1280 / 360dpi` Review Premium check-in card, no app fatal crash or ANR in logcat, and emulator restored to `1080x2400 / 420dpi`.
+
 Next:
 - Continue the next Premium product slice while keeping compact-screen validation in every pass.
 - Continue validating compact-screen layouts when new Premium controls are added.

@@ -637,8 +637,7 @@ private fun PremiumCheckInReviewCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.18f),
-        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.22f)),
-        shadowElevation = 1.dp
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.22f))
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -1131,8 +1130,7 @@ private fun PaydayAdjustmentRecommendationCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.20f),
-        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.28f)),
-        shadowElevation = 1.dp
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.28f))
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
