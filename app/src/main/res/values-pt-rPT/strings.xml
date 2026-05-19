@@ -576,6 +576,7 @@
     <string name="home_more_smart_adjustments_resume">Retomar observação</string>
     <string name="home_more_smart_adjustments_pause">Pausar observação</string>
     <string name="home_more_smart_adjustments_review">Rever ajuste</string>
+    <string name="home_more_smart_adjustments_waiting_action">À espera da primeira revisão</string>
     <string name="home_more_adjustment_memory_label">Memória Premium</string>
     <string name="home_more_adjustment_memory_title">Último ajuste guardado</string>
     <string name="home_more_adjustment_memory_title_undone">Último ajuste revertido</string>

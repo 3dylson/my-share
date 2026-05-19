@@ -575,6 +575,7 @@
     <string name="home_more_smart_adjustments_resume">Beobachtung fortsetzen</string>
     <string name="home_more_smart_adjustments_pause">Beobachtung pausieren</string>
     <string name="home_more_smart_adjustments_review">Anpassung prüfen</string>
+    <string name="home_more_smart_adjustments_waiting_action">Wartet auf erste Prüfung</string>
     <string name="home_more_adjustment_memory_label">Premium-Verlauf</string>
     <string name="home_more_adjustment_memory_title">Letzte Anpassung gespeichert</string>
     <string name="home_more_adjustment_memory_title_undone">Letzte Anpassung rückgängig</string>

@@ -575,6 +575,7 @@
     <string name="home_more_smart_adjustments_resume">Reprendre la veille</string>
     <string name="home_more_smart_adjustments_pause">Mettre en pause</string>
     <string name="home_more_smart_adjustments_review">Revoir l\'ajustement</string>
+    <string name="home_more_smart_adjustments_waiting_action">En attente du premier bilan</string>
     <string name="home_more_adjustment_memory_label">Mémoire Premium</string>
     <string name="home_more_adjustment_memory_title">Dernier ajustement enregistré</string>
     <string name="home_more_adjustment_memory_title_undone">Dernier ajustement annulé</string>

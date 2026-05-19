@@ -542,6 +542,8 @@ private fun SmartAdjustmentControlCard(
         stringResource(R.string.home_premium_checkin_action_catch_up)
     } else if (checkIn?.isDue == true) {
         stringResource(R.string.home_more_smart_checkin_start)
+    } else if (!smartAdjustment.hasRecommendation) {
+        stringResource(R.string.home_more_smart_adjustments_waiting_action)
     } else {
         stringResource(R.string.home_more_smart_adjustments_review)
     }

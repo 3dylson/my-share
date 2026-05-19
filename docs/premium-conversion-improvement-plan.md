@@ -616,6 +616,12 @@ Status after Premium watch activation pass on 2026-05-19:
 - Tested: HomeViewModel purchase-completion coverage now verifies the watch setting is saved and visible after Premium activation, plus full `testDebugUnitTest` and debug build.
 - Validated: debug install on `emulator-5554`, compact `720x1280 / 360dpi` paused Plan-to-More path, manual watch enable in More, compact active Plan proof card, no app fatal crash or ANR in logcat, and emulator restored to `1080x2400 / 420dpi`.
 
+Status after Premium watch waiting-state copy pass on 2026-05-19:
+- Done: More's Premium watch card now shows `Waiting for first review` instead of `Review adjustment` when there is no recommendation yet, so the disabled action no longer feels broken.
+- Done: The new waiting action copy is localized across supported languages.
+- Tested: full `testDebugUnitTest` and debug build.
+- Validated: debug install on `emulator-5554`, compact `720x1280 / 360dpi` More waiting state, no app fatal crash or ANR in logcat, and emulator restored to `1080x2400 / 420dpi`.
+
 Next:
 - Continue the next Premium product slice while keeping compact-screen validation in every pass.
 - Continue validating compact-screen layouts when new Premium controls are added.

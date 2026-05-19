@@ -620,6 +620,7 @@
     <string name="home_more_smart_adjustments_resume">Resume watch</string>
     <string name="home_more_smart_adjustments_pause">Pause watch</string>
     <string name="home_more_smart_adjustments_review">Review adjustment</string>
+    <string name="home_more_smart_adjustments_waiting_action">Waiting for first review</string>
     <string name="home_more_adjustment_memory_label">Premium memory</string>
     <string name="home_more_adjustment_memory_title">Last adjustment saved</string>
     <string name="home_more_adjustment_memory_title_undone">Last adjustment reversed</string>

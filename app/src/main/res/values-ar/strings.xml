@@ -575,6 +575,7 @@
     <string name="home_more_smart_adjustments_resume">استئناف المراقبة</string>
     <string name="home_more_smart_adjustments_pause">إيقاف المراقبة</string>
     <string name="home_more_smart_adjustments_review">مراجعة التعديل</string>
+    <string name="home_more_smart_adjustments_waiting_action">بانتظار أول مراجعة</string>
     <string name="home_more_adjustment_memory_label">ذاكرة Premium</string>
     <string name="home_more_adjustment_memory_title">تم حفظ آخر تعديل</string>
     <string name="home_more_adjustment_memory_title_undone">تم التراجع عن آخر تعديل</string>
