@@ -6,26 +6,27 @@ import pt.ms.myshare.domain.model.StoreProduct
 
 internal object BillingProductMapper {
 
-    fun map(details: ProductDetails): StoreProduct? {
+    fun map(details: ProductDetails): List<StoreProduct> {
         val expectedBillingPeriod = PremiumSubscriptionProducts.expectedBillingPeriod(details.productId)
-        val selectedOffer = details.subscriptionOfferDetails
+        return details.subscriptionOfferDetails
             .orEmpty()
             .sortedWith(
                 compareByDescending<ProductDetails.SubscriptionOfferDetails> {
                     it.matchesBillingPeriod(expectedBillingPeriod)
                 }.thenByDescending { it.hasFreeTrial() }
             )
-            .firstOrNull { it.pricingPhases.pricingPhaseList.isNotEmpty() }
-            ?: return null
+            .mapNotNull { offer -> offer.toStoreProduct(details) }
+    }
 
-        val phases = selectedOffer.pricingPhases.pricingPhaseList
+    private fun ProductDetails.SubscriptionOfferDetails.toStoreProduct(details: ProductDetails): StoreProduct? {
+        val phases = pricingPhases.pricingPhaseList
         val trialPhase = phases.firstOrNull { it.isFreeTrial() }
         val recurringPhase = phases.lastOrNull {
             it.priceAmountMicros > 0L &&
                 it.recurrenceMode == ProductDetails.RecurrenceMode.INFINITE_RECURRING
         } ?: phases.lastOrNull { it.priceAmountMicros > 0L }
 
-        val offerToken = selectedOffer.offerToken
+        val offerToken = this.offerToken
         val price = recurringPhase?.formattedPrice
         if (offerToken.isBlank() || price.isNullOrBlank()) return null
 
@@ -34,13 +35,13 @@ internal object BillingProductMapper {
             name = details.name,
             description = details.description,
             price = price,
-            basePlanId = selectedOffer.basePlanId,
+            basePlanId = basePlanId,
             offerToken = offerToken,
             priceAmountMicros = recurringPhase.priceAmountMicros,
             priceCurrencyCode = recurringPhase.priceCurrencyCode,
             recurringBillingPeriod = recurringPhase.billingPeriod,
-            offerId = selectedOffer.offerId,
-            offerTags = selectedOffer.offerTags.orEmpty(),
+            offerId = offerId,
+            offerTags = offerTags.orEmpty(),
             freeTrialPeriod = trialPhase?.billingPeriod,
             freeTrialDays = trialPhase?.let {
                 BillingPeriodParser.totalDays(it.billingPeriod, it.billingCycleCount)

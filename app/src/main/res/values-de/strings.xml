@@ -864,4 +864,20 @@
     <string name="plan_summary_investing_first">Eine investitionsgeführte Aufteilung für langfristige Anlagen.</string>
     <string name="plan_summary_flexible_budget_only">Ein flexibler Plan für klare sichere Ausgaben.</string>
     <string name="plan_summary_custom_strategy">Eine eigene Aufteilung nach Ihren Zahltagsregeln.</string>
+    <string name="subscription_retention_title">Bevor du Premium verlässt</string>
+    <string name="subscription_retention_body">Dein Plan wird bereits begleitet. Wenn der Preis das Problem ist, kannst du ein Angebot nutzen, bevor du Google Play öffnest.</string>
+    <string name="subscription_retention_primary">50 % sichern</string>
+    <string name="subscription_retention_secondary">Weiter zu Google Play</string>
+    <string name="subscription_retention_reason_review">Premium lernt aus jedem Zahltag-Check weiter.</string>
+    <string name="subscription_retention_reason_watch">Dein nächster Schritt bleibt vor dem nächsten Zahltag bereit.</string>
+    <string name="subscription_retention_reason_cancel">Du kannst in Google Play weiterhin verwalten oder kündigen.</string>
+    <string name="legacy_premium_grant_title">Ein kostenloses Premium-Jahr wartet</string>
+    <string name="legacy_premium_grant_body">Danke, dass du My Share früh genutzt hast. Bestehende Nutzer erhalten nach dem Update ein Jahr Premium.</string>
+    <string name="legacy_premium_grant_primary">Kostenloses Jahr aktivieren</string>
+    <string name="legacy_premium_grant_claiming">Wird aktiviert...</string>
+    <string name="legacy_premium_grant_claiming_body">Dein Premium-Zugang wird vorbereitet.</string>
+    <string name="legacy_premium_grant_reason_year">Ein volles Jahr Premium-Zugang.</string>
+    <string name="legacy_premium_grant_reason_watch">Premium begleitet diesen Plan und führt jeden Zahltag-Check.</string>
+    <string name="legacy_premium_grant_reason_no_charge">Keine Zahlung und keine automatische Verlängerung für diesen kostenlosen Pass.</string>
+    <string name="legacy_premium_grant_error">Das kostenlose Jahr konnte nicht aktiviert werden. Prüfe deine Verbindung und versuche es erneut.</string>
 </resources>

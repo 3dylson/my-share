@@ -864,4 +864,20 @@
     <string name="plan_summary_investing_first">Une répartition menée par l’investissement à long terme.</string>
     <string name="plan_summary_flexible_budget_only">Un plan flexible centré sur l’argent sûr à dépenser.</string>
     <string name="plan_summary_custom_strategy">Une répartition personnalisée selon vos règles de paie.</string>
+    <string name="subscription_retention_title">Avant de quitter Premium</string>
+    <string name="subscription_retention_body">Votre plan est déjà suivi. Si le prix est le problème, vous pouvez accepter une offre avant d’ouvrir Google Play.</string>
+    <string name="subscription_retention_primary">Profiter de 50 %</string>
+    <string name="subscription_retention_secondary">Continuer vers Google Play</string>
+    <string name="subscription_retention_reason_review">Premium continue d’apprendre de chaque bilan de paie.</string>
+    <string name="subscription_retention_reason_watch">Votre prochaine action reste prête avant le prochain jour de paie.</string>
+    <string name="subscription_retention_reason_cancel">Vous pouvez toujours gérer ou annuler dans Google Play.</string>
+    <string name="legacy_premium_grant_title">Un an de Premium gratuit vous attend</string>
+    <string name="legacy_premium_grant_body">Merci d’avoir utilisé My Share dès le début. Les utilisateurs existants reçoivent un an de Premium après la mise à jour.</string>
+    <string name="legacy_premium_grant_primary">Activer mon année gratuite</string>
+    <string name="legacy_premium_grant_claiming">Activation...</string>
+    <string name="legacy_premium_grant_claiming_body">Préparation de votre accès Premium.</string>
+    <string name="legacy_premium_grant_reason_year">Une année complète de Premium.</string>
+    <string name="legacy_premium_grant_reason_watch">Premium suivra ce plan et guidera chaque bilan de paie.</string>
+    <string name="legacy_premium_grant_reason_no_charge">Aucun paiement et aucun renouvellement automatique pour ce pass gratuit.</string>
+    <string name="legacy_premium_grant_error">Impossible d’activer l’année gratuite. Vérifiez votre connexion et réessayez.</string>
 </resources>

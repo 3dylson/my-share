@@ -864,4 +864,20 @@
     <string name="plan_summary_investing_first">تقسيم تقوده الاستثمارات طويلة الأجل.</string>
     <string name="plan_summary_flexible_budget_only">خطة مرنة تركز على وضوح الإنفاق الآمن.</string>
     <string name="plan_summary_custom_strategy">تقسيم مخصص حسب قواعد يوم الدفع الخاصة بك.</string>
+    <string name="subscription_retention_title">قبل مغادرة Premium</string>
+    <string name="subscription_retention_body">خطتك قيد المتابعة بالفعل. إذا كان السعر هو المشكلة، يمكنك استخدام عرض قبل فتح Google Play.</string>
+    <string name="subscription_retention_primary">احصل على خصم 50%</string>
+    <string name="subscription_retention_secondary">المتابعة إلى Google Play</string>
+    <string name="subscription_retention_reason_review">يواصل Premium التعلم من كل مراجعة راتب.</string>
+    <string name="subscription_retention_reason_watch">تبقى خطوتك التالية جاهزة قبل يوم الراتب القادم.</string>
+    <string name="subscription_retention_reason_cancel">لا يزال بإمكانك الإدارة أو الإلغاء في Google Play.</string>
+    <string name="legacy_premium_grant_title">ينتظرك عام مجاني من Premium</string>
+    <string name="legacy_premium_grant_body">شكراً لاستخدامك My Share مبكراً. يحصل المستخدمون الحاليون على عام من Premium بعد التحديث.</string>
+    <string name="legacy_premium_grant_primary">تفعيل عامي المجاني</string>
+    <string name="legacy_premium_grant_claiming">جارٍ التفعيل...</string>
+    <string name="legacy_premium_grant_claiming_body">جارٍ تجهيز وصولك إلى Premium.</string>
+    <string name="legacy_premium_grant_reason_year">عام كامل من وصول Premium.</string>
+    <string name="legacy_premium_grant_reason_watch">سيتابع Premium هذه الخطة ويوجه كل مراجعة راتب.</string>
+    <string name="legacy_premium_grant_reason_no_charge">لا يوجد دفع ولا تجديد تلقائي لهذا المرور المجاني.</string>
+    <string name="legacy_premium_grant_error">تعذر تفعيل العام المجاني. تحقق من الاتصال وحاول مرة أخرى.</string>
 </resources>

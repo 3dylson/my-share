@@ -11,6 +11,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pt.ms.myshare.BuildConfig
+import pt.ms.myshare.data.grant.LegacyPremiumGrantEligibilityStore
 import pt.ms.myshare.domain.repository.UserPreferencesRepository
 import pt.ms.myshare.presentation.ui.localization.UserLocaleManager
 import pt.ms.myshare.utils.logs.CrashlyticsTree
@@ -23,6 +24,7 @@ import javax.inject.Provider
 class MyShareApp : Application() {
 
     @Inject lateinit var userPreferencesRepositoryProvider: Provider<UserPreferencesRepository>
+    @Inject lateinit var legacyPremiumGrantEligibilityStore: LegacyPremiumGrantEligibilityStore
     @Inject lateinit var userLocaleManager: UserLocaleManager
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
@@ -37,6 +39,7 @@ class MyShareApp : Application() {
         Timber.plant(CrashlyticsTree())
 
         FirebaseUtils.init(this)
+        legacyPremiumGrantEligibilityStore.captureInstallEligibilitySnapshot()
 
         applyStoredLocale()
 

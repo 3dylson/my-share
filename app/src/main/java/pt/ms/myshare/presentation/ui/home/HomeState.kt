@@ -1,6 +1,7 @@
 package pt.ms.myshare.presentation.ui.home
 
 import pt.ms.myshare.domain.model.BillingPlan
+import pt.ms.myshare.domain.model.LegacyPremiumGrantState
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
 import pt.ms.myshare.domain.model.PremiumCheckInStatus
@@ -202,6 +203,7 @@ data class MoreCardState(
     val adjustmentMemory: PremiumAdjustmentMemoryState? = null,
     val adjustmentHistory: List<PremiumAdjustmentMemoryState> = emptyList(),
     val premiumCheckIn: PremiumCheckInState? = null,
+    val legacyPremiumGrant: LegacyPremiumGrantState = LegacyPremiumGrantState(),
     val error: String? = null
 ) {
     val requiresPremiumAccountProtectionBeforeLogout: Boolean

@@ -178,6 +178,11 @@ fun PaywallScreen(
     }
 
     KeyboardDismissEffect(showSecurePremiumAccessPrompt)
+    LaunchedEffect(showSecurePremiumAccessPrompt) {
+        if (showSecurePremiumAccessPrompt) {
+            scrollState.scrollTo(0)
+        }
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,

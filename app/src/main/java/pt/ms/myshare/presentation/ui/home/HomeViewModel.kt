@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import pt.ms.myshare.domain.model.BillingFlowLaunchResult
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.BillingPurchaseEvent
+import pt.ms.myshare.domain.model.LegacyPremiumGrantStatus
 import pt.ms.myshare.domain.model.PaydayRule
 import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendation
 import pt.ms.myshare.domain.model.ManualReview
@@ -37,6 +38,7 @@ import pt.ms.myshare.domain.model.StoreProduct
 import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
+import pt.ms.myshare.domain.repository.LegacyPremiumGrantRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.repository.UserPreferencesRepository
 import pt.ms.myshare.domain.use_case.AdjustGoalProgressForReviewCorrectionUseCase
@@ -76,6 +78,7 @@ class HomeViewModel @Inject constructor(
     private val plannerRepository: PlannerRepository,
     private val authRepository: AuthRepository,
     private val entitlementRepository: EntitlementRepository,
+    private val legacyPremiumGrantRepository: LegacyPremiumGrantRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase,
     private val createPaydayAdjustmentRecommendationUseCase: CreatePaydayAdjustmentRecommendationUseCase,
@@ -105,6 +108,7 @@ class HomeViewModel @Inject constructor(
     private var currentPaydayRecommendation: PaydayAdjustmentRecommendation? = null
     private var paydayRecommendationRollback: PaydayRecommendationRollback? = null
     private var nextReviewSavedEventId = 0L
+    private var legacyPremiumGrantViewedLogged = false
 
     private var currentPreferences = userPreferencesRepository.loadPreferences()
 
@@ -120,11 +124,13 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             plannerRepository.syncFromFirestore()
             userPreferencesRepository.syncFromFirestore()
+            legacyPremiumGrantRepository.refreshAvailability()
         }
         userLocaleManager.apply(currentPreferences)
         observeProducts()
         observeBillingPurchaseEvents()
         observeEntitlementLifecycle()
+        observeLegacyPremiumGrant()
         observePlannerData()
         observeReviewHistory()
         FirebaseUtils.logScreen("home")
@@ -143,6 +149,25 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             entitlementRepository.availableProducts.collect { products ->
                 availableStoreProducts = products
+            }
+        }
+    }
+
+    private fun observeLegacyPremiumGrant() {
+        viewModelScope.launch {
+            legacyPremiumGrantRepository.grantState.collect { grantState ->
+                if (!legacyPremiumGrantViewedLogged && grantState.status == LegacyPremiumGrantStatus.Eligible) {
+                    legacyPremiumGrantViewedLogged = true
+                    FirebaseUtils.logEvent("legacy_premium_grant_viewed")
+                    Timber.tag(TAG).d("Legacy Premium grant viewed")
+                }
+                uiState.update { current ->
+                    current.copy(
+                        moreCard = current.moreCard.copy(
+                            legacyPremiumGrant = grantState
+                        )
+                    )
+                }
             }
         }
     }
@@ -1023,6 +1048,22 @@ class HomeViewModel @Inject constructor(
         logPremiumGateEvent("premium_gate_upgrade_clicked", gate)
     }
 
+    fun logSubscriptionRetentionViewed() {
+        FirebaseUtils.logEvent("subscription_retention_viewed", android.os.Bundle().apply {
+            putString("source", "more_manage_subscription")
+            putString("offer_id", PremiumSubscriptionProducts.MONTHLY_SAVE_OFFER_ID)
+        })
+        Timber.tag(TAG).d("Subscription retention viewed")
+    }
+
+    fun logSubscriptionRetentionContinue() {
+        FirebaseUtils.logEvent("subscription_retention_continue_play", android.os.Bundle().apply {
+            putString("source", "more_manage_subscription")
+            putString("offer_id", PremiumSubscriptionProducts.MONTHLY_SAVE_OFFER_ID)
+        })
+        Timber.tag(TAG).d("Subscription retention continued to Google Play")
+    }
+
     fun unlockPremium(activity: android.app.Activity, source: String = "more_inline") {
         val storeProductId = selectedStoreProductId()
         val realProduct = selectedStoreProduct()
@@ -1074,6 +1115,84 @@ class HomeViewModel @Inject constructor(
                 }
                 Timber.tag(TAG).e("Cannot purchase: Product %s not found in store", storeProductId)
             }
+        }
+    }
+
+    fun claimSubscriptionSaveOffer(activity: android.app.Activity) {
+        val saveOfferProduct = monthlySaveOfferProduct()
+
+        viewModelScope.launch {
+            uiState.update {
+                it.copy(
+                    moreCard = it.moreCard.copy(
+                        isBillingActionInProgress = true,
+                        billingMessage = BillingStatusMessageKeys.STARTING,
+                        error = null
+                    )
+                )
+            }
+            if (saveOfferProduct != null) {
+                FirebaseUtils.logEvent("subscription_save_offer_started", android.os.Bundle().apply {
+                    putString("product_id", saveOfferProduct.productId)
+                    putString("offer_id", saveOfferProduct.offerId)
+                    putString("offer_tags", saveOfferProduct.offerTags.joinToString(","))
+                    putString("source", "subscription_retention")
+                })
+                val launchResult = entitlementRepository.purchasePlan(activity, saveOfferProduct)
+                uiState.update {
+                    it.copy(
+                        moreCard = it.moreCard.copy(
+                            isBillingActionInProgress = false,
+                            billingMessage = BillingStatusMessageMapper.fromLaunchResult(launchResult),
+                            error = null
+                        )
+                    )
+                }
+                logBillingLaunchResult(launchResult, saveOfferProduct.productId, "subscription_retention")
+            } else {
+                FirebaseUtils.logEvent("subscription_save_offer_unavailable", android.os.Bundle().apply {
+                    putString("product_id", PremiumSubscriptionProducts.MONTHLY_ID)
+                    putString("offer_id", PremiumSubscriptionProducts.MONTHLY_SAVE_OFFER_ID)
+                    putString("source", "subscription_retention")
+                })
+                uiState.update {
+                    it.copy(
+                        moreCard = it.moreCard.copy(
+                            isBillingActionInProgress = false,
+                            billingMessage = BillingStatusMessageKeys.PRODUCTS_UNAVAILABLE,
+                            error = "more_error_products_not_loaded"
+                        )
+                    )
+                }
+                Timber.tag(TAG).e(
+                    "Cannot launch subscription save offer: offer %s not found for product=%s",
+                    PremiumSubscriptionProducts.MONTHLY_SAVE_OFFER_ID,
+                    PremiumSubscriptionProducts.MONTHLY_ID
+                )
+            }
+        }
+    }
+
+    fun claimLegacyPremiumGrant() {
+        viewModelScope.launch {
+            FirebaseUtils.logEvent("legacy_premium_grant_claim_started")
+            val grantState = legacyPremiumGrantRepository.claimGrant()
+            if (grantState.status == LegacyPremiumGrantStatus.Claimed) {
+                plannerRepository.saveAutomationEnabled(true)
+                FirebaseUtils.logEvent("legacy_premium_grant_claimed")
+                Timber.tag(TAG).d("Legacy Premium grant claimed and Premium watch enabled")
+            } else if (grantState.status == LegacyPremiumGrantStatus.NotEligible) {
+                FirebaseUtils.logEvent("legacy_premium_grant_not_eligible")
+            } else if (grantState.status == LegacyPremiumGrantStatus.Error) {
+                FirebaseUtils.logEvent("legacy_premium_grant_error")
+            }
+        }
+    }
+
+    fun dismissLegacyPremiumGrant() {
+        viewModelScope.launch {
+            legacyPremiumGrantRepository.dismissGrant()
+            FirebaseUtils.logEvent("legacy_premium_grant_dismissed")
         }
     }
 
@@ -1150,7 +1269,25 @@ class HomeViewModel @Inject constructor(
 
     private fun selectedStoreProduct(): StoreProduct? {
         val storeProductId = selectedStoreProductId()
-        return availableStoreProducts.find { it.productId == storeProductId }
+        return availableStoreProducts
+            .filter { it.productId == storeProductId }
+            .sortedWith(
+                compareBy<StoreProduct> { it.isSubscriptionSaveOffer() }
+                    .thenByDescending { it.hasFreeTrial }
+            )
+            .firstOrNull()
+    }
+
+    private fun monthlySaveOfferProduct(): StoreProduct? {
+        return availableStoreProducts.firstOrNull {
+            it.productId == PremiumSubscriptionProducts.MONTHLY_ID &&
+                it.isSubscriptionSaveOffer()
+        }
+    }
+
+    private fun StoreProduct.isSubscriptionSaveOffer(): Boolean {
+        return offerId == PremiumSubscriptionProducts.MONTHLY_SAVE_OFFER_ID ||
+            PremiumSubscriptionProducts.SAVE_OFFER_TAG in offerTags
     }
 
     fun updateAdsConsentRequirement(isRequired: Boolean) {

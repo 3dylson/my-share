@@ -83,7 +83,7 @@ class BillingClientWrapper(context: Context) : PurchasesUpdatedListener {
         
         billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsResult ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                val storeProducts = productDetailsResult.productDetailsList.mapNotNull { details ->
+                val storeProducts = productDetailsResult.productDetailsList.flatMap { details ->
                     BillingProductMapper.map(details)
                 }
                 Timber.d("Billing products mapped: %d", storeProducts.size)

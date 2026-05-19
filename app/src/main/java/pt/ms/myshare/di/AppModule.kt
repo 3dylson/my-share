@@ -16,6 +16,8 @@ import pt.ms.myshare.data.billing.BillingAuthSession
 import pt.ms.myshare.data.billing.BillingClientWrapper
 import pt.ms.myshare.data.billing.FirebaseBillingAuthSession
 import pt.ms.myshare.data.billing.PlayBillingEntitlementRepository
+import pt.ms.myshare.data.grant.FirebaseLegacyPremiumGrantRepository
+import pt.ms.myshare.data.grant.LegacyPremiumGrantEligibilityStore
 import pt.ms.myshare.data.repository.FirestoreAppUpdatePolicyRepository
 import pt.ms.myshare.data.repository.AuthRepositoryImpl
 import pt.ms.myshare.data.repository.PlannerRepositoryImpl
@@ -23,6 +25,7 @@ import pt.ms.myshare.data.repository.SharedUserPreferencesRepository
 import pt.ms.myshare.domain.repository.AppUpdatePolicyRepository
 import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
+import pt.ms.myshare.domain.repository.LegacyPremiumGrantRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.repository.UserPreferencesRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
@@ -105,6 +108,21 @@ object AppModule {
     ): EntitlementRepository = 
         PlayBillingEntitlementRepository(
             billingClientWrapper,
+            billingAuthSession,
+            firestoreProvider,
+            firebaseFunctionsProvider
+        )
+
+    @Provides
+    @Singleton
+    fun provideLegacyPremiumGrantRepository(
+        eligibilityStore: LegacyPremiumGrantEligibilityStore,
+        billingAuthSession: BillingAuthSession,
+        firestoreProvider: Provider<FirebaseFirestore>,
+        firebaseFunctionsProvider: Provider<FirebaseFunctions>
+    ): LegacyPremiumGrantRepository =
+        FirebaseLegacyPremiumGrantRepository(
+            eligibilityStore,
             billingAuthSession,
             firestoreProvider,
             firebaseFunctionsProvider

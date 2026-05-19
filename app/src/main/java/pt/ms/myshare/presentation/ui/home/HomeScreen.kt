@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -36,6 +37,7 @@ import kotlinx.coroutines.launch
 import pt.ms.myshare.BuildConfig
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.BillingPlan
+import pt.ms.myshare.domain.model.LegacyPremiumGrantStatus
 import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReadResult
 import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReader
@@ -86,8 +88,13 @@ fun HomeRoute(
         onToggleAutomation = viewModel::onToggleAutomation,
         onBillingPlanSelected = viewModel::chooseBillingPlan,
         onUnlockPremium = viewModel::unlockPremium,
+        onClaimSubscriptionSaveOffer = viewModel::claimSubscriptionSaveOffer,
         onPremiumGateViewed = viewModel::logPremiumGateViewed,
         onPremiumGateUpgradeClicked = viewModel::logPremiumGateUpgradeClicked,
+        onSubscriptionRetentionViewed = viewModel::logSubscriptionRetentionViewed,
+        onSubscriptionRetentionContinue = viewModel::logSubscriptionRetentionContinue,
+        onClaimLegacyPremiumGrant = viewModel::claimLegacyPremiumGrant,
+        onDismissLegacyPremiumGrant = viewModel::dismissLegacyPremiumGrant,
         onConnectGoogleAccount = viewModel::connectGoogleAccount,
         onGoogleConnectionCredentialError = viewModel::setGoogleConnectionCredentialError,
         onDismissPremiumAccountPrompt = viewModel::dismissPremiumAccountPrompt,
@@ -127,8 +134,13 @@ fun HomeScreen(
     onToggleAutomation: (Boolean) -> Unit,
     onBillingPlanSelected: (BillingPlan) -> Unit,
     onUnlockPremium: (android.app.Activity, String) -> Unit,
+    onClaimSubscriptionSaveOffer: (android.app.Activity) -> Unit,
     onPremiumGateViewed: (HomePremiumGate) -> Unit,
     onPremiumGateUpgradeClicked: (HomePremiumGate) -> Unit,
+    onSubscriptionRetentionViewed: () -> Unit,
+    onSubscriptionRetentionContinue: () -> Unit,
+    onClaimLegacyPremiumGrant: () -> Unit,
+    onDismissLegacyPremiumGrant: () -> Unit,
     onConnectGoogleAccount: (String) -> Unit,
     onGoogleConnectionCredentialError: (String) -> Unit,
     onDismissPremiumAccountPrompt: () -> Unit,
@@ -148,6 +160,7 @@ fun HomeScreen(
 ) {
     val activity = androidx.activity.compose.LocalActivity.current
     val context = LocalContext.current
+    val uriHandler = LocalUriHandler.current
     val coroutineScope = rememberCoroutineScope()
     val googleIdTokenReader = remember(context) {
         GoogleIdTokenReader(
@@ -172,6 +185,7 @@ fun HomeScreen(
     var showStrategyRuleArchive by remember { mutableStateOf(false) }
     var showPremiumAdjustmentHistory by remember { mutableStateOf(false) }
     var showPremiumReviewResultSheet by remember { mutableStateOf(false) }
+    var showSubscriptionRetentionDialog by remember { mutableStateOf(false) }
     var recommendationPendingApply by remember { mutableStateOf<PaydayAdjustmentRecommendationState?>(null) }
     var showRecommendationAppliedSheet by remember { mutableStateOf(false) }
     var reviewBeingEdited by remember { mutableStateOf<ReviewHistoryItemState?>(null) }
@@ -484,6 +498,36 @@ fun HomeScreen(
         }
     }
 
+    if (showSubscriptionRetentionDialog) {
+        SubscriptionRetentionDialog(
+            onDismissRequest = { showSubscriptionRetentionDialog = false },
+            onClaimOffer = {
+                Timber.tag("HomeScreen").d("Subscription retention accepted: launching save offer")
+                showSubscriptionRetentionDialog = false
+                if (activity != null) {
+                    onClaimSubscriptionSaveOffer(activity)
+                } else {
+                    uriHandler.openUri("https://play.google.com/store/account/subscriptions?package=pt.ms.myshare")
+                }
+            },
+            onContinueToGooglePlay = {
+                Timber.tag("HomeScreen").d("Subscription retention declined: opening Google Play")
+                showSubscriptionRetentionDialog = false
+                onSubscriptionRetentionContinue()
+                uriHandler.openUri("https://play.google.com/store/account/subscriptions?package=pt.ms.myshare")
+            }
+        )
+    }
+
+    if (!state.moreCard.isPremium && state.moreCard.legacyPremiumGrant.shouldShowOffer) {
+        LegacyPremiumGrantDialog(
+            isClaiming = state.moreCard.legacyPremiumGrant.status == LegacyPremiumGrantStatus.Claiming,
+            errorMessageKey = state.moreCard.legacyPremiumGrant.errorMessageKey,
+            onClaim = onClaimLegacyPremiumGrant,
+            onDismiss = onDismissLegacyPremiumGrant
+        )
+    }
+
     if (showLanguagePicker) {
         LanguagePickerDialog(
             selectedLanguageTag = state.moreCard.userPreferences.languageTag,
@@ -746,6 +790,16 @@ fun HomeScreen(
                                 Timber.tag("HomeScreen").d("Account details opened from More tab")
                                 showAccountDetailsDialog = true
                             },
+                            onManageSubscription = {
+                                if (state.moreCard.isPremium) {
+                                    Timber.tag("HomeScreen").d("Subscription retention dialog opened before Google Play")
+                                    onSubscriptionRetentionViewed()
+                                    showSubscriptionRetentionDialog = true
+                                } else {
+                                    Timber.tag("HomeScreen").d("Google Play subscription management opened from non-premium state")
+                                    uriHandler.openUri("https://play.google.com/store/account/subscriptions?package=pt.ms.myshare")
+                                }
+                            },
                             onOpenAdjustmentHistory = {
                                 Timber.tag("HomeScreen").d("Premium adjustment history opened")
                                 showPremiumAdjustmentHistory = true
@@ -880,8 +934,13 @@ private fun HomeScreenPreview() {
             onToggleAutomation = { _ -> },
             onBillingPlanSelected = { _ -> },
             onUnlockPremium = { _, _ -> },
+            onClaimSubscriptionSaveOffer = { _ -> },
             onPremiumGateViewed = { _ -> },
             onPremiumGateUpgradeClicked = { _ -> },
+            onSubscriptionRetentionViewed = {},
+            onSubscriptionRetentionContinue = {},
+            onClaimLegacyPremiumGrant = {},
+            onDismissLegacyPremiumGrant = {},
             onConnectGoogleAccount = { _ -> },
             onGoogleConnectionCredentialError = { _ -> },
             onDismissPremiumAccountPrompt = {},

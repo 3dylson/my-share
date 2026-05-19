@@ -54,6 +54,20 @@ Recommended order:
 5. Strengthen paywall and tab-level premium surfaces.
 6. Run a full emulator verification pass.
 
+## Founder Premium And Retention Work
+
+Status after implementation pass on 2026-05-19:
+- Done: Created the Google Play developer-determined monthly save offer `save50-1m` with tag `save-offer`, offering 50% off for 2 monthly billing periods.
+- Done: More tab `Manage subscription` now shows a retention dialog for active Premium users before opening Google Play, with a plain-language save offer and analytics for viewed, accepted, unavailable, and continued-to-Google-Play states.
+- Done: Existing users can receive a one-year promotional Premium pass after updating, without checkout, payment, or auto-renewal copy.
+- Done: The founder pass is capped server-side to 100 claims through Cloud Function `claimLegacyPremiumGrant` and Firestore config `app_config/legacy_premium_grant`.
+- Done: Fresh installs are excluded by capturing an install-time eligibility snapshot before onboarding can write new planner values.
+- Done: Analytics events were added for founder pass viewed, claim started, claimed, not eligible, error, and dismissed.
+- Done: Firestore rules protect the cap/config and grant records from client writes.
+- Done: Deployed `claimLegacyPremiumGrant` and Firestore rules explicitly to Firebase project `my-share-finance`.
+- Validated: Existing-user emulator state shows `A free year of Premium is waiting`; fresh-install onboarding and post-skip home do not show the founder pass.
+- Guardrail: Do not tap `Activate my free year` during QA unless intentionally consuming one of the 100 live founder passes.
+
 ## Conversion And Copy Principles
 
 Marketing copy should follow a premium, trust-first approach:
@@ -676,6 +690,14 @@ Status after post-purchase messaging implementation pass on 2026-05-19:
 - Done: Success and account-protection copy was localized across supported languages.
 - Tested: full `testDebugUnitTest` and debug build.
 - Validation note: existing active canceled Play entitlement skips directly to reminders, so final purchase-event visual validation requires the current test period to expire before repurchasing.
+
+Status after monthly Play purchase success-state validation on 2026-05-19:
+- Done: Re-tested a fresh compact onboarding path, selected the monthly subscription on the paywall, completed the Google Play test purchase, and confirmed the onboarding success state replaces the sales paywall with `Premium is ready`.
+- Done: Fixed the success state inheriting the previous paywall scroll position by resetting the paywall scroll to the top when the Premium-ready prompt appears.
+- Done: Continued from the success state through reminders into Home and confirmed Premium is active with the compact top-bar badge and vertical core metrics layout.
+- Done: Opened More > Manage subscription and canceled the monthly Google Play test subscription; access remains active until the short test billing period ends.
+- Tested: full `testDebugUnitTest` and debug build.
+- Validated: debug install on `emulator-5554`, compact `720x1280 / 360dpi` Welcome, Goal, Salary, Fixed Costs, Plan Preview, Signup, Trajectory, active Play entitlement success state, Reminder skip, Home Premium state, More subscription management, and no app fatal crash or ANR in logcat.
 
 Status after compact onboarding trajectory readability pass on 2026-05-19:
 - Done: Fixed the onboarding trajectory card so goal dates, payday summary, adjustment labels, and supporting copy wrap instead of truncating on compact screens.

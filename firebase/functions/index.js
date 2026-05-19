@@ -6,6 +6,7 @@ const {requireAuthenticatedUid} = require('./src/authenticatedUid');
 const {processPurchaseForUid} = require('./src/subscriptionVerificationService');
 const {handlePlayBillingNotification} = require('./src/playBillingNotificationHandler');
 const {revalidatePremiumEntitlements} = require('./src/premiumEntitlementRevalidator');
+const {claimLegacyPremiumGrant} = require('./src/legacyPremiumGrantService');
 
 admin.initializeApp();
 
@@ -49,6 +50,28 @@ exports.verifySubscription = functions
         throw new functions.https.HttpsError(
             'internal',
             'Unable to verify subscription with Google Play.',
+        );
+      }
+    });
+
+exports.claimLegacyPremiumGrant = functions
+    .runWith({
+      minInstances: 0,
+      maxInstances: 5,
+    })
+    .https.onCall(async (data, context) => {
+      const uid = await requireAuthenticatedUid(data, context);
+      try {
+        return await claimLegacyPremiumGrant({
+          uid,
+          campaignId: data.campaignId,
+          clientEligibility: data.clientEligibility,
+        });
+      } catch (error) {
+        console.error('Error claiming legacy Premium grant:', error);
+        throw new functions.https.HttpsError(
+            'internal',
+            'Unable to claim legacy Premium grant.',
         );
       }
     });

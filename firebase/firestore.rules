@@ -22,11 +22,17 @@ service cloud.firestore {
         'verificationSource',
         'notificationType',
         'latestOrderId',
-        'regionCode'
+        'regionCode',
+        'grantCampaignId'
       ];
     }
 
     match /app_config/android_update_policy {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /app_config/legacy_premium_grant {
       allow read: if true;
       allow write: if false;
     }
@@ -36,6 +42,10 @@ service cloud.firestore {
     }
 
     match /billing_events/{doc} {
+      allow read, write: if false;
+    }
+
+    match /legacy_premium_grants/{doc} {
       allow read, write: if false;
     }
 

@@ -58,8 +58,11 @@ import pt.ms.myshare.domain.use_case.GetPerformanceStatsUseCase
 import pt.ms.myshare.domain.use_case.GetCoachingInsightsUseCase
 import pt.ms.myshare.domain.use_case.ResolveAllocationStrategyRulesUseCase
 import pt.ms.myshare.domain.model.Goal
+import pt.ms.myshare.domain.model.LegacyPremiumGrantState
+import pt.ms.myshare.domain.model.LegacyPremiumGrantStatus
 import pt.ms.myshare.domain.model.PremiumReviewCoachingStatus
 import pt.ms.myshare.domain.model.User
+import pt.ms.myshare.domain.repository.LegacyPremiumGrantRepository
 import pt.ms.myshare.TestUserPreferencesRepository
 import pt.ms.myshare.presentation.ui.localization.UserLocaleManager
 import pt.ms.myshare.presentation.ui.onboarding.ReminderWorkScheduler
@@ -78,6 +81,7 @@ class HomeViewModelTest {
     private lateinit var viewModel: HomeViewModel
     private lateinit var fakePlannerRepository: FakePlannerRepository
     private lateinit var fakeEntitlementRepository: TestFakeEntitlementRepository
+    private lateinit var fakeLegacyPremiumGrantRepository: TestFakeLegacyPremiumGrantRepository
     private val mockAuthRepository = mockk<AuthRepository>(relaxed = true)
     private val mockGetReviewHistoryUseCase = mockk<GetReviewHistoryUseCase>(relaxed = true)
     private val mockUpdateGoalProgressUseCase = mockk<UpdateGoalProgressUseCase>(relaxed = true)
@@ -90,6 +94,7 @@ class HomeViewModelTest {
         Dispatchers.setMain(testDispatcher)
         fakePlannerRepository = FakePlannerRepository()
         fakeEntitlementRepository = TestFakeEntitlementRepository()
+        fakeLegacyPremiumGrantRepository = TestFakeLegacyPremiumGrantRepository()
         val calculatePlanPreviewUseCase = CalculatePlanPreviewUseCase(ResolveAllocationStrategyRulesUseCase())
         currentUserFlow = MutableStateFlow(null)
         
@@ -100,6 +105,7 @@ class HomeViewModelTest {
             plannerRepository = fakePlannerRepository,
             authRepository = mockAuthRepository,
             entitlementRepository = fakeEntitlementRepository,
+            legacyPremiumGrantRepository = fakeLegacyPremiumGrantRepository,
             userPreferencesRepository = TestUserPreferencesRepository(),
             calculatePlanPreviewUseCase = calculatePlanPreviewUseCase,
             createPaydayAdjustmentRecommendationUseCase = CreatePaydayAdjustmentRecommendationUseCase(
@@ -1143,4 +1149,21 @@ class TestFakeEntitlementRepository : EntitlementRepository {
         _isPro.emit(state.hasPremiumAccess)
     }
     override suspend fun restorePurchases() {}
+}
+
+class TestFakeLegacyPremiumGrantRepository : LegacyPremiumGrantRepository {
+    private val _grantState = MutableStateFlow(LegacyPremiumGrantState())
+    override val grantState: Flow<LegacyPremiumGrantState> = _grantState.asStateFlow()
+
+    override suspend fun refreshAvailability() {}
+
+    override suspend fun claimGrant(): LegacyPremiumGrantState {
+        val claimedState = LegacyPremiumGrantState(status = LegacyPremiumGrantStatus.Claimed)
+        _grantState.emit(claimedState)
+        return claimedState
+    }
+
+    override suspend fun dismissGrant() {
+        _grantState.emit(LegacyPremiumGrantState(status = LegacyPremiumGrantStatus.Dismissed))
+    }
 }

@@ -54,6 +54,7 @@ fun LazyListScope.homeMoreTab(
     onShowCurrencyPicker: () -> Unit,
     onShowAutomationLock: () -> Unit,
     onShowAccountDetails: () -> Unit,
+    onManageSubscription: () -> Unit,
     onOpenAdjustmentHistory: () -> Unit,
     onOpenReview: () -> Unit,
     isGoogleCredentialRequestInProgress: Boolean,
@@ -280,9 +281,7 @@ fun LazyListScope.homeMoreTab(
                 subtitle = stringResource(R.string.home_more_account_manage_subscription_desc),
                 icon = Icons.Default.Payment,
                 iconColor = MySharePrimary,
-                onClick = {
-                    uriHandler.openUri("https://play.google.com/store/account/subscriptions?package=pt.ms.myshare")
-                }
+                onClick = onManageSubscription
             )
             PremiumSettingsRow(
                 title = stringResource(R.string.home_more_account_signout),
