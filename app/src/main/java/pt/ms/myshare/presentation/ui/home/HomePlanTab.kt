@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.AutoGraph
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.EventAvailable
 import androidx.compose.material.icons.filled.Flag
@@ -50,6 +51,7 @@ fun LazyListScope.homePlanTab(
     isPremium: Boolean,
     smartAdjustment: SmartAdjustmentControlState,
     premiumCheckIn: PremiumCheckInState?,
+    onOpenPremiumControls: () -> Unit,
     onShowPaywall: (HomePremiumGate) -> Unit
 ) {
     planCard?.let { card ->
@@ -141,7 +143,8 @@ fun LazyListScope.homePlanTab(
             item {
                 PremiumPlanBriefCard(
                     smartAdjustment = smartAdjustment,
-                    premiumCheckIn = premiumCheckIn
+                    premiumCheckIn = premiumCheckIn,
+                    onOpenPremiumControls = onOpenPremiumControls
                 )
             }
         }
@@ -152,8 +155,10 @@ fun LazyListScope.homePlanTab(
 private fun PremiumPlanBriefCard(
     smartAdjustment: SmartAdjustmentControlState,
     premiumCheckIn: PremiumCheckInState?,
+    onOpenPremiumControls: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isWatching = premiumCheckIn?.automationEnabled != false
     val body = when {
         smartAdjustment.isApplyable -> stringResource(
             R.string.home_plan_premium_brief_body_pending,
@@ -165,18 +170,26 @@ private fun PremiumPlanBriefCard(
             smartAdjustment.currentFlexibleSpendLabel,
             smartAdjustment.currentPriorityContributionLabel
         )
+        !isWatching -> stringResource(R.string.home_plan_premium_brief_body_paused)
         else -> stringResource(R.string.home_plan_premium_brief_body_waiting)
+    }
+    val title = if (isWatching) {
+        stringResource(R.string.home_plan_premium_brief_title_active)
+    } else {
+        stringResource(R.string.home_plan_premium_brief_title_paused)
     }
     val checkInLabel = premiumCheckIn?.relativeLabel()
         ?: stringResource(R.string.home_plan_premium_brief_checkin_waiting)
-    val watchLabel = if (premiumCheckIn?.automationEnabled == false) {
+    val watchLabel = if (!isWatching) {
         stringResource(R.string.home_plan_premium_brief_watch_paused)
     } else {
         stringResource(R.string.home_plan_premium_brief_watch_active)
     }
 
     Surface(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(enabled = !isWatching) { onOpenPremiumControls() },
         shape = RoundedCornerShape(20.dp),
         color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.16f),
         border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.22f)),
@@ -212,7 +225,7 @@ private fun PremiumPlanBriefCard(
                         fontWeight = FontWeight.Black
                     )
                     Text(
-                        text = stringResource(R.string.home_plan_premium_brief_title),
+                        text = title,
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold
@@ -222,6 +235,29 @@ private fun PremiumPlanBriefCard(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 18.sp
+                    )
+                }
+            }
+
+            if (!isWatching) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_plan_premium_brief_action),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MySharePrimary,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             }

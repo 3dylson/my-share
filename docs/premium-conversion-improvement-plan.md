@@ -606,8 +606,9 @@ Status after Premium Plan proof implementation pass on 2026-05-19:
 - Done: The project experience bar was written into `AGENTS.md` so future passes keep fixing issues during validation, avoid technical copy, protect onboarding conversion, and preserve compact-screen polish.
 - Done: Premium users now see a compact Plan-tab proof card showing that the plan is being watched, when the next review is due, and whether the Premium watch is on or paused.
 - Done: The card uses plain, outcome-first copy and stays separate from the More control center so Premium value is visible without repeating settings content.
+- Done: Follow-up validation found the paused state could imply the plan was already being watched. The paused card now says Premium is ready, shows a visible `Turn watch on` action, and routes to More controls.
 - Tested: full `testDebugUnitTest` and debug build.
-- Validated: debug install on `emulator-5554`, Google Play test subscription completion, server entitlement snapshot `PRO`, server acknowledgement, compact `720x1280 / 360dpi` Premium Plan proof card, no app fatal crash or ANR in logcat, and emulator restored to `1080x2400 / 420dpi`.
+- Validated: debug install on `emulator-5554`, Google Play test subscription completion, server entitlement snapshot `PRO`, server acknowledgement, compact `720x1280 / 360dpi` Premium Plan proof card, paused-state card-to-More handoff, no app fatal crash or ANR in logcat, and emulator restored to `1080x2400 / 420dpi`.
 
 Next:
 - Continue the next Premium product slice while keeping compact-screen validation in every pass.

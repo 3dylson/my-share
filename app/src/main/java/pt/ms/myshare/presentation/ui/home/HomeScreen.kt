@@ -646,6 +646,9 @@ fun HomeScreen(
                             isPremium = state.moreCard.isPremium,
                             smartAdjustment = state.moreCard.smartAdjustment,
                             premiumCheckIn = state.moreCard.premiumCheckIn,
+                            onOpenPremiumControls = {
+                                onDestinationSelected(HomeDestination.MORE)
+                            },
                             onShowPaywall = { gate ->
                                 openPremiumGate(gate)
                             }
