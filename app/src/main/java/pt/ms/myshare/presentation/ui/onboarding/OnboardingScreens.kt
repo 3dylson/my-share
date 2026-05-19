@@ -2,6 +2,7 @@ package pt.ms.myshare.presentation.ui.onboarding
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
@@ -9,6 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -76,7 +78,12 @@ fun PaywallScreen(
 ) {
     val activity = androidx.activity.compose.LocalActivity.current
     val context = LocalContext.current
-    val isCompactHeight = LocalConfiguration.current.screenHeightDp < 700
+    val configuration = LocalConfiguration.current
+    val fontScale = LocalDensity.current.fontScale
+    val paywallLayoutMode = remember(configuration.screenHeightDp, fontScale) {
+        PaywallLayoutMode.from(configuration.screenHeightDp, fontScale)
+    }
+    val isCompactHeight = paywallLayoutMode == PaywallLayoutMode.Compact
     val coroutineScope = rememberCoroutineScope()
     val googleIdTokenReader = remember(context) {
         GoogleIdTokenReader(
@@ -108,6 +115,9 @@ fun PaywallScreen(
         BillingPlan.ANNUAL -> stringResource(R.string.paywall_period_year)
     }
     val selectedTrialDays = selectedProduct?.freeTrialDays?.takeIf { it > 0 }
+    val displayTrialDays = availableProducts
+        .mapNotNull { product -> product.freeTrialDays?.takeIf { days -> days > 0 } }
+        .maxOrNull()
     val currencyMismatchNotice = selectedProduct?.priceCurrencyCode
         ?.takeUnless { it.equals(userPreferences.currencyCode, ignoreCase = true) }
         ?.let {
@@ -230,109 +240,240 @@ fun PaywallScreen(
             
             Spacer(Modifier.height(8.dp))
 
-            val headline = remember(pricingStrategy.paywallHeadline) {
-                val resId = context.resources.getIdentifier(pricingStrategy.paywallHeadline, "string", context.packageName)
-                if (resId != 0) context.getString(resId) else pricingStrategy.paywallHeadline
-            }
-            val subhead = remember(pricingStrategy.paywallSubhead) {
-                val resId = context.resources.getIdentifier(pricingStrategy.paywallSubhead, "string", context.packageName)
-                if (resId != 0) context.getString(resId) else pricingStrategy.paywallSubhead
-            }
-
-            PaywallHeroCard(
-                headline = headline,
-                subhead = subhead,
-                badge = if (selectedTrialDays != null) {
-                    stringResource(R.string.paywall_hero_trial_badge, selectedTrialDays)
-                } else {
-                    stringResource(R.string.premium_badge)
-                },
-                compactHeight = isCompactHeight
-            )
-
-            Spacer(Modifier.height(if (isCompactHeight) 16.dp else 22.dp))
-
-            PaywallAutopilotPreviewCard(
-                state = autopilotPreview,
-                goalName = goalName
-            )
-
-            Spacer(Modifier.height(if (isCompactHeight) 16.dp else 22.dp))
-
-            PaywallSectionLabel(text = stringResource(R.string.paywall_plan_section_title))
-
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                val hasLivePrices = monthlyProduct != null || annualProduct != null
-                val planCards = remember(pricingStrategy.heroPlan, monthlyProduct, annualProduct, selectedPlan, hasLivePrices) {
-                    val monthlyCard = PaywallPlanCardState(
-                        plan = BillingPlan.MONTHLY,
-                        product = monthlyProduct,
-                        badgeKey = if (pricingStrategy.heroPlan == BillingPlan.MONTHLY) {
-                            R.string.paywall_badge_easy_start
-                        } else {
-                            null
-                        }
-                    )
-                    val annualCard = PaywallPlanCardState(
-                        plan = BillingPlan.ANNUAL,
-                        product = annualProduct,
-                        badgeKey = if (hasLivePrices) R.string.paywall_badge_best_value else null
-                    )
-                    if (pricingStrategy.heroPlan == BillingPlan.ANNUAL) {
-                        listOf(annualCard, monthlyCard)
-                    } else {
-                        listOf(monthlyCard, annualCard)
-                    }
-                }
-
-                planCards.forEach { card ->
-                    PremiumPaywallCard(
-                        title = stringResource(card.plan.titleRes),
-                        price = card.product?.price ?: stringResource(R.string.paywall_price_loading),
-                        period = stringResource(card.plan.periodRes),
-                        description = stringResource(card.plan.descriptionRes),
-                        badge = card.badgeKey?.let { stringResource(it) },
-                        comparisonPrice = if (card.plan == BillingPlan.ANNUAL) {
-                            annualComparison?.monthlyEquivalentPrice
-                        } else {
-                            null
-                        },
-                        savingsLabel = if (card.plan == BillingPlan.ANNUAL) {
-                            annualComparison?.savingsPrice?.let { stringResource(R.string.paywall_annual_savings_label, it) }
-                        } else {
-                            null
-                        },
-                        isSelected = selectedPlan == card.plan,
-                        onClick = { onPlanSelected(card.plan) }
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(if (isCompactHeight) 16.dp else 22.dp))
+            val headline = stringResource(R.string.paywall_headline_default)
+            val subhead = stringResource(R.string.paywall_subhead_default)
 
             if (showSecurePremiumAccessPrompt) {
-                Spacer(Modifier.height(16.dp))
+                PaywallPurchaseSuccessContent(compactHeight = isCompactHeight)
+
+                Spacer(Modifier.height(if (isCompactHeight) 16.dp else 22.dp))
+
                 SecurePremiumAccessCard(
                     isLoading = isGoogleConnectionInProgress || isGoogleCredentialRequestInProgress,
                     feedback = googleConnectionFeedback,
                     isError = googleConnectionError != null,
                     onConnectGoogle = startGoogleConnection
                 )
+
+                Spacer(Modifier.height(24.dp))
+            } else {
+                PaywallAutopilotPreviewCard(
+                    state = autopilotPreview,
+                    goalName = goalName,
+                    headline = headline,
+                    subhead = subhead,
+                    badge = if (displayTrialDays != null) {
+                        stringResource(R.string.paywall_hero_trial_badge, displayTrialDays)
+                    } else {
+                        stringResource(R.string.premium_badge)
+                    },
+                    compactHeight = isCompactHeight
+                )
+
+                Spacer(Modifier.height(if (isCompactHeight) 16.dp else 22.dp))
+
+                PaywallSectionLabel(text = stringResource(R.string.paywall_plan_section_title))
+
+                Column(verticalArrangement = Arrangement.spacedBy(if (paywallLayoutMode == PaywallLayoutMode.Compact) 8.dp else 12.dp)) {
+                    val hasLivePrices = monthlyProduct != null || annualProduct != null
+                    val planCards = remember(pricingStrategy.heroPlan, monthlyProduct, annualProduct, selectedPlan, hasLivePrices) {
+                        val monthlyCard = PaywallPlanCardState(
+                            plan = BillingPlan.MONTHLY,
+                            product = monthlyProduct,
+                            badgeKey = if (pricingStrategy.heroPlan == BillingPlan.MONTHLY) {
+                                R.string.paywall_badge_easy_start
+                            } else {
+                                null
+                            }
+                        )
+                        val annualCard = PaywallPlanCardState(
+                            plan = BillingPlan.ANNUAL,
+                            product = annualProduct,
+                            badgeKey = if (hasLivePrices) R.string.paywall_badge_best_value else null
+                        )
+                        if (pricingStrategy.heroPlan == BillingPlan.ANNUAL) {
+                            listOf(annualCard, monthlyCard)
+                        } else {
+                            listOf(monthlyCard, annualCard)
+                        }
+                    }
+
+                    planCards.forEach { card ->
+                        val title = stringResource(card.plan.titleRes)
+                        val price = card.product?.price ?: stringResource(R.string.paywall_price_loading)
+                        val period = stringResource(card.plan.periodRes)
+                        val description = stringResource(card.plan.descriptionRes)
+                        val badge = card.badgeKey?.let { stringResource(it) }
+                        val comparisonPrice = if (card.plan == BillingPlan.ANNUAL) {
+                            annualComparison?.monthlyEquivalentPrice
+                        } else {
+                            null
+                        }
+                        val savingsLabel = if (card.plan == BillingPlan.ANNUAL) {
+                            annualComparison?.savingsPrice?.let { stringResource(R.string.paywall_annual_savings_label, it) }
+                        } else {
+                            null
+                        }
+                        if (paywallLayoutMode == PaywallLayoutMode.Compact) {
+                            CompactPaywallPlanRow(
+                                title = title,
+                                price = price,
+                                period = period,
+                                description = description,
+                                savingsLabel = savingsLabel,
+                                isSelected = selectedPlan == card.plan,
+                                onClick = { onPlanSelected(card.plan) }
+                            )
+                        } else {
+                            PremiumPaywallCard(
+                                title = title,
+                                price = price,
+                                period = period,
+                                description = description,
+                                badge = badge,
+                                comparisonPrice = comparisonPrice,
+                                savingsLabel = savingsLabel,
+                                isSelected = selectedPlan == card.plan,
+                                onClick = { onPlanSelected(card.plan) }
+                            )
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(if (isCompactHeight) 16.dp else 22.dp))
+
+                if (paywallLayoutMode != PaywallLayoutMode.Compact) {
+                    PaywallTrustList()
+                }
+
+                Spacer(Modifier.height(24.dp))
             }
+        }
+    }
+}
 
-            Spacer(Modifier.height(20.dp))
+private enum class PaywallLayoutMode {
+    Compact,
+    Standard,
+    Expanded;
 
-            PaywallSectionLabel(text = stringResource(R.string.paywall_value_section_title))
+    companion object {
+        fun from(screenHeightDp: Int, fontScale: Float): PaywallLayoutMode = when {
+            screenHeightDp < 720 || fontScale >= 1.25f -> Compact
+            screenHeightDp >= 880 && fontScale < 1.15f -> Expanded
+            else -> Standard
+        }
+    }
+}
 
-            Spacer(Modifier.height(10.dp))
+@Composable
+private fun PaywallPurchaseSuccessContent(
+    compactHeight: Boolean,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.78f),
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.55f))
+    ) {
+        Column(
+            modifier = Modifier.padding(if (compactHeight) 16.dp else 22.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(if (compactHeight) 12.dp else 16.dp)
+        ) {
+            Surface(
+                shape = CircleShape,
+                color = MySharePrimary.copy(alpha = 0.18f)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = null,
+                    tint = MySharePrimary,
+                    modifier = Modifier.padding(12.dp).size(if (compactHeight) 30.dp else 36.dp)
+                )
+            }
+            Text(
+                text = stringResource(R.string.paywall_purchase_success_title),
+                style = if (compactHeight) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                fontWeight = FontWeight.ExtraBold,
+                textAlign = TextAlign.Center,
+                lineHeight = if (compactHeight) 29.sp else 34.sp
+            )
+            Text(
+                text = stringResource(R.string.paywall_purchase_success_body),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.78f),
+                textAlign = TextAlign.Center,
+                lineHeight = 21.sp
+            )
+        }
+    }
 
-            PaywallFeatureGrid()
+    Spacer(Modifier.height(14.dp))
 
-            Spacer(Modifier.height(16.dp))
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        PaywallPurchaseSuccessStep(
+            icon = Icons.Default.Visibility,
+            title = stringResource(R.string.paywall_purchase_success_watch_title),
+            body = stringResource(R.string.paywall_purchase_success_watch_body)
+        )
+        PaywallPurchaseSuccessStep(
+            icon = Icons.Default.EventAvailable,
+            title = stringResource(R.string.paywall_purchase_success_review_title),
+            body = stringResource(R.string.paywall_purchase_success_review_body)
+        )
+        PaywallPurchaseSuccessStep(
+            icon = Icons.Default.AutoAwesome,
+            title = stringResource(R.string.paywall_purchase_success_next_move_title),
+            body = stringResource(R.string.paywall_purchase_success_next_move_body)
+        )
+    }
+}
 
-            PaywallTrustList()
-
-            Spacer(Modifier.height(24.dp))
+@Composable
+private fun PaywallPurchaseSuccessStep(
+    icon: ImageVector,
+    title: String,
+    body: String
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.22f))
+    ) {
+        Row(
+            modifier = Modifier.padding(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = MySharePrimary.copy(alpha = 0.14f)
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MySharePrimary,
+                    modifier = Modifier.padding(8.dp).size(20.dp)
+                )
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = body,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 18.sp
+                )
+            }
         }
     }
 }
@@ -341,6 +482,10 @@ fun PaywallScreen(
 private fun PaywallAutopilotPreviewCard(
     state: PaywallAutopilotPreviewUiState,
     goalName: String,
+    headline: String,
+    subhead: String,
+    badge: String,
+    compactHeight: Boolean,
     modifier: Modifier = Modifier
 ) {
     val recommendationBody = when {
@@ -359,28 +504,58 @@ private fun PaywallAutopilotPreviewCard(
 
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.28f))
+        shape = RoundedCornerShape(24.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.78f),
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.55f))
     ) {
         Column(
-            modifier = Modifier.padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.padding(if (compactHeight) 12.dp else 18.dp),
+            verticalArrangement = Arrangement.spacedBy(if (compactHeight) 8.dp else 14.dp)
         ) {
+            Surface(
+                shape = RoundedCornerShape(999.dp),
+                color = MySharePrimary
+            ) {
+                Text(
+                    text = badge.uppercase(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White,
+                    fontWeight = FontWeight.Black,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                )
+            }
+            Text(
+                text = headline,
+                style = if (compactHeight) MaterialTheme.typography.titleMedium else MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.ExtraBold,
+                lineHeight = if (compactHeight) 23.sp else 31.sp,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+            if (!compactHeight) {
+                Text(
+                    text = subhead,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.78f),
+                    lineHeight = 21.sp
+                )
+            }
+
             Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(if (compactHeight) 8.dp else 12.dp),
                 verticalAlignment = Alignment.Top
             ) {
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = MySharePrimary.copy(alpha = 0.14f)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.AutoAwesome,
-                        contentDescription = null,
-                        tint = MySharePrimary,
-                        modifier = Modifier.padding(8.dp).size(22.dp)
-                    )
+                if (!compactHeight) {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MySharePrimary.copy(alpha = 0.14f)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AutoAwesome,
+                            contentDescription = null,
+                            tint = MySharePrimary,
+                            modifier = Modifier.padding(8.dp).size(22.dp)
+                        )
+                    }
                 }
                 Column(
                     modifier = Modifier.weight(1f),
@@ -392,28 +567,29 @@ private fun PaywallAutopilotPreviewCard(
                             style = MaterialTheme.typography.labelSmall,
                             color = MySharePrimary,
                             fontWeight = FontWeight.Bold,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            lineHeight = 14.sp
                         )
                     }
                     Text(
                         text = stringResource(R.string.paywall_autopilot_recommendation_title),
-                        style = MaterialTheme.typography.titleMedium,
+                        style = if (compactHeight) MaterialTheme.typography.titleSmall else MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Text(
                         text = recommendationBody,
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.78f),
                         lineHeight = 18.sp
                     )
                 }
             }
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.16f))
+            if (!compactHeight) {
+                HorizontalDivider(color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.14f))
 
-            PaywallAutopilotComparisonGrid()
+                PaywallAutopilotComparisonGrid()
+            }
         }
     }
 }
@@ -513,6 +689,77 @@ private fun PaywallAutopilotComparisonPill(
 }
 
 @Composable
+private fun CompactPaywallPlanRow(
+    title: String,
+    price: String,
+    period: String,
+    description: String,
+    savingsLabel: String?,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val borderColor by animateColorAsState(
+        if (isSelected) MySharePrimary else MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+        label = "compactPaywallPlanBorder"
+    )
+    val backgroundColor by animateColorAsState(
+        if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f) else MaterialTheme.colorScheme.surface,
+        label = "compactPaywallPlanBackground"
+    )
+
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
+        color = backgroundColor,
+        border = BorderStroke(if (isSelected) 2.dp else 1.dp, borderColor)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 9.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(1.dp)
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = savingsLabel ?: description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            Text(
+                text = stringResource(R.string.price_per_period, price, period),
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Black,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Icon(
+                imageVector = if (isSelected) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
+                contentDescription = if (isSelected) stringResource(R.string.content_description_selected) else null,
+                tint = if (isSelected) MySharePrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+    }
+}
+
+@Composable
 private fun PaywallHeroCard(
     headline: String,
     subhead: String,
@@ -581,9 +828,7 @@ private fun PaywallHeroCard(
                 textAlign = TextAlign.Center,
                 lineHeight = headlineLineHeight,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.fillMaxWidth(),
-                maxLines = if (compactHeight) 2 else Int.MAX_VALUE,
-                overflow = TextOverflow.Ellipsis
+                modifier = Modifier.fillMaxWidth()
             )
             Text(
                 subhead,
@@ -591,9 +836,7 @@ private fun PaywallHeroCard(
                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.78f),
                 textAlign = TextAlign.Center,
                 lineHeight = bodyLineHeight,
-                modifier = Modifier.fillMaxWidth().padding(top = if (compactHeight) 4.dp else 8.dp),
-                maxLines = if (compactHeight) 1 else Int.MAX_VALUE,
-                overflow = TextOverflow.Ellipsis
+                modifier = Modifier.fillMaxWidth().padding(top = if (compactHeight) 4.dp else 8.dp)
             )
         }
     }

@@ -90,8 +90,7 @@ fun SignupScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .navigationBarsPadding()
-                        .padding(horizontal = 24.dp, vertical = 16.dp),
+                        .padding(start = 24.dp, top = 12.dp, end = 24.dp, bottom = 28.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     googleSignInError?.let { message ->
@@ -145,12 +144,11 @@ fun SignupScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
                 .padding(horizontal = 24.dp)
                 .nestedScroll(keyboardDismissOnScrollConnection)
                 .verticalScroll(rememberScrollState())
         ) {
-            Spacer(Modifier.height(40.dp))
+            Spacer(Modifier.height(28.dp))
             
             Text(
                 stringResource(R.string.onboarding_signup_title), 
@@ -195,15 +193,6 @@ fun SignupScreen(
                     )
                 }
             }
-
-            Spacer(Modifier.height(18.dp))
-
-            Text(
-                text = stringResource(R.string.onboarding_signup_local_note),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                lineHeight = 20.sp
-            )
 
             Spacer(Modifier.height(24.dp))
         }

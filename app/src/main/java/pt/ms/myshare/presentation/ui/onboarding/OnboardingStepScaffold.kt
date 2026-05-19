@@ -6,18 +6,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imeNestedScroll
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -60,7 +55,7 @@ fun OnboardingStepScaffold(
                 .padding(innerPadding)
         ) {
             val compactHeight = maxHeight < 700.dp
-            val topSpacing = if (compactHeight) 6.dp else 12.dp
+            val topSpacing = if (compactHeight) 28.dp else 36.dp
             val afterBackSpacing = if (compactHeight) 4.dp else 8.dp
             val afterProgressSpacing = if (compactHeight) 14.dp else 20.dp
             val beforeContentSpacing = if (compactHeight) 20.dp else 28.dp
@@ -69,7 +64,6 @@ fun OnboardingStepScaffold(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
                     .navigationBarsPadding()
                     .padding(horizontal = 24.dp)
                     .imeNestedScroll()
@@ -126,8 +120,7 @@ fun OnboardingStepScaffold(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .imePadding()
-                    .navigationBarsPadding(),
+                    .imePadding(),
                 color = MaterialTheme.colorScheme.background
             ) {
                 PremiumButton(
@@ -136,7 +129,7 @@ fun OnboardingStepScaffold(
                     enabled = actionEnabled,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 16.dp)
+                        .padding(start = 24.dp, top = 12.dp, end = 24.dp, bottom = 28.dp)
                 )
             }
         }

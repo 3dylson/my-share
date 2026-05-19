@@ -46,7 +46,7 @@
     <string name="onboarding_goal_picker_subtitle">This goal shapes the plan we build from your numbers.</string>
     <string name="onboarding_goal_picker_emergency">Emergency Fund</string>
     <string name="onboarding_goal_picker_debt">Debt Payoff</string>
-    <string name="onboarding_goal_picker_investment">Investment Portfolio</string>
+    <string name="onboarding_goal_picker_investment">Investing</string>
     <string name="onboarding_goal_picker_purchase">Major Purchase</string>
     <string name="onboarding_goal_picker_custom">Custom Goal</string>
     <string name="onboarding_goal_picker_guidance_title">Your first goal is free</string>
@@ -69,15 +69,15 @@
     <string name="onboarding_priorities_subtitle">You have %1$s after essentials. Choose the split for today’s plan.</string>
 
     <!-- Trajectory Screen -->
-    <string name="onboarding_trajectory_title">Your plan can get smarter after payday</string>
-    <string name="onboarding_trajectory_subtitle">The free plan tells you what to do today. Premium uses each quick review to help decide the next payday.</string>
+    <string name="onboarding_trajectory_title">Your payday plan is ready</string>
+    <string name="onboarding_trajectory_subtitle">Premium can keep improving it after each quick review.</string>
     <string name="onboarding_trajectory_goal_subtitle">At this pace, \"%1$s\" has a clear path.</string>
-    <string name="onboarding_trajectory_footer">Keep the manual plan free, or start Premium if you want each review to point to the next move.</string>
+    <string name="onboarding_trajectory_footer">Keep this plan free, or let Premium guide the next move after each review.</string>
     <string name="onboarding_trajectory_button">See my Premium plan</string>
     <string name="onboarding_trajectory_premium_bridge_label">Premium preview</string>
     <string name="onboarding_trajectory_premium_bridge_title">Turn reviews into the next move</string>
-    <string name="onboarding_trajectory_premium_bridge_body">Premium compares each review with your %1$s weekly guide, remembers changes, and shows whether to move more or less than %2$s toward %3$s next payday.</string>
-    <string name="onboarding_trajectory_premium_bridge_body_without_priority">Premium compares each review with your %1$s weekly guide, remembers changes, and shows what to tighten or relax before the next payday.</string>
+    <string name="onboarding_trajectory_premium_bridge_body">Premium watches your %1$s weekly guide and shows whether %2$s toward %3$s should change next payday.</string>
+    <string name="onboarding_trajectory_premium_bridge_body_without_priority">Premium watches your %1$s weekly guide and shows what to tighten or relax next payday.</string>
     <string name="onboarding_trajectory_adjustment_label">Premium next move</string>
     <string name="onboarding_trajectory_adjustment_title">A small review can change the next payday</string>
     <string name="onboarding_trajectory_adjustment_body">If your review shows %1$s unused, Premium can remember that pattern and suggest moving it to %2$s while keeping your %3$s weekly guide safe.</string>
@@ -235,18 +235,18 @@
     <string name="premium_gate_automation_body">Premium compares reviews with your weekly guide and shows what to change before the next payday.</string>
 
     <string name="onboarding_signup_title">Secure your plan</string>
-    <string name="onboarding_signup_subtitle">Sign in to keep your financial plan synced safely.</string>
+    <string name="onboarding_signup_subtitle">Save this plan with Google, or keep it only on this device.</string>
     <string name="onboarding_signup_google">Continue with Google</string>
     <string name="onboarding_signup_google_error_no_credentials">No Google account is available on this device. Add an account or continue locally.</string>
     <string name="onboarding_signup_google_error_generic">Google sign-in could not finish. Check your connection, add a Google account, or continue locally.</string>
-    <string name="onboarding_signup_continue_without_sync">Continue locally</string>
+    <string name="onboarding_signup_continue_without_sync">Use this device</string>
     <string name="onboarding_signup_feature_vault_title">Private by design</string>
     <string name="onboarding_signup_feature_vault_body">No bank credentials are stored.</string>
-    <string name="onboarding_signup_feature_sync_title">Cloud sync</string>
-    <string name="onboarding_signup_feature_sync_body">Keep your plan attached to your Google account.</string>
-    <string name="onboarding_signup_feature_privacy_title">Local fallback</string>
-    <string name="onboarding_signup_feature_privacy_body">Use the app now and sync later.</string>
-    <string name="onboarding_signup_local_note">Google sync is optional. Local mode keeps this plan on your device until you choose to connect an account.</string>
+    <string name="onboarding_signup_feature_sync_title">Google backup</string>
+    <string name="onboarding_signup_feature_sync_body">Keep the plan with your Google account.</string>
+    <string name="onboarding_signup_feature_privacy_title">Device only</string>
+    <string name="onboarding_signup_feature_privacy_body">Start now without signing in.</string>
+    <string name="onboarding_signup_local_note">Google is optional. Device-only mode keeps this plan here until you connect an account.</string>
     <string name="onboarding_goal_picker_label_name">Goal name</string>
     <string name="onboarding_goal_picker_placeholder_name">Emergency fund</string>
     <string name="onboarding_goal_picker_label_amount">Target amount</string>
@@ -743,9 +743,9 @@
     <string name="paywall_autopilot_preview_body">Premium starts with your %1$s weekly guide and %2$s priority move, then uses reviews and adjustment memory to guide the next payday.</string>
     <string name="paywall_autopilot_preview_body_without_priority">Premium starts with your %1$s weekly guide, then uses reviews and adjustment memory to guide the next payday.</string>
     <string name="paywall_autopilot_preview_body_generic">Premium starts with the plan you built, then uses reviews and adjustment memory to guide the next payday.</string>
-    <string name="paywall_autopilot_recommendation_title">Next adjustment preview</string>
-    <string name="paywall_autopilot_recommendation_body">If your review shows %1$s unused, Premium can remember that pattern and suggest moving it to %2$s while protecting your %3$s weekly guide.</string>
-    <string name="paywall_autopilot_recommendation_body_without_priority">Premium watches your %1$s weekly guide, remembers adjustments, and shows what to tighten or relax before next payday.</string>
+    <string name="paywall_autopilot_recommendation_title">What Premium will watch</string>
+    <string name="paywall_autopilot_recommendation_body">If %1$s is left over, Premium can suggest moving it to %2$s while keeping %3$s/week safe.</string>
+    <string name="paywall_autopilot_recommendation_body_without_priority">Premium watches your %1$s weekly guide and shows what to tighten or relax before next payday.</string>
     <string name="paywall_autopilot_recommendation_body_generic">After each review, Premium remembers what changed and shows what to adjust before next payday.</string>
     <string name="paywall_autopilot_preview_free_label">Free plan</string>
     <string name="paywall_autopilot_preview_free_body">Follow this split manually.</string>
@@ -770,20 +770,30 @@
     <string name="paywall_restore_success">Premium restored.</string>
     <string name="paywall_restore_none">No Premium purchase was found for this Play account.</string>
     <string name="paywall_billing_status_body">You can keep using My Share while this is resolved.</string>
+    <string name="paywall_purchase_success_title">Premium is ready</string>
+    <string name="paywall_purchase_success_body">Your plan is now being watched. After each payday review, Premium will show the next move.</string>
+    <string name="paywall_purchase_success_watch_title">Plan watch is on</string>
+    <string name="paywall_purchase_success_watch_body">Premium starts with the payday plan you just built.</string>
+    <string name="paywall_purchase_success_review_title">Review after payday</string>
+    <string name="paywall_purchase_success_review_body">Log what really happened so Premium can learn from it.</string>
+    <string name="paywall_purchase_success_next_move_title">Get the next move</string>
+    <string name="paywall_purchase_success_next_move_body">Premium turns that review into a clear adjustment before the next payday.</string>
+    <string name="premium_purchase_active_title">Premium is active</string>
+    <string name="premium_purchase_active_body">Your plan is now being watched. Connect Google so your plan and Premium access are easier to recover if this device is reset.</string>
     <string name="paywall_secure_account_title">Secure your Premium access</string>
     <string name="paywall_secure_account_body">Connect Google so your plan and Premium access are easier to recover if this device is reset.</string>
     <string name="paywall_secure_account_button">Connect Google account</string>
-    <string name="paywall_secure_account_continue">Continue without connecting</string>
+    <string name="paywall_secure_account_continue">Continue to reminders</string>
     <string name="paywall_period_month">month</string>
     <string name="paywall_period_year">year</string>
 
     <!-- Paywall Clusters -->
-    <string name="paywall_headline_emerging">Turn each review into the next payday move</string>
-    <string name="paywall_subhead_emerging">Monthly keeps the first step lighter while Premium remembers adjustments, keeps history, and helps recover missed check-ins.</string>
-    <string name="paywall_headline_brazil">Make each salary review guide the next payday</string>
+    <string name="paywall_headline_emerging">Keep this plan improving</string>
+    <string name="paywall_subhead_emerging">Start with Monthly if you want the lighter test. Premium watches each review and shows the next move.</string>
+    <string name="paywall_headline_brazil">Keep this salary plan improving</string>
     <string name="paywall_subhead_brazil">Monthly is highlighted first so you can test review-powered guidance before committing.</string>
-    <string name="paywall_headline_default">Turn each review into the next payday move</string>
-    <string name="paywall_subhead_default">Premium remembers what changed, keeps your history, and turns reviews into the next payday move.</string>
+    <string name="paywall_headline_default">Keep this plan improving</string>
+    <string name="paywall_subhead_default">Premium watches each review, remembers changes, and shows the next payday move.</string>
 
     <!-- Review Insights -->
     <string name="insight_review_save_stress_success_headline">Safety net growing</string>

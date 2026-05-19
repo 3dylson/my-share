@@ -659,6 +659,64 @@ Status after full conversion QA pass on 2026-05-19:
 - Tested: full `testDebugUnitTest` and debug build.
 - Validated: debug install on `emulator-5554`, fresh compact Welcome, Goal, Salary, Fixed Costs, Plan Preview, Signup local mode, Trajectory, Reminder skip, Home Plan Premium watch `On`, first Review submission, singular `1 check-in` result sheet, More Premium settings, no app fatal crash or ANR in logcat, and emulator restored to `1080x2400 / 420dpi`.
 
+Status after subscription cancellation and compact onboarding/paywall polish pass on 2026-05-19:
+- Done: Canceled the active Google Play test subscription from More > Manage subscription and confirmed the app downgraded after the test billing period ended.
+- Done: Replayed fresh compact onboarding as a non-subscribed user and fixed issues found on the way: oversized onboarding top/bottom spacing, clipped goal choices, truncated long goal labels, technical account setup copy, redundant account note overlap, and truncated paywall hero copy.
+- Done: Goal choices now wrap instead of ellipsizing, with the investing label simplified across supported languages.
+- Done: Account setup now uses user-friendly Google backup/device-only copy instead of technical sync/fallback wording.
+- Done: Re-purchased the annual Google Play test subscription from the paywall, confirmed the Play purchase sheet opens, Premium activation returns to the app, the post-purchase account protection prompt appears, and Premium watch is active on Home.
+- Done: Canceled the renewed test subscription again in Google Play to prevent test renewals; access remains active until the current test period ends, matching Play subscription behavior.
+- Tested: full `testDebugUnitTest` and debug build.
+- Validated: debug install on `emulator-5554`, compact `720x1280 / 360dpi` Welcome, Goal, Salary, Fixed Costs, Plan Preview, Signup, Trajectory, Paywall, Play purchase, Reminder skip, Home Premium proof, More subscription management, no app fatal crash or ANR in logcat, and emulator restored to `1080x2400 / 420dpi`.
+
+Status after post-purchase messaging implementation pass on 2026-05-19:
+- Done: Onboarding paywall now replaces sales content with a dedicated Premium-ready success state after purchase, so the user sees confirmation, plan watch, payday review, and next-move expectations before reminders.
+- Done: The onboarding post-purchase footer now says `Continue to reminders` instead of generic `Continue without connecting`.
+- Done: In-app Premium purchases now use a lighter `Premium is active` account-protection dialog, so purchases from More or locked features also confirm that the plan is being watched without replaying onboarding.
+- Done: Success and account-protection copy was localized across supported languages.
+- Tested: full `testDebugUnitTest` and debug build.
+- Validation note: existing active canceled Play entitlement skips directly to reminders, so final purchase-event visual validation requires the current test period to expire before repurchasing.
+
+Status after compact onboarding trajectory readability pass on 2026-05-19:
+- Done: Fixed the onboarding trajectory card so goal dates, payday summary, adjustment labels, and supporting copy wrap instead of truncating on compact screens.
+- Done: Kept the sticky `See my Premium plan` CTA while allowing all Premium preview and lower comparison content to scroll above it.
+- Tested: full `testDebugUnitTest` and debug build.
+- Validated: debug install on `emulator-5554`, compact `720x1280 / 360dpi` fresh onboarding through Goal, Salary, Fixed Costs, Plan Preview, Signup, Trajectory, active-entitlement Reminder skip, and Home Plan, with no fatal crash or ANR in logcat.
+- Purchase validation note: next Google Play test purchase should select the monthly subscription first because its test window is shorter.
+
+Status after onboarding trajectory density reduction pass on 2026-05-19:
+- Done: Reduced the post-signup trajectory screen from a dense Premium explainer into a calmer confirmation screen: one concise headline, one plan card, one plain Premium bridge sentence, and the Premium CTA.
+- Done: Removed the repeated goal/contribution rows and the extra Premium preview card from this screen so the paywall carries the deeper selling content instead.
+- Done: Tightened the trajectory headline, subtitle, footer, and Premium bridge copy across supported languages.
+- Tested: full `testDebugUnitTest` and debug build.
+- Validated: debug install on `emulator-5554`, compact `720x1280 / 360dpi` fresh onboarding through the trajectory screen, no hidden Premium card under the sticky CTA, no fatal crash or ANR in logcat, and emulator restored to `1080x2400 / 420dpi`.
+
+Status before paywall conversion consolidation pass on 2026-05-19:
+- Research synthesis: current subscription onboarding guidance consistently favors a personalized value moment before the paywall, a paywall placed immediately after that value, outcome-first copy, visible trial/cancel trust, and a short decision path instead of long feature education.
+- Product decision: keep the onboarding trajectory screen as the calm confirmation moment. Move the stronger Premium conversion argument to the paywall.
+- Paywall structure to implement:
+  1. One personalized proof card that repeats the user's exact weekly guide, priority move, and example next adjustment.
+  2. Pricing immediately after proof, with Monthly selectable for lower-commitment testing and Annual still positioned as best value.
+  3. Trust/risk reversal below pricing: Google Play checkout, no bank connection, cancel anytime.
+- What to avoid: separate generic hero plus separate feature grid plus separate preview. That makes the screen feel crowded and repeats the same promise.
+- Acceptance criteria: compact phones can understand the paywall above the fold; the first visible paywall card answers “what will Premium do for this plan?”; no important copy truncates; Play terms and trust remain visible before purchase.
+
+Status after paywall conversion consolidation pass on 2026-05-19:
+- Done: Consolidated the paywall hero and personalized Premium proof into one top proof card so the paywall starts with the user's actual plan instead of generic feature education.
+- Done: Removed the generic feature grid from the onboarding paywall path, keeping the decision flow focused on personalized proof, plan choice, and checkout trust.
+- Done: Decoupled the top paywall promise from the selected billing plan. Annual and Monthly selection now change only selected card, CTA, price, and terms; the Premium value story stays stable.
+- Done: Kept Annual as the default best-value selection for annual-first markets while preserving Monthly as the lower-commitment option.
+- Tested: full `testDebugUnitTest` and debug build.
+- Validated: debug install on `emulator-5554`, compact `720x1280 / 360dpi` onboarding paywall, Annual-to-Monthly selection, stable top copy, updated monthly/annual CTA and terms, no fatal crash or ANR in logcat, and emulator restored to `1080x2400 / 420dpi`.
+
+Status after adaptive paywall layout implementation pass on 2026-05-19:
+- Done: Added paywall layout modes for Compact, Standard, and Expanded so density changes by screen affordance instead of forcing one layout everywhere.
+- Done: Compact mode now uses slim selectable plan rows and relies on the sticky footer for checkout trust/legal copy, keeping the proof and selected plan readable on short phones.
+- Done: Standard and Expanded modes keep the richer proof card, comparison pills, full plan cards, and trust content.
+- Done: Compact rows omit the `Best value` badge because the savings line already communicates value and the badge crowded the price row.
+- Tested: full `testDebugUnitTest` and debug build.
+- Validated: debug install on `emulator-5554`, compact `720x1280 / 360dpi` paywall with slim Annual row, normal `1080x2400 / 420dpi` paywall with full Annual card, and no fatal crash or ANR in logcat.
+
 Next:
 - Continue the next Premium product slice while keeping compact-screen validation in every pass.
 - Continue validating compact-screen layouts when new Premium controls are added.

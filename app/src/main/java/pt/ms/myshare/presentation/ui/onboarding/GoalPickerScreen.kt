@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.ms.myshare.R
@@ -114,10 +113,6 @@ fun GoalPickerScreen(
         onBack = onBack,
         onAction = ::continueIfValid
     ) {
-        GoalPickerGuidanceCard()
-
-        Spacer(Modifier.height(16.dp))
-
         GoalFocusGrid(
             emergencySelected = selectedFocus == PlanningFocus.SAVE_WITHOUT_STRESS && !isCustomGoalSelected,
             debtSelected = selectedFocus == PlanningFocus.STOP_OVERSPENDING && !isCustomGoalSelected,
@@ -134,6 +129,10 @@ fun GoalPickerScreen(
                 if (goalName in defaultGoalNames) goalName = ""
             }
         )
+
+        Spacer(Modifier.height(16.dp))
+
+        GoalPickerGuidanceCard()
 
         Spacer(Modifier.height(16.dp))
 
@@ -284,7 +283,7 @@ private fun GoalFocusCard(
 ) {
     Surface(
         modifier = modifier
-            .heightIn(min = 86.dp)
+            .heightIn(min = 74.dp)
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(14.dp),
         color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else MaterialTheme.colorScheme.surface,
@@ -294,43 +293,42 @@ private fun GoalFocusCard(
         ),
         shadowElevation = if (isSelected) 3.dp else 1.dp
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 9.dp),
-            horizontalArrangement = Arrangement.spacedBy(9.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            Surface(
-                shape = RoundedCornerShape(11.dp),
-                color = accentColor.copy(alpha = if (isSelected) 0.18f else 0.11f)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = accentColor,
-                    modifier = Modifier.padding(7.dp).size(18.dp)
-                )
+                Surface(
+                    shape = RoundedCornerShape(11.dp),
+                    color = accentColor.copy(alpha = if (isSelected) 0.18f else 0.11f)
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = accentColor,
+                        modifier = Modifier.padding(6.dp).size(16.dp)
+                    )
+                }
+                if (isSelected) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = stringResource(R.string.content_description_selected),
+                        tint = MySharePrimary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(2.dp)
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-            if (isSelected) {
-                Icon(
-                    imageVector = Icons.Default.CheckCircle,
-                    contentDescription = stringResource(R.string.content_description_selected),
-                    tint = MySharePrimary,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 18.sp
+            )
         }
     }
 }

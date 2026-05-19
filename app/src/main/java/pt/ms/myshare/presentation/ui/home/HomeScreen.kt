@@ -430,14 +430,14 @@ fun HomeScreen(
         MyShareAlertDialog(
             onDismissRequest = onDismissPremiumAccountPrompt,
             icon = Icons.Default.WorkspacePremium,
-            title = stringResource(R.string.paywall_secure_account_title),
-            message = stringResource(R.string.paywall_secure_account_body),
+            title = stringResource(R.string.premium_purchase_active_title),
+            message = stringResource(R.string.premium_purchase_active_body),
             confirmText = stringResource(R.string.paywall_secure_account_button),
             onConfirm = {
                 onDismissPremiumAccountPrompt()
                 startGoogleAccountConnection()
             },
-            dismissText = stringResource(R.string.paywall_secure_account_continue),
+            dismissText = stringResource(R.string.dialog_not_now),
             onDismiss = onDismissPremiumAccountPrompt
         )
     }
