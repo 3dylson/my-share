@@ -488,6 +488,10 @@
     <string name="home_review_result_label">Bilan Premium</string>
     <string name="home_review_result_title">Bilan enregistré</string>
     <string name="home_review_result_desc">Premium a actualisé votre plan avec le bilan du %1$s et dispose maintenant de %2$d bilans pour apprendre.</string>
+    <plurals name="home_review_result_desc_quantity">
+        <item quantity="one">Premium a actualisé ton plan avec le bilan du %1$s et dispose maintenant de %2$d bilan pour apprendre.</item>
+        <item quantity="other">Premium a actualisé ton plan avec le bilan du %1$s et dispose maintenant de %2$d bilans pour apprendre.</item>
+    </plurals>
     <string name="home_review_result_pattern_title">Ce que Premium a appris</string>
     <string name="home_review_result_adjustment_title">Prochain mouvement prêt</string>
     <string name="home_review_result_adjustment_desc">Vérifiez l’ajustement de %1$s pendant que cette paie est encore récente.</string>

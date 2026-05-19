@@ -123,6 +123,9 @@ class OnboardingViewModel @Inject constructor(
             entitlementRepository.purchaseEvents.collect { event ->
                 val messageKey = BillingStatusMessageMapper.fromPurchaseEvent(event)
                 var shouldLogSecurePrompt = false
+                if (event == BillingPurchaseEvent.Completed) {
+                    enablePremiumWatchForOnboarding("purchase")
+                }
                 state.update {
                     val shouldShowSecurePrompt = event == BillingPurchaseEvent.Completed &&
                         it.isAnonymousUser &&
@@ -664,12 +667,23 @@ class OnboardingViewModel @Inject constructor(
         viewModelScope.launch {
             if (plannerRepository.loadPlan() != null) {
                 plannerRepository.setOnboardingCompleted(true)
+                if (state.value.isPremium) {
+                    enablePremiumWatchForOnboarding("existing_entitlement")
+                }
                 state.update { it.copy(onboardingCompleted = true) }
                 FirebaseUtils.logEvent("onboarding_completed")
             } else {
                 state.update { it.copy(error = "onboarding_error_valid_plan_required") }
             }
         }
+    }
+
+    private suspend fun enablePremiumWatchForOnboarding(source: String) {
+        plannerRepository.saveAutomationEnabled(true)
+        FirebaseUtils.logEvent("premium_watch_enabled_after_onboarding", Bundle().apply {
+            putString("source", source)
+        })
+        Timber.tag(TAG).d("Premium watch enabled during onboarding. source=%s", source)
     }
 
     fun saveReminderConfiguration(time: LocalTime, cadence: ReminderCadence, onSaved: () -> Unit = {}) {

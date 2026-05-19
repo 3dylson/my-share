@@ -330,6 +330,31 @@ class OnboardingViewModelTest {
     }
 
     @Test
+    fun `completeOnboarding enables premium watch for active entitlement`() = runTest {
+        viewModel.setSalaryDetails(BigDecimal("1000"), PayFrequency.MONTHLY, 1, "")
+        every { calculatePlanPreviewUseCase.execute(any(), any()) } returns mockk(relaxed = true)
+        viewModel.setFixedCostsAndBuild(BigDecimal("400"), AllocationPreset.BALANCED)
+        viewModel.skipReminderConfiguration()
+        isProFlow.value = true
+        advanceUntilIdle()
+
+        val plan = SalaryPlan(
+            focus = PlanningFocus.SAVE_WITHOUT_STRESS,
+            netIncomePerPayday = BigDecimal("1000"),
+            monthlyFixedCosts = BigDecimal("400"),
+            payFrequency = PayFrequency.MONTHLY,
+            preset = AllocationPreset.BALANCED
+        )
+        every { plannerRepository.loadPlan() } returns plan
+
+        viewModel.completeOnboarding()
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.onboardingCompleted)
+        coVerify { plannerRepository.saveAutomationEnabled(true) }
+    }
+
+    @Test
     fun `skipToHomeWithDefaultPlan sets defaults and completes`() = runTest {
         every { calculatePlanPreviewUseCase.execute(any(), any()) } returns mockk(relaxed = true)
         
@@ -468,6 +493,7 @@ class OnboardingViewModelTest {
 
         assertTrue(viewModel.uiState.value.shouldSecurePremiumAccess)
         assertEquals("paywall_billing_completed", viewModel.uiState.value.billingMessage)
+        coVerify { plannerRepository.saveAutomationEnabled(true) }
     }
 
     @Test

@@ -652,6 +652,13 @@ Status after plain-language Home copy pass on 2026-05-19:
 - Tested: full `testDebugUnitTest` and debug build.
 - Validated: debug install on `emulator-5554`, compact `720x1280 / 360dpi` Strategy, Review, and More tabs, updated visible copy fit in UI-tree and screenshots, no app fatal crash or ANR in logcat, and emulator restored to `1080x2400 / 420dpi`.
 
+Status after full conversion QA pass on 2026-05-19:
+- Done: Ran a fresh compact onboarding-to-Home Premium validation path with an already-active Play test entitlement. The paywall was skipped because the entitlement was already active, so the remaining paywall ask still needs a clean non-subscribed account for final conversion judgment.
+- Done: Fixed active-entitlement onboarding so Premium watch starts automatically when onboarding completes for an existing Premium user, matching the completed-purchase behavior.
+- Done: Fixed the first Premium review result grammar from `1 check-ins` to quantity-aware singular/plural copy across supported languages.
+- Tested: full `testDebugUnitTest` and debug build.
+- Validated: debug install on `emulator-5554`, fresh compact Welcome, Goal, Salary, Fixed Costs, Plan Preview, Signup local mode, Trajectory, Reminder skip, Home Plan Premium watch `On`, first Review submission, singular `1 check-in` result sheet, More Premium settings, no app fatal crash or ANR in logcat, and emulator restored to `1080x2400 / 420dpi`.
+
 Next:
 - Continue the next Premium product slice while keeping compact-screen validation in every pass.
 - Continue validating compact-screen layouts when new Premium controls are added.

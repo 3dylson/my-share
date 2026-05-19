@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -136,8 +137,9 @@ private fun PremiumReviewResultHeader(
                 fontWeight = FontWeight.Black
             )
             Text(
-                text = stringResource(
-                    R.string.home_review_result_desc,
+                text = pluralStringResource(
+                    R.plurals.home_review_result_desc_quantity,
+                    result.totalReviews,
                     result.savedReviewDateLabel,
                     result.totalReviews
                 ),

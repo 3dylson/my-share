@@ -533,6 +533,10 @@
     <string name="home_review_result_label">Premium check-in</string>
     <string name="home_review_result_title">Check-in saved</string>
     <string name="home_review_result_desc">Premium refreshed your plan from the %1$s review and now has %2$d check-ins to learn from.</string>
+    <plurals name="home_review_result_desc_quantity">
+        <item quantity="one">Premium refreshed your plan from the %1$s review and now has %2$d check-in to learn from.</item>
+        <item quantity="other">Premium refreshed your plan from the %1$s review and now has %2$d check-ins to learn from.</item>
+    </plurals>
     <string name="home_review_result_pattern_title">What Premium learned</string>
     <string name="home_review_result_adjustment_title">Next payday move ready</string>
     <string name="home_review_result_adjustment_desc">Review the %1$s adjustment while this payday is fresh.</string>

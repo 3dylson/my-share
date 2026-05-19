@@ -488,6 +488,10 @@
     <string name="home_review_result_label">Premium-Check-in</string>
     <string name="home_review_result_title">Check-in gespeichert</string>
     <string name="home_review_result_desc">Premium hat Ihren Plan mit dem Check-in vom %1$s aktualisiert und lernt jetzt aus %2$d Check-ins.</string>
+    <plurals name="home_review_result_desc_quantity">
+        <item quantity="one">Premium hat deinen Plan mit dem Check-in vom %1$s aktualisiert und lernt jetzt aus %2$d Check-in.</item>
+        <item quantity="other">Premium hat deinen Plan mit dem Check-in vom %1$s aktualisiert und lernt jetzt aus %2$d Check-ins.</item>
+    </plurals>
     <string name="home_review_result_pattern_title">Was Premium gelernt hat</string>
     <string name="home_review_result_adjustment_title">Nächster Schritt bereit</string>
     <string name="home_review_result_adjustment_desc">Prüfen Sie die Anpassung von %1$s, solange dieser Zahltag noch frisch ist.</string>
