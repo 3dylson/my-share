@@ -628,6 +628,12 @@ Status after Premium card shadow cleanup pass on 2026-05-19:
 - Tested: full `testDebugUnitTest` and debug build.
 - Validated: debug install on `emulator-5554`, compact `720x1280 / 360dpi` active Premium More watch card, active Premium Plan proof card, Google Play test purchase state still active, and no app fatal crash or ANR in logcat.
 
+Status after Home top-bar duplication cleanup pass on 2026-05-19:
+- Done: Removed the selected tab label from the Home top bar because the bottom navigation already communicates location and the duplicate label used valuable compact-screen space.
+- Done: Kept the top bar brand-only with the Premium status badge, preserving app identity while making the shell cleaner.
+- Tested: full `testDebugUnitTest` and debug build.
+- Validated: debug install on `emulator-5554`, compact `720x1280 / 360dpi` Plan and More tabs, no repeated selected-tab label in the top bar, no app fatal crash or ANR in logcat, and emulator restored to `1080x2400 / 420dpi`.
+
 Next:
 - Continue the next Premium product slice while keeping compact-screen validation in every pass.
 - Continue validating compact-screen layouts when new Premium controls are added.

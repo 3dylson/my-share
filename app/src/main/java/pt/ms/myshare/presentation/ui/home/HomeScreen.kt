@@ -553,7 +553,6 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         HomeTopBarTitle(
-                            selectedDestination = state.selectedDestination,
                             modifier = Modifier.weight(1f)
                         )
                         HomePremiumStatusBadge(
@@ -776,25 +775,16 @@ fun HomeScreen(
 
 @Composable
 private fun HomeTopBarTitle(
-    selectedDestination: HomeDestination,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
-        Text(
-            text = stringResource(R.string.app_name),
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.Black,
-            maxLines = 2
-        )
-        Text(
-            text = stringResource(selectedDestination.labelRes),
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 2
-        )
-    }
+    Text(
+        modifier = modifier,
+        text = stringResource(R.string.app_name),
+        style = MaterialTheme.typography.titleLarge,
+        color = MaterialTheme.colorScheme.onBackground,
+        fontWeight = FontWeight.Black,
+        maxLines = 1
+    )
 }
 
 @Composable
