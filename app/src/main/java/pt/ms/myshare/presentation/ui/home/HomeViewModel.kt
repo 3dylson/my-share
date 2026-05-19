@@ -19,6 +19,8 @@ import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendation
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.PremiumCheckInPlan
 import pt.ms.myshare.domain.model.PremiumCheckInStatus
+import pt.ms.myshare.domain.model.PremiumAdjustmentRecord
+import pt.ms.myshare.domain.model.PremiumAdjustmentStatus
 import pt.ms.myshare.domain.model.PremiumGoalPaydaySplit
 import pt.ms.myshare.domain.model.PremiumReviewCoachingMetric
 import pt.ms.myshare.domain.model.PremiumReviewCoachingMetricType
@@ -204,13 +206,15 @@ class HomeViewModel @Inject constructor(
                 plannerRepository.observeReminderConfiguration(),
                 plannerRepository.observeAutomationEnabled(),
                 plannerRepository.observeReviews(),
-                getPerformanceStatsUseCase.execute()
-            ) { reminder, automation, history, stats ->
+                getPerformanceStatsUseCase.execute(),
+                plannerRepository.observePremiumAdjustmentRecords()
+            ) { reminder, automation, history, stats, adjustments ->
                 PlannerSignals(
                     reminder = reminder,
                     automation = automation,
                     history = history,
-                    stats = stats
+                    stats = stats,
+                    adjustments = adjustments
                 )
             }
 
@@ -253,7 +257,8 @@ class HomeViewModel @Inject constructor(
                     performanceStats = signals.stats,
                     coachingSummary = coachingSummary,
                     coachingInsights = coaching,
-                    performanceTrend = trend
+                    performanceTrend = trend,
+                    adjustments = signals.adjustments
                 )
             }
 
@@ -326,6 +331,11 @@ class HomeViewModel @Inject constructor(
                         it.hiddenRuleCount
                     )
                 }
+                val latestAdjustment = planner.adjustments.maxByOrNull { it.createdAt }
+                val latestAppliedAdjustment = planner.adjustments
+                    .filter { it.status == PremiumAdjustmentStatus.APPLIED }
+                    .maxByOrNull { it.createdAt }
+                val latestAdjustedRuleIds = latestAppliedAdjustment?.affectedRuleIds.orEmpty().toSet()
                 val goalCards = goals.mapIndexed { index, goal ->
                     buildGoalCard(goal, updatedPlan, preferences).copy(
                         isLockedByEntitlement = !isPremium && index > 0
@@ -333,6 +343,7 @@ class HomeViewModel @Inject constructor(
                 }
                 val ruleCards = currentRules.mapIndexed { index, rule ->
                     buildRuleCard(rule, preferences).copy(
+                        isAdjustedByPremium = isPremium && latestAdjustedRuleIds.contains(rule.id),
                         isLockedByEntitlement = !isPremium && index > 0
                     )
                 }
@@ -443,6 +454,7 @@ class HomeViewModel @Inject constructor(
                         hasPlan = updatedPlan != null,
                         messageKey = recommendationMessageKey
                     ),
+                    adjustmentMemory = latestAdjustment?.takeIf { isPremium }?.toMemoryState(preferences),
                     premiumCheckIn = premiumCheckIn.takeIf { isPremium },
                     error = currentMore.error.takeUnless { shouldClearUnavailableMessage }
                 )
@@ -487,7 +499,8 @@ class HomeViewModel @Inject constructor(
         val performanceStats: PerformanceStats,
         val coachingSummary: PremiumReviewCoachingSummary?,
         val coachingInsights: List<ReviewInsight>,
-        val performanceTrend: List<Float>
+        val performanceTrend: List<Float>,
+        val adjustments: List<PremiumAdjustmentRecord>
     )
 
     private data class PlannerCore(
@@ -501,12 +514,14 @@ class HomeViewModel @Inject constructor(
         val reminder: ReminderConfiguration,
         val automation: Boolean,
         val history: List<ManualReview>,
-        val stats: PerformanceStats
+        val stats: PerformanceStats,
+        val adjustments: List<PremiumAdjustmentRecord>
     )
 
     private data class PaydayRecommendationRollback(
         val previousRules: List<PaydayRule>,
-        val affectedRuleIds: Set<String>
+        val affectedRuleIds: Set<String>,
+        val adjustmentRecordId: String
     )
 
     private fun buildPlanCard(
@@ -716,9 +731,14 @@ class HomeViewModel @Inject constructor(
 
         val rulesBeforeApply = plannerRepository.loadRules()
         val suggestedRules = recommendation.suggestedRules
+        val adjustmentRecord = recommendation.toPremiumAdjustmentRecord(
+            affectedRuleIds = suggestedRules.map { it.id },
+            reviewId = currentReviews.lastOrNull()?.id
+        )
         paydayRecommendationRollback = PaydayRecommendationRollback(
             previousRules = rulesBeforeApply,
-            affectedRuleIds = suggestedRules.map { it.id }.toSet()
+            affectedRuleIds = suggestedRules.map { it.id }.toSet(),
+            adjustmentRecordId = adjustmentRecord.id
         )
 
         viewModelScope.launch {
@@ -726,6 +746,7 @@ class HomeViewModel @Inject constructor(
                 suggestedRules.forEach { rule ->
                     plannerRepository.saveRule(rule)
                 }
+                plannerRepository.savePremiumAdjustmentRecord(adjustmentRecord)
                 uiState.update {
                     it.copy(
                         reviewCard = it.reviewCard.copy(
@@ -771,6 +792,16 @@ class HomeViewModel @Inject constructor(
                         plannerRepository.deleteRule(ruleId)
                     }
                 }
+                plannerRepository.loadPremiumAdjustmentRecords()
+                    .firstOrNull { it.id == rollback.adjustmentRecordId }
+                    ?.let { record ->
+                        plannerRepository.savePremiumAdjustmentRecord(
+                            record.copy(
+                                status = PremiumAdjustmentStatus.UNDONE,
+                                undoneAt = LocalDate.now()
+                            )
+                        )
+                    }
                 uiState.update {
                     it.copy(
                         reviewCard = it.reviewCard.copy(
@@ -1284,6 +1315,39 @@ class HomeViewModel @Inject constructor(
             adjustmentAmountLabel = currencyFormat.format(adjustmentAmount),
             confidencePercent = confidencePercent,
             isApplyable = isApplyable
+        )
+    }
+
+    private fun PaydayAdjustmentRecommendation.toPremiumAdjustmentRecord(
+        affectedRuleIds: List<String>,
+        reviewId: String?
+    ): PremiumAdjustmentRecord {
+        return PremiumAdjustmentRecord(
+            direction = direction,
+            adjustmentAmount = adjustmentAmount,
+            previousFlexibleSpend = currentFlexibleSpend,
+            recommendedFlexibleSpend = recommendedFlexibleSpend,
+            previousPriorityContribution = currentPriorityContribution,
+            recommendedPriorityContribution = recommendedPriorityContribution,
+            confidencePercent = confidencePercent,
+            analyzedReviewCount = analyzedReviewCount,
+            affectedRuleIds = affectedRuleIds,
+            reviewId = reviewId
+        )
+    }
+
+    private fun PremiumAdjustmentRecord.toMemoryState(preferences: UserPreferences): PremiumAdjustmentMemoryState {
+        val currencyFormat = currencyFormat(preferences)
+        return PremiumAdjustmentMemoryState(
+            dateLabel = createdAt.format(DateTimeFormatter.ofPattern("d MMM", preferences.locale)),
+            direction = direction,
+            status = status,
+            adjustmentAmountLabel = currencyFormat.format(adjustmentAmount),
+            previousFlexibleSpendLabel = currencyFormat.format(previousFlexibleSpend),
+            recommendedFlexibleSpendLabel = currencyFormat.format(recommendedFlexibleSpend),
+            previousPriorityContributionLabel = currencyFormat.format(previousPriorityContribution),
+            recommendedPriorityContributionLabel = currencyFormat.format(recommendedPriorityContribution),
+            affectedRuleCount = affectedRuleIds.size
         )
     }
 

@@ -24,8 +24,11 @@ import pt.ms.myshare.domain.model.ReminderConfiguration
 import pt.ms.myshare.domain.model.SalaryPlan
 import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.model.GoalType
+import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
 import pt.ms.myshare.domain.model.PaydayRule
 import pt.ms.myshare.domain.model.PaydayRuleType
+import pt.ms.myshare.domain.model.PremiumAdjustmentRecord
+import pt.ms.myshare.domain.model.PremiumAdjustmentStatus
 import pt.ms.myshare.domain.repository.PlannerRepository
 
 import timber.log.Timber
@@ -50,6 +53,7 @@ class PlannerRepositoryImpl @Inject constructor(
     private val goalState = MutableStateFlow<List<Goal>>(emptyList())
 
     private val reviewState = MutableStateFlow<List<ManualReview>>(emptyList())
+    private val premiumAdjustmentState = MutableStateFlow<List<PremiumAdjustmentRecord>>(emptyList())
 
     private val reminderState = MutableStateFlow(readReminderConfiguration())
     private val automationState = MutableStateFlow(readAutomationEnabled())
@@ -137,6 +141,7 @@ class PlannerRepositoryImpl @Inject constructor(
         ruleState.value = emptyList()
         goalState.value = emptyList()
         reviewState.value = emptyList()
+        premiumAdjustmentState.value = emptyList()
         automationState.value = false
     }
 
@@ -175,6 +180,7 @@ class PlannerRepositoryImpl @Inject constructor(
             syncRulesFromFirestore(user.uid)
             syncGoalsFromFirestore(user.uid)
             syncReviewsFromFirestore(user.uid)
+            syncPremiumAdjustmentsFromFirestore(user.uid)
 
             // 2. Sync Onboarding State
             val userDoc = firestore.collection("users").document(user.uid).get().await()
@@ -224,6 +230,7 @@ class PlannerRepositoryImpl @Inject constructor(
             ruleState.value.forEach { uploadRule(user.uid, it) }
             goalState.value.forEach { uploadGoal(user.uid, it) }
             reviewState.value.forEach { uploadReview(user.uid, it) }
+            premiumAdjustmentState.value.forEach { uploadPremiumAdjustment(user.uid, it) }
             uploadReminder(user.uid, reminderState.value)
             uploadAutomation(user.uid, automationState.value)
             uploadOnboardingState(user.uid, isOnboardingCompleted())
@@ -299,6 +306,13 @@ class PlannerRepositoryImpl @Inject constructor(
         )
         firestore.collection("users").document(uid)
             .collection("reviews").document(review.id).set(data)
+            .await()
+    }
+
+    private suspend fun uploadPremiumAdjustment(uid: String, record: PremiumAdjustmentRecord) {
+        firestore.collection("users").document(uid)
+            .collection("adjustments").document(record.id)
+            .set(record.toFirestoreData())
             .await()
     }
 
@@ -399,6 +413,42 @@ class PlannerRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Timber.tag(TAG).e(e, "syncReviewsFromFirestore failed")
         }
+    }
+
+    private suspend fun syncPremiumAdjustmentsFromFirestore(uid: String) {
+        try {
+            val snapshot = firestore.collection("users").document(uid).collection("adjustments").get().await()
+            val records = snapshot.documents.mapNotNull { doc ->
+                runCatching {
+                    PremiumAdjustmentRecord(
+                        id = doc.id,
+                        direction = doc.getString("direction")?.let { PaydayAdjustmentRecommendationDirection.valueOf(it) }
+                            ?: PaydayAdjustmentRecommendationDirection.MOVE_MORE_TO_PRIORITY,
+                        status = doc.getString("status")?.let { PremiumAdjustmentStatus.valueOf(it) }
+                            ?: PremiumAdjustmentStatus.APPLIED,
+                        adjustmentAmount = doc.getString("adjustmentAmount")?.toBigDecimalOrNull() ?: BigDecimal.ZERO,
+                        previousFlexibleSpend = doc.getString("previousFlexibleSpend")?.toBigDecimalOrNull() ?: BigDecimal.ZERO,
+                        recommendedFlexibleSpend = doc.getString("recommendedFlexibleSpend")?.toBigDecimalOrNull() ?: BigDecimal.ZERO,
+                        previousPriorityContribution = doc.getString("previousPriorityContribution")?.toBigDecimalOrNull() ?: BigDecimal.ZERO,
+                        recommendedPriorityContribution = doc.getString("recommendedPriorityContribution")?.toBigDecimalOrNull() ?: BigDecimal.ZERO,
+                        confidencePercent = doc.getLong("confidencePercent")?.toInt() ?: 0,
+                        analyzedReviewCount = doc.getLong("analyzedReviewCount")?.toInt() ?: 0,
+                        affectedRuleIds = doc.get("affectedRuleIds").asStringList(),
+                        createdAt = doc.getString("createdAtDate")?.let { LocalDate.parse(it) } ?: LocalDate.now(),
+                        reviewId = doc.getString("reviewId")?.takeIf { it.isNotBlank() },
+                        undoneAt = doc.getString("undoneAtDate")?.takeIf { it.isNotBlank() }?.let { LocalDate.parse(it) }
+                    )
+                }.getOrNull()
+            }.sortedBy { it.createdAt }
+            premiumAdjustmentState.value = records
+            Timber.tag(TAG).d("Premium adjustments synced from Firestore count=%d", records.size)
+        } catch (e: Exception) {
+            Timber.tag(TAG).e(e, "syncPremiumAdjustmentsFromFirestore failed")
+        }
+    }
+
+    private fun Any?.asStringList(): List<String> {
+        return (this as? List<*>)?.mapNotNull { it as? String }.orEmpty()
     }
 
     override fun observeRules(): Flow<List<PaydayRule>> = ruleState.asStateFlow()
@@ -614,6 +664,59 @@ class PlannerRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override fun observePremiumAdjustmentRecords(): Flow<List<PremiumAdjustmentRecord>> =
+        premiumAdjustmentState.asStateFlow()
+
+    override fun loadPremiumAdjustmentRecords(): List<PremiumAdjustmentRecord> =
+        premiumAdjustmentState.value
+
+    override suspend fun savePremiumAdjustmentRecord(record: PremiumAdjustmentRecord) = withContext(Dispatchers.IO) {
+        Timber.tag(TAG).d(
+            "savePremiumAdjustmentRecord id=%s status=%s direction=%s amount=%s rules=%d",
+            record.id,
+            record.status,
+            record.direction,
+            record.adjustmentAmount,
+            record.affectedRuleIds.size
+        )
+        val updated = premiumAdjustmentState.value
+            .filterNot { it.id == record.id }
+            .plus(record)
+            .sortedBy { it.createdAt }
+        premiumAdjustmentState.value = updated
+        syncPremiumAdjustmentToFirestore(record)
+    }
+
+    private fun syncPremiumAdjustmentToFirestore(record: PremiumAdjustmentRecord) {
+        val user = firebaseAuth.currentUser ?: return
+        coroutineScope.launch {
+            try {
+                firestore.collection("users").document(user.uid)
+                    .collection("adjustments").document(record.id)
+                    .set(record.toFirestoreData())
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e, "Failed to sync Premium adjustment to Firestore")
+            }
+        }
+    }
+
+    private fun PremiumAdjustmentRecord.toFirestoreData(): Map<String, Any?> = mapOf(
+        "id" to id,
+        "direction" to direction.name,
+        "status" to status.name,
+        "adjustmentAmount" to adjustmentAmount.toPlainString(),
+        "previousFlexibleSpend" to previousFlexibleSpend.toPlainString(),
+        "recommendedFlexibleSpend" to recommendedFlexibleSpend.toPlainString(),
+        "previousPriorityContribution" to previousPriorityContribution.toPlainString(),
+        "recommendedPriorityContribution" to recommendedPriorityContribution.toPlainString(),
+        "confidencePercent" to confidencePercent,
+        "analyzedReviewCount" to analyzedReviewCount,
+        "affectedRuleIds" to affectedRuleIds,
+        "createdAtDate" to createdAt.toString(),
+        "reviewId" to reviewId.orEmpty(),
+        "undoneAtDate" to (undoneAt?.toString() ?: "")
+    )
 
     override fun isOnboardingCompleted(): Boolean = prefs.getBoolean(KEY_ONBOARDING_COMPLETED, false)
 

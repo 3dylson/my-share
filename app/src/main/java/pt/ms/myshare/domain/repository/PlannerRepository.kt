@@ -3,6 +3,7 @@ package pt.ms.myshare.domain.repository
 import kotlinx.coroutines.flow.Flow
 import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.model.ManualReview
+import pt.ms.myshare.domain.model.PremiumAdjustmentRecord
 import pt.ms.myshare.domain.model.ReminderConfiguration
 import pt.ms.myshare.domain.model.SalaryPlan
 import pt.ms.myshare.domain.model.PaydayRule
@@ -39,6 +40,10 @@ interface PlannerRepository {
 
     fun observeAutomationEnabled(): Flow<Boolean>
     suspend fun saveAutomationEnabled(enabled: Boolean)
+
+    fun observePremiumAdjustmentRecords(): Flow<List<PremiumAdjustmentRecord>>
+    fun loadPremiumAdjustmentRecords(): List<PremiumAdjustmentRecord>
+    suspend fun savePremiumAdjustmentRecord(record: PremiumAdjustmentRecord)
 
     fun isOnboardingCompleted(): Boolean
     suspend fun setOnboardingCompleted(completed: Boolean)

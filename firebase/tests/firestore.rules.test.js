@@ -269,6 +269,17 @@ describe("Authenticated user — own document", () => {
         .get()
     );
   });
+
+  test("can write own adjustments sub-collection", async () => {
+    await assertSucceeds(
+      authedDb(USER_A)
+        .collection("users")
+        .doc(USER_A)
+        .collection("adjustments")
+        .doc("adj1")
+        .set({ adjustmentAmount: "40.00", status: "APPLIED" })
+    );
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -303,6 +314,26 @@ describe("Authenticated user — cross-user access denied", () => {
         .doc(USER_A)
         .collection("plans")
         .doc("p1")
+        .get()
+    );
+  });
+
+  test("userB cannot read userA adjustments", async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx
+        .firestore()
+        .collection("users")
+        .doc(USER_A)
+        .collection("adjustments")
+        .doc("adj1")
+        .set({ adjustmentAmount: "40.00", status: "APPLIED" });
+    });
+    await assertFails(
+      authedDb(USER_B)
+        .collection("users")
+        .doc(USER_A)
+        .collection("adjustments")
+        .doc("adj1")
         .get()
     );
   });

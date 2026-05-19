@@ -27,6 +27,7 @@ import pt.ms.myshare.BuildConfig
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
+import pt.ms.myshare.domain.model.PremiumAdjustmentStatus
 import pt.ms.myshare.domain.model.PremiumCheckInStatus
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.preferences.currencyLabel
@@ -82,6 +83,14 @@ fun LazyListScope.homeMoreTab(
                 onOpenReview = onOpenReview,
                 modifier = Modifier.padding(bottom = 20.dp)
             )
+        }
+        state.adjustmentMemory?.let { memory ->
+            item {
+                PremiumAdjustmentMemoryCard(
+                    memory = memory,
+                    modifier = Modifier.padding(bottom = 20.dp)
+                )
+            }
         }
     }
 
@@ -631,6 +640,186 @@ private fun SmartAdjustmentControlCard(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun PremiumAdjustmentMemoryCard(
+    memory: PremiumAdjustmentMemoryState,
+    modifier: Modifier = Modifier
+) {
+    val title = when (memory.status) {
+        PremiumAdjustmentStatus.APPLIED -> stringResource(R.string.home_more_adjustment_memory_title)
+        PremiumAdjustmentStatus.UNDONE -> stringResource(R.string.home_more_adjustment_memory_title_undone)
+    }
+    val body = when (memory.status) {
+        PremiumAdjustmentStatus.UNDONE -> stringResource(
+            R.string.home_more_adjustment_memory_body_undone,
+            memory.adjustmentAmountLabel
+        )
+        PremiumAdjustmentStatus.APPLIED -> when (memory.direction) {
+            PaydayAdjustmentRecommendationDirection.MOVE_MORE_TO_PRIORITY -> stringResource(
+                R.string.home_more_adjustment_memory_body_move,
+                memory.dateLabel,
+                memory.adjustmentAmountLabel
+            )
+            PaydayAdjustmentRecommendationDirection.RESTORE_FLEXIBLE_BUFFER -> stringResource(
+                R.string.home_more_adjustment_memory_body_restore,
+                memory.dateLabel,
+                memory.adjustmentAmountLabel
+            )
+            PaydayAdjustmentRecommendationDirection.KEEP_PLAN -> stringResource(
+                R.string.home_more_adjustment_memory_body_keep,
+                memory.dateLabel
+            )
+        }
+    }
+    val statusLabel = when (memory.status) {
+        PremiumAdjustmentStatus.APPLIED -> stringResource(R.string.home_more_adjustment_memory_status_applied)
+        PremiumAdjustmentStatus.UNDONE -> stringResource(R.string.home_more_adjustment_memory_status_undone)
+    }
+
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MySharePositive.copy(alpha = 0.2f)),
+        shadowElevation = 1.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = MySharePositive.copy(alpha = 0.12f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.History,
+                        contentDescription = null,
+                        tint = MySharePositive,
+                        modifier = Modifier.padding(10.dp).size(22.dp)
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.home_more_adjustment_memory_label).uppercase(),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MySharePositive,
+                            fontWeight = FontWeight.Black,
+                            modifier = Modifier.weight(1f)
+                        )
+                        SmartAdjustmentStatusPill(
+                            text = statusLabel,
+                            isActive = memory.status == PremiumAdjustmentStatus.APPLIED
+                        )
+                    }
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = body,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val shouldStack = maxWidth < 300.dp
+                if (shouldStack) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        PremiumAdjustmentMemoryMetric(
+                            label = stringResource(R.string.home_more_adjustment_memory_flexible),
+                            beforeLabel = memory.previousFlexibleSpendLabel,
+                            afterLabel = memory.recommendedFlexibleSpendLabel,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        PremiumAdjustmentMemoryMetric(
+                            label = stringResource(R.string.home_more_adjustment_memory_priority),
+                            beforeLabel = memory.previousPriorityContributionLabel,
+                            afterLabel = memory.recommendedPriorityContributionLabel,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                } else {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        PremiumAdjustmentMemoryMetric(
+                            label = stringResource(R.string.home_more_adjustment_memory_flexible),
+                            beforeLabel = memory.previousFlexibleSpendLabel,
+                            afterLabel = memory.recommendedFlexibleSpendLabel,
+                            modifier = Modifier.weight(1f)
+                        )
+                        PremiumAdjustmentMemoryMetric(
+                            label = stringResource(R.string.home_more_adjustment_memory_priority),
+                            beforeLabel = memory.previousPriorityContributionLabel,
+                            afterLabel = memory.recommendedPriorityContributionLabel,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+
+            Text(
+                text = stringResource(R.string.home_more_adjustment_memory_rules, memory.affectedRuleCount),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Composable
+private fun PremiumAdjustmentMemoryMetric(
+    label: String,
+    beforeLabel: String,
+    afterLabel: String,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.heightIn(min = 82.dp),
+        shape = RoundedCornerShape(14.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.14f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f))
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp)
+        ) {
+            Text(
+                text = label.uppercase(),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.Black,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = stringResource(R.string.home_more_adjustment_memory_change, beforeLabel, afterLabel),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Black,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }

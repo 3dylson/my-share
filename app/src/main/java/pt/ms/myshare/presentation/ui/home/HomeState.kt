@@ -4,6 +4,7 @@ import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
 import pt.ms.myshare.domain.model.PremiumCheckInStatus
+import pt.ms.myshare.domain.model.PremiumAdjustmentStatus
 import pt.ms.myshare.domain.model.PremiumReviewCoachingStatus
 import pt.ms.myshare.domain.model.PricingStrategy
 import pt.ms.myshare.domain.model.ReminderCadence
@@ -129,6 +130,7 @@ data class RuleCardState(
     val isPercentage: Boolean,
     val typeLabelKey: String? = null,
     val nameKey: String? = null,
+    val isAdjustedByPremium: Boolean = false,
     val isLockedByEntitlement: Boolean = false
 )
 
@@ -186,12 +188,25 @@ data class MoreCardState(
     val ruleCount: Int = 0,
     val reviewCount: Int = 0,
     val smartAdjustment: SmartAdjustmentControlState = SmartAdjustmentControlState(),
+    val adjustmentMemory: PremiumAdjustmentMemoryState? = null,
     val premiumCheckIn: PremiumCheckInState? = null,
     val error: String? = null
 ) {
     val requiresPremiumAccountProtectionBeforeLogout: Boolean
         get() = isPremium && userEmail.isNullOrBlank()
 }
+
+data class PremiumAdjustmentMemoryState(
+    val dateLabel: String,
+    val direction: PaydayAdjustmentRecommendationDirection,
+    val status: PremiumAdjustmentStatus,
+    val adjustmentAmountLabel: String,
+    val previousFlexibleSpendLabel: String,
+    val recommendedFlexibleSpendLabel: String,
+    val previousPriorityContributionLabel: String,
+    val recommendedPriorityContributionLabel: String,
+    val affectedRuleCount: Int
+)
 
 data class SmartAdjustmentControlState(
     val hasPlan: Boolean = false,

@@ -381,6 +381,7 @@
     <string name="home_strategy_archive_sheet_close">Fermer</string>
     <string name="home_strategy_rule_card_subtitle">Règle de paie récurrente</string>
     <string name="home_strategy_rule_static_badge">Règle manuelle statique</string>
+    <string name="home_strategy_rule_adjusted_badge">Ajustée après bilan</string>
     <string name="home_strategy_rule_preview_title">Transformer une règle en système de paie</string>
     <string name="home_strategy_rule_preview_body">Premium peut coordonner votre règle %1$s avec l’investissement, la dette et les réserves après chaque bilan.</string>
     <string name="home_strategy_rule_preview_free_label">Manuel</string>
@@ -541,6 +542,19 @@
     <string name="home_more_smart_adjustments_enable">Activer veille</string>
     <string name="home_more_smart_adjustments_pause">Mettre en pause</string>
     <string name="home_more_smart_adjustments_review">Revoir l\'ajustement</string>
+    <string name="home_more_adjustment_memory_label">Mémoire Premium</string>
+    <string name="home_more_adjustment_memory_title">Dernier ajustement enregistré</string>
+    <string name="home_more_adjustment_memory_title_undone">Dernier ajustement annulé</string>
+    <string name="home_more_adjustment_memory_body_move">Après votre bilan du %1$s, Premium a déplacé %2$s des dépenses flexibles vers les priorités.</string>
+    <string name="home_more_adjustment_memory_body_restore">Après votre bilan du %1$s, Premium a rendu %2$s aux dépenses flexibles pour une prochaine paie plus sereine.</string>
+    <string name="home_more_adjustment_memory_body_keep">Après votre bilan du %1$s, Premium a gardé le guide actuel parce que le plan tenait encore.</string>
+    <string name="home_more_adjustment_memory_body_undone">Vous avez annulé l’ajustement de %1$s. Premium garde la note pour donner du contexte au prochain bilan.</string>
+    <string name="home_more_adjustment_memory_status_applied">Appliqué</string>
+    <string name="home_more_adjustment_memory_status_undone">Annulé</string>
+    <string name="home_more_adjustment_memory_flexible">Dépenses flexibles</string>
+    <string name="home_more_adjustment_memory_priority">Priorité</string>
+    <string name="home_more_adjustment_memory_change">%1$s à %2$s</string>
+    <string name="home_more_adjustment_memory_rules">%1$d règle(s) mises à jour par Premium</string>
     <string name="home_more_smart_checkin_start">Démarrer check-in</string>
     <string name="home_more_smart_checkin_ready">Check-in prêt</string>
     <string name="home_more_smart_checkin_overdue">Check-in en attente</string>

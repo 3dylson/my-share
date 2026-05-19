@@ -80,6 +80,10 @@ service cloud.firestore {
       match /reviews/{doc} {
         allow read, write: if isOwner(userId);
       }
+
+      match /adjustments/{doc} {
+        allow read, write: if isOwner(userId);
+      }
     }
   }
 }

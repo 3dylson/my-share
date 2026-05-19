@@ -41,6 +41,7 @@ import pt.ms.myshare.R
 import pt.ms.myshare.presentation.ui.components.PremiumBenefitCard
 import pt.ms.myshare.presentation.ui.components.PremiumProgressBar
 import pt.ms.myshare.presentation.ui.components.PremiumSectionHeader
+import pt.ms.myshare.presentation.ui.theme.MySharePositive
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
 import java.text.NumberFormat
 import java.util.Locale
@@ -311,6 +312,7 @@ fun LazyListScope.homeStrategyTab(
                 },
                 isPremium = isPremium,
                 isLocked = rule.isLockedByEntitlement,
+                isAdjustedByPremium = rule.isAdjustedByPremium,
                 onClick = {
                     if (rule.isLockedByEntitlement) {
                         onShowPaywall(HomePremiumGate.MultipleRules)
@@ -738,6 +740,16 @@ private fun StrategyRuleArchiveRow(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                if (rule.isAdjustedByPremium) {
+                    Text(
+                        text = stringResource(R.string.home_strategy_rule_adjusted_badge).uppercase(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MySharePositive,
+                        fontWeight = FontWeight.Black,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
             Text(
                 text = rule.amountLabel,
@@ -1338,6 +1350,7 @@ private fun CompactStrategyRuleCard(
     typeLabel: String,
     isPremium: Boolean,
     isLocked: Boolean,
+    isAdjustedByPremium: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -1387,6 +1400,14 @@ private fun CompactStrategyRuleCard(
                             text = stringResource(R.string.premium_badge).uppercase(),
                             style = MaterialTheme.typography.labelSmall,
                             color = MySharePrimary,
+                            fontWeight = FontWeight.Black,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    } else if (isAdjustedByPremium) {
+                        Text(
+                            text = stringResource(R.string.home_strategy_rule_adjusted_badge).uppercase(),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MySharePositive,
                             fontWeight = FontWeight.Black,
                             modifier = Modifier.padding(top = 4.dp)
                         )

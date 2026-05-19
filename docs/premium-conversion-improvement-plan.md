@@ -551,6 +551,14 @@ Status after Premium post-review loop implementation pass on 2026-05-19:
 - Tested: focused HomeViewModel coverage for Premium post-review result state and full `testDebugUnitTest`.
 - Validated: release build, release install on `emulator-5554`, normal Premium post-review result sheet, result-to-adjustment handoff, compact `720x1280 / 360dpi` sheet top and scrolled actions, no app fatal crash in logcat, temporary Firestore Premium review data restored to the previous state, and the emulator restored to `1080x2400 / 420dpi`.
 
+Status after Premium adjustment memory implementation pass on 2026-05-19:
+- Done: Applying a Premium payday recommendation now writes a Premium adjustment record with the before/after guide, amount, confidence, review count, affected rules, and applied/undone status.
+- Done: More now shows a Premium memory card explaining the latest adjustment in user-friendly language, including the flexible and priority guide change.
+- Done: Strategy now marks rules touched by the latest applied Premium adjustment with `Adjusted after check-in`, so users can see what Premium changed.
+- Done: Undo marks the adjustment memory as undone and removes the active rule badge instead of leaving stale trust signals.
+- Tested: focused HomeViewModel coverage for adjustment memory, full `testDebugUnitTest`, and Firebase rules tests for the new `adjustments` subcollection.
+- Validated: release build, Firestore rules deployment, normal Premium apply-to-memory flow, normal and compact `720x1280 / 360dpi` More memory card, compact Strategy adjusted badge, no app fatal crash in logcat, temporary Firestore Premium adjustment data restored to the previous state, and emulator restored to `1080x2400 / 420dpi`.
+
 Next:
 - Continue the next Premium product slice while keeping compact-screen validation in every pass.
 - Continue validating compact-screen layouts when new Premium controls are added.

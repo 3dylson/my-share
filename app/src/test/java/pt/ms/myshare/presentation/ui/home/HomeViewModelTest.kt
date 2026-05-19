@@ -29,6 +29,8 @@ import pt.ms.myshare.domain.model.PaydayRuleType
 import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.domain.model.PremiumCheckInStatus
+import pt.ms.myshare.domain.model.PremiumAdjustmentRecord
+import pt.ms.myshare.domain.model.PremiumAdjustmentStatus
 import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
 import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.domain.model.ReminderConfiguration
@@ -695,6 +697,13 @@ class HomeViewModelTest {
         advanceUntilIdle()
 
         assertTrue(fakePlannerRepository.loadRules().isNotEmpty())
+        assertEquals(1, fakePlannerRepository.loadPremiumAdjustmentRecords().size)
+        assertEquals(
+            PremiumAdjustmentStatus.APPLIED,
+            fakePlannerRepository.loadPremiumAdjustmentRecords().first().status
+        )
+        assertTrue(viewModel.state.value.rules.first().isAdjustedByPremium)
+        assertTrue(viewModel.state.value.moreCard.adjustmentMemory != null)
         assertEquals(
             "home_review_recommendation_applied_feedback",
             viewModel.state.value.reviewCard.recommendationMessageKey
@@ -731,6 +740,14 @@ class HomeViewModelTest {
         advanceUntilIdle()
 
         assertTrue(fakePlannerRepository.loadRules().isEmpty())
+        assertEquals(
+            PremiumAdjustmentStatus.UNDONE,
+            fakePlannerRepository.loadPremiumAdjustmentRecords().first().status
+        )
+        assertEquals(
+            PremiumAdjustmentStatus.UNDONE,
+            viewModel.state.value.moreCard.adjustmentMemory?.status
+        )
         assertEquals(
             "home_review_recommendation_undone_feedback",
             viewModel.state.value.reviewCard.recommendationMessageKey
@@ -882,6 +899,7 @@ class FakePlannerRepository : PlannerRepository {
     private val goalsFlow = MutableStateFlow<List<Goal>>(emptyList())
     private val reviewFlow = MutableStateFlow<ManualReview?>(null)
     private val reviewsFlow = MutableStateFlow<List<ManualReview>>(emptyList())
+    private val adjustmentsFlow = MutableStateFlow<List<PremiumAdjustmentRecord>>(emptyList())
     private val reminderFlow = MutableStateFlow(ReminderConfiguration(false, 9, 0, ReminderCadence.PAYDAY))
     private val automationFlow = MutableStateFlow(false)
     private var isOnboardingCompletedState = false
@@ -948,6 +966,12 @@ class FakePlannerRepository : PlannerRepository {
     override suspend fun saveAutomationEnabled(enabled: Boolean) { automationFlow.emit(enabled) }
     fun automationEnabled(): Boolean = automationFlow.value
 
+    override fun observePremiumAdjustmentRecords(): Flow<List<PremiumAdjustmentRecord>> = adjustmentsFlow.asStateFlow()
+    override fun loadPremiumAdjustmentRecords(): List<PremiumAdjustmentRecord> = adjustmentsFlow.value
+    override suspend fun savePremiumAdjustmentRecord(record: PremiumAdjustmentRecord) {
+        adjustmentsFlow.emit(adjustmentsFlow.value.filterNot { it.id == record.id } + record)
+    }
+
     override fun isOnboardingCompleted(): Boolean = isOnboardingCompletedState
     override suspend fun setOnboardingCompleted(completed: Boolean) { isOnboardingCompletedState = completed }
     override fun loadPlan(): pt.ms.myshare.domain.model.SalaryPlan? = planFlow.value
@@ -958,6 +982,7 @@ class FakePlannerRepository : PlannerRepository {
         goalsFlow.emit(emptyList())
         reviewFlow.emit(null)
         reviewsFlow.emit(emptyList())
+        adjustmentsFlow.emit(emptyList())
         reminderFlow.emit(ReminderConfiguration(false, 9, 0, ReminderCadence.PAYDAY))
         automationFlow.emit(false)
         isOnboardingCompletedState = false

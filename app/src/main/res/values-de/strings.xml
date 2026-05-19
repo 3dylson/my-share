@@ -381,6 +381,7 @@
     <string name="home_strategy_archive_sheet_close">Schließen</string>
     <string name="home_strategy_rule_card_subtitle">Regel für wiederkehrende Zahltage</string>
     <string name="home_strategy_rule_static_badge">Statische manuelle Regel</string>
+    <string name="home_strategy_rule_adjusted_badge">Nach Prüfung angepasst</string>
     <string name="home_strategy_rule_preview_title">Aus einer Regel ein Zahltagsystem machen</string>
     <string name="home_strategy_rule_preview_body">Premium kann die Regel %1$s nach jeder Prüfung mit Investieren, Schulden und Puffern koordinieren.</string>
     <string name="home_strategy_rule_preview_free_label">Manuell</string>
@@ -541,6 +542,19 @@
     <string name="home_more_smart_adjustments_enable">Beobachtung an</string>
     <string name="home_more_smart_adjustments_pause">Beobachtung pausieren</string>
     <string name="home_more_smart_adjustments_review">Anpassung prüfen</string>
+    <string name="home_more_adjustment_memory_label">Premium-Verlauf</string>
+    <string name="home_more_adjustment_memory_title">Letzte Anpassung gespeichert</string>
+    <string name="home_more_adjustment_memory_title_undone">Letzte Anpassung rückgängig</string>
+    <string name="home_more_adjustment_memory_body_move">Nach Ihrer Prüfung vom %1$s hat Premium %2$s vom flexiblen Budget zu Prioritäten verschoben.</string>
+    <string name="home_more_adjustment_memory_body_restore">Nach Ihrer Prüfung vom %1$s hat Premium %2$s zurück ins flexible Budget gelegt, damit der nächste Zahltag sicherer wirkt.</string>
+    <string name="home_more_adjustment_memory_body_keep">Nach Ihrer Prüfung vom %1$s hat Premium den aktuellen Leitfaden beibehalten, weil der Plan noch passte.</string>
+    <string name="home_more_adjustment_memory_body_undone">Sie haben die Anpassung von %1$s rückgängig gemacht. Premium behält die Notiz als Kontext für die nächste Prüfung.</string>
+    <string name="home_more_adjustment_memory_status_applied">Angewendet</string>
+    <string name="home_more_adjustment_memory_status_undone">Rückgängig</string>
+    <string name="home_more_adjustment_memory_flexible">Flexibel</string>
+    <string name="home_more_adjustment_memory_priority">Priorität</string>
+    <string name="home_more_adjustment_memory_change">%1$s zu %2$s</string>
+    <string name="home_more_adjustment_memory_rules">%1$d Regel(n) von Premium aktualisiert</string>
     <string name="home_more_smart_checkin_start">Check-in starten</string>
     <string name="home_more_smart_checkin_ready">Check-in bereit</string>
     <string name="home_more_smart_checkin_overdue">Check-in wartet</string>
