@@ -109,6 +109,23 @@ data class RuleCardState(
     val isLockedByEntitlement: Boolean = false
 )
 
+data class RulePaydayMixCardState(
+    val totalMoveLabel: String,
+    val ruleCount: Int,
+    val visibleItems: List<RulePaydayMixItemState>,
+    val hiddenRuleCount: Int = 0
+)
+
+data class RulePaydayMixItemState(
+    val ruleId: String,
+    val ruleName: String,
+    val ruleNameKey: String? = null,
+    val typeLabel: String,
+    val typeLabelKey: String? = null,
+    val amountLabel: String,
+    val shareLabel: String
+)
+
 data class MoreCardState(
     val reminderEnabled: Boolean = false,
     val reminderLabel: String = "",
@@ -207,6 +224,7 @@ data class HomeState(
     val plan: SalaryPlan? = null,
     val planCard: HomePlanCardState? = null,
     val goalPaydaySplit: GoalPaydaySplitCardState? = null,
+    val rulePaydayMix: RulePaydayMixCardState? = null,
     val rules: List<RuleCardState> = emptyList(),
     val goals: List<GoalCardState> = emptyList(),
     val reviewCard: ReviewCardState = ReviewCardState(),

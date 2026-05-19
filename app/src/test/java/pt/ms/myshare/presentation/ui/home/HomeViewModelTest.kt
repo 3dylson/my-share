@@ -40,6 +40,7 @@ import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.CreatePaydayAdjustmentRecommendationUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumCheckInPlanUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumGoalPaydaySplitUseCase
+import pt.ms.myshare.domain.use_case.CreatePremiumRulePaydayMixUseCase
 import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
 import pt.ms.myshare.domain.use_case.EnforcePremiumDowngradeUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
@@ -102,6 +103,7 @@ class HomeViewModelTest {
             ),
             createPremiumCheckInPlanUseCase = CreatePremiumCheckInPlanUseCase(),
             createPremiumGoalPaydaySplitUseCase = CreatePremiumGoalPaydaySplitUseCase(),
+            createPremiumRulePaydayMixUseCase = CreatePremiumRulePaydayMixUseCase(),
             createReviewInsightUseCase = CreateReviewInsightUseCase(calculatePlanPreviewUseCase),
             enforcePremiumDowngradeUseCase = EnforcePremiumDowngradeUseCase(fakePlannerRepository),
             resolvePricingStrategyUseCase = ResolvePricingStrategyUseCase(),
@@ -491,6 +493,65 @@ class HomeViewModelTest {
         assertEquals(1, split?.hiddenGoalCount)
         assertEquals("goal-1", split?.visibleItems?.first()?.goalId)
         assertTrue(split?.totalMoveLabel?.isNotBlank() == true)
+    }
+
+    @Test
+    fun `premium user sees next payday mix across multiple priority rules`() = runTest {
+        fakePlannerRepository.savePlan(
+            SalaryPlan(
+                focus = PlanningFocus.SAVE_WITHOUT_STRESS,
+                netIncomePerPayday = BigDecimal("2000"),
+                monthlyFixedCosts = BigDecimal("800"),
+                payFrequency = PayFrequency.MONTHLY,
+                monthlyPayday = 1,
+                preset = AllocationPreset.BALANCED
+            )
+        )
+        listOf(
+            PaydayRule(
+                id = "rule-1",
+                name = "Savings",
+                amount = BigDecimal("10"),
+                isPercentage = true,
+                type = PaydayRuleType.SAVINGS
+            ),
+            PaydayRule(
+                id = "rule-2",
+                name = "Investing",
+                amount = BigDecimal("5"),
+                isPercentage = true,
+                type = PaydayRuleType.INVESTING
+            ),
+            PaydayRule(
+                id = "rule-3",
+                name = "Debt payoff",
+                amount = BigDecimal("100"),
+                isPercentage = false,
+                type = PaydayRuleType.DEBT
+            ),
+            PaydayRule(
+                id = "rule-4",
+                name = "Crypto",
+                amount = BigDecimal("2"),
+                isPercentage = true,
+                type = PaydayRuleType.CRYPTO
+            )
+        ).forEach { rule ->
+            fakePlannerRepository.saveRule(rule)
+        }
+        advanceUntilIdle()
+
+        assertEquals(null, viewModel.state.value.rulePaydayMix)
+
+        fakeEntitlementRepository.setPro(true)
+        advanceUntilIdle()
+
+        val mix = viewModel.state.value.rulePaydayMix
+        assertEquals(4, mix?.ruleCount)
+        assertEquals(3, mix?.visibleItems?.size)
+        assertEquals(1, mix?.hiddenRuleCount)
+        assertEquals("rule-1", mix?.visibleItems?.first()?.ruleId)
+        assertTrue(mix?.totalMoveLabel?.isNotBlank() == true)
     }
 
     @Test

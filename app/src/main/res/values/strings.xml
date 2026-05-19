@@ -408,6 +408,12 @@
     <string name="home_strategy_rule_empty_desc">Automate a payday allocation.</string>
     <string name="home_strategy_rule_add_title">Add another rule</string>
     <string name="home_strategy_rule_add_desc_free">Create an automated transfer rule.</string>
+    <string name="home_strategy_rule_mix_title">Next payday rules</string>
+    <string name="home_strategy_rule_mix_body">Your next %1$s priority move follows %2$d saved rules.</string>
+    <string name="home_strategy_rule_mix_total_label">Priority move</string>
+    <string name="home_strategy_rule_mix_item_body">%1$s - %2$s of move</string>
+    <string name="home_strategy_rule_mix_hidden_single">1 more rule included</string>
+    <string name="home_strategy_rule_mix_hidden">%1$d more rules included</string>
     <string name="home_strategy_rule_stack_title">Your payday rules</string>
     <string name="home_strategy_rule_stack_body">You have %1$d active rules. We show %2$d here so the plan stays easy to scan.</string>
     <string name="home_strategy_rule_stack_metric">Rules</string>

@@ -363,6 +363,12 @@
     <string name="home_strategy_rule_empty_desc">Automatisez une allocation de salaire.</string>
     <string name="home_strategy_rule_add_title">Ajouter une autre règle</string>
     <string name="home_strategy_rule_add_desc_free">Créez une règle de transfert automatisé.</string>
+    <string name="home_strategy_rule_mix_title">Règles de la prochaine paie</string>
+    <string name="home_strategy_rule_mix_body">Votre prochaine action prioritaire de %1$s suit %2$d règles enregistrées.</string>
+    <string name="home_strategy_rule_mix_total_label">Action prioritaire</string>
+    <string name="home_strategy_rule_mix_item_body">%1$s - %2$s du mouvement</string>
+    <string name="home_strategy_rule_mix_hidden_single">1 règle de plus incluse</string>
+    <string name="home_strategy_rule_mix_hidden">%1$d règles de plus incluses</string>
     <string name="home_strategy_rule_stack_title">Vos règles de paie</string>
     <string name="home_strategy_rule_stack_body">Vous avez %1$d règles actives. Nous en affichons %2$d ici pour garder le plan facile à parcourir.</string>
     <string name="home_strategy_rule_stack_metric">Règles</string>

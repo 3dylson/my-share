@@ -530,6 +530,13 @@ Status after Premium multi-goal payday split implementation pass on 2026-05-19:
 - Tested: focused split use-case coverage, HomeViewModel state coverage, and full `testDebugUnitTest`.
 - Validated: release build, release install on `emulator-5554`, normal Strategy split card, normal all-goals sheet, compact `720x1280 / 360dpi` split card top and scrolled states, and compact all-goals sheet. Temporary Firestore Premium goal data was restored to the previous `FREE` state, and the emulator was restored to `1080x2400 / 420dpi`.
 
+Status after Premium multi-rule payday mix implementation pass on 2026-05-19:
+- Done: Added a domain-level Premium rule payday mix that calculates the user's next priority move per saved priority rule, including percentage and fixed rules.
+- Done: Premium Strategy now replaces the generic multi-rule summary with a concrete `Next payday rules` card when the user has a plan, a positive priority move, and multiple saved priority rules.
+- Done: The mix card keeps long rule lists scan-friendly by showing the first three rule rows inline and routing the full list to `See every rule`.
+- Tested: focused rule-mix use-case coverage, HomeViewModel state coverage, and full `testDebugUnitTest`.
+- Validated: release build, release install on `emulator-5554`, normal Strategy rule mix card, normal all-rules sheet, compact `720x1280 / 360dpi` rule mix top and scrolled states, and compact all-rules sheet. Temporary Firestore Premium rule data was restored to the previous `FREE` state, and the emulator was restored to `1080x2400 / 420dpi`.
+
 Next:
 - Continue the next Premium product slice while keeping compact-screen validation in every pass.
 - Continue validating compact-screen layouts when new Premium controls are added.

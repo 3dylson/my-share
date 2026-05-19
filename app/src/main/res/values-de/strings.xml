@@ -363,6 +363,12 @@
     <string name="home_strategy_rule_empty_desc">Automatisieren Sie eine Zahltagzuweisung.</string>
     <string name="home_strategy_rule_add_title">Fügen Sie eine weitere Regel hinzu</string>
     <string name="home_strategy_rule_add_desc_free">Erstellen Sie eine automatisierte Übertragungsregel.</string>
+    <string name="home_strategy_rule_mix_title">Regeln am nächsten Zahltag</string>
+    <string name="home_strategy_rule_mix_body">Dein nächster Prioritätsschritt von %1$s folgt %2$d gespeicherten Regeln.</string>
+    <string name="home_strategy_rule_mix_total_label">Prioritätsschritt</string>
+    <string name="home_strategy_rule_mix_item_body">%1$s - %2$s des Schritts</string>
+    <string name="home_strategy_rule_mix_hidden_single">1 weitere Regel enthalten</string>
+    <string name="home_strategy_rule_mix_hidden">%1$d weitere Regeln enthalten</string>
     <string name="home_strategy_rule_stack_title">Deine Zahltagregeln</string>
     <string name="home_strategy_rule_stack_body">Du hast %1$d aktive Regeln. Wir zeigen hier %2$d, damit der Plan leicht zu überblicken bleibt.</string>
     <string name="home_strategy_rule_stack_metric">Regeln</string>

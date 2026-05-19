@@ -627,6 +627,7 @@ fun HomeScreen(
                             rules = state.rules,
                             planCard = state.planCard,
                             goalPaydaySplit = state.goalPaydaySplit,
+                            rulePaydayMix = state.rulePaydayMix,
                             isPremium = state.moreCard.isPremium,
                             onAddNewGoal = onAddNewGoal,
                             onEditGoal = onEditGoal,

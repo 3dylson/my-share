@@ -364,6 +364,12 @@
     <string name="home_strategy_rule_empty_desc">Automatize uma atribuição de dia de pagamento.</string>
     <string name="home_strategy_rule_add_title">Adicionar outra regra</string>
     <string name="home_strategy_rule_add_desc_free">Crie uma regra de transferência automatizada.</string>
+    <string name="home_strategy_rule_mix_title">Regras do próximo pagamento</string>
+    <string name="home_strategy_rule_mix_body">O próximo movimento prioritário de %1$s segue %2$d regras guardadas.</string>
+    <string name="home_strategy_rule_mix_total_label">Movimento prioritário</string>
+    <string name="home_strategy_rule_mix_item_body">%1$s - %2$s do movimento</string>
+    <string name="home_strategy_rule_mix_hidden_single">Mais 1 regra incluída</string>
+    <string name="home_strategy_rule_mix_hidden">Mais %1$d regras incluídas</string>
     <string name="home_strategy_rule_stack_title">As tuas regras de pagamento</string>
     <string name="home_strategy_rule_stack_body">Tens %1$d regras ativas. Mostramos %2$d aqui para o plano continuar fácil de ler.</string>
     <string name="home_strategy_rule_stack_metric">Regras</string>

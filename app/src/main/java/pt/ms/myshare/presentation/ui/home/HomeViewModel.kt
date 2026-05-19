@@ -20,6 +20,7 @@ import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.PremiumCheckInPlan
 import pt.ms.myshare.domain.model.PremiumCheckInStatus
 import pt.ms.myshare.domain.model.PremiumGoalPaydaySplit
+import pt.ms.myshare.domain.model.PremiumRulePaydayMix
 import pt.ms.myshare.domain.model.ReviewInsight
 import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
@@ -37,6 +38,7 @@ import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.CreatePaydayAdjustmentRecommendationUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumCheckInPlanUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumGoalPaydaySplitUseCase
+import pt.ms.myshare.domain.use_case.CreatePremiumRulePaydayMixUseCase
 import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
 import pt.ms.myshare.domain.use_case.EnforcePremiumDowngradeUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
@@ -71,6 +73,7 @@ class HomeViewModel @Inject constructor(
     private val createPaydayAdjustmentRecommendationUseCase: CreatePaydayAdjustmentRecommendationUseCase,
     private val createPremiumCheckInPlanUseCase: CreatePremiumCheckInPlanUseCase,
     private val createPremiumGoalPaydaySplitUseCase: CreatePremiumGoalPaydaySplitUseCase,
+    private val createPremiumRulePaydayMixUseCase: CreatePremiumRulePaydayMixUseCase,
     private val createReviewInsightUseCase: CreateReviewInsightUseCase,
     private val enforcePremiumDowngradeUseCase: EnforcePremiumDowngradeUseCase,
     private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase,
@@ -299,6 +302,21 @@ class HomeViewModel @Inject constructor(
                         it.hiddenGoalCount
                     )
                 }
+                val rulePaydayMix = if (isPremium && updatedPlan != null) {
+                    createPremiumRulePaydayMixUseCase
+                        .execute(updatedPlan)
+                        ?.toState(currentRules, preferences)
+                } else {
+                    null
+                }
+                rulePaydayMix?.let {
+                    Timber.tag(TAG).d(
+                        "Premium rule payday mix ready. ruleCount=%d visible=%d hidden=%d",
+                        it.ruleCount,
+                        it.visibleItems.size,
+                        it.hiddenRuleCount
+                    )
+                }
                 val goalCards = goals.mapIndexed { index, goal ->
                     buildGoalCard(goal, updatedPlan, preferences).copy(
                         isLockedByEntitlement = !isPremium && index > 0
@@ -400,6 +418,7 @@ class HomeViewModel @Inject constructor(
                     plan = updatedPlan,
                     planCard = planCard,
                     goalPaydaySplit = goalPaydaySplit,
+                    rulePaydayMix = rulePaydayMix,
                     goals = goalCards,
                     rules = ruleCards,
                     performanceStats = performanceStats,
@@ -1169,6 +1188,33 @@ class HomeViewModel @Inject constructor(
         )
     }
 
+    private fun PremiumRulePaydayMix.toState(
+        rules: List<PaydayRule>,
+        preferences: UserPreferences
+    ): RulePaydayMixCardState {
+        val currencyFormat = currencyFormat(preferences)
+        val rulesById = rules.associateBy { it.id }
+        val visibleItems = items.take(MIX_VISIBLE_RULE_COUNT).mapNotNull { item ->
+            val rule = rulesById[item.ruleId] ?: return@mapNotNull null
+            RulePaydayMixItemState(
+                ruleId = rule.id,
+                ruleName = rule.name,
+                ruleNameKey = rule.defaultNameKey,
+                typeLabel = rule.type.name.lowercase().replaceFirstChar { it.titlecase() },
+                typeLabelKey = rule.type.labelKey,
+                amountLabel = currencyFormat.format(item.amount),
+                shareLabel = LocalizedAmountFormatter.formatPercentage(item.sharePercent, preferences.locale)
+            )
+        }
+
+        return RulePaydayMixCardState(
+            totalMoveLabel = currencyFormat.format(totalMove),
+            ruleCount = items.size,
+            visibleItems = visibleItems,
+            hiddenRuleCount = (items.size - visibleItems.size).coerceAtLeast(0)
+        )
+    }
+
     private fun PaydayAdjustmentRecommendation.toState(preferences: UserPreferences): PaydayAdjustmentRecommendationState {
         val currencyFormat = currencyFormat(preferences)
         return PaydayAdjustmentRecommendationState(
@@ -1255,6 +1301,7 @@ class HomeViewModel @Inject constructor(
     private companion object {
         const val TAG = "HomeViewModel"
         const val SPLIT_VISIBLE_GOAL_COUNT = 3
+        const val MIX_VISIBLE_RULE_COUNT = 3
     }
     }
 

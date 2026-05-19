@@ -51,6 +51,7 @@ fun LazyListScope.homeStrategyTab(
     rules: List<RuleCardState>,
     planCard: HomePlanCardState?,
     goalPaydaySplit: GoalPaydaySplitCardState?,
+    rulePaydayMix: RulePaydayMixCardState?,
     isPremium: Boolean,
     onAddNewGoal: () -> Unit,
     onEditGoal: (String) -> Unit,
@@ -250,7 +251,15 @@ fun LazyListScope.homeStrategyTab(
             )
         )
         if (isPremium) {
-            if (rules.size > 1) {
+            if (rulePaydayMix != null) {
+                item {
+                    RulePaydayMixCard(
+                        state = rulePaydayMix,
+                        onClick = onOpenRuleArchive
+                    )
+                    Spacer(Modifier.height(16.dp))
+                }
+            } else if (rules.size > 1) {
                 item {
                     StrategyCollectionSummaryCard(
                         title = stringResource(R.string.home_strategy_rule_stack_title),

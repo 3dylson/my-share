@@ -363,6 +363,12 @@
     <string name="home_strategy_rule_empty_desc">أتمتة تخصيص يوم الدفع.</string>
     <string name="home_strategy_rule_add_title">أضف قاعدة أخرى</string>
     <string name="home_strategy_rule_add_desc_free">إنشاء قاعدة نقل تلقائية.</string>
+    <string name="home_strategy_rule_mix_title">قواعد يوم الدفع التالي</string>
+    <string name="home_strategy_rule_mix_body">تتبع حركة الأولوية التالية بقيمة %1$s عدد %2$d قواعد محفوظة.</string>
+    <string name="home_strategy_rule_mix_total_label">حركة الأولوية</string>
+    <string name="home_strategy_rule_mix_item_body">%1$s - %2$s من الحركة</string>
+    <string name="home_strategy_rule_mix_hidden_single">قاعدة إضافية واحدة مشمولة</string>
+    <string name="home_strategy_rule_mix_hidden">%1$d قواعد إضافية مشمولة</string>
     <string name="home_strategy_rule_stack_title">قواعد يوم الدفع</string>
     <string name="home_strategy_rule_stack_body">لديك %1$d قواعد نشطة. نعرض %2$d هنا حتى تبقى الخطة سهلة القراءة.</string>
     <string name="home_strategy_rule_stack_metric">القواعد</string>
