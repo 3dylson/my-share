@@ -587,6 +587,14 @@ Status after More inline Premium autopilot proof implementation pass on 2026-05-
 - Tested: full `testDebugUnitTest`, including localized string parity.
 - Validated: debug build, debug install on `emulator-5554`, compact `720x1280 / 360dpi` More upgrade card top and scrolled states, no app fatal crash in logcat, and emulator restored to `1080x2400 / 420dpi`.
 
+Status after onboarding/paywall conversion polish pass on 2026-05-19:
+- Done: Plan Preview now reveals the first payday plan card with a subtle Compose fade/slide animation so the aha moment feels more intentional without adding decorative filler.
+- Done: The onboarding paywall now shows the personalized Premium next-adjustment proof before plan selection, so users see why Premium matters before evaluating price.
+- Done: High-impact onboarding, paywall, Premium-gate, coaching, and Home copy was simplified away from technical wording like `blueprint`, `safe-to-spend`, `adaptive`, `rule mix`, and generic `unlock` language.
+- Done: English, Portuguese, Spanish, French, German, and Arabic high-impact conversion strings were kept aligned so language switching does not return users to older technical copy.
+- Tested: full `testDebugUnitTest` and debug build.
+- Validated: debug install on `emulator-5554`, fresh compact onboarding through Welcome, Goal, Salary, Fixed Costs, Plan Preview, Signup, Trajectory, Paywall, Reminder skip, and Home Plan at `720x1280 / 360dpi`. Paywall plan cards remain reachable, the annual badge does not overlap the selected state, Home core metrics stay aligned, no app fatal crash or ANR appeared in logcat, and the emulator was restored to `1080x2400 / 420dpi`.
+
 Next:
 - Continue the next Premium product slice while keeping compact-screen validation in every pass.
 - Continue validating compact-screen layouts when new Premium controls are added.

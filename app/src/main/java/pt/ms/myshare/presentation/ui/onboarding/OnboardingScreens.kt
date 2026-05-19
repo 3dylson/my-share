@@ -252,6 +252,13 @@ fun PaywallScreen(
 
             Spacer(Modifier.height(if (isCompactHeight) 16.dp else 22.dp))
 
+            PaywallAutopilotPreviewCard(
+                state = autopilotPreview,
+                goalName = goalName
+            )
+
+            Spacer(Modifier.height(if (isCompactHeight) 16.dp else 22.dp))
+
             PaywallSectionLabel(text = stringResource(R.string.paywall_plan_section_title))
 
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -302,11 +309,6 @@ fun PaywallScreen(
             }
 
             Spacer(Modifier.height(if (isCompactHeight) 16.dp else 22.dp))
-
-            PaywallAutopilotPreviewCard(
-                state = autopilotPreview,
-                goalName = goalName
-            )
 
             if (showSecurePremiumAccessPrompt) {
                 Spacer(Modifier.height(16.dp))

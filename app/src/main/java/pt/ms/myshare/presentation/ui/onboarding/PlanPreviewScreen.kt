@@ -1,5 +1,9 @@
 package pt.ms.myshare.presentation.ui.onboarding
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -40,6 +44,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -84,10 +92,12 @@ fun PlanPreviewScreen(
     val hasPriorityContribution = preview.priorityContributionPerPayday > BigDecimal.ZERO
     val goalLabel = goalName.ifBlank { stringResource(R.string.onboarding_plan_preview_default_goal) }
     val keyboardDismissOnScrollConnection = rememberKeyboardDismissOnScrollConnection()
+    var revealVisible by remember(preview.nextPayday) { mutableStateOf(false) }
 
     KeyboardDismissEffect(preview.nextPayday)
 
     LaunchedEffect(preview.nextPayday, preview.weeklyFlexibleSpend, preview.priorityContributionPerPayday) {
+        revealVisible = true
         Timber.d(
             "Plan preview reveal shown: nextPayday=%s weeklyFlexibleSpend=%s priorityContribution=%s fixedCosts=%s",
             preview.nextPayday,
@@ -144,13 +154,19 @@ fun PlanPreviewScreen(
                 PlanPreviewHeader(nextPayday = formattedNextPayday)
             }
             item {
-                PaydayRevealCard(
-                    weeklySpend = currency.format(preview.weeklyFlexibleSpend),
-                    fixedCosts = currency.format(preview.fixedCostsPerPayday),
-                    priorityContribution = currency.format(preview.priorityContributionPerPayday),
-                    goalLabel = goalLabel,
-                    hasPriorityContribution = hasPriorityContribution
-                )
+                AnimatedVisibility(
+                    visible = revealVisible,
+                    enter = fadeIn(animationSpec = tween(420)) +
+                        slideInVertically(animationSpec = tween(420)) { fullHeight -> fullHeight / 5 }
+                ) {
+                    PaydayRevealCard(
+                        weeklySpend = currency.format(preview.weeklyFlexibleSpend),
+                        fixedCosts = currency.format(preview.fixedCostsPerPayday),
+                        priorityContribution = currency.format(preview.priorityContributionPerPayday),
+                        goalLabel = goalLabel,
+                        hasPriorityContribution = hasPriorityContribution
+                    )
+                }
             }
             item {
                 PaydayMovesCard(
