@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -75,6 +76,7 @@ fun PaywallScreen(
 ) {
     val activity = androidx.activity.compose.LocalActivity.current
     val context = LocalContext.current
+    val isCompactHeight = LocalConfiguration.current.screenHeightDp < 700
     val coroutineScope = rememberCoroutineScope()
     val googleIdTokenReader = remember(context) {
         GoogleIdTokenReader(
@@ -244,27 +246,11 @@ fun PaywallScreen(
                     stringResource(R.string.paywall_hero_trial_badge, selectedTrialDays)
                 } else {
                     stringResource(R.string.premium_badge)
-                }
+                },
+                compactHeight = isCompactHeight
             )
 
-            Spacer(Modifier.height(16.dp))
-
-            PaywallAutopilotPreviewCard(
-                state = autopilotPreview,
-                goalName = goalName
-            )
-
-            if (showSecurePremiumAccessPrompt) {
-                Spacer(Modifier.height(16.dp))
-                SecurePremiumAccessCard(
-                    isLoading = isGoogleConnectionInProgress || isGoogleCredentialRequestInProgress,
-                    feedback = googleConnectionFeedback,
-                    isError = googleConnectionError != null,
-                    onConnectGoogle = startGoogleConnection
-                )
-            }
-            
-            Spacer(Modifier.height(22.dp))
+            Spacer(Modifier.height(if (isCompactHeight) 16.dp else 22.dp))
 
             PaywallSectionLabel(text = stringResource(R.string.paywall_plan_section_title))
 
@@ -313,6 +299,23 @@ fun PaywallScreen(
                         onClick = { onPlanSelected(card.plan) }
                     )
                 }
+            }
+
+            Spacer(Modifier.height(if (isCompactHeight) 16.dp else 22.dp))
+
+            PaywallAutopilotPreviewCard(
+                state = autopilotPreview,
+                goalName = goalName
+            )
+
+            if (showSecurePremiumAccessPrompt) {
+                Spacer(Modifier.height(16.dp))
+                SecurePremiumAccessCard(
+                    isLoading = isGoogleConnectionInProgress || isGoogleCredentialRequestInProgress,
+                    feedback = googleConnectionFeedback,
+                    isError = googleConnectionError != null,
+                    onConnectGoogle = startGoogleConnection
+                )
             }
 
             Spacer(Modifier.height(20.dp))
@@ -512,8 +515,26 @@ private fun PaywallHeroCard(
     headline: String,
     subhead: String,
     badge: String,
+    compactHeight: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val cardPadding = if (compactHeight) 16.dp else 22.dp
+    val iconPadding = if (compactHeight) 9.dp else 12.dp
+    val iconSize = if (compactHeight) 22.dp else 28.dp
+    val verticalSpacing = if (compactHeight) 10.dp else 14.dp
+    val headlineStyle = if (compactHeight) {
+        MaterialTheme.typography.titleLarge
+    } else {
+        MaterialTheme.typography.headlineMedium
+    }
+    val headlineLineHeight = if (compactHeight) 27.sp else 34.sp
+    val bodyStyle = if (compactHeight) {
+        MaterialTheme.typography.bodySmall
+    } else {
+        MaterialTheme.typography.bodyMedium
+    }
+    val bodyLineHeight = if (compactHeight) 18.sp else 21.sp
+
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
@@ -521,21 +542,23 @@ private fun PaywallHeroCard(
         border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.55f))
     ) {
         Column(
-            modifier = Modifier.padding(22.dp),
+            modifier = Modifier.padding(cardPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Surface(
-                shape = CircleShape,
-                color = MySharePrimary.copy(alpha = 0.18f)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.WorkspacePremium,
-                    contentDescription = null,
-                    tint = MySharePrimary,
-                    modifier = Modifier.padding(12.dp).size(28.dp)
-                )
+            if (!compactHeight) {
+                Surface(
+                    shape = CircleShape,
+                    color = MySharePrimary.copy(alpha = 0.18f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.WorkspacePremium,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.padding(iconPadding).size(iconSize)
+                    )
+                }
+                Spacer(Modifier.height(verticalSpacing))
             }
-            Spacer(Modifier.height(14.dp))
             Surface(
                 shape = RoundedCornerShape(999.dp),
                 color = MySharePrimary
@@ -548,23 +571,27 @@ private fun PaywallHeroCard(
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                 )
             }
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(verticalSpacing))
             Text(
                 headline,
-                style = MaterialTheme.typography.headlineMedium,
+                style = headlineStyle,
                 fontWeight = FontWeight.ExtraBold,
                 textAlign = TextAlign.Center,
-                lineHeight = 34.sp,
+                lineHeight = headlineLineHeight,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                maxLines = if (compactHeight) 2 else Int.MAX_VALUE,
+                overflow = TextOverflow.Ellipsis
             )
             Text(
                 subhead,
-                style = MaterialTheme.typography.bodyMedium,
+                style = bodyStyle,
                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.78f),
                 textAlign = TextAlign.Center,
-                lineHeight = 21.sp,
-                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                lineHeight = bodyLineHeight,
+                modifier = Modifier.fillMaxWidth().padding(top = if (compactHeight) 6.dp else 8.dp),
+                maxLines = if (compactHeight) 2 else Int.MAX_VALUE,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }

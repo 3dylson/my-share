@@ -85,6 +85,8 @@ fun SalaryAndScheduleScreen(
         title = stringResource(R.string.onboarding_salary_title),
         subtitle = stringResource(R.string.onboarding_salary_subtitle),
         actionText = stringResource(R.string.continue_button),
+        progressStep = 2,
+        progressTotal = OnboardingViewModel.SETUP_STEP_TOTAL,
         onBack = onBack,
         onAction = ::continueIfValid
     ) {

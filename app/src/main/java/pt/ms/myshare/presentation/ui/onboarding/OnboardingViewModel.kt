@@ -31,6 +31,7 @@ import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.repository.UserPreferencesRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
+import pt.ms.myshare.domain.use_case.ResolveAllocationStrategyRulesUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
 import pt.ms.myshare.presentation.ui.localization.UserLocaleManager
 import pt.ms.myshare.presentation.ui.paywall.BillingStatusMessageKeys
@@ -50,13 +51,16 @@ class OnboardingViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase,
+    private val resolveAllocationStrategyRulesUseCase: ResolveAllocationStrategyRulesUseCase,
     private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase,
     private val reminderWorkScheduler: ReminderWorkScheduler,
-    private val userLocaleManager: UserLocaleManager
+    private val userLocaleManager: UserLocaleManager,
+    private val onboardingAnalyticsLogger: OnboardingAnalyticsLogger
 ) : ViewModel() {
 
     private val state = MutableStateFlow(OnboardingState())
     val uiState: StateFlow<OnboardingState> = state.asStateFlow()
+    private var activationLogged = false
 
     init {
         val completed = plannerRepository.isOnboardingCompleted()
@@ -72,10 +76,7 @@ class OnboardingViewModel @Inject constructor(
             )
         }
         if (!completed) {
-            FirebaseUtils.logEvent("onboarding_started", Bundle().apply {
-                putString("price_cluster", pricing.marketCluster)
-                putString("language", preferences.locale.language)
-            })
+            onboardingAnalyticsLogger.logStarted(pricing, preferences)
         }
         viewModelScope.launch {
             userPreferencesRepository.observePreferences().collect { updatedPreferences ->
@@ -158,6 +159,50 @@ class OnboardingViewModel @Inject constructor(
 
     fun setGoal(goalName: String, goalAmount: BigDecimal) {
         state.update { it.copy(goalName = goalName, goalAmount = goalAmount) }
+    }
+
+    fun logSetupStepViewed(route: OnboardingRoute, stepIndex: Int, stepTotal: Int = SETUP_STEP_TOTAL) {
+        val current = state.value
+        onboardingAnalyticsLogger.logStepViewed(
+            route = route.route,
+            stepIndex = stepIndex,
+            setupStepTotal = stepTotal,
+            focus = current.selectedFocus,
+            pricingStrategy = current.pricingStrategy
+        )
+    }
+
+    fun logSetupStepCompleted(route: OnboardingRoute, stepIndex: Int, stepTotal: Int = SETUP_STEP_TOTAL) {
+        val current = state.value
+        onboardingAnalyticsLogger.logStepCompleted(
+            route = route.route,
+            stepIndex = stepIndex,
+            setupStepTotal = stepTotal,
+            focus = current.selectedFocus,
+            pricingStrategy = current.pricingStrategy
+        )
+    }
+
+    fun logActivationReached() {
+        if (activationLogged) return
+        activationLogged = true
+        val current = state.value
+        onboardingAnalyticsLogger.logActivationReached(current.selectedFocus, current.pricingStrategy)
+    }
+
+    fun logAllocationTuneStarted() {
+        val current = state.value
+        onboardingAnalyticsLogger.logAllocationTuneStarted(current.selectedFocus, current.pricingStrategy)
+    }
+
+    fun logAllocationTuneCompleted() {
+        val current = state.value
+        onboardingAnalyticsLogger.logAllocationTuneCompleted(current.selectedFocus, current.pricingStrategy)
+    }
+
+    fun logReminderPermissionResult(granted: Boolean) {
+        val current = state.value
+        onboardingAnalyticsLogger.logReminderPermissionResult(granted, current.selectedFocus, current.pricingStrategy)
     }
 
     fun setSalaryDetails(
@@ -282,10 +327,6 @@ class OnboardingViewModel @Inject constructor(
 
     fun setReminderSaved() {
         state.update { it.copy(reminderSaved = true) }
-    }
-
-    fun setBankSyncHandled() {
-        state.update { it.copy(bankSyncHandled = true) }
     }
 
     fun setSelectedBillingPlan(plan: BillingPlan) {
@@ -462,6 +503,7 @@ class OnboardingViewModel @Inject constructor(
             if (result.isSuccess) {
                 plannerRepository.syncLocalStateIfAuthenticated()
                 userPreferencesRepository.syncFromFirestore()
+                onboardingAnalyticsLogger.logSignupMode("google", state.value.selectedFocus, state.value.pricingStrategy)
                 FirebaseUtils.logEvent("login_success")
                 onComplete()
             } else {
@@ -480,6 +522,7 @@ class OnboardingViewModel @Inject constructor(
     fun continueLocally(onComplete: () -> Unit) {
         viewModelScope.launch {
             state.update { it.copy(isSignupActionInProgress = true, error = null) }
+            onboardingAnalyticsLogger.logSignupMode("local", state.value.selectedFocus, state.value.pricingStrategy)
             FirebaseUtils.logEvent("local_mode_selected")
             Timber.tag(TAG).d("Continuing onboarding in local-only mode")
             yield()
@@ -507,8 +550,7 @@ class OnboardingViewModel @Inject constructor(
                 goalName = "",
                 goalAmount = BigDecimal("5000"),
                 planSaved = true,
-                reminderSkipped = true,
-                bankSyncHandled = true
+                reminderSkipped = true
             )
         }
         viewModelScope.launch {
@@ -618,10 +660,6 @@ class OnboardingViewModel @Inject constructor(
             state.update { it.copy(error = "onboarding_error_reminder_required") }
             return
         }
-        if (!current.bankSyncHandled) {
-            state.update { it.copy(error = "onboarding_error_bank_sync_required") }
-            return
-        }
 
         viewModelScope.launch {
             if (plannerRepository.loadPlan() != null) {
@@ -634,7 +672,7 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    fun saveReminderConfiguration(time: LocalTime, cadence: ReminderCadence) {
+    fun saveReminderConfiguration(time: LocalTime, cadence: ReminderCadence, onSaved: () -> Unit = {}) {
         viewModelScope.launch {
             val configuration = ReminderConfiguration(
                 enabled = true,
@@ -646,16 +684,18 @@ class OnboardingViewModel @Inject constructor(
             reminderWorkScheduler.sync(configuration)
             state.update { it.copy(reminderSaved = true, reminderSkipped = false) }
             FirebaseUtils.logEvent("reminder_enabled")
+            onSaved()
         }
     }
 
-    fun skipReminderConfiguration() {
+    fun skipReminderConfiguration(onSkipped: () -> Unit = {}) {
         viewModelScope.launch {
             val configuration = ReminderConfiguration(enabled = false)
             plannerRepository.saveReminderConfiguration(configuration)
             reminderWorkScheduler.sync(configuration)
             state.update { it.copy(reminderSaved = false, reminderSkipped = true) }
             FirebaseUtils.logEvent("reminder_skipped")
+            onSkipped()
         }
     }
 
@@ -674,18 +714,6 @@ class OnboardingViewModel @Inject constructor(
         FirebaseUtils.logEvent("trajectory_viewed")
     }
 
-    fun logBankSyncPromptShown() {
-        FirebaseUtils.logEvent("bank_sync_prompt_shown")
-    }
-
-    fun logBankSyncInterestExpressed() {
-        FirebaseUtils.logEvent("bank_sync_interest_expressed")
-    }
-
-    fun logBankSyncSkipped() {
-        FirebaseUtils.logEvent("bank_sync_skipped")
-    }
-
     private fun buildPlan(current: OnboardingState, income: BigDecimal, fixedCosts: BigDecimal): SalaryPlan? {
         val nextBiweeklyPayday = if (current.payFrequency == PayFrequency.BIWEEKLY) {
             runCatching { LocalDate.parse(current.nextBiweeklyPaydayText) }.getOrElse {
@@ -696,18 +724,35 @@ class OnboardingViewModel @Inject constructor(
             null
         }
 
-        val rules = mutableListOf<PaydayRule>()
-        current.allocatedSavings?.let { 
-            if (it > BigDecimal.ZERO) rules.add(PaydayRule(name = "Savings", amount = it, type = PaydayRuleType.SAVINGS, isPercentage = current.allocationIsPercentage)) 
-        }
-        current.allocatedInvesting?.let { 
-            if (it > BigDecimal.ZERO) rules.add(PaydayRule(name = "Investing", amount = it, type = PaydayRuleType.INVESTING, isPercentage = current.allocationIsPercentage)) 
-        }
-        current.allocatedCrypto?.let { 
-            if (it > BigDecimal.ZERO) rules.add(PaydayRule(name = "Crypto", amount = it, type = PaydayRuleType.CRYPTO, isPercentage = current.allocationIsPercentage)) 
-        }
-        current.allocatedDebt?.let {
-            if (it > BigDecimal.ZERO) rules.add(PaydayRule(name = "Debt", amount = it, type = PaydayRuleType.DEBT, isPercentage = current.allocationIsPercentage))
+        val hasExplicitAllocations = listOf(
+            current.allocatedFlexibleSpend,
+            current.allocatedSavings,
+            current.allocatedInvesting,
+            current.allocatedCrypto,
+            current.allocatedDebt
+        ).any { it != null }
+
+        val rules = if (hasExplicitAllocations) {
+            mutableListOf<PaydayRule>().apply {
+                current.allocatedSavings?.let {
+                    if (it > BigDecimal.ZERO) add(PaydayRule(name = "Savings", amount = it, type = PaydayRuleType.SAVINGS, isPercentage = current.allocationIsPercentage))
+                }
+                current.allocatedInvesting?.let {
+                    if (it > BigDecimal.ZERO) add(PaydayRule(name = "Investing", amount = it, type = PaydayRuleType.INVESTING, isPercentage = current.allocationIsPercentage))
+                }
+                current.allocatedCrypto?.let {
+                    if (it > BigDecimal.ZERO) add(PaydayRule(name = "Crypto", amount = it, type = PaydayRuleType.CRYPTO, isPercentage = current.allocationIsPercentage))
+                }
+                current.allocatedDebt?.let {
+                    if (it > BigDecimal.ZERO) add(PaydayRule(name = "Debt", amount = it, type = PaydayRuleType.DEBT, isPercentage = current.allocationIsPercentage))
+                }
+            }
+        } else {
+            resolveAllocationStrategyRulesUseCase.execute(
+                focus = current.selectedFocus,
+                preset = current.preset,
+                strategy = current.strategy
+            )
         }
 
         return SalaryPlan(
@@ -726,6 +771,7 @@ class OnboardingViewModel @Inject constructor(
 
     companion object {
         private const val TAG = "OnboardingViewModel"
+        const val SETUP_STEP_TOTAL = 4
         const val FIXED_COSTS_EXCEED_INCOME_ERROR = "onboarding_fixed_costs_error_exceeds_income"
     }
 }

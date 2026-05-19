@@ -40,6 +40,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
             )
         }
         composable(OnboardingRoute.GoalPicker.route) {
+            LaunchedEffect(Unit) { viewModel.logSetupStepViewed(OnboardingRoute.GoalPicker, 1) }
             GoalPickerScreen(
                 initialFocus = state.selectedFocus,
                 initialGoalName = state.goalName,
@@ -49,11 +50,13 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                 onNext = { focus, goalName, goalAmount ->
                     viewModel.setFocus(focus, goalName, goalAmount)
                     viewModel.setGoal(goalName, goalAmount)
+                    viewModel.logSetupStepCompleted(OnboardingRoute.GoalPicker, 1)
                     navController.navigate(OnboardingRoute.SalaryAndSchedule.route)
                 }
             )
         }
         composable(OnboardingRoute.SalaryAndSchedule.route) {
+            LaunchedEffect(Unit) { viewModel.logSetupStepViewed(OnboardingRoute.SalaryAndSchedule, 2) }
             SalaryAndScheduleScreen(
                 initialIncome = state.netIncomePerPayday,
                 initialFrequency = state.payFrequency,
@@ -68,11 +71,13 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                         monthlyPayday = monthlyPayday,
                         nextBiweeklyPaydayText = biweeklyPayday
                     )
+                    viewModel.logSetupStepCompleted(OnboardingRoute.SalaryAndSchedule, 2)
                     navController.navigate(OnboardingRoute.FixedCosts.route)
                 }
             )
         }
         composable(OnboardingRoute.FixedCosts.route) {
+            LaunchedEffect(Unit) { viewModel.logSetupStepViewed(OnboardingRoute.FixedCosts, 3) }
             FixedCostsScreen(
                 initialFixedCosts = state.monthlyFixedCosts,
                 incomePerPayday = state.netIncomePerPayday,
@@ -84,7 +89,8 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                 onBack = { navController.popBackStack() },
                 onNext = { fixedCosts, preset, strategy, customStrategyName ->
                     if (viewModel.setFixedCostsAndBuild(fixedCosts, preset, strategy, customStrategyName)) {
-                        navController.navigate(OnboardingRoute.AllocationPriorities.route)
+                        viewModel.logSetupStepCompleted(OnboardingRoute.FixedCosts, 3)
+                        navController.navigate(OnboardingRoute.PlanPreview.route)
                     }
                 }
             )
@@ -105,7 +111,10 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                     onBack = { navController.popBackStack() },
                     onNext = { flex, sav, inv, cry, debt, isPercentage ->
                         if (viewModel.setAllocationsAndBuild(flex, sav, inv, cry, debt, isPercentage)) {
-                            navController.navigate(OnboardingRoute.BuildingPlan.route)
+                            viewModel.logAllocationTuneCompleted()
+                            if (!navController.popBackStack(OnboardingRoute.PlanPreview.route, inclusive = false)) {
+                                navController.navigate(OnboardingRoute.PlanPreview.route)
+                            }
                         }
                     }
                 )
@@ -126,12 +135,23 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
         composable(OnboardingRoute.PlanPreview.route) {
             val preview = state.planPreview
             if (preview != null) {
+                LaunchedEffect(Unit) {
+                    viewModel.logSetupStepViewed(OnboardingRoute.PlanPreview, 4)
+                    viewModel.logActivationReached()
+                }
                 PlanPreviewScreen(
                     preview = preview,
                     goalName = state.goalName,
                     goalAmount = state.goalAmount,
                     userPreferences = state.userPreferences,
-                    onContinue = { navController.navigate(OnboardingRoute.Signup.route) }
+                    onTuneAllocation = {
+                        viewModel.logAllocationTuneStarted()
+                        navController.navigate(OnboardingRoute.AllocationPriorities.route)
+                    },
+                    onContinue = {
+                        viewModel.logSetupStepCompleted(OnboardingRoute.PlanPreview, 4)
+                        navController.navigate(OnboardingRoute.Signup.route)
+                    }
                 )
             }
         }
@@ -206,28 +226,16 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
         }
         composable(OnboardingRoute.ReminderSetup.route) {
             ReminderSetupScreen(
+                onPermissionResult = viewModel::logReminderPermissionResult,
                 onConfirm = { time, cadence ->
-                    viewModel.saveReminderConfiguration(time, cadence)
-                    navController.navigate(OnboardingRoute.BankSyncOptional.route)
+                    viewModel.saveReminderConfiguration(time, cadence) {
+                        viewModel.completeOnboarding()
+                    }
                 },
                 onSkip = {
-                    viewModel.skipReminderConfiguration()
-                    navController.navigate(OnboardingRoute.BankSyncOptional.route)
-                }
-            )
-        }
-        composable(OnboardingRoute.BankSyncOptional.route) {
-            LaunchedEffect(Unit) { viewModel.logBankSyncPromptShown() }
-            BankSyncOptionalScreen(
-                onSync = { 
-                    viewModel.logBankSyncInterestExpressed()
-                    viewModel.setBankSyncHandled()
-                    viewModel.completeOnboarding() 
-                },
-                onSkip = { 
-                    viewModel.logBankSyncSkipped()
-                    viewModel.setBankSyncHandled()
-                    viewModel.completeOnboarding() 
+                    viewModel.skipReminderConfiguration {
+                        viewModel.completeOnboarding()
+                    }
                 }
             )
         }

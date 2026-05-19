@@ -37,6 +37,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -73,6 +74,7 @@ fun PlanPreviewScreen(
     goalName: String,
     goalAmount: BigDecimal,
     userPreferences: UserPreferences,
+    onTuneAllocation: () -> Unit,
     onContinue: () -> Unit
 ) {
     val locale = userPreferences.locale
@@ -109,6 +111,16 @@ fun PlanPreviewScreen(
                         text = stringResource(R.string.onboarding_plan_preview_button_secure),
                         onClick = onContinue
                     )
+                    TextButton(
+                        onClick = onTuneAllocation,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = stringResource(R.string.onboarding_plan_preview_button_tune),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
                 }
             }
         }
@@ -122,6 +134,12 @@ fun PlanPreviewScreen(
             contentPadding = PaddingValues(top = 30.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            item {
+                OnboardingProgressIndicator(
+                    stepIndex = 4,
+                    stepTotal = OnboardingViewModel.SETUP_STEP_TOTAL
+                )
+            }
             item {
                 PlanPreviewHeader(nextPayday = formattedNextPayday)
             }

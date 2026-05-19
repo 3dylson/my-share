@@ -109,6 +109,8 @@ fun GoalPickerScreen(
         title = stringResource(R.string.onboarding_goal_picker_title),
         subtitle = stringResource(R.string.onboarding_goal_picker_subtitle),
         actionText = stringResource(R.string.continue_button),
+        progressStep = 1,
+        progressTotal = OnboardingViewModel.SETUP_STEP_TOTAL,
         onBack = onBack,
         onAction = ::continueIfValid
     ) {

@@ -4,6 +4,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -38,6 +39,7 @@ import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.TestUserPreferencesRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
+import pt.ms.myshare.domain.use_case.ResolveAllocationStrategyRulesUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
 import pt.ms.myshare.presentation.ui.localization.UserLocaleManager
 import java.math.BigDecimal
@@ -52,9 +54,11 @@ class OnboardingViewModelTest {
     private val entitlementRepository: EntitlementRepository = mockk(relaxed = true)
     private val authRepository: AuthRepository = mockk(relaxed = true)
     private val calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase = mockk()
+    private val resolveAllocationStrategyRulesUseCase = ResolveAllocationStrategyRulesUseCase()
     private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase = mockk()
     private val reminderWorkScheduler: ReminderWorkScheduler = mockk(relaxed = true)
     private val userLocaleManager: UserLocaleManager = mockk(relaxed = true)
+    private val onboardingAnalyticsLogger: OnboardingAnalyticsLogger = mockk(relaxed = true)
     private lateinit var isProFlow: MutableStateFlow<Boolean>
     private lateinit var availableProductsFlow: MutableStateFlow<List<StoreProduct>>
     private lateinit var purchaseEventsFlow: MutableSharedFlow<BillingPurchaseEvent>
@@ -93,9 +97,11 @@ class OnboardingViewModelTest {
             authRepository,
             TestUserPreferencesRepository(),
             calculatePlanPreviewUseCase,
+            resolveAllocationStrategyRulesUseCase,
             resolvePricingStrategyUseCase,
             reminderWorkScheduler,
-            userLocaleManager
+            userLocaleManager,
+            onboardingAnalyticsLogger
         )
     }
 
@@ -244,6 +250,27 @@ class OnboardingViewModelTest {
     }
 
     @Test
+    fun `setFixedCostsAndBuild persists default strategy rules before allocation tuning`() = runTest {
+        val savedPlans = mutableListOf<SalaryPlan>()
+        every { calculatePlanPreviewUseCase.execute(any(), any()) } returns previewResult()
+        viewModel.setSalaryDetails(BigDecimal("1000"), PayFrequency.MONTHLY, 1, "")
+
+        val built = viewModel.setFixedCostsAndBuild(
+            monthlyFixedCosts = BigDecimal("400"),
+            preset = AllocationPreset.BALANCED,
+            strategy = AllocationStrategy.BALANCED_SAVINGS
+        )
+        advanceUntilIdle()
+
+        assertTrue(built)
+        coVerify(atLeast = 1) { plannerRepository.savePlan(capture(savedPlans)) }
+        val plan = savedPlans.last()
+        assertTrue(plan.rules.isNotEmpty())
+        assertTrue(plan.rules.any { it.type == PaydayRuleType.SAVINGS })
+        assertTrue(plan.rules.all { it.isPercentage })
+    }
+
+    @Test
     fun `setFixedCostsAndBuild rejects fixed costs greater than payday income`() = runTest {
         viewModel.setSalaryDetails(BigDecimal("1000"), PayFrequency.MONTHLY, 1, "")
 
@@ -285,14 +312,7 @@ class OnboardingViewModelTest {
         // Handle reminder
         viewModel.skipReminderConfiguration()
         advanceUntilIdle()
-        
-        // Bank sync not handled
-        viewModel.completeOnboarding()
-        assertEquals("onboarding_error_bank_sync_required", viewModel.uiState.value.error)
-        
-        // Handle bank sync
-        viewModel.setBankSyncHandled()
-        
+
         // Now it should succeed if plan exists in repo
         val plan = SalaryPlan(
             focus = PlanningFocus.SAVE_WITHOUT_STRESS,
@@ -321,8 +341,19 @@ class OnboardingViewModelTest {
         assertEquals(BigDecimal("1500"), state.netIncomePerPayday)
         assertTrue(state.planSaved)
         assertTrue(state.reminderSkipped)
-        assertTrue(state.bankSyncHandled)
         coVerify { plannerRepository.setOnboardingCompleted(true) }
+    }
+
+    @Test
+    fun `analytics logger receives setup and activation events`() = runTest {
+        viewModel.logSetupStepViewed(OnboardingRoute.GoalPicker, 1)
+        viewModel.logSetupStepCompleted(OnboardingRoute.GoalPicker, 1)
+        viewModel.logActivationReached()
+        viewModel.logActivationReached()
+
+        verify { onboardingAnalyticsLogger.logStepViewed("goal_picker", 1, OnboardingViewModel.SETUP_STEP_TOTAL, any(), any()) }
+        verify { onboardingAnalyticsLogger.logStepCompleted("goal_picker", 1, OnboardingViewModel.SETUP_STEP_TOTAL, any(), any()) }
+        verify(exactly = 1) { onboardingAnalyticsLogger.logActivationReached(any(), any()) }
     }
 
     @Test

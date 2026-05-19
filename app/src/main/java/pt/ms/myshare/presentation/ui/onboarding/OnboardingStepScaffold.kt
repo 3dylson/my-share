@@ -1,6 +1,7 @@
 package pt.ms.myshare.presentation.ui.onboarding
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -44,6 +45,8 @@ fun OnboardingStepScaffold(
     subtitle: String,
     actionText: String,
     actionEnabled: Boolean = true,
+    progressStep: Int? = null,
+    progressTotal: Int? = null,
     onBack: () -> Unit,
     onAction: () -> Unit,
     content: @Composable ColumnScope.() -> Unit
@@ -51,23 +54,29 @@ fun OnboardingStepScaffold(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
-        Box(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            val compactHeight = maxHeight < 700.dp
+            val topSpacing = if (compactHeight) 6.dp else 12.dp
+            val afterBackSpacing = if (compactHeight) 4.dp else 8.dp
+            val afterProgressSpacing = if (compactHeight) 14.dp else 20.dp
+            val beforeContentSpacing = if (compactHeight) 20.dp else 28.dp
+            val bottomContentPadding = if (compactHeight) 164.dp else 132.dp
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
                     .navigationBarsPadding()
                     .padding(horizontal = 24.dp)
-                    .padding(bottom = 112.dp)
                     .imeNestedScroll()
                     .imePadding()
                     .verticalScroll(rememberScrollState())
             ) {
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(topSpacing))
                 IconButton(
                     onClick = onBack,
                     content = {
@@ -79,11 +88,23 @@ fun OnboardingStepScaffold(
                     }
                 )
 
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(afterBackSpacing))
+
+                if (progressStep != null && progressTotal != null) {
+                    OnboardingProgressIndicator(
+                        stepIndex = progressStep,
+                        stepTotal = progressTotal
+                    )
+                    Spacer(Modifier.height(afterProgressSpacing))
+                }
 
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = if (compactHeight) {
+                        MaterialTheme.typography.headlineSmall
+                    } else {
+                        MaterialTheme.typography.headlineMedium
+                    },
                     fontWeight = FontWeight.ExtraBold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -96,9 +117,9 @@ fun OnboardingStepScaffold(
                     modifier = Modifier.padding(top = 8.dp)
                 )
 
-                Spacer(Modifier.height(28.dp))
+                Spacer(Modifier.height(beforeContentSpacing))
                 content()
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(bottomContentPadding))
             }
 
             Surface(

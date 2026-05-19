@@ -26,7 +26,7 @@
     <string name="id_amount_for_savings" translatable="false">amount_for_savings</string>
     <!-- Welcome Screen -->
     <string name="onboarding_welcome_title">Know what to do\nwhen money lands</string>
-    <string name="onboarding_welcome_subtitle">Build a clear payday plan in under two minutes, then run it manually or let Premium guide future adjustments.</string>
+    <string name="onboarding_welcome_subtitle">Build a clear payday plan in under two minutes, then let reviews turn into next-payday guidance with Premium.</string>
     <string name="onboarding_welcome_badge">Payday plan in 2 minutes</string>
     <string name="onboarding_welcome_outcome_payday_title">Next payday action plan</string>
     <string name="onboarding_welcome_outcome_payday_body">See what to move to bills, goals, and everyday spending.</string>
@@ -50,7 +50,7 @@
     <string name="onboarding_goal_picker_purchase">Major Purchase</string>
     <string name="onboarding_goal_picker_custom">Custom Goal</string>
     <string name="onboarding_goal_picker_guidance_title">Your first goal is free</string>
-    <string name="onboarding_goal_picker_guidance_body">Premium can split each payday across every goal later. Start with one clear outcome now.</string>
+    <string name="onboarding_goal_picker_guidance_body">Premium can split each payday across multiple goals later. Start with one clear outcome now.</string>
     <string name="onboarding_goal_picker_details_title">Selected goal details</string>
     <string name="onboarding_goal_picker_details_body">This is the target your first payday plan will protect.</string>
 
@@ -69,23 +69,23 @@
     <string name="onboarding_priorities_subtitle">You have %1$s after essentials. Choose the split for today’s plan.</string>
 
     <!-- Trajectory Screen -->
-    <string name="onboarding_trajectory_title">This path can keep adapting</string>
-    <string name="onboarding_trajectory_subtitle">Your manual plan is ready. Premium is the version that reviews reality and guides the next payday.</string>
+    <string name="onboarding_trajectory_title">Reviews can guide the next payday</string>
+    <string name="onboarding_trajectory_subtitle">Your manual plan is ready. Premium remembers what changed, keeps the history, and helps recover missed check-ins.</string>
     <string name="onboarding_trajectory_goal_subtitle">Estimated date to reach your \"%1$s\" target.</string>
-    <string name="onboarding_trajectory_footer">Use the manual plan free. Continue only if you want the adaptive version for future paydays.</string>
-    <string name="onboarding_trajectory_button">See adaptive plan</string>
+    <string name="onboarding_trajectory_footer">Use the manual plan free. Continue only if you want review-based guidance, adjustment memory, and recovery support.</string>
+    <string name="onboarding_trajectory_button">See Premium guidance</string>
     <string name="onboarding_trajectory_premium_bridge_label">Premium preview</string>
-    <string name="onboarding_trajectory_premium_bridge_title">Keep this path adjusting</string>
-    <string name="onboarding_trajectory_premium_bridge_body">Premium can compare each review with your %1$s weekly guide and show whether to move more or less than %2$s toward %3$s next payday.</string>
-    <string name="onboarding_trajectory_premium_bridge_body_without_priority">Premium can compare each review with your %1$s weekly guide and show what to tighten or relax before the next payday.</string>
+    <string name="onboarding_trajectory_premium_bridge_title">Turn reviews into the next move</string>
+    <string name="onboarding_trajectory_premium_bridge_body">Premium compares each review with your %1$s weekly guide, remembers changes, and shows whether to move more or less than %2$s toward %3$s next payday.</string>
+    <string name="onboarding_trajectory_premium_bridge_body_without_priority">Premium compares each review with your %1$s weekly guide, remembers changes, and shows what to tighten or relax before the next payday.</string>
     <string name="onboarding_trajectory_adjustment_label">Locked Premium example</string>
-    <string name="onboarding_trajectory_adjustment_title">What changes after a review</string>
-    <string name="onboarding_trajectory_adjustment_body">If your review shows %1$s unused, Premium can suggest moving it to %2$s while keeping your %3$s weekly guide safe.</string>
-    <string name="onboarding_trajectory_adjustment_body_without_priority">If your review shows %1$s unused, Premium can show what to tighten or relax while keeping your %2$s weekly guide safe.</string>
+    <string name="onboarding_trajectory_adjustment_title">Review, remember, recover</string>
+    <string name="onboarding_trajectory_adjustment_body">If your review shows %1$s unused, Premium can remember that pattern and suggest moving it to %2$s while keeping your %3$s weekly guide safe.</string>
+    <string name="onboarding_trajectory_adjustment_body_without_priority">If your review shows %1$s unused, Premium can remember that pattern and show what to tighten or relax while keeping your %2$s weekly guide safe.</string>
     <string name="onboarding_trajectory_adjustment_free_label">Manual plan</string>
     <string name="onboarding_trajectory_adjustment_free_body">Keep today’s split until you change it.</string>
-    <string name="onboarding_trajectory_adjustment_premium_label">Adaptive Premium</string>
-    <string name="onboarding_trajectory_adjustment_premium_body">Review once, get the next adjustment.</string>
+    <string name="onboarding_trajectory_adjustment_premium_label">Premium memory</string>
+    <string name="onboarding_trajectory_adjustment_premium_body">Reviews, history, and missed-check-in recovery.</string>
 
     <!-- Bank Sync Screen -->
     <string name="onboarding_banksync_title">Manual planning is ready</string>
@@ -196,28 +196,30 @@
     <string name="onboarding_plan_preview_impact_body">At this pace, %1$s is on track around %2$s %3$s.</string>
     <string name="onboarding_plan_preview_reminder_callout">We will remind you on %1$s so the plan does not stay in your head.</string>
     <string name="onboarding_plan_preview_premium_label">Premium preview</string>
-    <string name="onboarding_plan_preview_premium_title">Manual now, adaptive later</string>
-    <string name="onboarding_plan_preview_premium_body">Free saves this as a static split. Premium can review what happened and suggest the next adjustment before another payday.</string>
+    <string name="onboarding_plan_preview_premium_title">Manual now, review-powered later</string>
+    <string name="onboarding_plan_preview_premium_body">Free saves this split. Premium learns from reviews, remembers applied adjustments, and helps recover when a check-in is missed.</string>
     <string name="onboarding_plan_preview_free_label">Free</string>
     <string name="onboarding_plan_preview_free_body">Follow these moves manually.</string>
     <string name="onboarding_plan_preview_premium_compare_label">Premium</string>
-    <string name="onboarding_plan_preview_premium_compare_body">Know what to change next.</string>
+    <string name="onboarding_plan_preview_premium_compare_body">Reviews become next moves.</string>
     <string name="onboarding_plan_preview_default_goal">your goal</string>
     <string name="onboarding_plan_preview_button_secure">Continue to account setup</string>
     <string name="onboarding_plan_preview_button_basic">I’ll do it manually</string>
+    <string name="onboarding_plan_preview_button_tune">Tune payday split</string>
 
     <!-- Paywall -->
     <string name="paywall_close_content_description">Close</string>
     <string name="paywall_restore_button">Restore</string>
-    <string name="paywall_feature_automation_title">Adaptive adjustments</string>
-    <string name="paywall_feature_automation_desc">Get the next payday change to consider after each review.</string>
-    <string name="paywall_feature_reminders_title">Payday rhythm</string>
-    <string name="paywall_feature_reminders_desc">Keep check-ins tied to the plan you just built.</string>
-    <string name="paywall_feature_goals_title">Multiple goals</string>
-    <string name="paywall_feature_goals_desc">Split each payday across every target that matters.</string>
+    <string name="paywall_feature_automation_title">Adaptive reviews</string>
+    <string name="paywall_feature_automation_desc">Compare actual spending and goal moves against the plan.</string>
+    <string name="paywall_feature_reminders_title">Adjustment memory</string>
+    <string name="paywall_feature_reminders_desc">Remember applied changes so guidance does not reset every payday.</string>
+    <string name="paywall_feature_goals_title">Multi-goal splits + rule mix</string>
+    <string name="paywall_feature_goals_desc">Coordinate goals, savings, investing, debt, and buffers together.</string>
 
     <!-- Compatibility aliases for the Compose refactor -->
     <string name="back">Back</string>
+    <string name="onboarding_progress_label">Step %1$d of %2$d</string>
     <string name="continue_button">Continue</string>
     <string name="error_invalid_number">Enter a valid number.</string>
     <string name="period_month">month</string>
@@ -275,12 +277,12 @@
     <string name="onboarding_fixed_costs_error_negative">Fixed costs cannot be negative.</string>
     <string name="onboarding_fixed_costs_error_exceeds_income">Fixed costs exceed your payday income. Lower fixed costs or increase income.</string>
     <string name="onboarding_fixed_costs_protection_title">Monthly commitments</string>
-    <string name="onboarding_fixed_costs_protection_body">Rent, bills, subscriptions, and commitments are reserved before goals or flexible spending.</string>
+    <string name="onboarding_fixed_costs_protection_body">Rent, bills, and subscriptions are protected first.</string>
     <string name="onboarding_fixed_costs_protection_amount">%1$s protected first</string>
     <string name="onboarding_fixed_costs_protection_amount_body">My Share will reserve this before shaping the rest of your payday plan.</string>
     <string name="onboarding_fixed_costs_remaining_label">Remaining for this plan</string>
-    <string name="onboarding_fixed_costs_automation_title">Premium keeps this running</string>
-    <string name="onboarding_fixed_costs_automation_body">Recurring rules and payday reminders can protect essentials automatically after setup.</string>
+    <string name="onboarding_fixed_costs_automation_title">Premium coordinates the rule mix</string>
+    <string name="onboarding_fixed_costs_automation_body">Premium can keep savings, investing, debt, buffers, and goals working together after each review.</string>
     <string name="onboarding_fixed_costs_preset_title">Choose your guardrail</string>
     <string name="onboarding_fixed_costs_preset_conservative">Strict</string>
     <string name="onboarding_fixed_costs_preset_conservative_desc">Keep extra cushion around bills before funding goals.</string>
@@ -312,8 +314,8 @@
     <string name="onboarding_priorities_summary_body">Your split turns this into today’s payday rules.</string>
     <string name="onboarding_priorities_metric_allocated">Allocated</string>
     <string name="onboarding_priorities_metric_remaining">Remaining</string>
-    <string name="onboarding_priorities_adaptive_title">Start static, let Premium refine it</string>
-    <string name="onboarding_priorities_adaptive_body">Free keeps this split manual. Premium can compare reviews and recommend exact changes before the next payday.</string>
+    <string name="onboarding_priorities_adaptive_title">Start with a split, let reviews refine it</string>
+    <string name="onboarding_priorities_adaptive_body">Free keeps this split manual. Premium remembers adjustments, reviews history, and recommends the next rule mix.</string>
     <string name="onboarding_priorities_mode_title">Planning mode</string>
     <string name="onboarding_priorities_mode_percentage">Percent</string>
     <string name="onboarding_priorities_mode_fixed">Fixed amount</string>
@@ -677,8 +679,8 @@
     <string name="dialog_close">Close</string>
     <string name="dialog_save">Save</string>
     <string name="dialog_not_now">Not now</string>
-    <string name="paywall_feature_tracking_title">Plan vs actual</string>
-    <string name="paywall_feature_tracking_desc">See drift early and adjust before it becomes a habit.</string>
+    <string name="paywall_feature_tracking_title">History + missed-check-in recovery</string>
+    <string name="paywall_feature_tracking_desc">Keep the full timeline visible and recover when a review is skipped.</string>
     <string name="paywall_plan_monthly">Monthly</string>
     <string name="paywall_plan_annual">Annual</string>
     <string name="paywall_desc_monthly">Flexible start</string>
@@ -688,24 +690,24 @@
     <string name="paywall_annual_savings_label">Save %1$s per year</string>
     <string name="paywall_hero_trial_badge">%1$d-day trial</string>
     <string name="paywall_plan_section_title">Choose your plan</string>
-    <string name="paywall_value_section_title">How Premium improves this plan</string>
+    <string name="paywall_value_section_title">What Premium really adds</string>
     <string name="paywall_price_loading">Checking Play price</string>
     <string name="paywall_footer_trial_terms">%1$d-day free trial, then automatically renews at %2$s / %3$s unless canceled in Google Play before the trial ends.</string>
     <string name="paywall_footer_no_trial_terms">Automatically renews at %1$s / %2$s. Cancel anytime in Google Play.</string>
     <string name="paywall_footer_store_terms_unavailable">Secure checkout opens in Google Play. Pricing and trial eligibility appear there.</string>
     <string name="paywall_currency_mismatch_notice">Your plan uses %1$s. Google Play charges in %2$s based on your Play Store region.</string>
     <string name="paywall_autopilot_preview_goal_label">Built for %1$s</string>
-    <string name="paywall_autopilot_preview_title">This plan can adapt</string>
-    <string name="paywall_autopilot_preview_body">Premium starts with your %1$s weekly guide and %2$s priority move, then recommends the next adjustment after each review.</string>
-    <string name="paywall_autopilot_preview_body_without_priority">Premium starts with your %1$s weekly guide, then recommends the next adjustment after each review.</string>
-    <string name="paywall_autopilot_preview_body_generic">Premium starts with the plan you built, then recommends the next adjustment after each review.</string>
-    <string name="paywall_autopilot_recommendation_title">Example Premium adjustment</string>
-    <string name="paywall_autopilot_recommendation_body">If your review shows %1$s unused, Premium can suggest moving it to %2$s while protecting your %3$s weekly guide.</string>
-    <string name="paywall_autopilot_recommendation_body_without_priority">Premium watches your %1$s weekly guide after each review and shows what to tighten or relax before next payday.</string>
-    <string name="paywall_autopilot_recommendation_body_generic">After each review, Premium shows what to adjust before next payday.</string>
+    <string name="paywall_autopilot_preview_title">Next adjustment preview</string>
+    <string name="paywall_autopilot_preview_body">Premium starts with your %1$s weekly guide and %2$s priority move, then uses reviews and adjustment memory to guide the next payday.</string>
+    <string name="paywall_autopilot_preview_body_without_priority">Premium starts with your %1$s weekly guide, then uses reviews and adjustment memory to guide the next payday.</string>
+    <string name="paywall_autopilot_preview_body_generic">Premium starts with the plan you built, then uses reviews and adjustment memory to guide the next payday.</string>
+    <string name="paywall_autopilot_recommendation_title">Next adjustment preview</string>
+    <string name="paywall_autopilot_recommendation_body">If your review shows %1$s unused, Premium can remember that pattern and suggest moving it to %2$s while protecting your %3$s weekly guide.</string>
+    <string name="paywall_autopilot_recommendation_body_without_priority">Premium watches your %1$s weekly guide, remembers adjustments, and shows what to tighten or relax before next payday.</string>
+    <string name="paywall_autopilot_recommendation_body_generic">After each review, Premium remembers what changed and shows what to adjust before next payday.</string>
     <string name="paywall_autopilot_preview_free_label">Free plan</string>
     <string name="paywall_autopilot_preview_free_body">Follow this split manually.</string>
-    <string name="paywall_autopilot_preview_premium_body">See what to change next.</string>
+    <string name="paywall_autopilot_preview_premium_body">Reviews become next moves.</string>
     <string name="paywall_trust_play_title">Google Play checkout</string>
     <string name="paywall_trust_play_body">Price, trial eligibility, renewal, and cancellation are handled by Google Play.</string>
     <string name="paywall_trust_manual_title">Manual-first plan</string>
@@ -734,12 +736,12 @@
     <string name="paywall_period_year">year</string>
 
     <!-- Paywall Clusters -->
-    <string name="paywall_headline_emerging">Try adaptive payday guidance first</string>
-    <string name="paywall_subhead_emerging">Monthly keeps the first step lighter while Premium uses each review to guide the next one.</string>
-    <string name="paywall_headline_brazil">Make every salary review guide the next one</string>
-    <string name="paywall_subhead_brazil">Monthly is highlighted first so you can test the adaptive plan before committing.</string>
-    <string name="paywall_headline_default">Know what to adjust every payday</string>
-    <string name="paywall_subhead_default">Start with this plan. After each review, Premium shows the next change to consider.</string>
+    <string name="paywall_headline_emerging">Turn each review into the next payday move</string>
+    <string name="paywall_subhead_emerging">Monthly keeps the first step lighter while Premium remembers adjustments, keeps history, and helps recover missed check-ins.</string>
+    <string name="paywall_headline_brazil">Make each salary review guide the next payday</string>
+    <string name="paywall_subhead_brazil">Monthly is highlighted first so you can test review-powered guidance before committing.</string>
+    <string name="paywall_headline_default">Turn each review into the next payday move</string>
+    <string name="paywall_subhead_default">Premium remembers adjustments, keeps history, recovers missed check-ins, and coordinates goals with your rule mix.</string>
 
     <!-- Review Insights -->
     <string name="insight_review_save_stress_success_headline">Safety net growing</string>
@@ -827,7 +829,6 @@
     <string name="error_anonymous_login_failed">Local sign-in failed. Try again in a moment.</string>
     <string name="onboarding_error_plan_required">Please build your plan first.</string>
     <string name="onboarding_error_reminder_required">Please handle the reminder step.</string>
-    <string name="onboarding_error_bank_sync_required">Please complete or skip the bank sync step.</string>
     <string name="onboarding_error_valid_plan_required">Cannot complete onboarding without a valid plan.</string>
     <string name="onboarding_error_next_payday_format">Use YYYY-MM-DD for the next biweekly payday.</string>
     <string name="goal_add_error_missing">This goal is no longer available.</string>

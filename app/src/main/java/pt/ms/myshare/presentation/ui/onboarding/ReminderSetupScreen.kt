@@ -38,6 +38,7 @@ import java.time.LocalTime
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ReminderSetupScreen(
+    onPermissionResult: (Boolean) -> Unit = {},
     onConfirm: (LocalTime, ReminderCadence) -> Unit,
     onSkip: () -> Unit
 ) {
@@ -52,6 +53,7 @@ fun ReminderSetupScreen(
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { granted ->
+            onPermissionResult(granted)
             if (granted) {
                 onConfirm(time, cadence)
             } else {
@@ -67,6 +69,7 @@ fun ReminderSetupScreen(
         }
         val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
         if (granted) {
+            onPermissionResult(true)
             onConfirm(time, cadence)
         } else {
             permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)

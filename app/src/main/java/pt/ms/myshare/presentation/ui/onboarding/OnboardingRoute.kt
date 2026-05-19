@@ -12,6 +12,4 @@ sealed class OnboardingRoute(val route: String) {
     object Trajectory : OnboardingRoute("trajectory")
     object Paywall : OnboardingRoute("paywall")
     object ReminderSetup : OnboardingRoute("reminder_setup")
-    object BankSyncOptional : OnboardingRoute("bank_sync_optional")
 }
-

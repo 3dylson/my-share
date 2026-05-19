@@ -41,7 +41,6 @@ data class OnboardingState(
     val planSaved: Boolean = false,
     val reminderSaved: Boolean = false,
     val reminderSkipped: Boolean = false,
-    val bankSyncHandled: Boolean = false,
     val onboardingCompleted: Boolean = false,
     val isSignupActionInProgress: Boolean = false,
     val isPremium: Boolean = false,

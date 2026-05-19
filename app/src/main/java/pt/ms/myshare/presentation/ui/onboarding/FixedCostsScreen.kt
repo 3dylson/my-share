@@ -108,6 +108,8 @@ fun FixedCostsScreen(
         title = stringResource(R.string.onboarding_fixed_costs_title),
         subtitle = stringResource(R.string.onboarding_fixed_costs_subtitle),
         actionText = stringResource(R.string.continue_button),
+        progressStep = 3,
+        progressTotal = OnboardingViewModel.SETUP_STEP_TOTAL,
         onBack = onBack,
         onAction = ::continueIfValid
     ) {

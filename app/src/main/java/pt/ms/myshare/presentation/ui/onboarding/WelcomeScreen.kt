@@ -103,86 +103,103 @@ fun WelcomeScreen(
             }
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .statusBarsPadding()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp)
-                .padding(top = 24.dp, bottom = 18.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Surface(
-                shape = RoundedCornerShape(999.dp),
-                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f),
-                border = androidx.compose.foundation.BorderStroke(
-                    1.dp,
-                    MySharePrimary.copy(alpha = 0.24f)
-                )
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
-                    horizontalArrangement = Arrangement.spacedBy(7.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.AutoGraph,
-                        contentDescription = null,
-                        tint = MySharePrimary,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Text(
-                        text = stringResource(R.string.onboarding_welcome_badge).uppercase(),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MySharePrimary,
-                        fontWeight = FontWeight.Black
-                    )
-                }
+        BoxWithConstraints(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+            val compactHeight = maxHeight < 700.dp
+            val topPadding = if (compactHeight) 10.dp else 24.dp
+            val heroSpacing = if (compactHeight) 14.dp else 22.dp
+            val titleStyle = if (compactHeight) {
+                MaterialTheme.typography.headlineMedium
+            } else {
+                MaterialTheme.typography.headlineLarge
             }
-
-            Spacer(Modifier.height(22.dp))
-
-            Text(
-                stringResource(R.string.onboarding_welcome_title), 
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.ExtraBold,
-                textAlign = TextAlign.Center,
-                lineHeight = 42.sp,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            Text(
-                stringResource(R.string.onboarding_welcome_subtitle),
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 12.dp, start = 4.dp, end = 4.dp),
-                lineHeight = 24.sp
-            )
-
-            Spacer(Modifier.height(22.dp))
-
-            WelcomeOutcomeCard()
-
-            Spacer(Modifier.height(16.dp))
+            val titleLineHeight = if (compactHeight) 36.sp else 42.sp
+            val subtitleStyle = if (compactHeight) {
+                MaterialTheme.typography.bodyMedium
+            } else {
+                MaterialTheme.typography.bodyLarge
+            }
+            val subtitleLineHeight = if (compactHeight) 21.sp else 24.sp
 
             Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .statusBarsPadding()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp)
+                    .padding(top = topPadding, bottom = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                WelcomePreferenceRow(
-                    title = stringResource(R.string.preferences_language_title),
-                    value = languageLabel(userPreferences.languageTag),
-                    icon = Icons.Default.Language,
-                    onClick = { showLanguagePicker = true }
+                Surface(
+                    shape = RoundedCornerShape(999.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f),
+                    border = androidx.compose.foundation.BorderStroke(
+                        1.dp,
+                        MySharePrimary.copy(alpha = 0.24f)
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+                        horizontalArrangement = Arrangement.spacedBy(7.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AutoGraph,
+                            contentDescription = null,
+                            tint = MySharePrimary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            text = stringResource(R.string.onboarding_welcome_badge).uppercase(),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MySharePrimary,
+                            fontWeight = FontWeight.Black
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(heroSpacing))
+
+                Text(
+                    stringResource(R.string.onboarding_welcome_title),
+                    style = titleStyle,
+                    fontWeight = FontWeight.ExtraBold,
+                    textAlign = TextAlign.Center,
+                    lineHeight = titleLineHeight,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
-                WelcomePreferenceRow(
-                    title = stringResource(R.string.preferences_currency_title),
-                    value = currencyLabel(userPreferences.currencyCode, userPreferences.locale),
-                    icon = Icons.Default.Payments,
-                    onClick = { showCurrencyPicker = true }
+
+                Text(
+                    stringResource(R.string.onboarding_welcome_subtitle),
+                    style = subtitleStyle,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = if (compactHeight) 8.dp else 12.dp, start = 4.dp, end = 4.dp),
+                    lineHeight = subtitleLineHeight
                 )
+
+                Spacer(Modifier.height(heroSpacing))
+
+                WelcomeOutcomeCard()
+
+                Spacer(Modifier.height(16.dp))
+
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    WelcomePreferenceRow(
+                        title = stringResource(R.string.preferences_language_title),
+                        value = languageLabel(userPreferences.languageTag),
+                        icon = Icons.Default.Language,
+                        onClick = { showLanguagePicker = true }
+                    )
+                    WelcomePreferenceRow(
+                        title = stringResource(R.string.preferences_currency_title),
+                        value = currencyLabel(userPreferences.currencyCode, userPreferences.locale),
+                        icon = Icons.Default.Payments,
+                        onClick = { showCurrencyPicker = true }
+                    )
+                }
             }
         }
     }
