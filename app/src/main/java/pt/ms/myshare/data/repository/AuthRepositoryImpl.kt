@@ -7,13 +7,15 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import pt.ms.myshare.data.auth.CredentialStateClearer
 import pt.ms.myshare.domain.model.User
 import pt.ms.myshare.domain.repository.AuthRepository
 import timber.log.Timber
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
+    private val credentialStateClearer: CredentialStateClearer
 ) : AuthRepository {
 
     override val currentUser: Flow<User?> = callbackFlow {
@@ -95,6 +97,12 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun signOut() {
         Timber.d("Signing out Firebase user")
         firebaseAuth.signOut()
+        try {
+            credentialStateClearer.clearCredentialState()
+            Timber.d("Credential Manager state cleared after Firebase sign-out")
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to clear Credential Manager state after Firebase sign-out")
+        }
     }
 
     private fun com.google.firebase.auth.FirebaseUser.toDomainResult(): Result<User> {

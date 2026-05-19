@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -60,6 +61,7 @@ fun GoalAddScreen(
     val context = LocalContext.current
     var showDeleteDialog by remember { mutableStateOf(false) }
     val isEditMode = state.requestedGoalId != null || state.goalId != null
+    val inputKeyboardActions = rememberInputKeyboardActions(onDone = onSave)
 
     if (showDeleteDialog) {
         MyShareAlertDialog(
@@ -153,7 +155,9 @@ fun GoalAddScreen(
                     value = state.name,
                     onValueChange = onNameChanged,
                     label = stringResource(R.string.goal_add_label_name),
-                    placeholder = stringResource(R.string.goal_add_hint_name)
+                    placeholder = stringResource(R.string.goal_add_hint_name),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    keyboardActions = inputKeyboardActions
                 )
 
                 PremiumTextField(
@@ -170,7 +174,11 @@ fun GoalAddScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = inputKeyboardActions
                 )
 
                 if (state.error != null) {

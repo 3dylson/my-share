@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -67,6 +68,7 @@ fun RuleAddScreen(
     val context = LocalContext.current
     var showDeleteDialog by remember { mutableStateOf(false) }
     val isEditMode = state.requestedRuleId != null || state.ruleId != null
+    val inputKeyboardActions = rememberInputKeyboardActions(onDone = onSave)
 
     if (showDeleteDialog) {
         MyShareAlertDialog(
@@ -160,7 +162,9 @@ fun RuleAddScreen(
                     value = state.name,
                     onValueChange = onNameChanged,
                     label = stringResource(R.string.rule_add_label_name),
-                    placeholder = stringResource(R.string.rule_add_hint_name)
+                    placeholder = stringResource(R.string.rule_add_hint_name),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    keyboardActions = inputKeyboardActions
                 )
 
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -216,7 +220,11 @@ fun RuleAddScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     ) 
                 },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Decimal,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = inputKeyboardActions
             )
 
             Column(modifier = Modifier.fillMaxWidth()) {

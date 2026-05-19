@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -33,6 +34,7 @@ import pt.ms.myshare.domain.model.AllocationPreset
 import pt.ms.myshare.domain.model.AllocationStrategy
 import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.presentation.ui.components.PremiumTextField
+import pt.ms.myshare.presentation.ui.components.rememberInputKeyboardActions
 import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.presentation.ui.theme.*
 import java.math.BigDecimal
@@ -103,6 +105,7 @@ fun FixedCostsScreen(
             onNext(fixedCosts ?: BigDecimal.ZERO, preset, strategy, customStrategyName)
         }
     }
+    val inputKeyboardActions = rememberInputKeyboardActions(onDone = ::continueIfValid)
 
     OnboardingStepScaffold(
         title = stringResource(R.string.onboarding_fixed_costs_title),
@@ -124,7 +127,11 @@ fun FixedCostsScreen(
                 placeholder = amountPlaceholder,
                 prefix = { if (currencySymbol.isNotEmpty()) Text("$currencySymbol ") },
                 isError = fixedCostsError,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Decimal,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = inputKeyboardActions
             )
             when {
                 requiredError -> OnboardingValidationText(stringResource(R.string.onboarding_fixed_costs_error_required))
@@ -243,7 +250,9 @@ fun FixedCostsScreen(
                 value = customStrategyName,
                 onValueChange = { customStrategyName = it },
                 label = stringResource(R.string.onboarding_strategy_custom_label),
-                placeholder = stringResource(R.string.onboarding_strategy_custom_placeholder)
+                placeholder = stringResource(R.string.onboarding_strategy_custom_placeholder),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = inputKeyboardActions
             )
         }
 

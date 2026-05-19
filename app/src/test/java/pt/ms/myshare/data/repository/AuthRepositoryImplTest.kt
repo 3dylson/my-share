@@ -5,6 +5,8 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -12,11 +14,13 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
+import pt.ms.myshare.data.auth.CredentialStateClearer
 
 class AuthRepositoryImplTest {
 
     private val firebaseAuth: FirebaseAuth = mockk(relaxed = true)
-    private val repository = AuthRepositoryImpl(firebaseAuth)
+    private val credentialStateClearer: CredentialStateClearer = mockk(relaxed = true)
+    private val repository = AuthRepositoryImpl(firebaseAuth, credentialStateClearer)
 
     @Test
     fun `connectGoogleAccount signs into existing account after link collision`() = runTest {
@@ -43,5 +47,23 @@ class AuthRepositoryImplTest {
         assertEquals("user@example.com", result.getOrThrow().email)
         assertFalse(result.getOrThrow().isAnonymous)
         verify(exactly = 1) { firebaseAuth.signInWithCredential(any()) }
+    }
+
+    @Test
+    fun `signOut clears Firebase session and Credential Manager state`() = runTest {
+        repository.signOut()
+
+        verify(exactly = 1) { firebaseAuth.signOut() }
+        coVerify(exactly = 1) { credentialStateClearer.clearCredentialState() }
+    }
+
+    @Test
+    fun `signOut completes when Credential Manager state clearing fails`() = runTest {
+        coEvery { credentialStateClearer.clearCredentialState() } throws IllegalStateException("clear failed")
+
+        repository.signOut()
+
+        verify(exactly = 1) { firebaseAuth.signOut() }
+        coVerify(exactly = 1) { credentialStateClearer.clearCredentialState() }
     }
 }

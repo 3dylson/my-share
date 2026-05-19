@@ -10,6 +10,8 @@ import dagger.hilt.components.SingletonComponent
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
+import pt.ms.myshare.data.auth.AndroidCredentialStateClearer
+import pt.ms.myshare.data.auth.CredentialStateClearer
 import pt.ms.myshare.data.billing.BillingAuthSession
 import pt.ms.myshare.data.billing.BillingClientWrapper
 import pt.ms.myshare.data.billing.FirebaseBillingAuthSession
@@ -50,7 +52,16 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(firebaseAuth: FirebaseAuth): AuthRepository = AuthRepositoryImpl(firebaseAuth)
+    fun provideCredentialStateClearer(
+        @ApplicationContext context: Context
+    ): CredentialStateClearer = AndroidCredentialStateClearer(context)
+
+    @Provides
+    @Singleton
+    fun provideAuthRepository(
+        firebaseAuth: FirebaseAuth,
+        credentialStateClearer: CredentialStateClearer
+    ): AuthRepository = AuthRepositoryImpl(firebaseAuth, credentialStateClearer)
 
     @Provides
     @Singleton

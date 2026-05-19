@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
@@ -22,6 +23,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -29,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.presentation.ui.components.bringFocusedInputIntoView
+import pt.ms.myshare.presentation.ui.components.rememberInputKeyboardActions
 import pt.ms.myshare.presentation.ui.formatting.AllocationAmountConverter
 import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.presentation.ui.theme.*
@@ -148,6 +151,13 @@ fun AllocationPrioritiesScreen(
         }
         allocationIsPercentage = usePercentage
     }
+    val inputKeyboardActions = rememberInputKeyboardActions(
+        onDone = {
+            if (isValid) {
+                onNext(parsedFlex, parsedSav, parsedInv, parsedCry, parsedDebt, allocationIsPercentage)
+            }
+        }
+    )
 
     OnboardingStepScaffold(
         title = stringResource(R.string.onboarding_priorities_title),
@@ -219,7 +229,9 @@ fun AllocationPrioritiesScreen(
                 prefixText = if (allocationIsPercentage) stringResource(R.string.percentage_prefix) else currencySymbol,
                 placeholder = if (allocationIsPercentage) stringResource(R.string.rule_add_hint_rate) else amountPlaceholder,
                 inputLabel = if (allocationIsPercentage) stringResource(R.string.onboarding_priorities_input_percent) else stringResource(R.string.onboarding_priorities_input_amount),
-                equivalentText = equivalentText(parsedFlex)
+                equivalentText = equivalentText(parsedFlex),
+                imeAction = ImeAction.Next,
+                keyboardActions = inputKeyboardActions
             )
             AllocationCategoryCard(
                 title = stringResource(R.string.onboarding_priorities_label_sav),
@@ -237,7 +249,9 @@ fun AllocationPrioritiesScreen(
                 prefixText = if (allocationIsPercentage) stringResource(R.string.percentage_prefix) else currencySymbol,
                 placeholder = if (allocationIsPercentage) stringResource(R.string.rule_add_hint_rate) else amountPlaceholder,
                 inputLabel = if (allocationIsPercentage) stringResource(R.string.onboarding_priorities_input_percent) else stringResource(R.string.onboarding_priorities_input_amount),
-                equivalentText = equivalentText(parsedSav)
+                equivalentText = equivalentText(parsedSav),
+                imeAction = ImeAction.Next,
+                keyboardActions = inputKeyboardActions
             )
             AllocationCategoryCard(
                 title = stringResource(R.string.onboarding_priorities_label_inv),
@@ -255,7 +269,9 @@ fun AllocationPrioritiesScreen(
                 prefixText = if (allocationIsPercentage) stringResource(R.string.percentage_prefix) else currencySymbol,
                 placeholder = if (allocationIsPercentage) stringResource(R.string.rule_add_hint_rate) else amountPlaceholder,
                 inputLabel = if (allocationIsPercentage) stringResource(R.string.onboarding_priorities_input_percent) else stringResource(R.string.onboarding_priorities_input_amount),
-                equivalentText = equivalentText(parsedInv)
+                equivalentText = equivalentText(parsedInv),
+                imeAction = ImeAction.Next,
+                keyboardActions = inputKeyboardActions
             )
             AllocationCategoryCard(
                 title = stringResource(R.string.onboarding_priorities_label_cry),
@@ -273,7 +289,9 @@ fun AllocationPrioritiesScreen(
                 prefixText = if (allocationIsPercentage) stringResource(R.string.percentage_prefix) else currencySymbol,
                 placeholder = if (allocationIsPercentage) stringResource(R.string.rule_add_hint_rate) else amountPlaceholder,
                 inputLabel = if (allocationIsPercentage) stringResource(R.string.onboarding_priorities_input_percent) else stringResource(R.string.onboarding_priorities_input_amount),
-                equivalentText = equivalentText(parsedCry)
+                equivalentText = equivalentText(parsedCry),
+                imeAction = ImeAction.Next,
+                keyboardActions = inputKeyboardActions
             )
             AllocationCategoryCard(
                 title = stringResource(R.string.onboarding_priorities_label_debt),
@@ -291,7 +309,9 @@ fun AllocationPrioritiesScreen(
                 prefixText = if (allocationIsPercentage) stringResource(R.string.percentage_prefix) else currencySymbol,
                 placeholder = if (allocationIsPercentage) stringResource(R.string.rule_add_hint_rate) else amountPlaceholder,
                 inputLabel = if (allocationIsPercentage) stringResource(R.string.onboarding_priorities_input_percent) else stringResource(R.string.onboarding_priorities_input_amount),
-                equivalentText = equivalentText(parsedDebt)
+                equivalentText = equivalentText(parsedDebt),
+                imeAction = ImeAction.Done,
+                keyboardActions = inputKeyboardActions
             )
         }
     }
@@ -577,7 +597,9 @@ private fun AllocationCategoryCard(
     prefixText: String,
     placeholder: String,
     inputLabel: String,
-    equivalentText: String
+    equivalentText: String,
+    imeAction: ImeAction,
+    keyboardActions: KeyboardActions
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -638,7 +660,11 @@ private fun AllocationCategoryCard(
                     }
                 },
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Decimal,
+                    imeAction = imeAction
+                ),
+                keyboardActions = keyboardActions,
                 shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MySharePrimary,

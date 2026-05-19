@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,6 +29,7 @@ import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.presentation.ui.components.PremiumTextField
+import pt.ms.myshare.presentation.ui.components.rememberInputKeyboardActions
 import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.presentation.ui.theme.*
 import java.math.BigDecimal
@@ -103,6 +105,7 @@ fun GoalPickerScreen(
             onNext(selectedFocus, goalName.trim(), goalAmount ?: BigDecimal.ZERO)
         }
     }
+    val inputKeyboardActions = rememberInputKeyboardActions(onDone = ::continueIfValid)
 
     OnboardingStepScaffold(
         title = stringResource(R.string.onboarding_goal_picker_title),
@@ -146,7 +149,8 @@ fun GoalPickerScreen(
             },
             goalAmountError = goalAmountError,
             currencySymbol = currencySymbol,
-            amountPlaceholder = amountPlaceholder
+            amountPlaceholder = amountPlaceholder,
+            keyboardActions = inputKeyboardActions
         )
     }
 }
@@ -342,7 +346,8 @@ private fun GoalDetailsCard(
     onGoalAmountChange: (String) -> Unit,
     goalAmountError: Boolean,
     currencySymbol: String,
-    amountPlaceholder: String
+    amountPlaceholder: String,
+    keyboardActions: androidx.compose.foundation.text.KeyboardActions
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -394,7 +399,9 @@ private fun GoalDetailsCard(
                 onValueChange = onGoalNameChange,
                 label = stringResource(R.string.onboarding_goal_picker_label_name),
                 placeholder = stringResource(R.string.onboarding_goal_picker_placeholder_name),
-                isError = goalNameError
+                isError = goalNameError,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = keyboardActions
             )
             if (goalNameError) {
                 OnboardingValidationText(stringResource(R.string.onboarding_goal_picker_error_name))
@@ -406,7 +413,11 @@ private fun GoalDetailsCard(
                 prefix = { if (currencySymbol.isNotEmpty()) Text("$currencySymbol ") },
                 placeholder = amountPlaceholder,
                 isError = goalAmountError,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Decimal,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = keyboardActions
             )
             if (goalAmountError) {
                 OnboardingValidationText(

@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -28,6 +29,7 @@ import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.presentation.ui.components.PremiumTextField
+import pt.ms.myshare.presentation.ui.components.rememberInputKeyboardActions
 import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.presentation.ui.theme.*
 import java.math.BigDecimal
@@ -80,6 +82,7 @@ fun SalaryAndScheduleScreen(
             onNext(income ?: BigDecimal.ZERO, frequency, payday ?: 1, biweeklyPaydayText)
         }
     }
+    val inputKeyboardActions = rememberInputKeyboardActions(onDone = ::continueIfValid)
 
     OnboardingStepScaffold(
         title = stringResource(R.string.onboarding_salary_title),
@@ -98,7 +101,11 @@ fun SalaryAndScheduleScreen(
                 placeholder = amountPlaceholder,
                 prefix = { if (currencySymbol.isNotEmpty()) Text("$currencySymbol ") },
                 isError = incomeError,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Decimal,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = inputKeyboardActions
             )
             if (incomeError) {
                 OnboardingValidationText(
@@ -159,7 +166,11 @@ fun SalaryAndScheduleScreen(
                     label = stringResource(R.string.onboarding_salary_label_payday),
                     placeholder = stringResource(R.string.onboarding_salary_placeholder_payday),
                     isError = paydayError,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = inputKeyboardActions
                 )
                 if (paydayError) {
                     OnboardingValidationText(stringResource(R.string.onboarding_salary_error_payday_range))
@@ -170,7 +181,9 @@ fun SalaryAndScheduleScreen(
                     onValueChange = { biweeklyPaydayText = it },
                     label = stringResource(R.string.onboarding_salary_label_next_date),
                     placeholder = stringResource(R.string.onboarding_salary_placeholder_next_date),
-                    isError = biweeklyDateError
+                    isError = biweeklyDateError,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = inputKeyboardActions
                 )
                 if (biweeklyDateError) {
                     OnboardingValidationText(stringResource(R.string.onboarding_salary_error_next_date_required))

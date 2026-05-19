@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TrendingDown
@@ -37,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -942,6 +944,14 @@ fun ReviewCorrectionBottomSheet(
     var flexibleSpend by remember(item.id) { mutableStateOf(item.editableFlexibleSpend) }
     var goalContribution by remember(item.id) { mutableStateOf(item.editableGoalContribution) }
     var showValidationError by remember(item.id) { mutableStateOf(false) }
+    fun saveCorrection() {
+        if (onSave(flexibleSpend, goalContribution)) {
+            onDismissRequest()
+        } else {
+            showValidationError = true
+        }
+    }
+    val inputKeyboardActions = rememberInputKeyboardActions(onDone = ::saveCorrection)
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -999,7 +1009,9 @@ fun ReviewCorrectionBottomSheet(
                                 flexibleSpend = it
                                 showValidationError = false
                             },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            imeAction = ImeAction.Next,
+                            keyboardActions = inputKeyboardActions
                         )
                         ReviewAmountField(
                             label = stringResource(R.string.home_review_input_goal_exact),
@@ -1009,7 +1021,9 @@ fun ReviewCorrectionBottomSheet(
                                 goalContribution = it
                                 showValidationError = false
                             },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            imeAction = ImeAction.Done,
+                            keyboardActions = inputKeyboardActions
                         )
                     }
                 } else {
@@ -1022,7 +1036,9 @@ fun ReviewCorrectionBottomSheet(
                                 flexibleSpend = it
                                 showValidationError = false
                             },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            imeAction = ImeAction.Next,
+                            keyboardActions = inputKeyboardActions
                         )
                         ReviewAmountField(
                             label = stringResource(R.string.home_review_input_goal_exact),
@@ -1032,7 +1048,9 @@ fun ReviewCorrectionBottomSheet(
                                 goalContribution = it
                                 showValidationError = false
                             },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            imeAction = ImeAction.Done,
+                            keyboardActions = inputKeyboardActions
                         )
                     }
                 }
@@ -1051,13 +1069,7 @@ fun ReviewCorrectionBottomSheet(
                 if (shouldStack) {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Button(
-                            onClick = {
-                                if (onSave(flexibleSpend, goalContribution)) {
-                                    onDismissRequest()
-                                } else {
-                                    showValidationError = true
-                                }
-                            },
+                            onClick = ::saveCorrection,
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(14.dp)
                         ) {
@@ -1085,13 +1097,7 @@ fun ReviewCorrectionBottomSheet(
                             Text(stringResource(R.string.dialog_cancel))
                         }
                         Button(
-                            onClick = {
-                                if (onSave(flexibleSpend, goalContribution)) {
-                                    onDismissRequest()
-                                } else {
-                                    showValidationError = true
-                                }
-                            },
+                            onClick = ::saveCorrection,
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(14.dp)
                         ) {
@@ -2204,7 +2210,9 @@ private fun ReviewAmountField(
     value: String,
     currencySymbol: String,
     onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    imeAction: ImeAction,
+    keyboardActions: KeyboardActions
 ) {
     OutlinedTextField(
         value = value,
@@ -2212,7 +2220,11 @@ private fun ReviewAmountField(
         label = { Text(label) },
         prefix = { Text(currencySymbol) },
         singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Decimal,
+            imeAction = imeAction
+        ),
+        keyboardActions = keyboardActions,
         modifier = modifier.bringFocusedInputIntoView(debugLabel = label),
         shape = RoundedCornerShape(16.dp)
     )
@@ -2228,6 +2240,8 @@ private fun CompactReviewEntryCard(
     onGoalContributionChanged: (String) -> Unit,
     onSaveReview: () -> Unit
 ) {
+    val inputKeyboardActions = rememberInputKeyboardActions(onDone = onSaveReview)
+
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
@@ -2278,14 +2292,18 @@ private fun CompactReviewEntryCard(
                             value = flexibleSpend,
                             currencySymbol = currencySymbol,
                             onValueChange = onFlexibleSpendChanged,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            imeAction = ImeAction.Next,
+                            keyboardActions = inputKeyboardActions
                         )
                         ReviewAmountField(
                             label = stringResource(R.string.home_review_input_goal_exact),
                             value = goalContribution,
                             currencySymbol = currencySymbol,
                             onValueChange = onGoalContributionChanged,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            imeAction = ImeAction.Done,
+                            keyboardActions = inputKeyboardActions
                         )
                     }
                 } else {
@@ -2295,14 +2313,18 @@ private fun CompactReviewEntryCard(
                             value = flexibleSpend,
                             currencySymbol = currencySymbol,
                             onValueChange = onFlexibleSpendChanged,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            imeAction = ImeAction.Next,
+                            keyboardActions = inputKeyboardActions
                         )
                         ReviewAmountField(
                             label = stringResource(R.string.home_review_input_goal_exact),
                             value = goalContribution,
                             currencySymbol = currencySymbol,
                             onValueChange = onGoalContributionChanged,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            imeAction = ImeAction.Done,
+                            keyboardActions = inputKeyboardActions
                         )
                     }
                 }
