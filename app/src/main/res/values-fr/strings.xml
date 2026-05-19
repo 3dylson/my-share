@@ -454,6 +454,16 @@
     <string name="home_review_recommendation_review_rules">Revoir les règles</string>
     <string name="home_review_recommendation_undo">Annuler l\'ajustement</string>
     <string name="home_review_coach_title">Coin des autocars</string>
+    <string name="home_review_coaching_summary_label">Modèle Premium</string>
+    <string name="home_review_coaching_summary_headline_strong">Vos bilans montrent une bonne dynamique</string>
+    <string name="home_review_coaching_summary_body_strong">La plupart des paies analysées sont restées dans le plan. Continuez à utiliser chaque bilan pour protéger ce qui fonctionne déjà.</string>
+    <string name="home_review_coaching_summary_headline_steady">Votre plan trouve son rythme</string>
+    <string name="home_review_coaching_summary_body_steady">Vos bilans récents montrent des progrès avec quelques paies à ajuster. Premium garde le prochain objectif réaliste.</string>
+    <string name="home_review_coaching_summary_headline_attention">Votre prochain objectif a besoin de marge</string>
+    <string name="home_review_coaching_summary_body_attention">Les bilans récents montrent une pression. Utilisez ce modèle pour adoucir la prochaine paie avant que le plan devienne difficile à suivre.</string>
+    <string name="home_review_coaching_metric_buffer">Moy. restant</string>
+    <string name="home_review_coaching_metric_extra">Moy. extra objectifs</string>
+    <string name="home_review_coaching_metric_hit_rate">Paies sur la bonne voie</string>
     <string name="home_review_manual_title">Enregistrement sur salaire</string>
     <string name="home_review_manual_desc">Entrez les chiffres exacts pour que votre prochain guide reste honnête.</string>
     <string name="home_review_input_flex_exact">Réel flexible</string>

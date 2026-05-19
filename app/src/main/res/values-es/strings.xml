@@ -454,6 +454,16 @@
     <string name="home_review_recommendation_review_rules">Revisar reglas</string>
     <string name="home_review_recommendation_undo">Deshacer ajuste</string>
     <string name="home_review_coach_title">Rincón del entrenador</string>
+    <string name="home_review_coaching_summary_label">Patrón Premium</string>
+    <string name="home_review_coaching_summary_headline_strong">Tus revisiones muestran impulso</string>
+    <string name="home_review_coaching_summary_body_strong">La mayoría de los cobros revisados se mantuvo dentro del plan. Sigue usando cada revisión para proteger lo que ya funciona.</string>
+    <string name="home_review_coaching_summary_headline_steady">Tu plan está encontrando ritmo</string>
+    <string name="home_review_coaching_summary_body_steady">Tus revisiones recientes muestran progreso con algunos cobros por ajustar. Premium mantiene el próximo objetivo realista.</string>
+    <string name="home_review_coaching_summary_headline_attention">Tu próximo objetivo necesita margen</string>
+    <string name="home_review_coaching_summary_body_attention">Las revisiones recientes muestran presión. Usa este patrón para suavizar el próximo cobro antes de que el plan sea difícil de seguir.</string>
+    <string name="home_review_coaching_metric_buffer">Prom. sin gastar</string>
+    <string name="home_review_coaching_metric_extra">Prom. extra a metas</string>
+    <string name="home_review_coaching_metric_hit_rate">Cobros en camino</string>
     <string name="home_review_manual_title">check-in de día de pago</string>
     <string name="home_review_manual_desc">Ingrese datos reales exactos para que su próxima guía sea honesta.</string>
     <string name="home_review_input_flex_exact">Real flexible</string>

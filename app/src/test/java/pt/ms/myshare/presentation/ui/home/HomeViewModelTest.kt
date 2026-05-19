@@ -41,6 +41,7 @@ import pt.ms.myshare.domain.use_case.CreatePaydayAdjustmentRecommendationUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumCheckInPlanUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumGoalPaydaySplitUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumRulePaydayMixUseCase
+import pt.ms.myshare.domain.use_case.CreatePremiumReviewCoachingSummaryUseCase
 import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
 import pt.ms.myshare.domain.use_case.EnforcePremiumDowngradeUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
@@ -54,6 +55,7 @@ import pt.ms.myshare.domain.use_case.GetPerformanceStatsUseCase
 import pt.ms.myshare.domain.use_case.GetCoachingInsightsUseCase
 import pt.ms.myshare.domain.use_case.ResolveAllocationStrategyRulesUseCase
 import pt.ms.myshare.domain.model.Goal
+import pt.ms.myshare.domain.model.PremiumReviewCoachingStatus
 import pt.ms.myshare.domain.model.User
 import pt.ms.myshare.TestUserPreferencesRepository
 import pt.ms.myshare.presentation.ui.localization.UserLocaleManager
@@ -104,6 +106,7 @@ class HomeViewModelTest {
             createPremiumCheckInPlanUseCase = CreatePremiumCheckInPlanUseCase(),
             createPremiumGoalPaydaySplitUseCase = CreatePremiumGoalPaydaySplitUseCase(),
             createPremiumRulePaydayMixUseCase = CreatePremiumRulePaydayMixUseCase(),
+            createPremiumReviewCoachingSummaryUseCase = CreatePremiumReviewCoachingSummaryUseCase(calculatePlanPreviewUseCase),
             createReviewInsightUseCase = CreateReviewInsightUseCase(calculatePlanPreviewUseCase),
             enforcePremiumDowngradeUseCase = EnforcePremiumDowngradeUseCase(fakePlannerRepository),
             resolvePricingStrategyUseCase = ResolvePricingStrategyUseCase(),
@@ -434,6 +437,7 @@ class HomeViewModelTest {
         assertEquals(BigDecimal.ZERO, stats.totalSavings)
         assertTrue(stats.performanceTrend.isEmpty())
         assertEquals(2, stats.totalReviews)
+        assertEquals(null, viewModel.state.value.reviewCard.coachingSummary)
     }
 
     @Test
@@ -449,6 +453,19 @@ class HomeViewModelTest {
         assertEquals(BigDecimal("50"), stats.totalSavings)
         assertEquals(2, stats.performanceTrend.size)
         assertEquals(2, stats.totalReviews)
+    }
+
+    @Test
+    fun `premium user receives review coaching summary`() = runTest {
+        seedPlanWithPerformanceReviews()
+        fakeEntitlementRepository.setEntitlementState(EntitlementState.PRO)
+        advanceUntilIdle()
+
+        val summary = viewModel.state.value.reviewCard.coachingSummary
+
+        assertEquals(PremiumReviewCoachingStatus.STEADY, summary?.status)
+        assertEquals("home_review_coaching_summary_headline_steady", summary?.headlineKey)
+        assertTrue(summary?.metrics?.isNotEmpty() == true)
     }
 
     @Test

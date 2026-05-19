@@ -20,6 +20,9 @@ import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.PremiumCheckInPlan
 import pt.ms.myshare.domain.model.PremiumCheckInStatus
 import pt.ms.myshare.domain.model.PremiumGoalPaydaySplit
+import pt.ms.myshare.domain.model.PremiumReviewCoachingMetric
+import pt.ms.myshare.domain.model.PremiumReviewCoachingMetricType
+import pt.ms.myshare.domain.model.PremiumReviewCoachingSummary
 import pt.ms.myshare.domain.model.PremiumRulePaydayMix
 import pt.ms.myshare.domain.model.ReviewInsight
 import pt.ms.myshare.domain.model.Goal
@@ -39,6 +42,7 @@ import pt.ms.myshare.domain.use_case.CreatePaydayAdjustmentRecommendationUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumCheckInPlanUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumGoalPaydaySplitUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumRulePaydayMixUseCase
+import pt.ms.myshare.domain.use_case.CreatePremiumReviewCoachingSummaryUseCase
 import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
 import pt.ms.myshare.domain.use_case.EnforcePremiumDowngradeUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
@@ -74,6 +78,7 @@ class HomeViewModel @Inject constructor(
     private val createPremiumCheckInPlanUseCase: CreatePremiumCheckInPlanUseCase,
     private val createPremiumGoalPaydaySplitUseCase: CreatePremiumGoalPaydaySplitUseCase,
     private val createPremiumRulePaydayMixUseCase: CreatePremiumRulePaydayMixUseCase,
+    private val createPremiumReviewCoachingSummaryUseCase: CreatePremiumReviewCoachingSummaryUseCase,
     private val createReviewInsightUseCase: CreateReviewInsightUseCase,
     private val enforcePremiumDowngradeUseCase: EnforcePremiumDowngradeUseCase,
     private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase,
@@ -215,6 +220,9 @@ class HomeViewModel @Inject constructor(
                 } else {
                     emptyList()
                 }
+                val coachingSummary = core.plan?.let {
+                    createPremiumReviewCoachingSummaryUseCase.execute(it, signals.history)
+                }
                 
                 val trend = if (core.plan != null) {
                     signals.history.reversed().takeLast(5).map { review ->
@@ -243,6 +251,7 @@ class HomeViewModel @Inject constructor(
                     automation = signals.automation,
                     reviewHistory = signals.history,
                     performanceStats = signals.stats,
+                    coachingSummary = coachingSummary,
                     coachingInsights = coaching,
                     performanceTrend = trend
                 )
@@ -338,6 +347,18 @@ class HomeViewModel @Inject constructor(
                 } else {
                     emptyList()
                 }
+                val coachingSummary = if (isPremium) {
+                    planner.coachingSummary?.toState(preferences)
+                } else {
+                    null
+                }
+                coachingSummary?.let {
+                    Timber.tag(TAG).d(
+                        "Premium review coaching summary ready. status=%s metrics=%d",
+                        it.status,
+                        it.metrics.size
+                    )
+                }
                 
                 val monthlyProduct = products.find { it.productId == PremiumSubscriptionProducts.MONTHLY_ID }
                 val annualProduct = products.find { it.productId == PremiumSubscriptionProducts.ANNUAL_ID }
@@ -423,6 +444,7 @@ class HomeViewModel @Inject constructor(
                     rules = ruleCards,
                     performanceStats = performanceStats,
                     reviewCard = reviewCard.copy(
+                        coachingSummary = coachingSummary,
                         coachingInsights = coachingInsights,
                         paydayRecommendation = paydayRecommendationState,
                         premiumCheckIn = premiumCheckIn.takeIf { isPremium },
@@ -450,6 +472,7 @@ class HomeViewModel @Inject constructor(
         val automation: Boolean,
         val reviewHistory: List<ManualReview>,
         val performanceStats: PerformanceStats,
+        val coachingSummary: PremiumReviewCoachingSummary?,
         val coachingInsights: List<ReviewInsight>,
         val performanceTrend: List<Float>
     )
@@ -1134,6 +1157,27 @@ class HomeViewModel @Inject constructor(
             supportingText = supportingText,
             type = type,
             actionLabel = actionLabel
+        )
+    }
+
+    private fun PremiumReviewCoachingSummary.toState(preferences: UserPreferences): PremiumReviewCoachingSummaryState {
+        return PremiumReviewCoachingSummaryState(
+            headlineKey = headlineKey,
+            bodyKey = bodyKey,
+            status = status,
+            metrics = metrics.map { it.toState(preferences) }
+        )
+    }
+
+    private fun PremiumReviewCoachingMetric.toState(preferences: UserPreferences): PremiumReviewCoachingMetricState {
+        val valueLabel = when (valueType) {
+            PremiumReviewCoachingMetricType.MONEY -> currencyFormat(preferences).format(value)
+            PremiumReviewCoachingMetricType.PERCENT -> LocalizedAmountFormatter.formatPercentage(value, preferences.locale)
+        }
+        return PremiumReviewCoachingMetricState(
+            labelKey = labelKey,
+            valueLabel = valueLabel,
+            isPositive = isPositive
         )
     }
 

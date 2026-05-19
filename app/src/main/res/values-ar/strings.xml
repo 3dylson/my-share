@@ -454,6 +454,16 @@
     <string name="home_review_recommendation_review_rules">مراجعة القواعد</string>
     <string name="home_review_recommendation_undo">التراجع عن التعديل</string>
     <string name="home_review_coach_title">ركن المدرب</string>
+    <string name="home_review_coaching_summary_label">نمط Premium</string>
+    <string name="home_review_coaching_summary_headline_strong">مراجعاتك تظهر زخما</string>
+    <string name="home_review_coaching_summary_body_strong">بقيت معظم أيام الدفع التي تمت مراجعتها ضمن الخطة. واصل استخدام كل مراجعة لحماية ما يعمل بالفعل.</string>
+    <string name="home_review_coaching_summary_headline_steady">خطتك تجد إيقاعها</string>
+    <string name="home_review_coaching_summary_body_steady">تظهر مراجعاتك الأخيرة تقدما مع بعض أيام الدفع التي تحتاج إلى تعديل. يساعد Premium في إبقاء الهدف التالي واقعيا.</string>
+    <string name="home_review_coaching_summary_headline_attention">هدفك التالي يحتاج إلى مساحة</string>
+    <string name="home_review_coaching_summary_body_attention">تظهر المراجعات الأخيرة ضغطا. استخدم هذا النمط لتخفيف يوم الدفع التالي قبل أن تصبح الخطة صعبة المتابعة.</string>
+    <string name="home_review_coaching_metric_buffer">متوسط المتبقي</string>
+    <string name="home_review_coaching_metric_extra">متوسط الزيادة للأهداف</string>
+    <string name="home_review_coaching_metric_hit_rate">أيام الدفع على المسار</string>
     <string name="home_review_manual_title">تسجيل الوصول ليوم الدفع</string>
     <string name="home_review_manual_desc">أدخل القيم الفعلية الدقيقة حتى يظل دليلك التالي صادقًا.</string>
     <string name="home_review_input_flex_exact">مرنة الفعلية</string>

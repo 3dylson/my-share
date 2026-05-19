@@ -537,6 +537,13 @@ Status after Premium multi-rule payday mix implementation pass on 2026-05-19:
 - Tested: focused rule-mix use-case coverage, HomeViewModel state coverage, and full `testDebugUnitTest`.
 - Validated: release build, release install on `emulator-5554`, normal Strategy rule mix card, normal all-rules sheet, compact `720x1280 / 360dpi` rule mix top and scrolled states, and compact all-rules sheet. Temporary Firestore Premium rule data was restored to the previous `FREE` state, and the emulator was restored to `1080x2400 / 420dpi`.
 
+Status after Premium history/coaching depth implementation pass on 2026-05-19:
+- Done: Added a deterministic Premium coaching summary that reads the last six review snapshots and turns them into a strong, steady, or needs-attention pattern.
+- Done: Premium Review now shows a concrete pattern card with average flexible spend left over, average extra moved to goals, and the on-track payday rate before the simpler coaching tips.
+- Done: The coaching summary layout stacks its metric rows on compact screens and keeps the copy outcome-focused instead of technical.
+- Tested: focused coaching-summary use-case coverage, HomeViewModel Premium/free gating coverage, and full `testDebugUnitTest`.
+- Validated: release build, release install on `emulator-5554`, normal Review coaching card, compact `720x1280 / 360dpi` coaching card top and metric stack, no app fatal crash in logcat, temporary Firestore Premium review data restored to the previous `FREE` state, and the emulator restored to `1080x2400 / 420dpi`.
+
 Next:
 - Continue the next Premium product slice while keeping compact-screen validation in every pass.
 - Continue validating compact-screen layouts when new Premium controls are added.

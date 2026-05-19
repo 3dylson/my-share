@@ -455,6 +455,16 @@
     <string name="home_review_recommendation_review_rules">Rever regras</string>
     <string name="home_review_recommendation_undo">Anular ajuste</string>
     <string name="home_review_coach_title">Canto do treinador</string>
+    <string name="home_review_coaching_summary_label">Padrão Premium</string>
+    <string name="home_review_coaching_summary_headline_strong">Os seus check-ins mostram impulso</string>
+    <string name="home_review_coaching_summary_body_strong">A maioria dos dias de pagamento revistos ficou dentro do plano. Continue a usar cada revisão para proteger o que já está a funcionar.</string>
+    <string name="home_review_coaching_summary_headline_steady">O seu plano está a ganhar ritmo</string>
+    <string name="home_review_coaching_summary_body_steady">Os seus check-ins recentes mostram progresso com alguns dias de pagamento a ajustar. O Premium mantém o próximo alvo realista.</string>
+    <string name="home_review_coaching_summary_headline_attention">O próximo alvo precisa de margem</string>
+    <string name="home_review_coaching_summary_body_attention">Os check-ins recentes mostram pressão. Use este padrão para suavizar o próximo dia de pagamento antes de o plano ficar difícil de seguir.</string>
+    <string name="home_review_coaching_metric_buffer">Média por gastar</string>
+    <string name="home_review_coaching_metric_extra">Média extra para objetivos</string>
+    <string name="home_review_coaching_metric_hit_rate">Dias no caminho certo</string>
     <string name="home_review_manual_title">Check-in no dia de pagamento</string>
     <string name="home_review_manual_desc">Introduza dados reais exatos para que o seu próximo guia permaneça honesto.</string>
     <string name="home_review_input_flex_exact">Real flexível</string>

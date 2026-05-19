@@ -59,6 +59,7 @@ fun LazyListScope.homeReviewTab(
     onApplyPaydayRecommendation: () -> Unit
 ) {
     val coachingInsights = state.coachingInsights
+    val coachingSummary = state.coachingSummary
     val paydayRecommendation = state.paydayRecommendation
     val premiumCheckIn = state.premiumCheckIn
 
@@ -188,7 +189,7 @@ fun LazyListScope.homeReviewTab(
         }
     }
 
-    if (coachingInsights.isNotEmpty() && isPremium) {
+    if (isPremium && (coachingSummary != null || coachingInsights.isNotEmpty())) {
         item {
             val context = LocalContext.current
             PremiumSectionHeader(title = stringResource(R.string.home_review_coach_title))
@@ -198,6 +199,10 @@ fun LazyListScope.homeReviewTab(
                     .padding(bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                coachingSummary?.let {
+                    PremiumReviewCoachingSummaryCard(summary = it)
+                }
+
                 coachingInsights.forEach { insight ->
                     val headline = remember(insight.headline) {
                         val resId = context.resources.getIdentifier(insight.headline, "string", context.packageName)

@@ -499,6 +499,16 @@
     <string name="home_review_recommendation_review_rules">Review rules</string>
     <string name="home_review_recommendation_undo">Undo adjustment</string>
     <string name="home_review_coach_title">Coach corner</string>
+    <string name="home_review_coaching_summary_label">Premium pattern</string>
+    <string name="home_review_coaching_summary_headline_strong">Your check-ins show momentum</string>
+    <string name="home_review_coaching_summary_body_strong">Most reviewed paydays stayed on plan. Keep using each review to protect what is already working.</string>
+    <string name="home_review_coaching_summary_headline_steady">Your plan is finding its rhythm</string>
+    <string name="home_review_coaching_summary_body_steady">Your recent check-ins show progress with a few paydays to adjust. Premium keeps the next target realistic.</string>
+    <string name="home_review_coaching_summary_headline_attention">Your next target needs breathing room</string>
+    <string name="home_review_coaching_summary_body_attention">Recent check-ins show pressure. Use this pattern to soften the next payday before the plan feels hard to follow.</string>
+    <string name="home_review_coaching_metric_buffer">Avg left over</string>
+    <string name="home_review_coaching_metric_extra">Avg extra to goals</string>
+    <string name="home_review_coaching_metric_hit_rate">Paydays on track</string>
     <string name="home_review_manual_title">Payday check-in</string>
     <string name="home_review_manual_desc">Enter exact actuals so your next guide stays honest.</string>
     <string name="home_review_input_flex_exact">Flexible actual</string>

@@ -454,6 +454,16 @@
     <string name="home_review_recommendation_review_rules">Regeln prüfen</string>
     <string name="home_review_recommendation_undo">Anpassung rückgängig</string>
     <string name="home_review_coach_title">Trainerecke</string>
+    <string name="home_review_coaching_summary_label">Premium-Muster</string>
+    <string name="home_review_coaching_summary_headline_strong">Ihre Check-ins zeigen Schwung</string>
+    <string name="home_review_coaching_summary_body_strong">Die meisten geprüften Zahltage blieben im Plan. Nutzen Sie jede Prüfung weiter, um zu schützen, was bereits funktioniert.</string>
+    <string name="home_review_coaching_summary_headline_steady">Ihr Plan findet seinen Rhythmus</string>
+    <string name="home_review_coaching_summary_body_steady">Ihre letzten Check-ins zeigen Fortschritt mit einigen Zahltagen zum Anpassen. Premium hält das nächste Ziel realistisch.</string>
+    <string name="home_review_coaching_summary_headline_attention">Ihr nächstes Ziel braucht Luft</string>
+    <string name="home_review_coaching_summary_body_attention">Die letzten Check-ins zeigen Druck. Nutzen Sie dieses Muster, um den nächsten Zahltag zu entspannen, bevor der Plan schwer zu halten ist.</string>
+    <string name="home_review_coaching_metric_buffer">Ø übrig</string>
+    <string name="home_review_coaching_metric_extra">Ø extra für Ziele</string>
+    <string name="home_review_coaching_metric_hit_rate">Zahltage im Plan</string>
     <string name="home_review_manual_title">Check-in am Zahltag</string>
     <string name="home_review_manual_desc">Geben Sie genaue Ist-Werte ein, damit Ihr nächster Reiseführer ehrlich bleibt.</string>
     <string name="home_review_input_flex_exact">Flexibel aktuell</string>
