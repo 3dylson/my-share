@@ -40,6 +40,7 @@ When working on this project, adhere strictly to the following guidelines and pr
 ### 6. Logging & Troubleshooting
 - **Critical Debug Logs:** Always include critical debug logs (`Timber.d()`, `Timber.e()`) at major state changes, repository data fetches, or error catches to support troubleshooting.
 - **Timber Integration:** Use `Timber` for all logging. The app is configured with `CrashlyticsTree` to pipe errors and warnings to Firebase Crashlytics. Use `Timber.e()` for non-fatal exceptions and `Timber.d()` for general flow tracking.
+- **Configuration and Analytics Alignment:** When changing user-facing flows, paywall/onboarding copy, Premium behavior, billing logic, retention flows, or feature gates, update and validate the matching Analytics events, Crashlytics keys, Remote Config defaults, Firebase/Play Console configuration, and any live Remote Config template values. Do not rely on app-side compatibility mappings to hide stale backend configuration; keep real configuration data aligned so testing reflects production behavior.
 
 ## Android Best Practices & Tech Stack
 - **UI:** Exclusively use Jetpack Compose for all UI development. Maintain unidirectional data flow (UDF) using state hoisting.
