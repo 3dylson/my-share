@@ -51,7 +51,7 @@ class PlayBillingEntitlementRepository(
     private val serverEntitlementState: Flow<EntitlementState?> = observeServerEntitlementState()
     private val verifiedPurchaseEvents = MutableSharedFlow<BillingPurchaseEvent>(extraBufferCapacity = 1)
     private val purchaseVerificationLock = Any()
-    private val verifiedPurchaseTokens = mutableSetOf<String>()
+    private val verifiedPurchaseKeys = mutableSetOf<String>()
     private val purchaseVerificationInFlight = mutableSetOf<String>()
 
     override val entitlementState: Flow<EntitlementState> = combine(
@@ -122,7 +122,7 @@ class PlayBillingEntitlementRepository(
         CoroutineScope(Dispatchers.IO).launch {
             billingClientWrapper.purchases.collect { purchases ->
                 purchases.forEach { purchase ->
-                    if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED && !purchase.isAcknowledged) {
+                    if (purchase.isActivePremiumSubscription()) {
                         verifyAndAcknowledge(purchase)
                     }
                 }
@@ -133,14 +133,13 @@ class PlayBillingEntitlementRepository(
 
     private suspend fun verifyAndAcknowledge(purchase: Purchase) {
         val productId = purchase.products.firstOrNull() ?: return
-        if (!markPurchaseVerificationStarted(purchase.purchaseToken)) return
 
         val session = billingAuthSession.requireAuthenticatedSession()
             .onFailure { e ->
                 Timber.tag(TAG).e(e, "Cannot verify purchase because billing session authentication failed")
-                markPurchaseVerificationFinished(purchase.purchaseToken, verified = false)
             }
             .getOrNull() ?: return
+        if (!markPurchaseVerificationStarted(session.userId, purchase.purchaseToken)) return
         val data = hashMapOf(
             "purchaseToken" to purchase.purchaseToken,
             "subscriptionId" to productId,
@@ -156,43 +155,47 @@ class PlayBillingEntitlementRepository(
             val resultMap = result.data as? Map<*, *>
             val isValid = resultMap?.get("isValid") as? Boolean ?: false
             if (isValid) {
-                markPurchaseVerificationFinished(purchase.purchaseToken, verified = true)
+                markPurchaseVerificationFinished(session.userId, purchase.purchaseToken, verified = true)
                 verifiedPurchaseEvents.tryEmit(BillingPurchaseEvent.Completed)
                 if (resultMap?.isServerAcknowledged() == true) {
                     Timber.tag(TAG).d("Purchase acknowledged by server product=%s", productId)
-                } else {
+                } else if (!purchase.isAcknowledged) {
                     Timber.tag(TAG).d("Falling back to BillingClient acknowledgement product=%s", productId)
                     billingClientWrapper.acknowledgePurchase(purchase.purchaseToken)
                 }
             } else {
                 Timber.tag(TAG).e("Purchase verification returned inactive entitlement for product=%s", productId)
-                markPurchaseVerificationFinished(purchase.purchaseToken, verified = false)
+                markPurchaseVerificationFinished(session.userId, purchase.purchaseToken, verified = false)
             }
         } catch (e: Exception) {
             Timber.tag(TAG).e(e, "Verification failed")
-            markPurchaseVerificationFinished(purchase.purchaseToken, verified = false)
+            markPurchaseVerificationFinished(session.userId, purchase.purchaseToken, verified = false)
         }
     }
 
-    private fun markPurchaseVerificationStarted(purchaseToken: String): Boolean {
+    private fun markPurchaseVerificationStarted(userId: String, purchaseToken: String): Boolean {
+        val key = purchaseVerificationKey(userId, purchaseToken)
         return synchronized(purchaseVerificationLock) {
-            if (purchaseToken in verifiedPurchaseTokens || purchaseToken in purchaseVerificationInFlight) {
+            if (key in verifiedPurchaseKeys || key in purchaseVerificationInFlight) {
                 false
             } else {
-                purchaseVerificationInFlight.add(purchaseToken)
+                purchaseVerificationInFlight.add(key)
                 true
             }
         }
     }
 
-    private fun markPurchaseVerificationFinished(purchaseToken: String, verified: Boolean) {
+    private fun markPurchaseVerificationFinished(userId: String, purchaseToken: String, verified: Boolean) {
+        val key = purchaseVerificationKey(userId, purchaseToken)
         synchronized(purchaseVerificationLock) {
-            purchaseVerificationInFlight.remove(purchaseToken)
+            purchaseVerificationInFlight.remove(key)
             if (verified) {
-                verifiedPurchaseTokens.add(purchaseToken)
+                verifiedPurchaseKeys.add(key)
             }
         }
     }
+
+    private fun purchaseVerificationKey(userId: String, purchaseToken: String): String = "$userId:$purchaseToken"
 
 
     private fun Map<*, *>.isServerAcknowledged(): Boolean {

@@ -19,6 +19,7 @@ import pt.ms.myshare.domain.model.AllocationStrategy
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.domain.model.PlanningFocus
+import pt.ms.myshare.domain.model.PlannerSyncResult
 import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.domain.model.ReminderConfiguration
 import pt.ms.myshare.domain.model.SalaryPlan
@@ -202,49 +203,87 @@ class PlannerRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun syncLocalStateIfAuthenticated() = withContext(Dispatchers.IO) {
-        val user = firebaseAuth.currentUser ?: return@withContext
-        Timber.tag(TAG).d("syncLocalStateIfAuthenticated starting for user %s", user.uid)
-
-        try {
-            val remotePlan = firestore.collection("users")
-                .document(user.uid)
-                .collection("plans")
-                .document("current")
-                .get()
-                .await()
-
-            if (remotePlan.exists()) {
-                Timber.tag(TAG).d("Remote plan exists for user %s. Keeping remote data as source of truth.", user.uid)
-                syncFromFirestore()
-                return@withContext
+    override suspend fun syncLocalStateIfAuthenticated() {
+        withContext(Dispatchers.IO) {
+            try {
+                syncLocalStateToAuthenticatedUser(preserveLocalPlan = false)
+            } catch (e: Exception) {
+                Timber.tag(TAG).e(e, "syncLocalStateIfAuthenticated failed")
             }
-
-            val localPlan = planState.value
-            if (localPlan == null) {
-                Timber.tag(TAG).d("No local plan to sync for user %s", user.uid)
-            } else {
-                uploadPlan(user.uid, localPlan)
-            }
-
-            ruleState.value.forEach { uploadRule(user.uid, it) }
-            goalState.value.forEach { uploadGoal(user.uid, it) }
-            reviewState.value.forEach { uploadReview(user.uid, it) }
-            premiumAdjustmentState.value.forEach { uploadPremiumAdjustment(user.uid, it) }
-            uploadReminder(user.uid, reminderState.value)
-            uploadAutomation(user.uid, automationState.value)
-            uploadOnboardingState(user.uid, isOnboardingCompleted())
-            Timber.tag(TAG).d(
-                "Local planner state synced for user %s planPresent=%s rules=%d goals=%d reviews=%d",
-                user.uid,
-                localPlan != null,
-                ruleState.value.size,
-                goalState.value.size,
-                reviewState.value.size
-            )
-        } catch (e: Exception) {
-            Timber.tag(TAG).e(e, "syncLocalStateIfAuthenticated failed")
         }
+    }
+
+    override suspend fun preserveLocalStateForAuthenticatedUser(): Result<PlannerSyncResult> = withContext(Dispatchers.IO) {
+        runCatching {
+            syncLocalStateToAuthenticatedUser(preserveLocalPlan = true)
+        }.onFailure { e ->
+            Timber.tag(TAG).e(e, "preserveLocalStateForAuthenticatedUser failed")
+        }
+    }
+
+    private suspend fun syncLocalStateToAuthenticatedUser(preserveLocalPlan: Boolean): PlannerSyncResult {
+        val user = firebaseAuth.currentUser ?: error("No authenticated user available for planner sync")
+        Timber.tag(TAG).d(
+            "syncLocalStateToAuthenticatedUser starting user=%s preserveLocalPlan=%s",
+            user.uid,
+            preserveLocalPlan
+        )
+
+        val remotePlan = firestore.collection("users")
+            .document(user.uid)
+            .collection("plans")
+            .document("current")
+            .get()
+            .await()
+
+        if (remotePlan.exists() && !preserveLocalPlan) {
+            Timber.tag(TAG).d("Remote plan exists for user %s. Keeping remote data as source of truth.", user.uid)
+            syncFromFirestore()
+            return PlannerSyncResult(
+                localPlanUploaded = false,
+                remotePlanPreserved = true,
+                ruleCount = 0,
+                goalCount = 0,
+                reviewCount = 0,
+                premiumAdjustmentCount = 0
+            )
+        }
+
+        val localPlan = planState.value
+        if (localPlan == null) {
+            Timber.tag(TAG).d("No local plan to sync for user %s", user.uid)
+            if (remotePlan.exists()) syncFromFirestore()
+        } else {
+            if (remotePlan.exists()) {
+                Timber.tag(TAG).d("Overwriting remote plan with active local plan for account merge user=%s", user.uid)
+            }
+            uploadPlan(user.uid, localPlan)
+        }
+
+        ruleState.value.forEach { uploadRule(user.uid, it) }
+        goalState.value.forEach { uploadGoal(user.uid, it) }
+        reviewState.value.forEach { uploadReview(user.uid, it) }
+        premiumAdjustmentState.value.forEach { uploadPremiumAdjustment(user.uid, it) }
+        uploadReminder(user.uid, reminderState.value)
+        uploadAutomation(user.uid, automationState.value)
+        uploadOnboardingState(user.uid, isOnboardingCompleted())
+        Timber.tag(TAG).d(
+            "Local planner state synced for user %s planPresent=%s rules=%d goals=%d reviews=%d adjustments=%d",
+            user.uid,
+            localPlan != null,
+            ruleState.value.size,
+            goalState.value.size,
+            reviewState.value.size,
+            premiumAdjustmentState.value.size
+        )
+        return PlannerSyncResult(
+            localPlanUploaded = localPlan != null,
+            remotePlanPreserved = remotePlan.exists() && localPlan == null,
+            ruleCount = ruleState.value.size,
+            goalCount = goalState.value.size,
+            reviewCount = reviewState.value.size,
+            premiumAdjustmentCount = premiumAdjustmentState.value.size
+        )
     }
 
     private suspend fun uploadPlan(uid: String, plan: SalaryPlan) {

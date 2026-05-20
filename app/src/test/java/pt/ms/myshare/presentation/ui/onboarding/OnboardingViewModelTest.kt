@@ -31,6 +31,8 @@ import pt.ms.myshare.domain.model.PricingStrategy
 import pt.ms.myshare.domain.model.BillingFlowLaunchResult
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.BillingPurchaseEvent
+import pt.ms.myshare.domain.model.GoogleAccountConnection
+import pt.ms.myshare.domain.model.GoogleAccountConnectionMode
 import pt.ms.myshare.domain.model.SalaryPlan
 import pt.ms.myshare.domain.model.PlanPreview
 import pt.ms.myshare.domain.model.ProductExperienceConfig
@@ -534,7 +536,10 @@ class OnboardingViewModelTest {
         currentUserFlow.value = User(isAnonymous = true)
         isProFlow.value = true
         coEvery { authRepository.connectGoogleAccount("google-token") } returns Result.success(
-            User(email = "user@example.com", isAnonymous = false)
+            GoogleAccountConnection(
+                user = User(email = "user@example.com", isAnonymous = false),
+                mode = GoogleAccountConnectionMode.LinkedToCurrentUser
+            )
         )
         advanceUntilIdle()
 

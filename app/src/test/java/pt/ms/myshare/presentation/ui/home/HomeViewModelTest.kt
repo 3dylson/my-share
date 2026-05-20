@@ -59,8 +59,11 @@ import pt.ms.myshare.domain.use_case.GetPerformanceStatsUseCase
 import pt.ms.myshare.domain.use_case.GetCoachingInsightsUseCase
 import pt.ms.myshare.domain.use_case.ResolveAllocationStrategyRulesUseCase
 import pt.ms.myshare.domain.model.Goal
+import pt.ms.myshare.domain.model.GoogleAccountConnection
+import pt.ms.myshare.domain.model.GoogleAccountConnectionMode
 import pt.ms.myshare.domain.model.LegacyPremiumGrantState
 import pt.ms.myshare.domain.model.LegacyPremiumGrantStatus
+import pt.ms.myshare.domain.model.PlannerSyncResult
 import pt.ms.myshare.domain.model.PremiumReviewCoachingStatus
 import pt.ms.myshare.domain.model.ProductExperienceConfig
 import pt.ms.myshare.domain.model.RemoteBillingPlanDefault
@@ -1012,7 +1015,10 @@ class HomeViewModelTest {
     @Test
     fun `connectGoogleAccount shows success feedback`() = runTest {
         coEvery { mockAuthRepository.connectGoogleAccount("google-token") } returns Result.success(
-            User(email = "user@example.com")
+            GoogleAccountConnection(
+                user = User(email = "user@example.com"),
+                mode = GoogleAccountConnectionMode.LinkedToCurrentUser
+            )
         )
 
         viewModel.connectGoogleAccount("google-token")
@@ -1025,6 +1031,27 @@ class HomeViewModelTest {
         )
         assertEquals(null, viewModel.state.value.moreCard.googleConnectionError)
         assertEquals(1, fakePlannerRepository.syncLocalStateIfAuthenticatedCalls)
+    }
+
+    @Test
+    fun `connectGoogleAccount preserves local state and restores purchases after existing account collision`() = runTest {
+        coEvery { mockAuthRepository.connectGoogleAccount("google-token") } returns Result.success(
+            GoogleAccountConnection(
+                user = User(id = "existing-uid", email = "user@example.com"),
+                mode = GoogleAccountConnectionMode.SignedInToExistingAccount,
+                previousUserId = "anonymous-uid",
+                currentUserId = "existing-uid"
+            )
+        )
+
+        viewModel.connectGoogleAccount("google-token")
+        advanceUntilIdle()
+
+        assertEquals(0, fakePlannerRepository.syncLocalStateIfAuthenticatedCalls)
+        assertEquals(1, fakePlannerRepository.preserveLocalStateForAuthenticatedUserCalls)
+        assertEquals(1, fakeEntitlementRepository.restorePurchasesCalls)
+        assertEquals("home_more_account_connect_google_success", viewModel.state.value.moreCard.googleConnectionMessage)
+        assertEquals(null, viewModel.state.value.moreCard.googleConnectionError)
     }
 
     @Test
@@ -1170,6 +1197,7 @@ class FakePlannerRepository : PlannerRepository {
     private val automationFlow = MutableStateFlow(false)
     private var isOnboardingCompletedState = false
     var syncLocalStateIfAuthenticatedCalls = 0
+    var preserveLocalStateForAuthenticatedUserCalls = 0
     var clearPlanCalls = 0
 
     override fun observePlan(): MutableStateFlow<SalaryPlan?> = planFlow
@@ -1258,6 +1286,19 @@ class FakePlannerRepository : PlannerRepository {
     override suspend fun syncLocalStateIfAuthenticated() {
         syncLocalStateIfAuthenticatedCalls += 1
     }
+    override suspend fun preserveLocalStateForAuthenticatedUser(): Result<PlannerSyncResult> {
+        preserveLocalStateForAuthenticatedUserCalls += 1
+        return Result.success(
+            PlannerSyncResult(
+                localPlanUploaded = planFlow.value != null,
+                remotePlanPreserved = false,
+                ruleCount = rulesFlow.value.size,
+                goalCount = goalsFlow.value.size,
+                reviewCount = reviewsFlow.value.size,
+                premiumAdjustmentCount = adjustmentsFlow.value.size
+            )
+        )
+    }
 }
 
 class TestFirstRunExperienceRepository : FirstRunExperienceRepository {
@@ -1280,6 +1321,7 @@ class TestFakeEntitlementRepository : EntitlementRepository {
     private val _purchaseEvents = MutableSharedFlow<BillingPurchaseEvent>(extraBufferCapacity = 1)
     override val purchaseEvents = _purchaseEvents
     var purchaseResult: BillingFlowLaunchResult = BillingFlowLaunchResult.Launched
+    var restorePurchasesCalls = 0
 
     override suspend fun checkActiveEntitlement() {}
     override suspend fun refreshProducts(): List<StoreProduct> = _availableProducts.value
@@ -1294,7 +1336,9 @@ class TestFakeEntitlementRepository : EntitlementRepository {
         _entitlementState.emit(state)
         _isPro.emit(state.hasPremiumAccess)
     }
-    override suspend fun restorePurchases() {}
+    override suspend fun restorePurchases() {
+        restorePurchasesCalls += 1
+    }
 }
 
 class TestFakeLegacyPremiumGrantRepository : LegacyPremiumGrantRepository {

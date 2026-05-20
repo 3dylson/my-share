@@ -30,6 +30,7 @@ import pt.ms.myshare.domain.model.PremiumReviewMomentum
 import pt.ms.myshare.domain.model.PremiumRulePaydayMix
 import pt.ms.myshare.domain.model.ReviewInsight
 import pt.ms.myshare.domain.model.Goal
+import pt.ms.myshare.domain.model.GoogleAccountConnectionMode
 import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
 import pt.ms.myshare.domain.model.ProductExperienceConfig
 import pt.ms.myshare.domain.model.ReminderCadence
@@ -1160,9 +1161,39 @@ class HomeViewModel @Inject constructor(
 
             val result = authRepository.connectGoogleAccount(idToken)
             result.fold(
-                onSuccess = { user ->
-                    plannerRepository.syncLocalStateIfAuthenticated()
-                    userPreferencesRepository.syncFromFirestore()
+                onSuccess = { connection ->
+                    val user = connection.user
+                    val syncSucceeded = if (connection.mode == GoogleAccountConnectionMode.SignedInToExistingAccount) {
+                        val syncResult = plannerRepository.preserveLocalStateForAuthenticatedUser()
+                        if (syncResult.isSuccess) {
+                            userPreferencesRepository.syncToFirestoreIfAuthenticated()
+                            entitlementRepository.restorePurchases()
+                            Timber.tag(TAG).d(
+                                "Google account collision merged local state previousUid=%s currentUid=%s",
+                                connection.previousUserId,
+                                connection.currentUserId
+                            )
+                        }
+                        syncResult.isSuccess
+                    } else {
+                        plannerRepository.syncLocalStateIfAuthenticated()
+                        userPreferencesRepository.syncFromFirestore()
+                        true
+                    }
+                    if (!syncSucceeded) {
+                        uiState.update {
+                            it.copy(
+                                moreCard = it.moreCard.copy(
+                                    isGoogleConnectionInProgress = false,
+                                    googleConnectionMessage = null,
+                                    googleConnectionError = "home_more_account_connect_google_error_generic"
+                                )
+                            )
+                        }
+                        FirebaseUtils.logEvent("google_account_connect_failed")
+                        Timber.tag(TAG).e("Google account connected but local state merge failed")
+                        return@fold
+                    }
                     uiState.update {
                         it.copy(
                             moreCard = it.moreCard.copy(

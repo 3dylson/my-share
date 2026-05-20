@@ -15,6 +15,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
 import pt.ms.myshare.data.auth.CredentialStateClearer
+import pt.ms.myshare.domain.model.GoogleAccountConnectionMode
 
 class AuthRepositoryImplTest {
 
@@ -44,8 +45,13 @@ class AuthRepositoryImplTest {
 
         val result = repository.connectGoogleAccount("google-id-token")
 
-        assertEquals("user@example.com", result.getOrThrow().email)
-        assertFalse(result.getOrThrow().isAnonymous)
+        val connection = result.getOrThrow()
+
+        assertEquals("user@example.com", connection.user.email)
+        assertFalse(connection.user.isAnonymous)
+        assertEquals("anonymous-uid", connection.previousUserId)
+        assertEquals("existing-uid", connection.currentUserId)
+        assertEquals(GoogleAccountConnectionMode.SignedInToExistingAccount, connection.mode)
         verify(exactly = 1) { firebaseAuth.signInWithCredential(any()) }
     }
 

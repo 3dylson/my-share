@@ -7,6 +7,7 @@ import pt.ms.myshare.domain.model.PremiumAdjustmentRecord
 import pt.ms.myshare.domain.model.ReminderConfiguration
 import pt.ms.myshare.domain.model.SalaryPlan
 import pt.ms.myshare.domain.model.PaydayRule
+import pt.ms.myshare.domain.model.PlannerSyncResult
 
 interface PlannerRepository {
     fun observePlan(): Flow<SalaryPlan?>
@@ -51,4 +52,5 @@ interface PlannerRepository {
     
     suspend fun syncFromFirestore()
     suspend fun syncLocalStateIfAuthenticated()
+    suspend fun preserveLocalStateForAuthenticatedUser(): Result<PlannerSyncResult>
 }

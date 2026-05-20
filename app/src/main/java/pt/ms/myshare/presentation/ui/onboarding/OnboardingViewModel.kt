@@ -18,6 +18,7 @@ import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.BillingPurchaseEvent
 import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.model.GoalType
+import pt.ms.myshare.domain.model.GoogleAccountConnectionMode
 import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
@@ -517,9 +518,39 @@ class OnboardingViewModel @Inject constructor(
 
             val result = authRepository.connectGoogleAccount(idToken)
             result.fold(
-                onSuccess = { user ->
-                    plannerRepository.syncLocalStateIfAuthenticated()
-                    userPreferencesRepository.syncFromFirestore()
+                onSuccess = { connection ->
+                    val user = connection.user
+                    val syncSucceeded = if (connection.mode == GoogleAccountConnectionMode.SignedInToExistingAccount) {
+                        val syncResult = plannerRepository.preserveLocalStateForAuthenticatedUser()
+                        if (syncResult.isSuccess) {
+                            userPreferencesRepository.syncToFirestoreIfAuthenticated()
+                            entitlementRepository.restorePurchases()
+                            Timber.tag(TAG).d(
+                                "Google account collision merged local onboarding state previousUid=%s currentUid=%s",
+                                connection.previousUserId,
+                                connection.currentUserId
+                            )
+                        }
+                        syncResult.isSuccess
+                    } else {
+                        plannerRepository.syncLocalStateIfAuthenticated()
+                        userPreferencesRepository.syncFromFirestore()
+                        true
+                    }
+                    if (!syncSucceeded) {
+                        state.update {
+                            it.copy(
+                                isGoogleConnectionInProgress = false,
+                                googleConnectionMessage = null,
+                                googleConnectionError = "home_more_account_connect_google_error_generic"
+                            )
+                        }
+                        FirebaseUtils.logEvent("google_account_connect_failed", Bundle().apply {
+                            putString("source", "onboarding_paywall")
+                        })
+                        Timber.tag(TAG).e("Google account connected but onboarding local state merge failed")
+                        return@fold
+                    }
                     state.update {
                         it.copy(
                             isAnonymousUser = user.isAnonymous,
