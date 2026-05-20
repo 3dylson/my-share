@@ -1,7 +1,12 @@
 const {PACKAGE_NAME} = require('./config');
 const {androidPublisherClient, fetchSubscriptionPurchase} = require('./playBillingApi');
 const {writeBillingEvent} = require('./billingEventStore');
-const {uidForPurchaseToken, writeVoidedEntitlement} = require('./entitlementStore');
+const {
+  uidForObfuscatedAccountId,
+  uidForPurchaseToken,
+  writeVoidedEntitlement,
+} = require('./entitlementStore');
+const {externalAccountIdFromPurchaseInfo} = require('./obfuscatedAccountId');
 const {writePurchaseInfoForUid} = require('./subscriptionVerificationService');
 
 function decodePubSubJson(message) {
@@ -26,8 +31,10 @@ async function processSubscriptionNotification(payload, context) {
       androidPublisher,
   );
   const linkedPurchaseToken = purchaseInfo.linkedPurchaseToken || null;
+  const externalAccountId = externalAccountIdFromPurchaseInfo(purchaseInfo);
   const uid = await uidForPurchaseToken(purchaseToken) ||
-      (linkedPurchaseToken ? await uidForPurchaseToken(linkedPurchaseToken) : null);
+      (linkedPurchaseToken ? await uidForPurchaseToken(linkedPurchaseToken) : null) ||
+      (externalAccountId ? await uidForObfuscatedAccountId(externalAccountId) : null);
 
   if (!uid) {
     console.warn('RTDN subscription token has no known owner', {
@@ -35,6 +42,7 @@ async function processSubscriptionNotification(payload, context) {
       subscriptionId,
       subscriptionState: purchaseInfo.subscriptionState || null,
       notificationType,
+      hasExternalAccountId: Boolean(externalAccountId),
     });
     await writeBillingEvent({
       eventId: context.eventId,

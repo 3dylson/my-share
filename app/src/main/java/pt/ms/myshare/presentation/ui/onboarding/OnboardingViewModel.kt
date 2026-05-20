@@ -21,6 +21,7 @@ import pt.ms.myshare.domain.model.GoalType
 import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
+import pt.ms.myshare.domain.model.PremiumStoreProductSelector
 import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.domain.model.ReminderConfiguration
 import pt.ms.myshare.domain.model.SalaryPlan
@@ -391,7 +392,10 @@ class OnboardingViewModel @Inject constructor(
                 )
             }
             val products = entitlementRepository.availableProducts.first()
-            val product = products.find { it.productId == storeProductId }
+            val product = PremiumStoreProductSelector.standardProduct(
+                products = products,
+                plan = state.value.selectedBillingPlan
+            )
             if (product == null) {
                 state.update {
                     it.copy(

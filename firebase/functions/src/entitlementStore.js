@@ -1,5 +1,6 @@
 const admin = require('firebase-admin');
 const {MAX_REVALIDATIONS_PER_RUN} = require('./config');
+const {obfuscatedAccountIdForUid} = require('./obfuscatedAccountId');
 const {purchaseTokenHash} = require('./purchaseTokenHasher');
 
 function userEntitlementFields(snapshot) {
@@ -13,8 +14,10 @@ function userEntitlementFields(snapshot) {
 }
 
 function tokenIndexFields(uid, purchaseToken, snapshot) {
+  const obfuscatedAccountId = obfuscatedAccountIdForUid(uid);
   const fields = {
     uid,
+    obfuscatedAccountId,
     purchaseToken,
     purchaseTokenHash: snapshot.purchaseTokenHash,
     subscriptionId: snapshot.subscriptionId,
@@ -46,6 +49,14 @@ function tokenIndexFields(uid, purchaseToken, snapshot) {
   return fields;
 }
 
+function accountLinkFields(uid) {
+  return {
+    uid,
+    obfuscatedAccountId: obfuscatedAccountIdForUid(uid),
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  };
+}
+
 async function writeEntitlementSnapshot(uid, purchaseToken, snapshot) {
   const firestore = admin.firestore();
   const userRef = firestore.collection('users').doc(uid);
@@ -53,6 +64,9 @@ async function writeEntitlementSnapshot(uid, purchaseToken, snapshot) {
   const tokenRef = firestore
       .collection('billing_purchase_tokens')
       .doc(snapshot.purchaseTokenHash);
+  const accountLinkRef = firestore
+      .collection('billing_account_links')
+      .doc(obfuscatedAccountIdForUid(uid));
 
   const batch = firestore.batch();
   batch.set(userRef, userEntitlementFields(snapshot), {merge: true});
@@ -62,6 +76,7 @@ async function writeEntitlementSnapshot(uid, purchaseToken, snapshot) {
       tokenIndexFields(uid, purchaseToken, snapshot),
       {merge: true},
   );
+  batch.set(accountLinkRef, accountLinkFields(uid), {merge: true});
   await batch.commit();
 }
 
@@ -78,8 +93,18 @@ async function uidForPurchaseToken(purchaseToken) {
   return uidFromIndexedToken(purchaseToken);
 }
 
+async function uidForObfuscatedAccountId(obfuscatedAccountId) {
+  if (!obfuscatedAccountId) return null;
+  const accountSnapshot = await admin.firestore()
+      .collection('billing_account_links')
+      .doc(obfuscatedAccountId)
+      .get();
+  return accountSnapshot.exists ? accountSnapshot.get('uid') : null;
+}
+
 async function writeVoidedEntitlement(uid, purchaseToken, notification) {
   const tokenHash = purchaseTokenHash(purchaseToken);
+  const obfuscatedAccountId = obfuscatedAccountIdForUid(uid);
   const subscriptionId = notification.subscriptionId || null;
   const notificationType = notification.notificationType || null;
   const firestore = admin.firestore();
@@ -110,6 +135,7 @@ async function writeVoidedEntitlement(uid, purchaseToken, notification) {
   };
   const tokenFields = {
     uid,
+    obfuscatedAccountId,
     purchaseToken,
     purchaseTokenHash: tokenHash,
     subscriptionId,
@@ -124,11 +150,15 @@ async function writeVoidedEntitlement(uid, purchaseToken, notification) {
     voidedAt: serverTime,
     updatedAt: serverTime,
   };
+  const accountLinkRef = firestore
+      .collection('billing_account_links')
+      .doc(obfuscatedAccountId);
 
   const batch = firestore.batch();
   batch.set(userRef, userFields, {merge: true});
   batch.set(entitlementRef, entitlementFields, {merge: true});
   batch.set(tokenRef, tokenFields, {merge: true});
+  batch.set(accountLinkRef, accountLinkFields(uid), {merge: true});
   await batch.commit();
 }
 
@@ -171,6 +201,7 @@ async function activeTokenRecordsForRevalidation() {
 
 module.exports = {
   activeTokenRecordsForRevalidation,
+  uidForObfuscatedAccountId,
   uidForPurchaseToken,
   writeEntitlementSnapshot,
   writeVoidedEntitlement,

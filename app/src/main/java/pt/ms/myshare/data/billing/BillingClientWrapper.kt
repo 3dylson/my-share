@@ -216,13 +216,12 @@ class BillingClientWrapper(context: Context) : PurchasesUpdatedListener {
                     _purchases.value = _purchases.value + newOnes
                 }
                 if (validPurchases.isNotEmpty()) {
-                    Timber.d("Purchase update completed count=%d", validPurchases.size)
-                    _purchaseEvents.tryEmit(BillingPurchaseEvent.Completed)
+                    Timber.d("Purchase update received purchased tokens count=%d", validPurchases.size)
                 } else if (pendingPurchases.isNotEmpty()) {
                     Timber.d("Purchase update pending count=%d", pendingPurchases.size)
                     _purchaseEvents.tryEmit(BillingPurchaseEvent.Pending)
                 }
-                // Note: verify-and-acknowledge is triggered reactively by the collect loop in PlayBillingEntitlementRepository
+                // Completion is emitted only after server verification in PlayBillingEntitlementRepository.
             }
             billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED -> {
                 Timber.i("User cancelled purchase flow.")
@@ -245,6 +244,18 @@ class BillingClientWrapper(context: Context) : PurchasesUpdatedListener {
         product: StoreProduct,
         obfuscatedAccountId: String? = null
     ): BillingFlowLaunchResult = suspendCancellableCoroutine { continuation ->
+        if (!billingClient.isReady) {
+            Timber.e("Cannot launch billing flow because Billing Client is not ready")
+            startBillingConnection()
+            continuation.resume(
+                BillingFlowLaunchResult.Failed(
+                    responseCode = BillingClient.BillingResponseCode.SERVICE_DISCONNECTED,
+                    debugMessage = "Billing service is not ready"
+                )
+            )
+            return@suspendCancellableCoroutine
+        }
+
         val params = QueryProductDetailsParams.newBuilder()
             .setProductList(
                 listOf(QueryProductDetailsParams.Product.newBuilder()

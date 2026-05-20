@@ -10,12 +10,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import pt.ms.myshare.domain.model.BillingPurchaseEvent
 import pt.ms.myshare.domain.model.BillingFlowLaunchResult
 import pt.ms.myshare.domain.model.EntitlementState
 import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
@@ -38,13 +41,18 @@ class PlayBillingEntitlementRepository(
         if (!hasLoadedPurchases) {
             EntitlementState.UNKNOWN
         } else if (purchases.any { it.isActivePremiumSubscription() }) {
-            EntitlementState.PRO
+            Timber.tag(TAG).d("Local premium purchase found and waiting for server entitlement verification")
+            EntitlementState.UNKNOWN
         } else {
             EntitlementState.FREE
         }
     }.distinctUntilChanged()
 
     private val serverEntitlementState: Flow<EntitlementState?> = observeServerEntitlementState()
+    private val verifiedPurchaseEvents = MutableSharedFlow<BillingPurchaseEvent>(extraBufferCapacity = 1)
+    private val purchaseVerificationLock = Any()
+    private val verifiedPurchaseTokens = mutableSetOf<String>()
+    private val purchaseVerificationInFlight = mutableSetOf<String>()
 
     override val entitlementState: Flow<EntitlementState> = combine(
         localEntitlementState,
@@ -104,7 +112,10 @@ class PlayBillingEntitlementRepository(
     }
 
     override val availableProducts: Flow<List<StoreProduct>> = billingClientWrapper.availableProducts
-    override val purchaseEvents = billingClientWrapper.purchaseEvents
+    override val purchaseEvents: Flow<BillingPurchaseEvent> = merge(
+        billingClientWrapper.purchaseEvents,
+        verifiedPurchaseEvents
+    )
 
     init {
         billingClientWrapper.startBillingConnection()
@@ -122,9 +133,12 @@ class PlayBillingEntitlementRepository(
 
     private suspend fun verifyAndAcknowledge(purchase: Purchase) {
         val productId = purchase.products.firstOrNull() ?: return
+        if (!markPurchaseVerificationStarted(purchase.purchaseToken)) return
+
         val session = billingAuthSession.requireAuthenticatedSession()
             .onFailure { e ->
                 Timber.tag(TAG).e(e, "Cannot verify purchase because billing session authentication failed")
+                markPurchaseVerificationFinished(purchase.purchaseToken, verified = false)
             }
             .getOrNull() ?: return
         val data = hashMapOf(
@@ -142,6 +156,8 @@ class PlayBillingEntitlementRepository(
             val resultMap = result.data as? Map<*, *>
             val isValid = resultMap?.get("isValid") as? Boolean ?: false
             if (isValid) {
+                markPurchaseVerificationFinished(purchase.purchaseToken, verified = true)
+                verifiedPurchaseEvents.tryEmit(BillingPurchaseEvent.Completed)
                 if (resultMap?.isServerAcknowledged() == true) {
                     Timber.tag(TAG).d("Purchase acknowledged by server product=%s", productId)
                 } else {
@@ -150,9 +166,31 @@ class PlayBillingEntitlementRepository(
                 }
             } else {
                 Timber.tag(TAG).e("Purchase verification returned inactive entitlement for product=%s", productId)
+                markPurchaseVerificationFinished(purchase.purchaseToken, verified = false)
             }
         } catch (e: Exception) {
             Timber.tag(TAG).e(e, "Verification failed")
+            markPurchaseVerificationFinished(purchase.purchaseToken, verified = false)
+        }
+    }
+
+    private fun markPurchaseVerificationStarted(purchaseToken: String): Boolean {
+        return synchronized(purchaseVerificationLock) {
+            if (purchaseToken in verifiedPurchaseTokens || purchaseToken in purchaseVerificationInFlight) {
+                false
+            } else {
+                purchaseVerificationInFlight.add(purchaseToken)
+                true
+            }
+        }
+    }
+
+    private fun markPurchaseVerificationFinished(purchaseToken: String, verified: Boolean) {
+        synchronized(purchaseVerificationLock) {
+            purchaseVerificationInFlight.remove(purchaseToken)
+            if (verified) {
+                verifiedPurchaseTokens.add(purchaseToken)
+            }
         }
     }
 

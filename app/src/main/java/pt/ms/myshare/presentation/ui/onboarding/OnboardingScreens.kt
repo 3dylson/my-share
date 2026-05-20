@@ -35,6 +35,7 @@ import pt.ms.myshare.BuildConfig
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.PlanPreview
+import pt.ms.myshare.domain.model.PremiumStoreProductSelector
 import pt.ms.myshare.domain.model.PricingStrategy
 import pt.ms.myshare.domain.model.StoreProduct
 import pt.ms.myshare.domain.model.UserPreferences
@@ -94,8 +95,8 @@ fun PaywallScreen(
     val scrollState = rememberScrollState()
     val keyboardDismissOnScrollConnection = rememberKeyboardDismissOnScrollConnection()
     var isGoogleCredentialRequestInProgress by remember { mutableStateOf(false) }
-    val monthlyProduct = availableProducts.find { it.productId.contains("monthly", ignoreCase = true) }
-    val annualProduct = availableProducts.find { it.productId.contains("annual", ignoreCase = true) }
+    val monthlyProduct = PremiumStoreProductSelector.standardProduct(availableProducts, BillingPlan.MONTHLY)
+    val annualProduct = PremiumStoreProductSelector.standardProduct(availableProducts, BillingPlan.ANNUAL)
     val annualComparison = remember(monthlyProduct, annualProduct) {
         SubscriptionSavingsFormatter.formatAnnualComparison(
             monthlyProduct = monthlyProduct,
