@@ -82,6 +82,7 @@ Status after implementation pass on 2026-05-19:
 Status after implementation pass on 2026-05-20:
 - Done: The onboarding plan preview now shows what Premium starts watching immediately, using the user's weekly guide, priority move, and first-review promise.
 - Done: Replaced the abstract free-vs-Premium comparison pills with three concrete watch items: weekly guide, priority move or bills-first fallback, and first review.
+- Done: The plan preview no longer truncates key money values or metric labels; payday move rows stack amounts on compact or large-font layouts so the aha-moment numbers stay readable.
 - Goal: Premium should feel useful before the real payday cycle completes by making the future check-in benefit visible today, without crowding the aha moment.
 - QA focus: validate the plan preview on compact screens and long localized text so the watch items wrap cleanly and do not truncate important values.
 
