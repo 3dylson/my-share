@@ -708,6 +708,8 @@
     <string name="preferences_currency_title">Currency</string>
     <string name="preferences_currency_search_hint">Search currency or code</string>
     <string name="home_more_pref_notifications">Payday reminders</string>
+    <string name="home_more_pref_rate_app">Rate My Share</string>
+    <string name="home_more_pref_rate_app_desc">Open Google Play to leave a rating</string>
     <string name="home_more_pref_automation">Auto rules</string>
     <string name="home_more_pref_automation_active">Auto rules are on</string>
     <string name="home_more_pref_automation_idle">Ready to automate your payday rules</string>

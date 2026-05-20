@@ -23,8 +23,10 @@ import pt.ms.myshare.data.repository.FirestoreAppUpdatePolicyRepository
 import pt.ms.myshare.data.repository.AuthRepositoryImpl
 import pt.ms.myshare.data.repository.FirebaseProductConfigRepository
 import pt.ms.myshare.data.repository.PlannerRepositoryImpl
+import pt.ms.myshare.data.repository.SharedPreferencesAppReviewPromptRepository
 import pt.ms.myshare.data.repository.SharedFirstRunExperienceRepository
 import pt.ms.myshare.data.repository.SharedUserPreferencesRepository
+import pt.ms.myshare.domain.repository.AppReviewPromptRepository
 import pt.ms.myshare.domain.repository.AppUpdatePolicyRepository
 import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
@@ -81,6 +83,12 @@ object AppModule {
         @ApplicationContext context: Context,
         firestoreProvider: Provider<FirebaseFirestore>
     ): AppUpdatePolicyRepository = FirestoreAppUpdatePolicyRepository(context, firestoreProvider)
+
+    @Provides
+    @Singleton
+    fun provideAppReviewPromptRepository(
+        @ApplicationContext context: Context
+    ): AppReviewPromptRepository = SharedPreferencesAppReviewPromptRepository(context)
 
     @Provides
     @Singleton

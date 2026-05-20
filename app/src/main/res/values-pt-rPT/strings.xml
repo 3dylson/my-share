@@ -658,6 +658,8 @@
     <string name="preferences_currency_title">Moeda</string>
     <string name="preferences_currency_search_hint">Pesquisar moeda ou código</string>
     <string name="home_more_pref_notifications">Lembretes do dia de pagamento</string>
+    <string name="home_more_pref_rate_app">Avaliar My Share</string>
+    <string name="home_more_pref_rate_app_desc">Abrir o Google Play para deixar uma avaliação</string>
     <string name="home_more_pref_automation">Regras automáticas</string>
     <string name="home_more_pref_automation_active">Regras automáticas ativas</string>
     <string name="home_more_pref_automation_idle">Pronto para automatizar as regras do dia de pagamento</string>

@@ -657,6 +657,8 @@
     <string name="preferences_currency_title">Devise</string>
     <string name="preferences_currency_search_hint">Rechercher une devise ou un code</string>
     <string name="home_more_pref_notifications">Rappels du jour de paie</string>
+    <string name="home_more_pref_rate_app">Noter My Share</string>
+    <string name="home_more_pref_rate_app_desc">Ouvrir Google Play pour laisser une note</string>
     <string name="home_more_pref_automation">Règles automatiques</string>
     <string name="home_more_pref_automation_active">Les règles automatiques sont actives</string>
     <string name="home_more_pref_automation_idle">Prêt à automatiser vos règles de paie</string>

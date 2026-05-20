@@ -657,6 +657,8 @@
     <string name="preferences_currency_title">Währung</string>
     <string name="preferences_currency_search_hint">Währung oder Code suchen</string>
     <string name="home_more_pref_notifications">Zahltag-Erinnerungen</string>
+    <string name="home_more_pref_rate_app">My Share bewerten</string>
+    <string name="home_more_pref_rate_app_desc">Google Play öffnen, um eine Bewertung abzugeben</string>
     <string name="home_more_pref_automation">Automatische Regeln</string>
     <string name="home_more_pref_automation_active">Automatische Regeln sind aktiv</string>
     <string name="home_more_pref_automation_idle">Bereit, deine Zahltag-Regeln zu automatisieren</string>
