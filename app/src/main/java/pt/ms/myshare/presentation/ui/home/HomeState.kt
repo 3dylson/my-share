@@ -183,6 +183,7 @@ data class MoreCardState(
     val actualAnnualTrialDays: Int? = null,
     val showAdsConsentOption: Boolean = true,
     val selectedBillingPlan: BillingPlan = BillingPlan.MONTHLY,
+    val hasUserSelectedBillingPlan: Boolean = false,
     val isBillingActionInProgress: Boolean = false,
     val billingMessage: String? = null,
     val isPremium: Boolean = false,

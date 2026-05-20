@@ -61,8 +61,11 @@ import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.model.LegacyPremiumGrantState
 import pt.ms.myshare.domain.model.LegacyPremiumGrantStatus
 import pt.ms.myshare.domain.model.PremiumReviewCoachingStatus
+import pt.ms.myshare.domain.model.ProductExperienceConfig
+import pt.ms.myshare.domain.model.RemoteBillingPlanDefault
 import pt.ms.myshare.domain.model.User
 import pt.ms.myshare.domain.repository.LegacyPremiumGrantRepository
+import pt.ms.myshare.domain.repository.ProductConfigRepository
 import pt.ms.myshare.TestUserPreferencesRepository
 import pt.ms.myshare.presentation.ui.localization.UserLocaleManager
 import pt.ms.myshare.presentation.ui.onboarding.ReminderWorkScheduler
@@ -82,6 +85,7 @@ class HomeViewModelTest {
     private lateinit var fakePlannerRepository: FakePlannerRepository
     private lateinit var fakeEntitlementRepository: TestFakeEntitlementRepository
     private lateinit var fakeLegacyPremiumGrantRepository: TestFakeLegacyPremiumGrantRepository
+    private lateinit var fakeProductConfigRepository: TestProductConfigRepository
     private val mockAuthRepository = mockk<AuthRepository>(relaxed = true)
     private val mockGetReviewHistoryUseCase = mockk<GetReviewHistoryUseCase>(relaxed = true)
     private val mockUpdateGoalProgressUseCase = mockk<UpdateGoalProgressUseCase>(relaxed = true)
@@ -95,6 +99,7 @@ class HomeViewModelTest {
         fakePlannerRepository = FakePlannerRepository()
         fakeEntitlementRepository = TestFakeEntitlementRepository()
         fakeLegacyPremiumGrantRepository = TestFakeLegacyPremiumGrantRepository()
+        fakeProductConfigRepository = TestProductConfigRepository()
         val calculatePlanPreviewUseCase = CalculatePlanPreviewUseCase(ResolveAllocationStrategyRulesUseCase())
         currentUserFlow = MutableStateFlow(null)
         
@@ -129,7 +134,8 @@ class HomeViewModelTest {
             getPerformanceStatsUseCase = GetPerformanceStatsUseCase(fakePlannerRepository),
             getCoachingInsightsUseCase = GetCoachingInsightsUseCase(calculatePlanPreviewUseCase),
             reminderWorkScheduler = mockReminderWorkScheduler,
-            userLocaleManager = mockUserLocaleManager
+            userLocaleManager = mockUserLocaleManager,
+            productConfigRepository = fakeProductConfigRepository
         )
     }
 
@@ -702,6 +708,49 @@ class HomeViewModelTest {
     }
 
     @Test
+    fun `remote config can disable premium reminder messaging without changing saved reminder`() = runTest {
+        val today = LocalDate.now()
+        fakeProductConfigRepository.setConfig(ProductExperienceConfig(premiumRemindersEnabled = false))
+        fakeEntitlementRepository.setPro(true)
+        fakePlannerRepository.saveReminderConfiguration(
+            ReminderConfiguration(enabled = true, cadence = ReminderCadence.PAYDAY)
+        )
+        fakePlannerRepository.savePlan(
+            SalaryPlan(
+                focus = PlanningFocus.SAVE_WITHOUT_STRESS,
+                netIncomePerPayday = BigDecimal("1000"),
+                monthlyFixedCosts = BigDecimal("400"),
+                payFrequency = PayFrequency.BIWEEKLY,
+                nextBiweeklyPayday = today,
+                preset = AllocationPreset.BALANCED,
+                createdAt = today.minusMonths(1)
+            )
+        )
+        advanceUntilIdle()
+
+        assertTrue(viewModel.state.value.moreCard.reminderEnabled)
+        assertEquals(false, viewModel.state.value.moreCard.premiumCheckIn?.reminderEnabled)
+    }
+
+    @Test
+    fun `remote config can force monthly as default until user chooses a plan`() = runTest {
+        fakeProductConfigRepository.setConfig(
+            ProductExperienceConfig(paywallDefaultPlan = RemoteBillingPlanDefault.MONTHLY)
+        )
+        advanceUntilIdle()
+
+        assertEquals(BillingPlan.MONTHLY, viewModel.state.value.moreCard.selectedBillingPlan)
+
+        viewModel.chooseBillingPlan(BillingPlan.ANNUAL)
+        fakeProductConfigRepository.setConfig(
+            ProductExperienceConfig(paywallDefaultPlan = RemoteBillingPlanDefault.MONTHLY)
+        )
+        advanceUntilIdle()
+
+        assertEquals(BillingPlan.ANNUAL, viewModel.state.value.moreCard.selectedBillingPlan)
+    }
+
+    @Test
     fun `premium user sees overdue recovery when payday review is missed`() = runTest {
         val today = LocalDate.now()
         val missedPayday = today.minusDays(7).dayOfMonth.coerceIn(1, 28)
@@ -1095,6 +1144,7 @@ class FakePlannerRepository : PlannerRepository {
     override fun loadReminderConfiguration(): ReminderConfiguration = reminderFlow.value
     
     override fun observeAutomationEnabled(): Flow<Boolean> = automationFlow.asStateFlow()
+    override fun loadAutomationEnabled(): Boolean = automationFlow.value
     override suspend fun saveAutomationEnabled(enabled: Boolean) { automationFlow.emit(enabled) }
     fun automationEnabled(): Boolean = automationFlow.value
 
@@ -1178,5 +1228,14 @@ class TestFakeLegacyPremiumGrantRepository : LegacyPremiumGrantRepository {
 
     override suspend fun dismissGrant() {
         _grantState.emit(LegacyPremiumGrantState(status = LegacyPremiumGrantStatus.Dismissed))
+    }
+}
+
+class TestProductConfigRepository : ProductConfigRepository {
+    private val configState = MutableStateFlow(ProductExperienceConfig())
+    override val config = configState.asStateFlow()
+    override suspend fun refresh() {}
+    suspend fun setConfig(config: ProductExperienceConfig) {
+        configState.emit(config)
     }
 }

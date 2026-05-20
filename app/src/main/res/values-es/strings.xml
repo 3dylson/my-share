@@ -25,20 +25,20 @@
     <string name="id_amount_for_stocks" translatable="false">amount_for_stocks</string>
     <string name="id_amount_for_crypto" translatable="false">amount_for_crypto</string>
     <string name="id_amount_for_savings" translatable="false">amount_for_savings</string>
-    <string name="onboarding_welcome_title">Sabe qué hacer\ncuando llega el dinero</string>
-    <string name="onboarding_welcome_subtitle">Crea un plan de cobro claro en menos de dos minutos y deja que las revisiones se conviertan en guía para el próximo cobro con Premium.</string>
-    <string name="onboarding_welcome_badge">Plan de cobro en 2 minutos</string>
-    <string name="onboarding_welcome_outcome_payday_title">Plan de acción del próximo cobro</string>
-    <string name="onboarding_welcome_outcome_payday_body">Ve qué mover a facturas, objetivos y gasto diario.</string>
-    <string name="onboarding_welcome_outcome_weekly_title">Guía de gasto semanal</string>
-    <string name="onboarding_welcome_outcome_weekly_body">Convierte el dinero del cobro en una cantidad semanal confiable.</string>
-    <string name="onboarding_welcome_outcome_trust_title">Manual primero, sin banco</string>
-    <string name="onboarding_welcome_outcome_trust_body">Empieza sin conectar cuentas. Premium se ofrece solo cuando tu plan esté listo.</string>
+    <string name="onboarding_welcome_title">Planifica el cobro\nantes de gastar</string>
+    <string name="onboarding_welcome_subtitle">Añade lo que entra, lo que debe salir y un objetivo. My Share lo convierte en una lista simple para el día de cobro.</string>
+    <string name="onboarding_welcome_badge">Tu primera lista de cobro</string>
+    <string name="onboarding_welcome_outcome_payday_title">Separa las facturas primero</string>
+    <string name="onboarding_welcome_outcome_payday_body">Sabe cuánto mantener aparte antes de empezar el gasto diario.</string>
+    <string name="onboarding_welcome_outcome_weekly_title">Aclara la semana</string>
+    <string name="onboarding_welcome_outcome_weekly_body">Ve una cantidad semanal más fácil de seguir.</string>
+    <string name="onboarding_welcome_outcome_trust_title">Mueve dinero a un objetivo</string>
+    <string name="onboarding_welcome_outcome_trust_body">Empieza manualmente, sin conectar el banco, y deja Premium para más tarde.</string>
     <string name="onboarding_welcome_flow_income">Ingreso</string>
     <string name="onboarding_welcome_flow_bills">Facturas</string>
     <string name="onboarding_welcome_flow_weekly">Semana</string>
     <string name="onboarding_welcome_flow_goal">Meta</string>
-    <string name="onboarding_welcome_button_get_started">Empezar</string>
+    <string name="onboarding_welcome_button_get_started">Crear mi plan</string>
     <string name="onboarding_welcome_button_skip_dev" translatable="false">Skip to Home (Dev)</string>
     <string name="onboarding_goal_picker_title">Elige la meta protegida de este cobro</string>
     <string name="onboarding_goal_picker_subtitle">Esta meta da forma al plan que creamos con tus números.</string>
@@ -664,6 +664,7 @@
     <string name="home_more_account_details_email">Iniciado sesión como: %1$s</string>
     <string name="home_more_account_details_membership">Plan actual: %1$s</string>
     <string name="home_more_account_details_sync_note">Estás usando el modo local. Conecta Google para sincronizar este plan.</string>
+    <string name="home_more_account_details_synced_note">Google está conectado. Este plan puede sincronizarse y es más fácil de recuperar.</string>
     <string name="home_more_account_connect_google_title">Conectar cuenta de Google</string>
     <string name="home_more_account_connect_google_desc">Haz una copia de seguridad y sincroniza este plan con Google.</string>
     <string name="home_more_account_connect_google_success">Cuenta de Google conectada. Este plan ya puede sincronizarse con seguridad.</string>
@@ -795,6 +796,12 @@
     <string name="coaching_first_step_body">¡Buen comienzo con tu primera reseña! Cuanto más inicias sesión, más inteligente se vuelve tu ciclo de hábitos.</string>
     <string name="notification_payday_title">Tu misión de día de pago</string>
     <string name="notification_payday_body">Asegure %1$s para facturas y reserve %3$s. Tienes %2$s para gastar de forma segura.</string>
+    <string name="notification_weekly_review_title">Revisión semanal rápida</string>
+    <string name="notification_weekly_review_body">Comprueba si tu guía semanal de %1$s todavía se siente bien.</string>
+    <string name="notification_premium_checkin_due_title">Tu revisión Premium está lista</string>
+    <string name="notification_premium_checkin_due_body">Revisa este cobro para que Premium proteja %1$s/semana y tu próximo movimiento de %2$s.</string>
+    <string name="notification_premium_checkin_overdue_title">Todavía vale la pena revisar</string>
+    <string name="notification_premium_checkin_overdue_body">Una revisión rápida aún puede ayudar a Premium a ajustar tu guía semanal de %1$s y tu próximo movimiento de %2$s.</string>
     <string name="home_plan_next_payday">Próximo día de pago: %1$s</string>
     <string name="home_goal_mission_accomplished">¡Misión Cumplida!</string>
     <string name="home_goal_on_pace">En ritmo para %1$s</string>

@@ -39,6 +39,7 @@ interface PlannerRepository {
     suspend fun saveReminderConfiguration(configuration: ReminderConfiguration)
 
     fun observeAutomationEnabled(): Flow<Boolean>
+    fun loadAutomationEnabled(): Boolean
     suspend fun saveAutomationEnabled(enabled: Boolean)
 
     fun observePremiumAdjustmentRecords(): Flow<List<PremiumAdjustmentRecord>>

@@ -36,6 +36,7 @@ data class OnboardingState(
     // Live prices fetched from Google Play Billing; empty until billing client connects
     val availableProducts: List<StoreProduct> = emptyList(),
     val selectedBillingPlan: BillingPlan = BillingPlan.MONTHLY,
+    val hasUserSelectedBillingPlan: Boolean = false,
     val isBillingActionInProgress: Boolean = false,
     val billingMessage: String? = null,
     val planSaved: Boolean = false,

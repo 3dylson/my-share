@@ -6,5 +6,7 @@ package pt.ms.myshare.domain.use_case
 data class NotificationContent(
     val titleKey: String,
     val messageKey: String,
-    val messageArgs: List<String>
+    val messageArgs: List<String>,
+    val destination: String,
+    val analyticsType: String
 )

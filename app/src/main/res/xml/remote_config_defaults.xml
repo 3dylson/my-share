@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<defaultsMap>
+    <entry>
+        <key>paywall_default_plan</key>
+        <value>market</value>
+    </entry>
+    <entry>
+        <key>onboarding_paywall_variant</key>
+        <value>payday_proof</value>
+    </entry>
+    <entry>
+        <key>founder_offer_enabled</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>premium_reminders_enabled</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>premium_proof_variant</key>
+        <value>next_move</value>
+    </entry>
+</defaultsMap>

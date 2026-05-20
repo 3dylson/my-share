@@ -25,20 +25,20 @@
     <string name="id_amount_for_stocks" translatable="false">amount_for_stocks</string>
     <string name="id_amount_for_crypto" translatable="false">amount_for_crypto</string>
     <string name="id_amount_for_savings" translatable="false">amount_for_savings</string>
-    <string name="onboarding_welcome_title">Wisse, was zu tun ist,\nwenn Geld eingeht</string>
-    <string name="onboarding_welcome_subtitle">Erstelle in unter zwei Minuten einen klaren Zahltag-Plan und lass Bewertungen mit Premium zur Anleitung für den nächsten Zahltag werden.</string>
-    <string name="onboarding_welcome_badge">Zahltag-Plan in 2 Minuten</string>
-    <string name="onboarding_welcome_outcome_payday_title">Aktionsplan für den nächsten Zahltag</string>
-    <string name="onboarding_welcome_outcome_payday_body">Sieh, was zu Rechnungen, Zielen und Alltag verschoben werden sollte.</string>
-    <string name="onboarding_welcome_outcome_weekly_title">Wöchentlicher Ausgabenleitwert</string>
-    <string name="onboarding_welcome_outcome_weekly_body">Mach aus deinem Zahltag-Geld einen verlässlichen Wochenbetrag.</string>
-    <string name="onboarding_welcome_outcome_trust_title">Manuell zuerst, keine Bank nötig</string>
-    <string name="onboarding_welcome_outcome_trust_body">Starte ohne Kontoverbindung. Premium wird erst angeboten, wenn dein Plan bereit ist.</string>
+    <string name="onboarding_welcome_title">Plane den Zahltag,\nbevor du ausgibst</string>
+    <string name="onboarding_welcome_subtitle">Trage ein, was hereinkommt, was weg muss und ein Ziel. My Share macht daraus eine einfache Liste für den Zahltag.</string>
+    <string name="onboarding_welcome_badge">Deine erste Zahltag-Liste</string>
+    <string name="onboarding_welcome_outcome_payday_title">Lege Rechnungen zuerst beiseite</string>
+    <string name="onboarding_welcome_outcome_payday_body">Wisse, welchen Betrag du unberührt lässt, bevor Alltagsausgaben beginnen.</string>
+    <string name="onboarding_welcome_outcome_weekly_title">Mach die Woche klar</string>
+    <string name="onboarding_welcome_outcome_weekly_body">Sieh einen Wochenbetrag, der leichter einzuhalten ist.</string>
+    <string name="onboarding_welcome_outcome_trust_title">Verschiebe Geld zu einem Ziel</string>
+    <string name="onboarding_welcome_outcome_trust_body">Starte manuell, ohne Bankverbindung, und hebe Premium für später auf.</string>
     <string name="onboarding_welcome_flow_income">Einkommen</string>
     <string name="onboarding_welcome_flow_bills">Rechnungen</string>
     <string name="onboarding_welcome_flow_weekly">Woche</string>
     <string name="onboarding_welcome_flow_goal">Ziel</string>
-    <string name="onboarding_welcome_button_get_started">Legen Sie los</string>
+    <string name="onboarding_welcome_button_get_started">Meinen Plan erstellen</string>
     <string name="onboarding_welcome_button_skip_dev" translatable="false">Skip to Home (Dev)</string>
     <string name="onboarding_goal_picker_title">Wähle das geschützte Ziel dieses Zahltags</string>
     <string name="onboarding_goal_picker_subtitle">Dieses Ziel prägt den Plan, den wir aus deinen Zahlen erstellen.</string>
@@ -664,6 +664,7 @@
     <string name="home_more_account_details_email">Angemeldet als: %1$s</string>
     <string name="home_more_account_details_membership">Aktueller Plan: %1$s</string>
     <string name="home_more_account_details_sync_note">Du nutzt den lokalen Modus. Verbinde Google, um diesen Plan zu synchronisieren.</string>
+    <string name="home_more_account_details_synced_note">Google ist verbunden. Dieser Plan kann synchronisiert und leichter wiederhergestellt werden.</string>
     <string name="home_more_account_connect_google_title">Google-Konto verbinden</string>
     <string name="home_more_account_connect_google_desc">Sichere und synchronisiere diesen Plan mit Google.</string>
     <string name="home_more_account_connect_google_success">Google-Konto verbunden. Dieser Plan kann jetzt sicher synchronisiert werden.</string>
@@ -779,6 +780,12 @@
     <string name="coaching_first_step_body">Toller Start mit Ihrer ersten Bewertung! Je mehr Sie protokollieren, desto intelligenter wird Ihre Gewohnheitsschleife.</string>
     <string name="notification_payday_title">Ihre Zahltag-Mission</string>
     <string name="notification_payday_body">Sichern Sie %1$s für Rechnungen und legen Sie %3$s zurück. Sie haben %2$s für sichere Ausgaben.</string>
+    <string name="notification_weekly_review_title">Kurzer Wochencheck</string>
+    <string name="notification_weekly_review_body">Prüfe, ob dein Wochenleitwert von %1$s noch passt.</string>
+    <string name="notification_premium_checkin_due_title">Dein Premium-Check-in ist bereit</string>
+    <string name="notification_premium_checkin_due_body">Prüfe diesen Zahltag, damit Premium %1$s/Woche und deinen nächsten Schritt von %2$s schützen kann.</string>
+    <string name="notification_premium_checkin_overdue_title">Prüfen lohnt sich noch</string>
+    <string name="notification_premium_checkin_overdue_body">Ein kurzer Check-in kann Premium noch helfen, deinen Wochenleitwert von %1$s und deinen nächsten Schritt von %2$s anzupassen.</string>
     <string name="home_plan_next_payday">Nächster Zahltag: %1$s</string>
     <string name="home_goal_mission_accomplished">Mission erfüllt!</string>
     <string name="home_goal_on_pace">Auf Tempo für %1$s</string>

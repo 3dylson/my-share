@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -32,11 +33,13 @@ import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.BillingPurchaseEvent
 import pt.ms.myshare.domain.model.SalaryPlan
 import pt.ms.myshare.domain.model.PlanPreview
+import pt.ms.myshare.domain.model.ProductExperienceConfig
 import pt.ms.myshare.domain.model.StoreProduct
 import pt.ms.myshare.domain.model.User
 import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
+import pt.ms.myshare.domain.repository.ProductConfigRepository
 import pt.ms.myshare.TestUserPreferencesRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.ResolveAllocationStrategyRulesUseCase
@@ -59,6 +62,7 @@ class OnboardingViewModelTest {
     private val reminderWorkScheduler: ReminderWorkScheduler = mockk(relaxed = true)
     private val userLocaleManager: UserLocaleManager = mockk(relaxed = true)
     private val onboardingAnalyticsLogger: OnboardingAnalyticsLogger = mockk(relaxed = true)
+    private val productConfigRepository = TestProductConfigRepository()
     private lateinit var isProFlow: MutableStateFlow<Boolean>
     private lateinit var availableProductsFlow: MutableStateFlow<List<StoreProduct>>
     private lateinit var purchaseEventsFlow: MutableSharedFlow<BillingPurchaseEvent>
@@ -101,7 +105,8 @@ class OnboardingViewModelTest {
             resolvePricingStrategyUseCase,
             reminderWorkScheduler,
             userLocaleManager,
-            onboardingAnalyticsLogger
+            onboardingAnalyticsLogger,
+            productConfigRepository
         )
     }
 
@@ -550,4 +555,10 @@ class OnboardingViewModelTest {
         goalTargetDate = null,
         summary = "Preview snippet"
     )
+}
+
+private class TestProductConfigRepository : ProductConfigRepository {
+    private val configState = MutableStateFlow(ProductExperienceConfig())
+    override val config = configState.asStateFlow()
+    override suspend fun refresh() {}
 }

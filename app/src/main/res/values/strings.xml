@@ -25,20 +25,20 @@
     <string name="id_amount_for_crypto" translatable="false">amount_for_crypto</string>
     <string name="id_amount_for_savings" translatable="false">amount_for_savings</string>
     <!-- Welcome Screen -->
-    <string name="onboarding_welcome_title">Know what to do\nwhen money lands</string>
-    <string name="onboarding_welcome_subtitle">Build a clear payday plan in under two minutes, then let reviews turn into next-payday guidance with Premium.</string>
-    <string name="onboarding_welcome_badge">Payday plan in 2 minutes</string>
-    <string name="onboarding_welcome_outcome_payday_title">Next payday action plan</string>
-    <string name="onboarding_welcome_outcome_payday_body">See what to move to bills, goals, and everyday spending.</string>
-    <string name="onboarding_welcome_outcome_weekly_title">Weekly spend guide</string>
-    <string name="onboarding_welcome_outcome_weekly_body">Turn payday money into a weekly amount you can trust.</string>
-    <string name="onboarding_welcome_outcome_trust_title">Manual-first, no bank required</string>
-    <string name="onboarding_welcome_outcome_trust_body">Start without connecting accounts. Premium is offered only after your plan is ready.</string>
+    <string name="onboarding_welcome_title">Plan payday\nbefore you spend</string>
+    <string name="onboarding_welcome_subtitle">Add what comes in, what must go out, and one goal. My Share turns it into a simple payday checklist.</string>
+    <string name="onboarding_welcome_badge">Your first payday checklist</string>
+    <string name="onboarding_welcome_outcome_payday_title">Set bills aside first</string>
+    <string name="onboarding_welcome_outcome_payday_body">Know the amount to keep untouched before daily spending starts.</string>
+    <string name="onboarding_welcome_outcome_weekly_title">Keep the week clear</string>
+    <string name="onboarding_welcome_outcome_weekly_body">See a weekly spending number that is easier to follow.</string>
+    <string name="onboarding_welcome_outcome_trust_title">Move money to one goal</string>
+    <string name="onboarding_welcome_outcome_trust_body">Start manually, without a bank connection, and keep Premium for later.</string>
     <string name="onboarding_welcome_flow_income">Income</string>
     <string name="onboarding_welcome_flow_bills">Bills</string>
     <string name="onboarding_welcome_flow_weekly">Weekly</string>
     <string name="onboarding_welcome_flow_goal">Goal</string>
-    <string name="onboarding_welcome_button_get_started">Get Started</string>
+    <string name="onboarding_welcome_button_get_started">Build my plan</string>
     <string name="onboarding_welcome_button_skip_dev" translatable="false">Skip to Home (Dev)</string>
 
     <!-- Goal Picker Screen -->
@@ -709,6 +709,7 @@
     <string name="home_more_account_details_email">Signed in as: %1$s</string>
     <string name="home_more_account_details_membership">Plan: %1$s</string>
     <string name="home_more_account_details_sync_note">You are using local mode. Connect Google to sync this plan.</string>
+    <string name="home_more_account_details_synced_note">Google is connected. This plan can sync and is easier to recover.</string>
     <string name="home_more_account_connect_google_title">Connect Google account</string>
     <string name="home_more_account_connect_google_desc">Back up and sync this plan with Google.</string>
     <string name="home_more_account_connect_google_success">Google account connected. This plan can now sync safely.</string>
@@ -848,6 +849,12 @@
 
     <string name="notification_payday_title">Your Payday Mission</string>
     <string name="notification_payday_body">Secure %1$s for bills and set aside %3$s. You have %2$s for safe spending.</string>
+    <string name="notification_weekly_review_title">Quick weekly review</string>
+    <string name="notification_weekly_review_body">Check if your %1$s weekly guide still feels right.</string>
+    <string name="notification_premium_checkin_due_title">Your Premium check-in is ready</string>
+    <string name="notification_premium_checkin_due_body">Review this payday so Premium can protect %1$s/week and your %2$s next move.</string>
+    <string name="notification_premium_checkin_overdue_title">Still worth reviewing</string>
+    <string name="notification_premium_checkin_overdue_body">A quick check-in can still help Premium tune your %1$s weekly guide and %2$s next move.</string>
 
     <!-- Home ViewModel Additions -->
     <string name="home_plan_next_payday">Next payday: %1$s</string>

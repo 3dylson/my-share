@@ -6,10 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
-import androidx.compose.material.icons.filled.AutoGraph
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Savings
@@ -106,7 +103,7 @@ fun WelcomeScreen(
         BoxWithConstraints(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             val compactHeight = maxHeight < 700.dp
             val topPadding = if (compactHeight) 10.dp else 24.dp
-            val heroSpacing = if (compactHeight) 14.dp else 22.dp
+            val heroSpacing = if (compactHeight) 14.dp else 20.dp
             val titleStyle = if (compactHeight) {
                 MaterialTheme.typography.headlineMedium
             } else {
@@ -129,40 +126,10 @@ fun WelcomeScreen(
                     .padding(top = topPadding, bottom = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Surface(
-                    shape = RoundedCornerShape(999.dp),
-                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f),
-                    border = androidx.compose.foundation.BorderStroke(
-                        1.dp,
-                        MySharePrimary.copy(alpha = 0.24f)
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
-                        horizontalArrangement = Arrangement.spacedBy(7.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.AutoGraph,
-                            contentDescription = null,
-                            tint = MySharePrimary,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Text(
-                            text = stringResource(R.string.onboarding_welcome_badge).uppercase(),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MySharePrimary,
-                            fontWeight = FontWeight.Black
-                        )
-                    }
-                }
-
-                Spacer(Modifier.height(heroSpacing))
-
                 Text(
                     stringResource(R.string.onboarding_welcome_title),
                     style = titleStyle,
-                    fontWeight = FontWeight.ExtraBold,
+                    fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     lineHeight = titleLineHeight,
                     color = MaterialTheme.colorScheme.onSurface
@@ -179,7 +146,7 @@ fun WelcomeScreen(
 
                 Spacer(Modifier.height(heroSpacing))
 
-                WelcomeOutcomeCard()
+                PaydayChecklistCard()
 
                 Spacer(Modifier.height(16.dp))
 
@@ -206,29 +173,42 @@ fun WelcomeScreen(
 }
 
 @Composable
-private fun WelcomeOutcomeCard() {
+private fun PaydayChecklistCard() {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surface,
         border = androidx.compose.foundation.BorderStroke(
             1.dp,
-            MySharePrimary.copy(alpha = 0.22f)
+            MaterialTheme.colorScheme.outline.copy(alpha = 0.18f)
         ),
         shadowElevation = 1.dp
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(13.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            PaydayFlowVisual()
+            Text(
+                text = stringResource(R.string.onboarding_welcome_badge),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold
+            )
             HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.16f))
             WelcomeOutcomeRow(
+                index = "1",
+                title = stringResource(R.string.onboarding_welcome_outcome_payday_title),
+                body = stringResource(R.string.onboarding_welcome_outcome_payday_body),
+                icon = Icons.Default.AccountBalance
+            )
+            WelcomeOutcomeRow(
+                index = "2",
                 title = stringResource(R.string.onboarding_welcome_outcome_weekly_title),
                 body = stringResource(R.string.onboarding_welcome_outcome_weekly_body),
                 icon = Icons.Default.Savings
             )
             WelcomeOutcomeRow(
+                index = "3",
                 title = stringResource(R.string.onboarding_welcome_outcome_trust_title),
                 body = stringResource(R.string.onboarding_welcome_outcome_trust_body),
                 icon = Icons.Default.CheckCircle
@@ -238,91 +218,8 @@ private fun WelcomeOutcomeCard() {
 }
 
 @Composable
-private fun PaydayFlowVisual() {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        PaydayFlowNode(
-            label = stringResource(R.string.onboarding_welcome_flow_income),
-            icon = Icons.Default.Payments,
-            tint = MySharePrimary,
-            modifier = Modifier.weight(1f)
-        )
-        PaydayFlowConnector()
-        PaydayFlowNode(
-            label = stringResource(R.string.onboarding_welcome_flow_bills),
-            icon = Icons.Default.AccountBalance,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.weight(1f)
-        )
-        PaydayFlowConnector()
-        PaydayFlowNode(
-            label = stringResource(R.string.onboarding_welcome_flow_weekly),
-            icon = Icons.Default.Savings,
-            tint = MySharePositive,
-            modifier = Modifier.weight(1f)
-        )
-        PaydayFlowConnector()
-        PaydayFlowNode(
-            label = stringResource(R.string.onboarding_welcome_flow_goal),
-            icon = Icons.Default.Flag,
-            tint = MySharePrimary,
-            modifier = Modifier.weight(1f)
-        )
-    }
-}
-
-@Composable
-private fun PaydayFlowNode(
-    label: String,
-    icon: ImageVector,
-    tint: androidx.compose.ui.graphics.Color,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(7.dp)
-    ) {
-        Surface(
-            shape = RoundedCornerShape(14.dp),
-            color = tint.copy(alpha = 0.12f),
-            border = androidx.compose.foundation.BorderStroke(1.dp, tint.copy(alpha = 0.18f))
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = tint,
-                modifier = Modifier.padding(9.dp).size(21.dp)
-            )
-        }
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurface,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
-}
-
-@Composable
-private fun PaydayFlowConnector() {
-    Surface(
-        modifier = Modifier
-            .width(14.dp)
-            .height(2.dp),
-        color = MySharePrimary.copy(alpha = 0.24f),
-        shape = RoundedCornerShape(999.dp),
-        content = {}
-    )
-}
-
-@Composable
 private fun WelcomeOutcomeRow(
+    index: String,
     title: String,
     body: String,
     icon: ImageVector
@@ -333,14 +230,15 @@ private fun WelcomeOutcomeRow(
         verticalAlignment = Alignment.Top
     ) {
         Surface(
-            shape = RoundedCornerShape(10.dp),
-            color = MySharePrimary.copy(alpha = 0.12f)
+            shape = RoundedCornerShape(999.dp),
+            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.52f)
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = MySharePrimary,
-                modifier = Modifier.padding(7.dp).size(18.dp)
+            Text(
+                text = index,
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                style = MaterialTheme.typography.labelMedium,
+                color = MySharePrimary,
+                fontWeight = FontWeight.Bold
             )
         }
         Column(
@@ -362,6 +260,12 @@ private fun WelcomeOutcomeRow(
                 lineHeight = 17.sp
             )
         }
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(18.dp)
+        )
     }
 }
 

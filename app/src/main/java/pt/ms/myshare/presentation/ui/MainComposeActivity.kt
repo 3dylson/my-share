@@ -38,6 +38,8 @@ import pt.ms.myshare.presentation.ui.theme.MyShareTheme
 import pt.ms.myshare.presentation.ui.ads.AdsConsentManager
 import pt.ms.myshare.domain.use_case.ResolveAppUpdateDecisionUseCase
 import pt.ms.myshare.domain.use_case.RefreshEntitlementUseCase
+import pt.ms.myshare.presentation.notifications.MyShareNotificationIntentFactory
+import pt.ms.myshare.presentation.ui.home.HomeDestination
 import pt.ms.myshare.utils.isDarkTheme
 import pt.ms.myshare.utils.logs.FirebaseUtils
 import timber.log.Timber
@@ -64,6 +66,7 @@ class MainComposeActivity : ComponentActivity() {
     private var sessionCountForAds = 1
     private var isAppUpdateGateEvaluationInFlight = false
     private var lastAppUpdateGateEvaluationElapsedRealtime = 0L
+    private var notificationHomeDestination by mutableStateOf<HomeDestination?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,6 +82,7 @@ class MainComposeActivity : ComponentActivity() {
         }
         
         updateSessionCountForAds()
+        handleNotificationIntent(intent)
 
         consentManager = AdsConsentManager(this)
         
@@ -100,6 +104,10 @@ class MainComposeActivity : ComponentActivity() {
                                 .background(MaterialTheme.colorScheme.background)
                         ) {
                             AppNavigation(
+                                notificationHomeDestination = notificationHomeDestination,
+                                onNotificationHomeDestinationConsumed = {
+                                    notificationHomeDestination = null
+                                },
                                 onManageAdsConsent = {
                                     ensureAdsConsentReady(sessionCountForAds) {
                                         consentManager.showPrivacyOptionsForm { formError ->
@@ -134,6 +142,12 @@ class MainComposeActivity : ComponentActivity() {
             force = true
         )
         logAppStart()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleNotificationIntent(intent)
     }
 
     override fun onResume() {
@@ -192,6 +206,20 @@ class MainComposeActivity : ComponentActivity() {
                 .onFailure { error ->
                     Timber.e(error, "Active entitlement refresh failed on resume")
                 }
+        }
+    }
+
+    private fun handleNotificationIntent(intent: Intent?) {
+        val destination = intent?.getStringExtra(MyShareNotificationIntentFactory.EXTRA_HOME_DESTINATION)
+            ?.toHomeDestination()
+        if (destination != null) {
+            notificationHomeDestination = destination
+            val type = intent.getStringExtra(MyShareNotificationIntentFactory.EXTRA_NOTIFICATION_TYPE).orEmpty()
+            FirebaseUtils.logEvent("notification_opened", android.os.Bundle().apply {
+                putString("type", type)
+                putString("destination", destination.name.lowercase(Locale.US))
+            })
+            Timber.d("Notification opened type=%s destination=%s", type, destination)
         }
     }
 
@@ -321,4 +349,12 @@ class MainComposeActivity : ComponentActivity() {
     companion object {
         private const val APP_UPDATE_GATE_RESUME_RECHECK_INTERVAL_MS = 60_000L
     }
+}
+
+private fun String.toHomeDestination(): HomeDestination? = when (lowercase(Locale.US)) {
+    "plan" -> HomeDestination.PLAN
+    "review" -> HomeDestination.REVIEW
+    "strategy" -> HomeDestination.STRATEGY
+    "more" -> HomeDestination.MORE
+    else -> null
 }

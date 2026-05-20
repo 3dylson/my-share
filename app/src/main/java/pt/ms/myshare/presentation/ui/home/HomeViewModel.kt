@@ -31,15 +31,18 @@ import pt.ms.myshare.domain.model.PremiumRulePaydayMix
 import pt.ms.myshare.domain.model.ReviewInsight
 import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
+import pt.ms.myshare.domain.model.ProductExperienceConfig
 import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.domain.model.ReminderConfiguration
 import pt.ms.myshare.domain.model.SalaryPlan
 import pt.ms.myshare.domain.model.StoreProduct
+import pt.ms.myshare.domain.model.User
 import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.LegacyPremiumGrantRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
+import pt.ms.myshare.domain.repository.ProductConfigRepository
 import pt.ms.myshare.domain.repository.UserPreferencesRepository
 import pt.ms.myshare.domain.use_case.AdjustGoalProgressForReviewCorrectionUseCase
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
@@ -96,7 +99,8 @@ class HomeViewModel @Inject constructor(
     private val getPerformanceStatsUseCase: GetPerformanceStatsUseCase,
     private val getCoachingInsightsUseCase: GetCoachingInsightsUseCase,
     private val reminderWorkScheduler: ReminderWorkScheduler,
-    private val userLocaleManager: UserLocaleManager
+    private val userLocaleManager: UserLocaleManager,
+    private val productConfigRepository: ProductConfigRepository
 ) : ViewModel() {
 
     private val uiState = MutableStateFlow(HomeState())
@@ -110,6 +114,7 @@ class HomeViewModel @Inject constructor(
     private var nextReviewSavedEventId = 0L
     private var legacyPremiumGrantViewedLogged = false
     private var isFounderOfferBillingFlowPending = false
+    private var currentProductConfig = ProductExperienceConfig()
 
     private var currentPreferences = userPreferencesRepository.loadPreferences()
 
@@ -126,6 +131,7 @@ class HomeViewModel @Inject constructor(
             plannerRepository.syncFromFirestore()
             userPreferencesRepository.syncFromFirestore()
             legacyPremiumGrantRepository.refreshAvailability()
+            productConfigRepository.refresh()
         }
         userLocaleManager.apply(currentPreferences)
         observeProducts()
@@ -157,7 +163,14 @@ class HomeViewModel @Inject constructor(
     private fun observeLegacyPremiumGrant() {
         viewModelScope.launch {
             legacyPremiumGrantRepository.grantState.collect { grantState ->
-                if (!legacyPremiumGrantViewedLogged && grantState.status == LegacyPremiumGrantStatus.Eligible) {
+                val founderOfferEnabled = currentProductConfig.founderOfferEnabled
+                val visibleGrantState = grantState.takeIf { founderOfferEnabled }
+                    ?: pt.ms.myshare.domain.model.LegacyPremiumGrantState()
+                if (
+                    founderOfferEnabled &&
+                    !legacyPremiumGrantViewedLogged &&
+                    grantState.status == LegacyPremiumGrantStatus.Eligible
+                ) {
                     legacyPremiumGrantViewedLogged = true
                     FirebaseUtils.logEvent("legacy_premium_grant_viewed")
                     Timber.tag(TAG).d("Legacy Premium grant viewed")
@@ -165,7 +178,7 @@ class HomeViewModel @Inject constructor(
                 uiState.update { current ->
                     current.copy(
                         moreCard = current.moreCard.copy(
-                            legacyPremiumGrant = grantState
+                            legacyPremiumGrant = visibleGrantState
                         )
                     )
                 }
@@ -309,14 +322,30 @@ class HomeViewModel @Inject constructor(
                 )
             }
 
-            combine(
-                plannerFlow,
+            val productFlow = combine(
                 entitlementRepository.isPro,
                 entitlementRepository.availableProducts,
                 authRepository.currentUser,
-                userPreferencesRepository.observePreferences()
-            ) { planner, isPremium, products, user, preferences ->
+                userPreferencesRepository.observePreferences(),
+                productConfigRepository.config
+            ) { isPremium, products, user, preferences, productConfig ->
+                ProductInputs(
+                    isPremium = isPremium,
+                    products = products,
+                    user = user,
+                    preferences = preferences,
+                    productConfig = productConfig
+                )
+            }
+
+            combine(plannerFlow, productFlow) { planner, productInputs ->
                 val currentState = uiState.value
+                val isPremium = productInputs.isPremium
+                val products = productInputs.products
+                val user = productInputs.user
+                val preferences = productInputs.preferences
+                val productConfig = productInputs.productConfig
+                currentProductConfig = productConfig
                 currentPreferences = preferences
                 userLocaleManager.apply(preferences)
                 val locale = preferences.locale
@@ -339,7 +368,11 @@ class HomeViewModel @Inject constructor(
                     createPremiumCheckInPlanUseCase.execute(
                         plan = it,
                         latestReview = latestReview,
-                        reminderConfiguration = reminder,
+                        reminderConfiguration = if (productConfig.premiumRemindersEnabled) {
+                            reminder
+                        } else {
+                            reminder.copy(enabled = false)
+                        },
                         automationEnabled = automation && isPremium
                     ).toState(preferences)
                 }
@@ -439,10 +472,11 @@ class HomeViewModel @Inject constructor(
                     locale = locale
                 )
                 val currentMore = currentState.moreCard
-                val selectedBillingPlan = if (currentMore.pricingStrategy == null) {
-                    pricingStrategy.heroPlan
-                } else {
+                val remoteDefaultPlan = productConfig.paywallDefaultPlan.resolve(pricingStrategy.heroPlan)
+                val selectedBillingPlan = if (currentMore.hasUserSelectedBillingPlan) {
                     currentMore.selectedBillingPlan
+                } else {
+                    remoteDefaultPlan
                 }
                 val selectedProductAvailable = when (selectedBillingPlan) {
                     BillingPlan.MONTHLY -> monthlyProduct != null
@@ -493,6 +527,7 @@ class HomeViewModel @Inject constructor(
                     actualAnnualTrialDays = annualProduct?.freeTrialDays?.takeIf { it > 0 },
                     showAdsConsentOption = currentMore.showAdsConsentOption,
                     selectedBillingPlan = selectedBillingPlan,
+                    hasUserSelectedBillingPlan = currentMore.hasUserSelectedBillingPlan,
                     isBillingActionInProgress = currentMore.isBillingActionInProgress,
                     billingMessage = currentMore.billingMessage.takeUnless { shouldClearUnavailableMessage },
                     isPremium = isPremium,
@@ -520,6 +555,9 @@ class HomeViewModel @Inject constructor(
                         ?.map { it.toMemoryState(preferences) }
                         .orEmpty(),
                     premiumCheckIn = premiumCheckIn.takeIf { isPremium },
+                    legacyPremiumGrant = currentMore.legacyPremiumGrant.takeIf {
+                        productConfig.founderOfferEnabled
+                    } ?: pt.ms.myshare.domain.model.LegacyPremiumGrantState(),
                     error = currentMore.error.takeUnless { shouldClearUnavailableMessage }
                 )
                 HomeState(
@@ -581,6 +619,14 @@ class HomeViewModel @Inject constructor(
         val history: List<ManualReview>,
         val stats: PerformanceStats,
         val adjustments: List<PremiumAdjustmentRecord>
+    )
+
+    private data class ProductInputs(
+        val isPremium: Boolean,
+        val products: List<StoreProduct>,
+        val user: User?,
+        val preferences: UserPreferences,
+        val productConfig: ProductExperienceConfig
     )
 
     private data class PaydayRecommendationRollback(
@@ -978,7 +1024,16 @@ class HomeViewModel @Inject constructor(
     }
 
     fun chooseBillingPlan(plan: BillingPlan) {
-        uiState.update { it.copy(moreCard = it.moreCard.copy(selectedBillingPlan = plan, billingMessage = null, error = null)) }
+        uiState.update {
+            it.copy(
+                moreCard = it.moreCard.copy(
+                    selectedBillingPlan = plan,
+                    hasUserSelectedBillingPlan = true,
+                    billingMessage = null,
+                    error = null
+                )
+            )
+        }
         FirebaseUtils.logEvent("paywall_plan_selected", android.os.Bundle().apply {
             putString("billing_plan", plan.name.lowercase(Locale.US))
             putString("price_cluster", currentPricingStrategy().marketCluster)
@@ -1007,14 +1062,11 @@ class HomeViewModel @Inject constructor(
         currentPreferences = preferences
         val updatedPricing = resolvePricingStrategyUseCase.execute(preferences.locale)
         uiState.update { current ->
-            val previousPricing = current.moreCard.pricingStrategy
-            val updatedSelectedPlan = previousPricing?.let { oldPricing ->
-                if (current.moreCard.selectedBillingPlan == oldPricing.heroPlan) {
-                    updatedPricing.heroPlan
-                } else {
-                    current.moreCard.selectedBillingPlan
-                }
-            } ?: updatedPricing.heroPlan
+            val updatedSelectedPlan = if (current.moreCard.hasUserSelectedBillingPlan) {
+                current.moreCard.selectedBillingPlan
+            } else {
+                currentProductConfig.paywallDefaultPlan.resolve(updatedPricing.heroPlan)
+            }
 
             current.copy(
                 moreCard = current.moreCard.copy(
@@ -1233,6 +1285,11 @@ class HomeViewModel @Inject constructor(
 
     fun claimLegacyPremiumGrant(activity: android.app.Activity) {
         viewModelScope.launch {
+            if (!currentProductConfig.founderOfferEnabled) {
+                FirebaseUtils.logEvent("legacy_premium_grant_blocked_by_config")
+                Timber.tag(TAG).d("Legacy Premium grant claim blocked by Remote Config")
+                return@launch
+            }
             FirebaseUtils.logEvent("legacy_premium_grant_claim_started")
             val grantState = legacyPremiumGrantRepository.reserveFounderOffer()
             if (grantState.status == LegacyPremiumGrantStatus.Reserved) {

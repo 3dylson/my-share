@@ -25,20 +25,20 @@
     <string name="id_amount_for_stocks" translatable="false">amount_for_stocks</string>
     <string name="id_amount_for_crypto" translatable="false">amount_for_crypto</string>
     <string name="id_amount_for_savings" translatable="false">amount_for_savings</string>
-    <string name="onboarding_welcome_title">اعرف ما تفعل\nعندما يصل المال</string>
-    <string name="onboarding_welcome_subtitle">أنشئ خطة راتب واضحة في أقل من دقيقتين، ثم دع المراجعات تتحول مع Premium إلى توجيه للراتب التالي.</string>
-    <string name="onboarding_welcome_badge">خطة راتب في دقيقتين</string>
-    <string name="onboarding_welcome_outcome_payday_title">خطة عمل الراتب القادم</string>
-    <string name="onboarding_welcome_outcome_payday_body">اعرف ما يجب نقله للفواتير والأهداف والإنفاق اليومي.</string>
-    <string name="onboarding_welcome_outcome_weekly_title">دليل الإنفاق الأسبوعي</string>
-    <string name="onboarding_welcome_outcome_weekly_body">حوّل مال الراتب إلى مبلغ أسبوعي يمكنك الوثوق به.</string>
-    <string name="onboarding_welcome_outcome_trust_title">يدوي أولًا، بلا بنك</string>
-    <string name="onboarding_welcome_outcome_trust_body">ابدأ دون ربط الحسابات. يظهر Premium فقط بعد أن تصبح خطتك جاهزة.</string>
+    <string name="onboarding_welcome_title">خطط للراتب\nقبل أن تنفق</string>
+    <string name="onboarding_welcome_subtitle">أضف ما يدخل، وما يجب دفعه، وهدفًا واحدًا. يحول My Share ذلك إلى قائمة بسيطة ليوم الراتب.</string>
+    <string name="onboarding_welcome_badge">أول قائمة ليوم الراتب</string>
+    <string name="onboarding_welcome_outcome_payday_title">ضع الفواتير جانبًا أولًا</string>
+    <string name="onboarding_welcome_outcome_payday_body">اعرف المبلغ الذي يجب تركه قبل أن يبدأ الإنفاق اليومي.</string>
+    <string name="onboarding_welcome_outcome_weekly_title">اجعل الأسبوع أوضح</string>
+    <string name="onboarding_welcome_outcome_weekly_body">شاهد مبلغًا أسبوعيًا أسهل في المتابعة.</string>
+    <string name="onboarding_welcome_outcome_trust_title">انقل المال إلى هدف واحد</string>
+    <string name="onboarding_welcome_outcome_trust_body">ابدأ يدويًا، بدون ربط بنك، واترك Premium لوقت لاحق.</string>
     <string name="onboarding_welcome_flow_income">الدخل</string>
     <string name="onboarding_welcome_flow_bills">الفواتير</string>
     <string name="onboarding_welcome_flow_weekly">أسبوع</string>
     <string name="onboarding_welcome_flow_goal">هدف</string>
-    <string name="onboarding_welcome_button_get_started">ابدأ</string>
+    <string name="onboarding_welcome_button_get_started">أنشئ خطتي</string>
     <string name="onboarding_welcome_button_skip_dev" translatable="false">Skip to Home (Dev)</string>
     <string name="onboarding_goal_picker_title">اختر الهدف المحمي لهذا الراتب</string>
     <string name="onboarding_goal_picker_subtitle">هذا الهدف يشكل الخطة التي نبنيها من أرقامك.</string>
@@ -664,6 +664,7 @@
     <string name="home_more_account_details_email">تم تسجيل الدخول كـ: %1$s</string>
     <string name="home_more_account_details_membership">الخطة: %1$s</string>
     <string name="home_more_account_details_sync_note">أنت تستخدم الوضع المحلي. اربط Google لمزامنة هذه الخطة.</string>
+    <string name="home_more_account_details_synced_note">تم ربط Google. يمكن مزامنة هذه الخطة واستعادتها بسهولة أكبر.</string>
     <string name="home_more_account_connect_google_title">ربط حساب Google</string>
     <string name="home_more_account_connect_google_desc">انسخ هذه الخطة احتياطيًا وزامنها مع Google.</string>
     <string name="home_more_account_connect_google_success">تم ربط حساب Google. يمكن الآن مزامنة هذه الخطة بأمان.</string>
@@ -779,6 +780,12 @@
     <string name="coaching_first_step_body">بداية رائعة بمراجعتك الأولى! كلما قمت بتسجيل الدخول أكثر، أصبحت حلقة عادتك أكثر ذكاءً.</string>
     <string name="notification_payday_title">مهمة يوم الدفع الخاصة بك</string>
     <string name="notification_payday_body">قم بتأمين %1$s للفواتير وخصّص %3$s. لديك %2$s للإنفاق الآمن.</string>
+    <string name="notification_weekly_review_title">مراجعة أسبوعية سريعة</string>
+    <string name="notification_weekly_review_body">تحقق مما إذا كان دليلك الأسبوعي %1$s لا يزال مناسبًا.</string>
+    <string name="notification_premium_checkin_due_title">مراجعة Premium جاهزة</string>
+    <string name="notification_premium_checkin_due_body">راجع يوم الدفع هذا حتى يحمي Premium %1$s/أسبوع وخطوتك التالية %2$s.</string>
+    <string name="notification_premium_checkin_overdue_title">ما زالت المراجعة مفيدة</string>
+    <string name="notification_premium_checkin_overdue_body">يمكن لمراجعة سريعة أن تساعد Premium على تعديل دليلك الأسبوعي %1$s وخطوتك التالية %2$s.</string>
     <string name="home_plan_next_payday">يوم الدفع التالي: %1$s</string>
     <string name="home_goal_mission_accomplished">المهمة أنجزت!</string>
     <string name="home_goal_on_pace">على وتيرة %1$s</string>

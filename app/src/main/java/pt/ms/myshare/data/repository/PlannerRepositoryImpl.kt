@@ -646,6 +646,8 @@ class PlannerRepositoryImpl @Inject constructor(
 
     override fun observeAutomationEnabled(): Flow<Boolean> = automationState.asStateFlow()
 
+    override fun loadAutomationEnabled(): Boolean = automationState.value
+
     override suspend fun saveAutomationEnabled(enabled: Boolean) = withContext(Dispatchers.IO) {
         Timber.tag(TAG).d("saveAutomationEnabled enabled=%s", enabled)
         prefs.edit().putBoolean(KEY_AUTOMATION_ENABLED, enabled).apply()

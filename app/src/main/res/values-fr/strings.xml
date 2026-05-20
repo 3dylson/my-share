@@ -25,20 +25,20 @@
     <string name="id_amount_for_stocks" translatable="false">amount_for_stocks</string>
     <string name="id_amount_for_crypto" translatable="false">amount_for_crypto</string>
     <string name="id_amount_for_savings" translatable="false">amount_for_savings</string>
-    <string name="onboarding_welcome_title">Sache quoi faire\nquand l’argent arrive</string>
-    <string name="onboarding_welcome_subtitle">Crée un plan de paie clair en moins de deux minutes, puis laisse les bilans devenir des conseils pour la prochaine paie avec Premium.</string>
-    <string name="onboarding_welcome_badge">Plan de paie en 2 minutes</string>
-    <string name="onboarding_welcome_outcome_payday_title">Plan d’action de la prochaine paie</string>
-    <string name="onboarding_welcome_outcome_payday_body">Vois quoi déplacer vers les factures, les objectifs et les dépenses quotidiennes.</string>
-    <string name="onboarding_welcome_outcome_weekly_title">Guide de dépense hebdomadaire</string>
-    <string name="onboarding_welcome_outcome_weekly_body">Transforme l’argent de la paie en montant hebdomadaire fiable.</string>
-    <string name="onboarding_welcome_outcome_trust_title">Manuel d’abord, sans banque</string>
-    <string name="onboarding_welcome_outcome_trust_body">Commence sans connecter de comptes. Premium est proposé seulement quand ton plan est prêt.</string>
+    <string name="onboarding_welcome_title">Prépare ta paie\navant de dépenser</string>
+    <string name="onboarding_welcome_subtitle">Ajoute ce qui arrive, ce qui doit sortir et un objectif. My Share en fait une liste simple pour le jour de paie.</string>
+    <string name="onboarding_welcome_badge">Ta première liste de paie</string>
+    <string name="onboarding_welcome_outcome_payday_title">Mets les factures de côté d’abord</string>
+    <string name="onboarding_welcome_outcome_payday_body">Sache combien garder intact avant les dépenses du quotidien.</string>
+    <string name="onboarding_welcome_outcome_weekly_title">Clarifie la semaine</string>
+    <string name="onboarding_welcome_outcome_weekly_body">Vois un montant hebdomadaire plus simple à suivre.</string>
+    <string name="onboarding_welcome_outcome_trust_title">Déplace l’argent vers un objectif</string>
+    <string name="onboarding_welcome_outcome_trust_body">Commence manuellement, sans banque connectée, et garde Premium pour plus tard.</string>
     <string name="onboarding_welcome_flow_income">Revenu</string>
     <string name="onboarding_welcome_flow_bills">Factures</string>
     <string name="onboarding_welcome_flow_weekly">Semaine</string>
     <string name="onboarding_welcome_flow_goal">Objectif</string>
-    <string name="onboarding_welcome_button_get_started">Commencer</string>
+    <string name="onboarding_welcome_button_get_started">Créer mon plan</string>
     <string name="onboarding_welcome_button_skip_dev" translatable="false">Skip to Home (Dev)</string>
     <string name="onboarding_goal_picker_title">Choisis l’objectif protégé de cette paie</string>
     <string name="onboarding_goal_picker_subtitle">Cet objectif façonne le plan créé à partir de tes chiffres.</string>
@@ -664,6 +664,7 @@
     <string name="home_more_account_details_email">Connecté en tant que : %1$s</string>
     <string name="home_more_account_details_membership">Plan : %1$s</string>
     <string name="home_more_account_details_sync_note">Vous utilisez le mode local. Connectez Google pour synchroniser ce plan.</string>
+    <string name="home_more_account_details_synced_note">Google est connecté. Ce plan peut se synchroniser et sera plus facile à récupérer.</string>
     <string name="home_more_account_connect_google_title">Connecter un compte Google</string>
     <string name="home_more_account_connect_google_desc">Sauvegardez et synchronisez ce plan avec Google.</string>
     <string name="home_more_account_connect_google_success">Compte Google connecté. Ce plan peut maintenant se synchroniser en sécurité.</string>
@@ -779,6 +780,12 @@
     <string name="coaching_first_step_body">Bon début avec votre premier avis ! Plus vous vous connectez, plus votre boucle d’habitudes devient intelligente.</string>
     <string name="notification_payday_title">Votre mission sur salaire</string>
     <string name="notification_payday_body">Mets %1$s de côté pour les factures et réserve %3$s. Il te reste %2$s pour les dépenses sûres.</string>
+    <string name="notification_weekly_review_title">Bilan hebdo rapide</string>
+    <string name="notification_weekly_review_body">Vérifie si ton guide hebdomadaire de %1$s reste adapté.</string>
+    <string name="notification_premium_checkin_due_title">Ton bilan Premium est prêt</string>
+    <string name="notification_premium_checkin_due_body">Fais le bilan de cette paie pour que Premium protège %1$s/semaine et ton prochain mouvement de %2$s.</string>
+    <string name="notification_premium_checkin_overdue_title">Le bilan reste utile</string>
+    <string name="notification_premium_checkin_overdue_body">Un bilan rapide peut encore aider Premium à ajuster ton guide de %1$s/semaine et ton prochain mouvement de %2$s.</string>
     <string name="home_plan_next_payday">Prochain jour de paie : %1$s</string>
     <string name="home_goal_mission_accomplished">Mission accomplie !</string>
     <string name="home_goal_on_pace">Au rythme pour %1$s</string>

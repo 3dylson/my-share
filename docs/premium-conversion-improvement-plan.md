@@ -63,6 +63,7 @@ Status after implementation pass on 2026-05-19:
 - Done: The founder pass is capped server-side to 100 claims through Cloud Function `claimLegacyPremiumGrant` and Firestore config `app_config/legacy_premium_grant`.
 - Done: Fresh installs are excluded by capturing an install-time eligibility snapshot before onboarding can write new planner values.
 - Done: Analytics events were added for founder pass viewed, claim started, claimed, not eligible, error, and dismissed.
+- Done: Firebase Remote Config now controls founder offer visibility, paywall default plan selection, onboarding paywall variant, Premium reminder messaging, and Premium proof variant so growth experiments can be rolled out or stopped without a new app release.
 - Done: Firestore rules protect the cap/config and grant records from client writes.
 - Done: Deployed `claimLegacyPremiumGrant` and Firestore rules explicitly to Firebase project `my-share-finance`.
 - Validated: Existing-user emulator state shows `A free year of Premium is waiting`; fresh-install onboarding and post-skip home do not show the founder pass.

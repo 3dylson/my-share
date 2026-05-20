@@ -57,6 +57,8 @@ import timber.log.Timber
 fun HomeRoute(
     modifier: Modifier = Modifier,
     navController: NavController,
+    notificationHomeDestination: HomeDestination? = null,
+    onNotificationHomeDestinationConsumed: () -> Unit = {},
     onManageAdsConsent: () -> Unit = {},
     adsConsentManager: pt.ms.myshare.presentation.ui.ads.AdsConsentManager? = null,
     onFreeHomeReady: () -> Unit = {},
@@ -73,6 +75,14 @@ fun HomeRoute(
     LaunchedEffect(uiState.isLoading, uiState.moreCard.isPremium) {
         if (!uiState.isLoading && !uiState.moreCard.isPremium) {
             onFreeHomeReady()
+        }
+    }
+
+    LaunchedEffect(notificationHomeDestination) {
+        notificationHomeDestination?.let { destination ->
+            viewModel.selectDestination(destination)
+            onNotificationHomeDestinationConsumed()
+            Timber.tag("HomeScreen").d("Notification destination consumed: %s", destination)
         }
     }
 
@@ -491,13 +501,17 @@ fun HomeScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyLarge
             )
-            if (!state.moreCard.isPremium) {
-                Text(
-                    text = stringResource(R.string.home_more_account_details_sync_note),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+            Text(
+                text = stringResource(
+                    if (state.moreCard.canConnectGoogle) {
+                        R.string.home_more_account_details_sync_note
+                    } else {
+                        R.string.home_more_account_details_synced_note
+                    }
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 

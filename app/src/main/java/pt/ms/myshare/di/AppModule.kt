@@ -10,6 +10,7 @@ import dagger.hilt.components.SingletonComponent
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import pt.ms.myshare.data.auth.AndroidCredentialStateClearer
 import pt.ms.myshare.data.auth.CredentialStateClearer
 import pt.ms.myshare.data.billing.BillingAuthSession
@@ -20,6 +21,7 @@ import pt.ms.myshare.data.grant.FirebaseLegacyPremiumGrantRepository
 import pt.ms.myshare.data.grant.LegacyPremiumGrantEligibilityStore
 import pt.ms.myshare.data.repository.FirestoreAppUpdatePolicyRepository
 import pt.ms.myshare.data.repository.AuthRepositoryImpl
+import pt.ms.myshare.data.repository.FirebaseProductConfigRepository
 import pt.ms.myshare.data.repository.PlannerRepositoryImpl
 import pt.ms.myshare.data.repository.SharedUserPreferencesRepository
 import pt.ms.myshare.domain.repository.AppUpdatePolicyRepository
@@ -27,6 +29,7 @@ import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.LegacyPremiumGrantRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
+import pt.ms.myshare.domain.repository.ProductConfigRepository
 import pt.ms.myshare.domain.repository.UserPreferencesRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.CheckEntitlementLimitUseCase
@@ -52,6 +55,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideFirebaseFunctions(): FirebaseFunctions = FirebaseFunctions.getInstance()
+
+    @Provides
+    @Singleton
+    fun provideFirebaseRemoteConfig(): FirebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
 
     @Provides
     @Singleton
@@ -127,6 +134,12 @@ object AppModule {
             firestoreProvider,
             firebaseFunctionsProvider
         )
+
+    @Provides
+    @Singleton
+    fun provideProductConfigRepository(
+        remoteConfig: FirebaseRemoteConfig
+    ): ProductConfigRepository = FirebaseProductConfigRepository(remoteConfig)
 
     @Provides
     @Singleton

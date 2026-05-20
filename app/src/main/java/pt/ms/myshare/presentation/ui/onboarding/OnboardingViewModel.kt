@@ -22,6 +22,7 @@ import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
 import pt.ms.myshare.domain.model.PremiumStoreProductSelector
+import pt.ms.myshare.domain.model.ProductExperienceConfig
 import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.domain.model.ReminderConfiguration
 import pt.ms.myshare.domain.model.SalaryPlan
@@ -30,6 +31,7 @@ import pt.ms.myshare.domain.model.PaydayRuleType
 import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
+import pt.ms.myshare.domain.repository.ProductConfigRepository
 import pt.ms.myshare.domain.repository.UserPreferencesRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.ResolveAllocationStrategyRulesUseCase
@@ -56,12 +58,14 @@ class OnboardingViewModel @Inject constructor(
     private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase,
     private val reminderWorkScheduler: ReminderWorkScheduler,
     private val userLocaleManager: UserLocaleManager,
-    private val onboardingAnalyticsLogger: OnboardingAnalyticsLogger
+    private val onboardingAnalyticsLogger: OnboardingAnalyticsLogger,
+    private val productConfigRepository: ProductConfigRepository
 ) : ViewModel() {
 
     private val state = MutableStateFlow(OnboardingState())
     val uiState: StateFlow<OnboardingState> = state.asStateFlow()
     private var activationLogged = false
+    private var currentProductConfig = ProductExperienceConfig()
 
     init {
         val completed = plannerRepository.isOnboardingCompleted()
@@ -78,6 +82,34 @@ class OnboardingViewModel @Inject constructor(
         }
         if (!completed) {
             onboardingAnalyticsLogger.logStarted(pricing, preferences)
+        }
+        viewModelScope.launch {
+            productConfigRepository.refresh()
+        }
+        viewModelScope.launch {
+            productConfigRepository.config.collect { productConfig ->
+                currentProductConfig = productConfig
+                state.update { current ->
+                    val currentPricing = current.pricingStrategy ?: pricing
+                    current.copy(
+                        selectedBillingPlan = if (current.hasUserSelectedBillingPlan) {
+                            current.selectedBillingPlan
+                        } else {
+                            productConfig.paywallDefaultPlan.resolve(currentPricing.heroPlan)
+                        }
+                    )
+                }
+                FirebaseUtils.logEvent("product_config_applied", Bundle().apply {
+                    putString("screen", "onboarding")
+                    putString("paywall_default_plan", productConfig.paywallDefaultPlan.name.lowercase(Locale.US))
+                    putString("onboarding_paywall_variant", productConfig.onboardingPaywallVariant)
+                })
+                Timber.tag(TAG).d(
+                    "Onboarding product config applied paywallDefault=%s variant=%s",
+                    productConfig.paywallDefaultPlan,
+                    productConfig.onboardingPaywallVariant
+                )
+            }
         }
         viewModelScope.launch {
             userPreferencesRepository.observePreferences().collect { updatedPreferences ->
@@ -334,7 +366,13 @@ class OnboardingViewModel @Inject constructor(
     }
 
     fun setSelectedBillingPlan(plan: BillingPlan) {
-        state.update { it.copy(selectedBillingPlan = plan, billingMessage = null) }
+        state.update {
+            it.copy(
+                selectedBillingPlan = plan,
+                hasUserSelectedBillingPlan = true,
+                billingMessage = null
+            )
+        }
         FirebaseUtils.logEvent("paywall_plan_selected", Bundle().apply {
             putString("billing_plan", plan.name.lowercase(Locale.US))
             putString("price_cluster", state.value.pricingStrategy?.marketCluster)
@@ -371,13 +409,11 @@ class OnboardingViewModel @Inject constructor(
             current.copy(
                 userPreferences = preferences,
                 pricingStrategy = updatedPricing,
-                selectedBillingPlan = current.pricingStrategy?.let { oldPricing ->
-                    if (current.selectedBillingPlan == oldPricing.heroPlan) {
-                        updatedPricing.heroPlan
-                    } else {
-                        current.selectedBillingPlan
-                    }
-                } ?: updatedPricing.heroPlan
+                selectedBillingPlan = if (current.hasUserSelectedBillingPlan) {
+                    current.selectedBillingPlan
+                } else {
+                    currentProductConfig.paywallDefaultPlan.resolve(updatedPricing.heroPlan)
+                }
             )
         }
     }

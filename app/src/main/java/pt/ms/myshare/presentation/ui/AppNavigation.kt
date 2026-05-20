@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import pt.ms.myshare.presentation.ui.home.HomeRoute
+import pt.ms.myshare.presentation.ui.home.HomeDestination
 import pt.ms.myshare.presentation.ui.home.GoalAddRoute
 import pt.ms.myshare.presentation.ui.home.RuleAddRoute
 import pt.ms.myshare.presentation.ui.onboarding.OnboardingEntryRoute
@@ -15,6 +16,8 @@ import pt.ms.myshare.presentation.ui.onboarding.OnboardingEntryRoute
 @Composable
 fun AppNavigation(
     navController: NavHostController = rememberNavController(),
+    notificationHomeDestination: HomeDestination? = null,
+    onNotificationHomeDestinationConsumed: () -> Unit = {},
     onManageAdsConsent: () -> Unit = {},
     adsConsentManager: pt.ms.myshare.presentation.ui.ads.AdsConsentManager? = null,
     onFreeHomeReady: () -> Unit = {}
@@ -26,6 +29,8 @@ fun AppNavigation(
         composable("home") {
             HomeRoute(
                 navController = navController,
+                notificationHomeDestination = notificationHomeDestination,
+                onNotificationHomeDestinationConsumed = onNotificationHomeDestinationConsumed,
                 onManageAdsConsent = onManageAdsConsent,
                 adsConsentManager = adsConsentManager,
                 onFreeHomeReady = onFreeHomeReady
