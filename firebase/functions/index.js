@@ -6,7 +6,10 @@ const {requireAuthenticatedUid} = require('./src/authenticatedUid');
 const {processPurchaseForUid} = require('./src/subscriptionVerificationService');
 const {handlePlayBillingNotification} = require('./src/playBillingNotificationHandler');
 const {revalidatePremiumEntitlements} = require('./src/premiumEntitlementRevalidator');
-const {claimLegacyPremiumGrant} = require('./src/legacyPremiumGrantService');
+const {
+  releaseLegacyPremiumFounderOffer,
+  reserveLegacyPremiumFounderOffer,
+} = require('./src/legacyPremiumGrantService');
 
 admin.initializeApp();
 
@@ -54,7 +57,7 @@ exports.verifySubscription = functions
       }
     });
 
-exports.claimLegacyPremiumGrant = functions
+exports.reserveLegacyPremiumFounderOffer = functions
     .runWith({
       minInstances: 0,
       maxInstances: 5,
@@ -62,16 +65,37 @@ exports.claimLegacyPremiumGrant = functions
     .https.onCall(async (data, context) => {
       const uid = await requireAuthenticatedUid(data, context);
       try {
-        return await claimLegacyPremiumGrant({
+        return await reserveLegacyPremiumFounderOffer({
           uid,
           campaignId: data.campaignId,
           clientEligibility: data.clientEligibility,
         });
       } catch (error) {
-        console.error('Error claiming legacy Premium grant:', error);
+        console.error('Error reserving legacy Premium founder offer:', error);
         throw new functions.https.HttpsError(
             'internal',
-            'Unable to claim legacy Premium grant.',
+            'Unable to reserve legacy Premium founder offer.',
+        );
+      }
+    });
+
+exports.releaseLegacyPremiumFounderOffer = functions
+    .runWith({
+      minInstances: 0,
+      maxInstances: 5,
+    })
+    .https.onCall(async (data, context) => {
+      const uid = await requireAuthenticatedUid(data, context);
+      try {
+        return await releaseLegacyPremiumFounderOffer({
+          uid,
+          campaignId: data.campaignId,
+        });
+      } catch (error) {
+        console.error('Error releasing legacy Premium founder offer:', error);
+        throw new functions.https.HttpsError(
+            'internal',
+            'Unable to release legacy Premium founder offer.',
         );
       }
     });

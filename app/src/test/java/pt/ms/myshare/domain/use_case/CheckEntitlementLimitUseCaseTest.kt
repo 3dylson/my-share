@@ -123,6 +123,8 @@ class FakeEntitlementRepository : EntitlementRepository {
 
     override suspend fun checkActiveEntitlement() {}
 
+    override suspend fun refreshProducts(): List<StoreProduct> = _availableProducts.value
+
     override suspend fun purchasePlan(activity: android.app.Activity, product: StoreProduct): BillingFlowLaunchResult =
         BillingFlowLaunchResult.ProductUnavailable
 

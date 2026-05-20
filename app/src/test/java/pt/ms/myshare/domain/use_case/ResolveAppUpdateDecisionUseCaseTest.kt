@@ -58,6 +58,28 @@ class ResolveAppUpdateDecisionUseCaseTest {
     }
 
     @Test
+    fun `version below minimum blocks app use without immediate request when policy is not immediate`() = runTest {
+        val useCase = ResolveAppUpdateDecisionUseCase(
+            FakeAppUpdatePolicyRepository(
+                AppUpdatePolicyLoadResult.Available(
+                    policy = AppUpdatePolicy(
+                        minimumSupportedVersionCode = 8,
+                        immediateUpdateRequired = false,
+                        playStorePackageName = "pt.ms.myshare"
+                    ),
+                    source = AppUpdatePolicySource.Remote
+                )
+            )
+        )
+
+        val decision = useCase(installedVersionCode = 7)
+
+        assertFalse(decision.shouldRequestImmediateUpdate)
+        assertTrue(decision.mustBlockAppUse)
+        assertFalse(decision.canContinue)
+    }
+
+    @Test
     fun `cached policy still blocks when installed version is below minimum`() = runTest {
         val useCase = ResolveAppUpdateDecisionUseCase(
             FakeAppUpdatePolicyRepository(

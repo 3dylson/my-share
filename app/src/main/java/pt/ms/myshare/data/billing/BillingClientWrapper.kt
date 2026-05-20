@@ -46,7 +46,7 @@ class BillingClientWrapper(context: Context) : PurchasesUpdatedListener {
                 isConnectionInProgress = false
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                     Timber.d("Billing Client Connected")
-                    queryProducts()
+                    refreshProducts()
                     queryActivePurchases()
                 } else {
                     Timber.e(
@@ -65,7 +65,7 @@ class BillingClientWrapper(context: Context) : PurchasesUpdatedListener {
         })
     }
 
-    private fun queryProducts() {
+    fun refreshProducts() {
         val params = QueryProductDetailsParams.newBuilder()
             .setProductList(
                 listOf(
@@ -83,11 +83,98 @@ class BillingClientWrapper(context: Context) : PurchasesUpdatedListener {
         
         billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsResult ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                Timber.d(
+                    "Billing product query returned productDetails=%d unfetched=%d",
+                    productDetailsResult.productDetailsList.size,
+                    productDetailsResult.unfetchedProductList.size
+                )
                 val storeProducts = productDetailsResult.productDetailsList.flatMap { details ->
                     BillingProductMapper.map(details)
                 }
+                BillingDiagnosticsLogger.logUnfetchedProducts(
+                    source = PRODUCT_REFRESH_SOURCE_INITIAL,
+                    result = productDetailsResult
+                )
+                BillingDiagnosticsLogger.logProductRefresh(
+                    source = PRODUCT_REFRESH_SOURCE_INITIAL,
+                    result = productDetailsResult,
+                    products = storeProducts
+                )
                 Timber.d("Billing products mapped: %d", storeProducts.size)
                 _availableProducts.value = storeProducts
+            } else {
+                BillingDiagnosticsLogger.logProductRefreshFailure(
+                    source = PRODUCT_REFRESH_SOURCE_INITIAL,
+                    responseCode = billingResult.responseCode,
+                    debugMessage = billingResult.debugMessage
+                )
+                Timber.e(
+                    "Billing product query failed code=%d message=%s",
+                    billingResult.responseCode,
+                    billingResult.debugMessage
+                )
+            }
+        }
+    }
+
+    suspend fun refreshProductsNow(): List<StoreProduct> = suspendCancellableCoroutine { continuation ->
+        if (!billingClient.isReady) {
+            Timber.d("Billing Client not ready. Product refresh deferred until connection completes")
+            startBillingConnection()
+            continuation.resume(_availableProducts.value)
+            return@suspendCancellableCoroutine
+        }
+
+        val params = QueryProductDetailsParams.newBuilder()
+            .setProductList(
+                listOf(
+                    QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(PremiumSubscriptionProducts.MONTHLY_ID)
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build(),
+                    QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(PremiumSubscriptionProducts.ANNUAL_ID)
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build()
+                )
+            )
+            .build()
+
+        billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsResult ->
+            if (!continuation.isActive) return@queryProductDetailsAsync
+            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                Timber.d(
+                    "Billing product refresh returned productDetails=%d unfetched=%d",
+                    productDetailsResult.productDetailsList.size,
+                    productDetailsResult.unfetchedProductList.size
+                )
+                val storeProducts = productDetailsResult.productDetailsList.flatMap { details ->
+                    BillingProductMapper.map(details)
+                }
+                BillingDiagnosticsLogger.logUnfetchedProducts(
+                    source = PRODUCT_REFRESH_SOURCE_MANUAL,
+                    result = productDetailsResult
+                )
+                BillingDiagnosticsLogger.logProductRefresh(
+                    source = PRODUCT_REFRESH_SOURCE_MANUAL,
+                    result = productDetailsResult,
+                    products = storeProducts
+                )
+                Timber.d("Billing products refreshed: %d", storeProducts.size)
+                _availableProducts.value = storeProducts
+                continuation.resume(storeProducts)
+            } else {
+                BillingDiagnosticsLogger.logProductRefreshFailure(
+                    source = PRODUCT_REFRESH_SOURCE_MANUAL,
+                    responseCode = billingResult.responseCode,
+                    debugMessage = billingResult.debugMessage
+                )
+                Timber.e(
+                    "Billing product refresh failed code=%d message=%s",
+                    billingResult.responseCode,
+                    billingResult.debugMessage
+                )
+                continuation.resume(_availableProducts.value)
             }
         }
     }
@@ -241,5 +328,10 @@ class BillingClientWrapper(context: Context) : PurchasesUpdatedListener {
                 Timber.e("Error acknowledging purchase: %s", billingResult.debugMessage)
             }
         }
+    }
+
+    private companion object {
+        const val PRODUCT_REFRESH_SOURCE_INITIAL = "initial"
+        const val PRODUCT_REFRESH_SOURCE_MANUAL = "manual"
     }
 }

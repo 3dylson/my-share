@@ -1137,6 +1137,7 @@ class TestFakeEntitlementRepository : EntitlementRepository {
     var purchaseResult: BillingFlowLaunchResult = BillingFlowLaunchResult.Launched
 
     override suspend fun checkActiveEntitlement() {}
+    override suspend fun refreshProducts(): List<StoreProduct> = _availableProducts.value
     override suspend fun purchasePlan(activity: android.app.Activity, product: StoreProduct): BillingFlowLaunchResult = purchaseResult
     suspend fun setProducts(products: List<StoreProduct>) { _availableProducts.emit(products) }
     suspend fun emitPurchaseEvent(event: BillingPurchaseEvent) { _purchaseEvents.emit(event) }
@@ -1157,10 +1158,22 @@ class TestFakeLegacyPremiumGrantRepository : LegacyPremiumGrantRepository {
 
     override suspend fun refreshAvailability() {}
 
-    override suspend fun claimGrant(): LegacyPremiumGrantState {
-        val claimedState = LegacyPremiumGrantState(status = LegacyPremiumGrantStatus.Claimed)
-        _grantState.emit(claimedState)
-        return claimedState
+    override suspend fun reserveFounderOffer(): LegacyPremiumGrantState {
+        val reservedState = LegacyPremiumGrantState(status = LegacyPremiumGrantStatus.Reserved)
+        _grantState.emit(reservedState)
+        return reservedState
+    }
+
+    override suspend fun releaseFounderOffer() {
+        _grantState.emit(LegacyPremiumGrantState(status = LegacyPremiumGrantStatus.Eligible))
+    }
+
+    override suspend fun markFounderOfferStarted() {
+        _grantState.emit(LegacyPremiumGrantState(status = LegacyPremiumGrantStatus.Reserved))
+    }
+
+    override suspend fun markFounderOfferClaimed() {
+        _grantState.emit(LegacyPremiumGrantState(status = LegacyPremiumGrantStatus.Claimed))
     }
 
     override suspend fun dismissGrant() {

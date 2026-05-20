@@ -28,6 +28,15 @@ function subscriptionIdFrom(purchaseInfo, fallbackSubscriptionId) {
   return productId || fallbackSubscriptionId || null;
 }
 
+function offerDetailsFrom(purchaseInfo) {
+  const lineItems = Array.isArray(purchaseInfo.lineItems) ?
+      purchaseInfo.lineItems :
+      [];
+  return lineItems
+      .map((lineItem) => lineItem.offerDetails)
+      .find((offerDetails) => offerDetails != null) || null;
+}
+
 function entitlementStateFor(subscriptionState, expiryTimeMillis) {
   const isEntitledState = ENTITLED_SUBSCRIPTION_STATES.has(subscriptionState);
   const hasFutureExpiry =
@@ -59,6 +68,7 @@ function buildEntitlementSnapshot({
   const acknowledgementState = acknowledgementResult?.acknowledgementState ??
       purchaseInfo.acknowledgementState ??
       null;
+  const offerDetails = offerDetailsFrom(purchaseInfo);
 
   const snapshot = {
     isPro,
@@ -80,6 +90,11 @@ function buildEntitlementSnapshot({
     serverAcknowledgementStatus: acknowledgementResult?.status || null,
     latestOrderId: purchaseInfo.latestOrderId || null,
     regionCode: purchaseInfo.regionCode || null,
+    basePlanId: offerDetails?.basePlanId || null,
+    offerId: offerDetails?.offerId || null,
+    offerTags: Array.isArray(offerDetails?.offerTags) ?
+        offerDetails.offerTags :
+        [],
     verificationSource,
     notificationType: notificationType || null,
     lastVerifiedAt: admin.firestore.FieldValue.serverTimestamp(),

@@ -30,7 +30,7 @@ class FirebaseLegacyPremiumGrantRepository @Inject constructor(
         state.value = initialState()
     }
 
-    override suspend fun claimGrant(): LegacyPremiumGrantState {
+    override suspend fun reserveFounderOffer(): LegacyPremiumGrantState {
         if (state.value.status == LegacyPremiumGrantStatus.Claiming) return state.value
         if (!eligibilityStore.evaluateEligibility()) {
             state.value = LegacyPremiumGrantState(status = LegacyPremiumGrantStatus.NotEligible)
@@ -57,39 +57,67 @@ class FirebaseLegacyPremiumGrantRepository @Inject constructor(
 
         try {
             val result = firebaseFunctionsProvider.get()
-                .getHttpsCallable("claimLegacyPremiumGrant")
+                .getHttpsCallable("reserveLegacyPremiumFounderOffer")
                 .call(data)
                 .await()
             val resultMap = result.data as? Map<*, *>
-            val granted = resultMap?.get("granted") as? Boolean ?: false
-            val expiryTimeMillis = when (val rawExpiry = resultMap?.get("expiryTimeMillis")) {
-                is Number -> rawExpiry.toLong()
-                is String -> rawExpiry.toLongOrNull()
-                else -> null
-            }
+            val reserved = resultMap?.get("reserved") as? Boolean ?: false
             val reason = resultMap?.get("reason") as? String
-            if (granted) {
-                eligibilityStore.markClaimed()
+            if (reserved) {
                 state.value = LegacyPremiumGrantState(
-                    status = LegacyPremiumGrantStatus.Claimed,
-                    expiryTimeMillis = expiryTimeMillis
+                    status = LegacyPremiumGrantStatus.Reserved
                 )
-                Timber.tag(TAG).d("Legacy Premium grant claimed expiry=%s", expiryTimeMillis)
+                Timber.tag(TAG).d("Legacy Premium founder offer reserved")
             } else {
                 if (reason == "cap_reached") {
                     eligibilityStore.markDismissed()
                 }
                 state.value = LegacyPremiumGrantState(status = LegacyPremiumGrantStatus.NotEligible)
-                Timber.tag(TAG).d("Legacy Premium grant rejected by server reason=%s", reason)
+                Timber.tag(TAG).d("Legacy Premium founder offer rejected by server reason=%s", reason)
             }
         } catch (e: Exception) {
-            Timber.tag(TAG).e(e, "Legacy Premium grant claim failed")
+            Timber.tag(TAG).e(e, "Legacy Premium founder offer reservation failed")
             state.value = LegacyPremiumGrantState(
                 status = LegacyPremiumGrantStatus.Error,
                 errorMessageKey = "legacy_premium_grant_error"
             )
         }
         return state.value
+    }
+
+    override suspend fun releaseFounderOffer() {
+        val session = billingAuthSession.requireAuthenticatedSession()
+            .onFailure { Timber.tag(TAG).e(it, "Legacy Premium founder release authentication failed") }
+            .getOrNull()
+        if (session == null) return
+
+        val data = hashMapOf(
+            "firebaseIdToken" to session.idToken,
+            "campaignId" to CAMPAIGN_ID
+        )
+        try {
+            firebaseFunctionsProvider.get()
+                .getHttpsCallable("releaseLegacyPremiumFounderOffer")
+                .call(data)
+                .await()
+            if (eligibilityStore.evaluateEligibility()) {
+                state.value = LegacyPremiumGrantState(status = LegacyPremiumGrantStatus.Eligible)
+            }
+            Timber.tag(TAG).d("Legacy Premium founder offer reservation released")
+        } catch (e: Exception) {
+            Timber.tag(TAG).e(e, "Legacy Premium founder offer release failed")
+        }
+    }
+
+    override suspend fun markFounderOfferStarted() {
+        state.value = LegacyPremiumGrantState(status = LegacyPremiumGrantStatus.Reserved)
+        Timber.tag(TAG).d("Legacy Premium founder Play flow started")
+    }
+
+    override suspend fun markFounderOfferClaimed() {
+        eligibilityStore.markClaimed()
+        state.value = LegacyPremiumGrantState(status = LegacyPremiumGrantStatus.Claimed)
+        Timber.tag(TAG).d("Legacy Premium founder offer marked claimed locally")
     }
 
     override suspend fun dismissGrant() {
@@ -118,8 +146,9 @@ class FirebaseLegacyPremiumGrantRepository @Inject constructor(
             if (!snapshot.exists()) return true
             val active = snapshot.getBoolean("active") ?: true
             val claimedCount = snapshot.getLong("claimedCount") ?: 0L
+            val reservedCount = snapshot.getLong("reservedCount") ?: 0L
             val maxClaims = snapshot.getLong("maxClaims") ?: MAX_CLAIMS
-            active && claimedCount < maxClaims
+            active && claimedCount + reservedCount < maxClaims
         } catch (e: Exception) {
             Timber.tag(TAG).e(e, "Legacy Premium grant config unavailable")
             false

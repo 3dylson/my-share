@@ -14,6 +14,7 @@ interface EntitlementRepository {
     val purchaseEvents: Flow<BillingPurchaseEvent>
 
     suspend fun checkActiveEntitlement()
+    suspend fun refreshProducts(): List<StoreProduct>
     suspend fun purchasePlan(activity: Activity, product: StoreProduct): BillingFlowLaunchResult
     suspend fun restorePurchases()
 }

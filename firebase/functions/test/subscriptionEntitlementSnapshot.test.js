@@ -100,3 +100,33 @@ test('stores server acknowledgement result on entitlement snapshot', () => {
   assert.ok(snapshot.serverAcknowledgedAt);
   assert.equal(snapshot.serverAcknowledgementError, null);
 });
+
+test('stores base plan and offer details on entitlement snapshot', () => {
+  const snapshot = buildEntitlementSnapshot({
+    purchaseInfo: {
+      ...purchaseInfo(
+          'SUBSCRIPTION_STATE_ACTIVE',
+          '2099-01-01T00:00:00Z',
+      ),
+      lineItems: [
+        {
+          productId: 'myshare_annual',
+          expiryTime: '2099-01-01T00:00:00Z',
+          offerDetails: {
+            basePlanId: 'annual',
+            offerId: 'founder-free-1y',
+            offerTags: ['founder-offer'],
+          },
+        },
+      ],
+    },
+    purchaseToken: 'raw-token',
+    subscriptionId: 'fallback_product',
+    verificationSource: 'callable',
+    notificationType: null,
+  });
+
+  assert.equal(snapshot.basePlanId, 'annual');
+  assert.equal(snapshot.offerId, 'founder-free-1y');
+  assert.deepEqual(snapshot.offerTags, ['founder-offer']);
+});

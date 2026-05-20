@@ -23,6 +23,9 @@ service cloud.firestore {
         'notificationType',
         'latestOrderId',
         'regionCode',
+        'basePlanId',
+        'offerId',
+        'offerTags',
         'grantCampaignId'
       ];
     }

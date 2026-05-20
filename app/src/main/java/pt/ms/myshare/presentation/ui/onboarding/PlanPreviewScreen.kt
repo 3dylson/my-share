@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Celebration
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Card
@@ -193,7 +194,12 @@ fun PlanPreviewScreen(
                 }
             }
             item {
-                PremiumAdjustmentTeaserCard()
+                PremiumAdjustmentTeaserCard(
+                    weeklySpend = currency.format(preview.weeklyFlexibleSpend),
+                    priorityContribution = currency.format(preview.priorityContributionPerPayday),
+                    goalLabel = goalLabel,
+                    hasPriorityContribution = hasPriorityContribution
+                )
             }
         }
     }
@@ -547,7 +553,12 @@ private fun PlanImpactCard(
 }
 
 @Composable
-private fun PremiumAdjustmentTeaserCard() {
+private fun PremiumAdjustmentTeaserCard(
+    weeklySpend: String,
+    priorityContribution: String,
+    goalLabel: String,
+    hasPriorityContribution: Boolean
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -592,49 +603,65 @@ private fun PremiumAdjustmentTeaserCard() {
                 }
             }
             Text(
-                text = stringResource(R.string.onboarding_plan_preview_premium_body),
+                text = if (hasPriorityContribution) {
+                    stringResource(
+                        R.string.onboarding_plan_preview_premium_body,
+                        weeklySpend,
+                        priorityContribution,
+                        goalLabel
+                    )
+                } else {
+                    stringResource(
+                        R.string.onboarding_plan_preview_premium_body_without_priority,
+                        weeklySpend
+                    )
+                },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 lineHeight = 21.sp
             )
-            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-                val shouldStack = maxWidth < 300.dp || LocalDensity.current.fontScale >= 1.3f
-                if (shouldStack) {
-                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        PremiumComparisonPill(
-                            label = stringResource(R.string.onboarding_plan_preview_free_label),
-                            body = stringResource(R.string.onboarding_plan_preview_free_body),
-                            modifier = Modifier.fillMaxWidth()
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                PremiumWatchItem(
+                    icon = Icons.Default.Security,
+                    label = stringResource(R.string.onboarding_plan_preview_premium_watch_weekly_label),
+                    body = stringResource(R.string.onboarding_plan_preview_premium_watch_weekly_body, weeklySpend),
+                    iconColor = MySharePrimary
+                )
+                PremiumWatchItem(
+                    icon = Icons.Default.Flag,
+                    label = if (hasPriorityContribution) {
+                        stringResource(R.string.onboarding_plan_preview_premium_watch_priority_label)
+                    } else {
+                        stringResource(R.string.onboarding_plan_preview_premium_watch_bills_label)
+                    },
+                    body = if (hasPriorityContribution) {
+                        stringResource(
+                            R.string.onboarding_plan_preview_premium_watch_priority_body,
+                            priorityContribution,
+                            goalLabel
                         )
-                        PremiumComparisonPill(
-                            label = stringResource(R.string.onboarding_plan_preview_premium_compare_label),
-                            body = stringResource(R.string.onboarding_plan_preview_premium_compare_body),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                } else {
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        PremiumComparisonPill(
-                            label = stringResource(R.string.onboarding_plan_preview_free_label),
-                            body = stringResource(R.string.onboarding_plan_preview_free_body),
-                            modifier = Modifier.weight(1f)
-                        )
-                        PremiumComparisonPill(
-                            label = stringResource(R.string.onboarding_plan_preview_premium_compare_label),
-                            body = stringResource(R.string.onboarding_plan_preview_premium_compare_body),
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                }
+                    } else {
+                        stringResource(R.string.onboarding_plan_preview_premium_watch_bills_body)
+                    },
+                    iconColor = MySharePositive
+                )
+                PremiumWatchItem(
+                    icon = Icons.Default.Savings,
+                    label = stringResource(R.string.onboarding_plan_preview_premium_watch_review_label),
+                    body = stringResource(R.string.onboarding_plan_preview_premium_watch_review_body),
+                    iconColor = MyShareWarning
+                )
             }
         }
     }
 }
 
 @Composable
-private fun PremiumComparisonPill(
+private fun PremiumWatchItem(
+    icon: ImageVector,
     label: String,
     body: String,
+    iconColor: Color,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -642,22 +669,42 @@ private fun PremiumComparisonPill(
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.58f),
         shape = RoundedCornerShape(16.dp)
     ) {
-        Column(
+        Row(
             modifier = Modifier.padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.Top
         ) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                text = body,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface,
-                lineHeight = 17.sp
-            )
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(iconColor.copy(alpha = 0.12f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = iconColor,
+                    modifier = Modifier.size(17.dp)
+                )
+            }
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(3.dp)
+            ) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = body,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    lineHeight = 17.sp
+                )
+            }
         }
     }
 }

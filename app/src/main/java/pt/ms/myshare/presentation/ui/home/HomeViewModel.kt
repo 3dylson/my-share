@@ -109,6 +109,7 @@ class HomeViewModel @Inject constructor(
     private var paydayRecommendationRollback: PaydayRecommendationRollback? = null
     private var nextReviewSavedEventId = 0L
     private var legacyPremiumGrantViewedLogged = false
+    private var isFounderOfferBillingFlowPending = false
 
     private var currentPreferences = userPreferencesRepository.loadPreferences()
 
@@ -181,6 +182,19 @@ class HomeViewModel @Inject constructor(
                     plannerRepository.saveAutomationEnabled(true)
                     Timber.tag(TAG).d("Premium watch enabled after completed purchase")
                     FirebaseUtils.logEvent("premium_watch_enabled_after_purchase")
+                    if (isFounderOfferBillingFlowPending) {
+                        isFounderOfferBillingFlowPending = false
+                        legacyPremiumGrantRepository.markFounderOfferClaimed()
+                        FirebaseUtils.logEvent("legacy_premium_founder_offer_completed")
+                        Timber.tag(TAG).d("Legacy Premium founder offer completed through Play")
+                    }
+                } else if (isFounderOfferBillingFlowPending &&
+                    (event == BillingPurchaseEvent.Canceled || event is BillingPurchaseEvent.Failed)
+                ) {
+                    isFounderOfferBillingFlowPending = false
+                    legacyPremiumGrantRepository.releaseFounderOffer()
+                    FirebaseUtils.logEvent("legacy_premium_founder_offer_released")
+                    Timber.tag(TAG).d("Legacy Premium founder offer reservation released after Play event")
                 }
                 uiState.update {
                     val shouldShowAccountPrompt = event == BillingPurchaseEvent.Completed &&
@@ -715,8 +729,46 @@ class HomeViewModel @Inject constructor(
             plannerRepository.saveReview(review)
             updateGoalProgressUseCase.execute(actualGoal)
             emitReviewSavedFeedback()
-            
-            FirebaseUtils.logEvent("weekly_checkin_completed")
+
+            val historyAfterSave = currentReviews
+                .filterNot { it.id == review.id } + review
+            val recommendationAfterSave = createPaydayAdjustmentRecommendationUseCase.execute(
+                plan.copy(rules = plannerRepository.loadRules()),
+                historyAfterSave
+            )
+            val isPremium = uiState.value.moreCard.isPremium
+            FirebaseUtils.logEvent("weekly_checkin_completed", android.os.Bundle().apply {
+                putString("is_premium", isPremium.toString())
+                putInt("review_count", historyAfterSave.size)
+                putString("has_recommendation", (recommendationAfterSave != null).toString())
+                putString(
+                    "recommendation_direction",
+                    recommendationAfterSave?.direction?.name?.lowercase(Locale.US) ?: "none"
+                )
+                putString("recommendation_applyable", (recommendationAfterSave?.isApplyable == true).toString())
+            })
+            recommendationAfterSave?.let { recommendation ->
+                FirebaseUtils.logEvent("premium_review_recommendation_generated", android.os.Bundle().apply {
+                    putString("is_premium", isPremium.toString())
+                    putString("direction", recommendation.direction.name.lowercase(Locale.US))
+                    putInt("review_count", recommendation.analyzedReviewCount)
+                    putString("adjustment_amount", recommendation.adjustmentAmount.toPlainString())
+                    putString("is_applyable", recommendation.isApplyable.toString())
+                })
+                if (isPremium) {
+                    FirebaseUtils.logEvent("premium_review_result_ready", android.os.Bundle().apply {
+                        putString("direction", recommendation.direction.name.lowercase(Locale.US))
+                        putInt("review_count", recommendation.analyzedReviewCount)
+                        putString("is_applyable", recommendation.isApplyable.toString())
+                    })
+                } else {
+                    FirebaseUtils.logEvent("post_review_premium_proof_ready", android.os.Bundle().apply {
+                        putString("direction", recommendation.direction.name.lowercase(Locale.US))
+                        putInt("review_count", recommendation.analyzedReviewCount)
+                        putString("is_applyable", recommendation.isApplyable.toString())
+                    })
+                }
+            }
             Timber.tag(TAG).d("Review saved with snapshots. planFlex=%s planPriority=%s", preview.flexibleSpendPerPayday, preview.priorityContributionPerPayday)
         }
     }
@@ -777,6 +829,11 @@ class HomeViewModel @Inject constructor(
         }
         if (!uiState.value.moreCard.isPremium) {
             Timber.tag(TAG).d("Payday recommendation apply blocked for free user")
+            FirebaseUtils.logEvent("premium_payday_adjustment_apply_blocked", android.os.Bundle().apply {
+                putString("reason", "not_premium")
+                putString("direction", recommendation.direction.name.lowercase(Locale.US))
+                putInt("review_count", recommendation.analyzedReviewCount)
+            })
             return false
         }
 
@@ -1173,14 +1230,75 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun claimLegacyPremiumGrant() {
+    fun claimLegacyPremiumGrant(activity: android.app.Activity) {
         viewModelScope.launch {
             FirebaseUtils.logEvent("legacy_premium_grant_claim_started")
-            val grantState = legacyPremiumGrantRepository.claimGrant()
-            if (grantState.status == LegacyPremiumGrantStatus.Claimed) {
-                plannerRepository.saveAutomationEnabled(true)
-                FirebaseUtils.logEvent("legacy_premium_grant_claimed")
-                Timber.tag(TAG).d("Legacy Premium grant claimed and Premium watch enabled")
+            val grantState = legacyPremiumGrantRepository.reserveFounderOffer()
+            if (grantState.status == LegacyPremiumGrantStatus.Reserved) {
+                val founderProduct = annualFounderOfferProduct()
+                    ?: entitlementRepository.refreshProducts().firstOrNull {
+                        it.productId == PremiumSubscriptionProducts.ANNUAL_ID && it.isFounderOffer()
+                }
+                if (founderProduct == null) {
+                    legacyPremiumGrantRepository.releaseFounderOffer()
+                    val annualProducts = availableStoreProducts.filter {
+                        it.productId == PremiumSubscriptionProducts.ANNUAL_ID
+                    }
+                    val annualOfferIds = annualProducts.mapNotNull { it.offerId }.distinct()
+                    FirebaseUtils.logEvent("legacy_premium_founder_offer_unavailable", android.os.Bundle().apply {
+                        putString("product_id", PremiumSubscriptionProducts.ANNUAL_ID)
+                        putString("offer_id", PremiumSubscriptionProducts.ANNUAL_FOUNDER_OFFER_ID)
+                        putInt("available_product_count", availableStoreProducts.size)
+                        putInt("annual_offer_count", annualProducts.size)
+                        putString("annual_trial_returned", annualProducts.any { it.hasFreeTrial }.toString())
+                        putString("annual_offer_ids", annualOfferIds.toTelemetryValue())
+                    })
+                    FirebaseUtils.logEvent("legacy_founder_offer_missing", android.os.Bundle().apply {
+                        putInt("available_product_count", availableStoreProducts.size)
+                        putInt("annual_offer_count", annualProducts.size)
+                        putString("annual_trial_returned", annualProducts.any { it.hasFreeTrial }.toString())
+                        putString("annual_offer_ids", annualOfferIds.toTelemetryValue())
+                    })
+                    FirebaseUtils.setCrashlyticsKey("legacy_founder_offer_missing", true)
+                    FirebaseUtils.setCrashlyticsKey("legacy_founder_available_count", availableStoreProducts.size)
+                    FirebaseUtils.setCrashlyticsKey("legacy_founder_annual_offer_ids", annualOfferIds.toTelemetryValue())
+                    FirebaseUtils.logCrashlyticsBreadcrumb(
+                        "Founder offer unavailable available=${availableStoreProducts.size} annualOffers=${annualOfferIds.toTelemetryValue()}"
+                    )
+                    uiState.update {
+                        it.copy(
+                            moreCard = it.moreCard.copy(
+                                billingMessage = BillingStatusMessageKeys.PRODUCTS_UNAVAILABLE,
+                                error = "more_error_products_not_loaded"
+                            )
+                        )
+                    }
+                    Timber.tag(TAG).e("Legacy Premium founder offer product unavailable")
+                    return@launch
+                }
+
+                FirebaseUtils.logEvent("legacy_premium_founder_offer_started", android.os.Bundle().apply {
+                    putString("product_id", founderProduct.productId)
+                    putString("offer_id", founderProduct.offerId)
+                    putString("offer_tags", founderProduct.offerTags.joinToString(","))
+                    putInt("free_trial_days", founderProduct.freeTrialDays ?: 0)
+                })
+                val launchResult = entitlementRepository.purchasePlan(activity, founderProduct)
+                if (launchResult == BillingFlowLaunchResult.Launched) {
+                    isFounderOfferBillingFlowPending = true
+                    legacyPremiumGrantRepository.markFounderOfferStarted()
+                } else {
+                    legacyPremiumGrantRepository.releaseFounderOffer()
+                }
+                uiState.update {
+                    it.copy(
+                        moreCard = it.moreCard.copy(
+                            billingMessage = BillingStatusMessageMapper.fromLaunchResult(launchResult),
+                            error = null
+                        )
+                    )
+                }
+                logBillingLaunchResult(launchResult, founderProduct.productId, "legacy_premium_founder_offer")
             } else if (grantState.status == LegacyPremiumGrantStatus.NotEligible) {
                 FirebaseUtils.logEvent("legacy_premium_grant_not_eligible")
             } else if (grantState.status == LegacyPremiumGrantStatus.Error) {
@@ -1271,9 +1389,9 @@ class HomeViewModel @Inject constructor(
         val storeProductId = selectedStoreProductId()
         return availableStoreProducts
             .filter { it.productId == storeProductId }
+            .filterNot { it.isSpecialOffer() }
             .sortedWith(
-                compareBy<StoreProduct> { it.isSubscriptionSaveOffer() }
-                    .thenByDescending { it.hasFreeTrial }
+                compareByDescending<StoreProduct> { it.hasFreeTrial }
             )
             .firstOrNull()
     }
@@ -1285,9 +1403,29 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private fun annualFounderOfferProduct(): StoreProduct? {
+        return availableStoreProducts.firstOrNull {
+            it.productId == PremiumSubscriptionProducts.ANNUAL_ID &&
+                it.isFounderOffer()
+        }
+    }
+
+    private fun StoreProduct.isSpecialOffer(): Boolean {
+        return isSubscriptionSaveOffer() || isFounderOffer()
+    }
+
     private fun StoreProduct.isSubscriptionSaveOffer(): Boolean {
         return offerId == PremiumSubscriptionProducts.MONTHLY_SAVE_OFFER_ID ||
             PremiumSubscriptionProducts.SAVE_OFFER_TAG in offerTags
+    }
+
+    private fun StoreProduct.isFounderOffer(): Boolean {
+        return offerId == PremiumSubscriptionProducts.ANNUAL_FOUNDER_OFFER_ID ||
+            PremiumSubscriptionProducts.FOUNDER_OFFER_TAG in offerTags
+    }
+
+    private fun List<String>.toTelemetryValue(): String {
+        return if (isEmpty()) "none" else joinToString(",").take(100)
     }
 
     fun updateAdsConsentRequirement(isRequired: Boolean) {

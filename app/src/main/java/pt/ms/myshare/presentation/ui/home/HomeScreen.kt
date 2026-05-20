@@ -139,7 +139,7 @@ fun HomeScreen(
     onPremiumGateUpgradeClicked: (HomePremiumGate) -> Unit,
     onSubscriptionRetentionViewed: () -> Unit,
     onSubscriptionRetentionContinue: () -> Unit,
-    onClaimLegacyPremiumGrant: () -> Unit,
+    onClaimLegacyPremiumGrant: (android.app.Activity) -> Unit,
     onDismissLegacyPremiumGrant: () -> Unit,
     onConnectGoogleAccount: (String) -> Unit,
     onGoogleConnectionCredentialError: (String) -> Unit,
@@ -262,6 +262,9 @@ fun HomeScreen(
             if (state.moreCard.isPremium) {
                 showPremiumReviewResultSheet = true
                 Timber.tag("HomeScreen").d("Premium review result sheet opened after saved review")
+            } else if (state.reviewCard.paydayRecommendation != null) {
+                openPremiumGate(HomePremiumGate.FirstReview)
+                Timber.tag("HomeScreen").d("Post-review Premium proof opened for free user")
             } else {
                 snackbarHostState.showSnackbar(
                     message = reviewSavedMessage,
@@ -523,7 +526,9 @@ fun HomeScreen(
         LegacyPremiumGrantDialog(
             isClaiming = state.moreCard.legacyPremiumGrant.status == LegacyPremiumGrantStatus.Claiming,
             errorMessageKey = state.moreCard.legacyPremiumGrant.errorMessageKey,
-            onClaim = onClaimLegacyPremiumGrant,
+            onClaim = {
+                activity?.let(onClaimLegacyPremiumGrant)
+            },
             onDismiss = onDismissLegacyPremiumGrant
         )
     }
@@ -939,7 +944,7 @@ private fun HomeScreenPreview() {
             onPremiumGateUpgradeClicked = { _ -> },
             onSubscriptionRetentionViewed = {},
             onSubscriptionRetentionContinue = {},
-            onClaimLegacyPremiumGrant = {},
+            onClaimLegacyPremiumGrant = { _ -> },
             onDismissLegacyPremiumGrant = {},
             onConnectGoogleAccount = { _ -> },
             onGoogleConnectionCredentialError = { _ -> },

@@ -4,6 +4,7 @@ enum class LegacyPremiumGrantStatus {
     NotEligible,
     Eligible,
     Claiming,
+    Reserved,
     Claimed,
     Dismissed,
     Error

@@ -5,6 +5,8 @@ object PremiumSubscriptionProducts {
     const val ANNUAL_ID = "myshare_annual"
     const val MONTHLY_SAVE_OFFER_ID = "save50-1m"
     const val SAVE_OFFER_TAG = "save-offer"
+    const val ANNUAL_FOUNDER_OFFER_ID = "founder-free-1y"
+    const val FOUNDER_OFFER_TAG = "founder-offer"
     const val MONTHLY_BILLING_PERIOD = "P1M"
     const val ANNUAL_BILLING_PERIOD = "P1Y"
 

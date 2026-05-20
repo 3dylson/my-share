@@ -169,6 +169,11 @@ class PlayBillingEntitlementRepository(
         billingClientWrapper.queryActivePurchases()
     }
 
+    override suspend fun refreshProducts(): List<StoreProduct> {
+        Timber.tag(TAG).d("Refreshing billing products")
+        return billingClientWrapper.refreshProductsNow()
+    }
+
     override suspend fun purchasePlan(activity: Activity, product: StoreProduct): BillingFlowLaunchResult {
         val userId = billingAuthSession.requireAuthenticatedUserId()
             .onFailure { e ->

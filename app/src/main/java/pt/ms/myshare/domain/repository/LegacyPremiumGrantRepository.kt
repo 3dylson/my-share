@@ -7,6 +7,9 @@ interface LegacyPremiumGrantRepository {
     val grantState: Flow<LegacyPremiumGrantState>
 
     suspend fun refreshAvailability()
-    suspend fun claimGrant(): LegacyPremiumGrantState
+    suspend fun reserveFounderOffer(): LegacyPremiumGrantState
+    suspend fun releaseFounderOffer()
+    suspend fun markFounderOfferStarted()
+    suspend fun markFounderOfferClaimed()
     suspend fun dismissGrant()
 }

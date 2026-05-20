@@ -5,6 +5,7 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.SystemClock
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -62,6 +63,8 @@ class MainComposeActivity : ComponentActivity() {
     private var hasGatheredAdsConsentForSession = false
     private var hasInitializedAdsForSession = false
     private var sessionCountForAds = 1
+    private var isAppUpdateGateEvaluationInFlight = false
+    private var lastAppUpdateGateEvaluationElapsedRealtime = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -136,13 +139,20 @@ class MainComposeActivity : ComponentActivity() {
                 }
             }
         }
-        evaluateAppUpdateGate()
+        evaluateAppUpdateGate(
+            reason = "startup",
+            force = true
+        )
         logAppStart()
     }
 
     override fun onResume() {
         super.onResume()
         refreshActiveEntitlement()
+        evaluateAppUpdateGateOnResume()
+    }
+
+    private fun evaluateAppUpdateGateOnResume() {
         val gateState = appUpdateGateState
         if (gateState is AppUpdateGateState.RequiredUpdate && gateState.policy.immediateUpdateRequired) {
             immediateAppUpdateCoordinator.resumeImmediateUpdateIfInProgress(
@@ -154,7 +164,33 @@ class MainComposeActivity : ComponentActivity() {
                     Timber.d("Required update gate remains active without an in-progress Play update")
                 }
             )
+            return
         }
+
+        evaluateAppUpdateGate(
+            reason = "resume",
+            force = false
+        )
+    }
+
+    private fun shouldEvaluateAppUpdateGate(force: Boolean): Boolean {
+        if (isAppUpdateGateEvaluationInFlight) {
+            Timber.d("Skipping app update gate evaluation because another evaluation is in flight")
+            return false
+        }
+
+        if (force) return true
+
+        val elapsedSinceLastEvaluation =
+            SystemClock.elapsedRealtime() - lastAppUpdateGateEvaluationElapsedRealtime
+        val shouldEvaluate = elapsedSinceLastEvaluation >= APP_UPDATE_GATE_RESUME_RECHECK_INTERVAL_MS
+        if (!shouldEvaluate) {
+            Timber.d(
+                "Skipping app update gate evaluation because last check is still fresh. elapsedMillis=%d",
+                elapsedSinceLastEvaluation
+            )
+        }
+        return shouldEvaluate
     }
 
     private fun refreshActiveEntitlement() {
@@ -181,27 +217,37 @@ class MainComposeActivity : ComponentActivity() {
         }
     }
 
-    private fun evaluateAppUpdateGate() {
-        lifecycleScope.launch {
-            val decision = resolveAppUpdateDecisionUseCase(BuildConfig.VERSION_CODE)
-            if (decision.policyError != null) {
-                Timber.e(decision.policyError, "App update policy unavailable. Allowing app usage.")
-            }
+    private fun evaluateAppUpdateGate(reason: String, force: Boolean) {
+        if (!shouldEvaluateAppUpdateGate(force)) return
 
-            val policy = decision.policy
-            if (decision.mustBlockAppUse && policy != null) {
-                Timber.d(
-                    "Blocking app usage for required update. installedVersionCode=%d minimumSupportedVersionCode=%d",
-                    BuildConfig.VERSION_CODE,
-                    policy.minimumSupportedVersionCode
-                )
-                appUpdateGateState = AppUpdateGateState.RequiredUpdate(policy)
-                if (decision.shouldRequestImmediateUpdate) {
-                    requestImmediateAppUpdate()
+        isAppUpdateGateEvaluationInFlight = true
+        lastAppUpdateGateEvaluationElapsedRealtime = SystemClock.elapsedRealtime()
+        lifecycleScope.launch {
+            try {
+                Timber.d("Evaluating app update gate. reason=%s", reason)
+                val decision = resolveAppUpdateDecisionUseCase(BuildConfig.VERSION_CODE)
+                if (decision.policyError != null) {
+                    Timber.e(decision.policyError, "App update policy unavailable. Allowing app usage.")
                 }
-            } else {
-                Timber.d("App update gate passed. installedVersionCode=%d", BuildConfig.VERSION_CODE)
-                appUpdateGateState = AppUpdateGateState.Ready
+
+                val policy = decision.policy
+                if (decision.mustBlockAppUse && policy != null) {
+                    val wasAlreadyBlocked = appUpdateGateState is AppUpdateGateState.RequiredUpdate
+                    Timber.d(
+                        "Blocking app usage for required update. installedVersionCode=%d minimumSupportedVersionCode=%d",
+                        BuildConfig.VERSION_CODE,
+                        policy.minimumSupportedVersionCode
+                    )
+                    appUpdateGateState = AppUpdateGateState.RequiredUpdate(policy)
+                    if (decision.shouldRequestImmediateUpdate && !wasAlreadyBlocked) {
+                        requestImmediateAppUpdate()
+                    }
+                } else {
+                    Timber.d("App update gate passed. installedVersionCode=%d", BuildConfig.VERSION_CODE)
+                    appUpdateGateState = AppUpdateGateState.Ready
+                }
+            } finally {
+                isAppUpdateGateEvaluationInFlight = false
             }
         }
     }
@@ -280,5 +326,9 @@ class MainComposeActivity : ComponentActivity() {
                 putString("is_system_dark_theme", this@MainComposeActivity.isDarkTheme().toString())
             },
         )
+    }
+
+    companion object {
+        private const val APP_UPDATE_GATE_RESUME_RECHECK_INTERVAL_MS = 60_000L
     }
 }

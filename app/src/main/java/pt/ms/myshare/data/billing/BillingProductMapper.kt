@@ -3,6 +3,7 @@ package pt.ms.myshare.data.billing
 import com.android.billingclient.api.ProductDetails
 import pt.ms.myshare.domain.model.PremiumSubscriptionProducts
 import pt.ms.myshare.domain.model.StoreProduct
+import timber.log.Timber
 
 internal object BillingProductMapper {
 
@@ -28,7 +29,28 @@ internal object BillingProductMapper {
 
         val offerToken = this.offerToken
         val price = recurringPhase?.formattedPrice
-        if (offerToken.isBlank() || price.isNullOrBlank()) return null
+        Timber.tag(TAG).d(
+            "Billing offer returned product=%s basePlan=%s offerId=%s tags=%s phases=%s hasToken=%s",
+            details.productId,
+            basePlanId,
+            offerId,
+            offerTags.orEmpty().joinToString(","),
+            phases.joinToString("|") { phase ->
+                "${phase.formattedPrice}:${phase.billingPeriod}:${phase.recurrenceMode}:${phase.billingCycleCount}"
+            },
+            offerToken.isNotBlank()
+        )
+        if (offerToken.isBlank() || price.isNullOrBlank()) {
+            Timber.tag(TAG).e(
+                "Billing offer skipped product=%s basePlan=%s offerId=%s missingToken=%s missingRecurringPrice=%s",
+                details.productId,
+                basePlanId,
+                offerId,
+                offerToken.isBlank(),
+                price.isNullOrBlank()
+            )
+            return null
+        }
 
         return StoreProduct(
             productId = details.productId,
@@ -67,4 +89,6 @@ internal object BillingProductMapper {
             billingPeriod.isNotBlank() &&
             recurrenceMode != ProductDetails.RecurrenceMode.INFINITE_RECURRING
     }
+
+    private const val TAG = "BillingProductMapper"
 }

@@ -39,6 +39,11 @@ class SharedPreferencesEntitlementRepository @Inject constructor(
         // No-op for shared prefs
     }
 
+    override suspend fun refreshProducts(): List<StoreProduct> {
+        Timber.tag(TAG).d("refreshProducts unavailable for shared preferences entitlement")
+        return emptyList()
+    }
+
     override suspend fun purchasePlan(activity: Activity, product: StoreProduct): BillingFlowLaunchResult {
         Timber.tag(TAG).d("purchasePlan unavailable for shared preferences entitlement")
         return BillingFlowLaunchResult.ProductUnavailable

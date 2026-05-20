@@ -68,6 +68,14 @@ Status after implementation pass on 2026-05-19:
 - Validated: Existing-user emulator state shows `A free year of Premium is waiting`; fresh-install onboarding and post-skip home do not show the founder pass.
 - Guardrail: Do not tap `Activate my free year` during QA unless intentionally consuming one of the 100 live founder passes.
 
+## Immediate Premium Value Before The First Payday Cycle
+
+Status after implementation pass on 2026-05-20:
+- Done: The onboarding plan preview now shows what Premium starts watching immediately, using the user's weekly guide, priority move, and first-review promise.
+- Done: Replaced the abstract free-vs-Premium comparison pills with three concrete watch items: weekly guide, priority move or bills-first fallback, and first review.
+- Goal: Premium should feel useful before the real payday cycle completes by making the future check-in benefit visible today, without crowding the aha moment.
+- QA focus: validate the plan preview on compact screens and long localized text so the watch items wrap cleanly and do not truncate important values.
+
 ## Conversion And Copy Principles
 
 Marketing copy should follow a premium, trust-first approach:

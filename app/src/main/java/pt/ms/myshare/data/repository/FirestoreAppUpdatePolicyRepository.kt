@@ -62,11 +62,21 @@ class FirestoreAppUpdatePolicyRepository @Inject constructor(
             .putInt(KEY_MINIMUM_SUPPORTED_VERSION_CODE, policy.minimumSupportedVersionCode)
             .putBoolean(KEY_IMMEDIATE_UPDATE_REQUIRED, policy.immediateUpdateRequired)
             .putString(KEY_PLAY_STORE_PACKAGE_NAME, policy.playStorePackageName)
+            .putLong(KEY_FETCHED_AT_MILLIS, System.currentTimeMillis())
             .apply()
     }
 
     private fun loadCachedPolicy(): AppUpdatePolicy? {
         if (!preferences.contains(KEY_MINIMUM_SUPPORTED_VERSION_CODE)) return null
+        val cachedAtMillis = preferences.getLong(KEY_FETCHED_AT_MILLIS, 0L)
+        if (!AppUpdatePolicyCacheFreshness.isFresh(cachedAtMillis, System.currentTimeMillis())) {
+            Timber.e(
+                "Cached app update policy is stale or missing a fetch timestamp. cachedAtMillis=%d",
+                cachedAtMillis
+            )
+            return null
+        }
+
         return AppUpdatePolicy(
             minimumSupportedVersionCode = preferences.getInt(KEY_MINIMUM_SUPPORTED_VERSION_CODE, 0),
             immediateUpdateRequired = preferences.getBoolean(KEY_IMMEDIATE_UPDATE_REQUIRED, false),
@@ -82,6 +92,7 @@ class FirestoreAppUpdatePolicyRepository @Inject constructor(
         private const val KEY_MINIMUM_SUPPORTED_VERSION_CODE = "minimum_supported_version_code"
         private const val KEY_IMMEDIATE_UPDATE_REQUIRED = "immediate_update_required"
         private const val KEY_PLAY_STORE_PACKAGE_NAME = "play_store_package_name"
+        private const val KEY_FETCHED_AT_MILLIS = "fetched_at_millis"
         private const val DEFAULT_PACKAGE_NAME = "pt.ms.myshare"
     }
 }

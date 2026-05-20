@@ -5,6 +5,9 @@ const {
 } = require('./playBillingApi');
 const {writeEntitlementSnapshot} = require('./entitlementStore');
 const {buildEntitlementSnapshot} = require('./subscriptionEntitlementSnapshot');
+const {
+  recordLegacyPremiumFounderPurchase,
+} = require('./legacyPremiumGrantService');
 
 async function writePurchaseInfoForUid({
   uid,
@@ -24,6 +27,11 @@ async function writePurchaseInfoForUid({
     acknowledgementResult,
   });
   await writeEntitlementSnapshot(uid, purchaseToken, snapshot);
+  await recordLegacyPremiumFounderPurchase({
+    uid,
+    purchaseInfo,
+    subscriptionId: snapshot.subscriptionId || subscriptionId,
+  });
   return snapshot;
 }
 
