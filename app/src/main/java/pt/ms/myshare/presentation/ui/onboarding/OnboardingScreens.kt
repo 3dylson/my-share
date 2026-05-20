@@ -35,6 +35,7 @@ import pt.ms.myshare.BuildConfig
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.OnboardingPaywallVariant
+import pt.ms.myshare.domain.model.PaywallTrialFraming
 import pt.ms.myshare.domain.model.PlanPreview
 import pt.ms.myshare.domain.model.PremiumStoreProductSelector
 import pt.ms.myshare.domain.model.PricingStrategy
@@ -65,6 +66,7 @@ fun PaywallScreen(
     availableProducts: List<StoreProduct> = emptyList(),
     selectedPlan: BillingPlan,
     paywallVariant: OnboardingPaywallVariant = OnboardingPaywallVariant.PAYDAY_PROOF,
+    trialFraming: PaywallTrialFraming = PaywallTrialFraming.SEVEN_DAY,
     isBillingActionInProgress: Boolean = false,
     billingMessage: String? = null,
     showSecurePremiumAccessPrompt: Boolean = false,
@@ -118,6 +120,7 @@ fun PaywallScreen(
         BillingPlan.ANNUAL -> stringResource(R.string.paywall_period_year)
     }
     val selectedTrialDays = selectedProduct?.freeTrialDays?.takeIf { it > 0 }
+    val useFirstCheckInTrialFraming = trialFraming == PaywallTrialFraming.FIRST_CHECKIN
     val displayTrialDays = availableProducts
         .mapNotNull { product -> product.freeTrialDays?.takeIf { days -> days > 0 } }
         .maxOrNull()
@@ -197,6 +200,9 @@ fun PaywallScreen(
                     checkoutTerms = checkoutTerms,
                     ctaText = when {
                         selectedProduct == null -> stringResource(R.string.paywall_price_loading)
+                        selectedTrialDays != null && useFirstCheckInTrialFraming -> {
+                            stringResource(R.string.paywall_start_trial_button_first_checkin)
+                        }
                         selectedTrialDays != null -> stringResource(R.string.paywall_start_trial_button)
                         else -> stringResource(R.string.paywall_upgrade_button)
                     },
@@ -271,7 +277,11 @@ fun PaywallScreen(
                     headline = headline,
                     subhead = subhead,
                     badge = if (displayTrialDays != null) {
-                        stringResource(R.string.paywall_hero_trial_badge, displayTrialDays)
+                        if (useFirstCheckInTrialFraming) {
+                            stringResource(R.string.paywall_hero_trial_badge_first_checkin)
+                        } else {
+                            stringResource(R.string.paywall_hero_trial_badge, displayTrialDays)
+                        }
                     } else {
                         stringResource(R.string.premium_badge)
                     },

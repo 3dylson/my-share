@@ -40,10 +40,17 @@ class OnboardingAnalyticsLogger @Inject constructor() {
         Timber.tag(TAG).d("Onboarding step completed route=%s step=%d/%d", route, stepIndex, setupStepTotal)
     }
 
-    fun logActivationReached(focus: PlanningFocus, pricingStrategy: PricingStrategy?) {
+    fun logActivationReached(
+        focus: PlanningFocus,
+        pricingStrategy: PricingStrategy?,
+        onboardingExperiment: String? = null,
+        paywallTrialFraming: String? = null
+    ) {
         FirebaseUtils.logEvent("onboarding_activation_reached", Bundle().apply {
             putString("selected_focus", focus.analyticsName())
             putString("price_cluster", pricingStrategy?.marketCluster)
+            onboardingExperiment?.let { putString("onboarding_experiment", it) }
+            paywallTrialFraming?.let { putString("paywall_trial_framing", it) }
         })
         Timber.tag(TAG).d("Onboarding activation reached focus=%s", focus.analyticsName())
     }

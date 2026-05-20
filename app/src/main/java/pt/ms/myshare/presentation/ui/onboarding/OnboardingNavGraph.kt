@@ -202,6 +202,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                     availableProducts = state.availableProducts,
                     selectedPlan = state.selectedBillingPlan,
                     paywallVariant = state.onboardingPaywallVariant,
+                    trialFraming = state.paywallTrialFraming,
                     isBillingActionInProgress = state.isBillingActionInProgress,
                     billingMessage = state.billingMessage,
                     showSecurePremiumAccessPrompt = state.shouldSecurePremiumAccess,

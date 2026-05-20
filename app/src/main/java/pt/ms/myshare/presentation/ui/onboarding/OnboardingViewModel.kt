@@ -95,6 +95,8 @@ class OnboardingViewModel @Inject constructor(
                     val currentPricing = current.pricingStrategy ?: pricing
                     current.copy(
                         onboardingPaywallVariant = productConfig.onboardingPaywallVariant,
+                        onboardingConversionExperiment = productConfig.onboardingConversionExperiment,
+                        paywallTrialFraming = productConfig.paywallTrialFraming,
                         selectedBillingPlan = if (current.hasUserSelectedBillingPlan) {
                             current.selectedBillingPlan
                         } else {
@@ -106,6 +108,8 @@ class OnboardingViewModel @Inject constructor(
                     putString("screen", "onboarding")
                     putString("paywall_default_plan", productConfig.paywallDefaultPlan.name.lowercase(Locale.US))
                     putString("onboarding_paywall_variant", productConfig.onboardingPaywallVariant.remoteValue)
+                    putString("onboarding_experiment", productConfig.onboardingConversionExperiment)
+                    putString("paywall_trial_framing", productConfig.paywallTrialFraming.remoteValue)
                 })
                 Timber.tag(TAG).d(
                     "Onboarding product config applied paywallDefault=%s variant=%s",
@@ -226,7 +230,12 @@ class OnboardingViewModel @Inject constructor(
         if (activationLogged) return
         activationLogged = true
         val current = state.value
-        onboardingAnalyticsLogger.logActivationReached(current.selectedFocus, current.pricingStrategy)
+        onboardingAnalyticsLogger.logActivationReached(
+            focus = current.selectedFocus,
+            pricingStrategy = current.pricingStrategy,
+            onboardingExperiment = current.onboardingConversionExperiment,
+            paywallTrialFraming = current.paywallTrialFraming.remoteValue
+        )
     }
 
     fun logAllocationTuneStarted() {
@@ -381,6 +390,8 @@ class OnboardingViewModel @Inject constructor(
             putString("price_cluster", state.value.pricingStrategy?.marketCluster)
             putString("source", "onboarding_paywall")
             putString("onboarding_paywall_variant", state.value.onboardingPaywallVariant.remoteValue)
+            putString("onboarding_experiment", state.value.onboardingConversionExperiment)
+            putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
         })
     }
 
@@ -429,7 +440,9 @@ class OnboardingViewModel @Inject constructor(
                 name = "onboarding_purchase_launch",
                 attributes = mapOf(
                     "billing_plan" to state.value.selectedBillingPlan.name.lowercase(Locale.US),
-                    "paywall_variant" to state.value.onboardingPaywallVariant.remoteValue
+                    "paywall_variant" to state.value.onboardingPaywallVariant.remoteValue,
+                    "onboarding_experiment" to state.value.onboardingConversionExperiment,
+                    "trial_framing" to state.value.paywallTrialFraming.remoteValue
                 )
             ) { trace ->
                 state.update {
@@ -457,6 +470,8 @@ class OnboardingViewModel @Inject constructor(
                         putString("product_id", storeProductId)
                         putString("source", "onboarding_paywall")
                         putString("onboarding_paywall_variant", state.value.onboardingPaywallVariant.remoteValue)
+                        putString("onboarding_experiment", state.value.onboardingConversionExperiment)
+                        putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
                     })
                     Timber.tag("OnboardingBilling").e("Cannot purchase: Product %s not found in store", storeProductId)
                     return@traceSuspend
@@ -469,6 +484,8 @@ class OnboardingViewModel @Inject constructor(
                     putBoolean("has_trial", product.hasFreeTrial)
                     putString("source", "onboarding_paywall")
                     putString("onboarding_paywall_variant", state.value.onboardingPaywallVariant.remoteValue)
+                    putString("onboarding_experiment", state.value.onboardingConversionExperiment)
+                    putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
                 })
                 val launchResult = entitlementRepository.purchasePlan(activity, product)
                 state.update {
@@ -693,6 +710,8 @@ class OnboardingViewModel @Inject constructor(
                     putString("source", source)
                     putString("billing_plan", state.value.selectedBillingPlan.name.lowercase(Locale.US))
                     putString("product_id", PremiumSubscriptionProducts.productIdFor(state.value.selectedBillingPlan))
+                    putString("onboarding_experiment", state.value.onboardingConversionExperiment)
+                    putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
                 })
                 Timber.tag("OnboardingBilling").d(
                     "Billing purchase completed source=%s",
@@ -703,6 +722,8 @@ class OnboardingViewModel @Inject constructor(
                 FirebaseUtils.logEvent("purchase_pending", Bundle().apply {
                     putString("source", source)
                     putString("product_id", PremiumSubscriptionProducts.productIdFor(state.value.selectedBillingPlan))
+                    putString("onboarding_experiment", state.value.onboardingConversionExperiment)
+                    putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
                 })
                 Timber.tag("OnboardingBilling").d(
                     "Billing purchase pending source=%s",
@@ -713,6 +734,8 @@ class OnboardingViewModel @Inject constructor(
                 FirebaseUtils.logEvent("purchase_canceled", Bundle().apply {
                     putString("source", source)
                     putString("product_id", PremiumSubscriptionProducts.productIdFor(state.value.selectedBillingPlan))
+                    putString("onboarding_experiment", state.value.onboardingConversionExperiment)
+                    putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
                 })
                 Timber.tag("OnboardingBilling").d(
                     "Billing purchase canceled source=%s",
@@ -724,6 +747,8 @@ class OnboardingViewModel @Inject constructor(
                     putString("source", source)
                     putString("product_id", PremiumSubscriptionProducts.productIdFor(state.value.selectedBillingPlan))
                     putInt("response_code", event.responseCode)
+                    putString("onboarding_experiment", state.value.onboardingConversionExperiment)
+                    putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
                 })
                 Timber.tag("OnboardingBilling").e(
                     "Billing purchase failed source=%s code=%d message=%s",
@@ -800,6 +825,8 @@ class OnboardingViewModel @Inject constructor(
             putString("price_cluster", state.value.pricingStrategy?.marketCluster)
             putString("billing_plan", state.value.selectedBillingPlan.name.lowercase(Locale.US))
             putString("onboarding_paywall_variant", state.value.onboardingPaywallVariant.remoteValue)
+            putString("onboarding_experiment", state.value.onboardingConversionExperiment)
+            putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
         })
     }
 

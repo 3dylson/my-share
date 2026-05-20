@@ -5,6 +5,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Test
 import pt.ms.myshare.domain.model.ProductExperienceConfig
 import pt.ms.myshare.domain.model.OnboardingPaywallVariant
+import pt.ms.myshare.domain.model.PaywallTrialFraming
 import pt.ms.myshare.domain.model.PremiumProofVariant
 import pt.ms.myshare.domain.model.RemoteBillingPlanDefault
 
@@ -28,6 +29,8 @@ class RemoteProductConfigMapperTest {
         assertEquals(RemoteBillingPlanDefault.MARKET, config.paywallDefaultPlan)
         assertEquals(OnboardingPaywallVariant.PAYDAY_PROOF, config.onboardingPaywallVariant)
         assertEquals(PremiumProofVariant.NEXT_MOVE, config.premiumProofVariant)
+        assertEquals(ProductExperienceConfig.DEFAULT_ONBOARDING_CONVERSION_EXPERIMENT, config.onboardingConversionExperiment)
+        assertEquals(PaywallTrialFraming.SEVEN_DAY, config.paywallTrialFraming)
     }
 
     @Test
@@ -40,6 +43,17 @@ class RemoteProductConfigMapperTest {
     fun `maps supported premium proof variants`() {
         assertEquals(PremiumProofVariant.NEXT_MOVE, config(premiumProofVariant = "next_move").premiumProofVariant)
         assertEquals(PremiumProofVariant.PROGRESS_LOOP, config(premiumProofVariant = "progress_loop").premiumProofVariant)
+    }
+
+    @Test
+    fun `maps ab testing experiment controls`() {
+        val config = config(
+            onboardingConversionExperiment = "Paywall V1 / First Check-In",
+            paywallTrialFraming = "first_checkin"
+        )
+
+        assertEquals("paywall_v1_first_check_in", config.onboardingConversionExperiment)
+        assertEquals(PaywallTrialFraming.FIRST_CHECKIN, config.paywallTrialFraming)
     }
 
     @Test
@@ -58,14 +72,18 @@ class RemoteProductConfigMapperTest {
         onboardingPaywallVariant: String = "payday_proof",
         founderOfferEnabled: Boolean = true,
         premiumRemindersEnabled: Boolean = true,
-        premiumProofVariant: String = "next_move"
+        premiumProofVariant: String = "next_move",
+        onboardingConversionExperiment: String = "baseline",
+        paywallTrialFraming: String = "seven_day"
     ): ProductExperienceConfig {
         return RemoteProductConfigMapper.fromValues(
             paywallDefaultPlan = paywallDefaultPlan,
             onboardingPaywallVariant = onboardingPaywallVariant,
             founderOfferEnabled = founderOfferEnabled,
             premiumRemindersEnabled = premiumRemindersEnabled,
-            premiumProofVariant = premiumProofVariant
+            premiumProofVariant = premiumProofVariant,
+            onboardingConversionExperiment = onboardingConversionExperiment,
+            paywallTrialFraming = paywallTrialFraming
         )
     }
 }

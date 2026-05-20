@@ -5,11 +5,14 @@ data class ProductExperienceConfig(
     val onboardingPaywallVariant: OnboardingPaywallVariant = OnboardingPaywallVariant.PAYDAY_PROOF,
     val founderOfferEnabled: Boolean = true,
     val premiumRemindersEnabled: Boolean = true,
-    val premiumProofVariant: PremiumProofVariant = PremiumProofVariant.NEXT_MOVE
+    val premiumProofVariant: PremiumProofVariant = PremiumProofVariant.NEXT_MOVE,
+    val onboardingConversionExperiment: String = DEFAULT_ONBOARDING_CONVERSION_EXPERIMENT,
+    val paywallTrialFraming: PaywallTrialFraming = PaywallTrialFraming.SEVEN_DAY
 ) {
     companion object {
         const val DEFAULT_ONBOARDING_PAYWALL_VARIANT = "payday_proof"
         const val DEFAULT_PREMIUM_PROOF_VARIANT = "next_move"
+        const val DEFAULT_ONBOARDING_CONVERSION_EXPERIMENT = "baseline"
     }
 }
 
@@ -21,6 +24,11 @@ enum class OnboardingPaywallVariant(val remoteValue: String) {
 enum class PremiumProofVariant(val remoteValue: String) {
     NEXT_MOVE(ProductExperienceConfig.DEFAULT_PREMIUM_PROOF_VARIANT),
     PROGRESS_LOOP("progress_loop")
+}
+
+enum class PaywallTrialFraming(val remoteValue: String) {
+    SEVEN_DAY("seven_day"),
+    FIRST_CHECKIN("first_checkin")
 }
 
 enum class RemoteBillingPlanDefault {

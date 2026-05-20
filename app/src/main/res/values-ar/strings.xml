@@ -695,6 +695,7 @@
     <string name="paywall_badge_easy_start">بداية سهلة</string>
     <string name="paywall_annual_savings_label">وفّر %1$s سنويًا</string>
     <string name="paywall_hero_trial_badge">تجربة %1$d أيام</string>
+    <string name="paywall_hero_trial_badge_first_checkin">تجربة حتى أول مراجعة</string>
     <string name="paywall_plan_section_title">اختر خطتك</string>
     <string name="paywall_value_section_title">ما الذي يضيفه Premium فعلاً</string>
     <string name="paywall_price_loading">جارٍ التحقق من سعر Play</string>
@@ -722,6 +723,7 @@
     <string name="paywall_trust_cancel_body">يمكنك الإدارة أو الإلغاء من Google Play. يبقى الوصول فعالًا حتى نهاية الفترة المدفوعة.</string>
     <string name="paywall_upgrade_button">الترقية الآن</string>
     <string name="paywall_start_trial_button">ابدأ التجربة المجانية</string>
+    <string name="paywall_start_trial_button_first_checkin">جرّب حتى أول مراجعة</string>
     <string name="paywall_upgrade_loading">جارٍ تجهيز الشراء…</string>
     <string name="paywall_billing_starting">جارٍ تجهيز شاشة الشراء الآمنة في Play…</string>
     <string name="paywall_billing_handoff">تم فتح شاشة الشراء في Play. أكمل هناك لتفعيل Premium.</string>

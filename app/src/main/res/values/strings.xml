@@ -756,6 +756,7 @@
     <string name="paywall_badge_easy_start">EASY START</string>
     <string name="paywall_annual_savings_label">Save %1$s per year</string>
     <string name="paywall_hero_trial_badge">%1$d-day trial</string>
+    <string name="paywall_hero_trial_badge_first_checkin">First check-in trial</string>
     <string name="paywall_plan_section_title">Choose your plan</string>
     <string name="paywall_value_section_title">What Premium really adds</string>
     <string name="paywall_price_loading">Checking Play price</string>
@@ -783,6 +784,7 @@
     <string name="paywall_trust_cancel_body">Manage or cancel from Google Play. Access stays active until the paid period ends.</string>
     <string name="paywall_upgrade_button">Upgrade Now</string>
     <string name="paywall_start_trial_button">Start Free Trial</string>
+    <string name="paywall_start_trial_button_first_checkin">Try through my first check-in</string>
     <string name="paywall_upgrade_loading">Preparing purchase…</string>
     <string name="paywall_billing_starting">Preparing the secure Play purchase screen…</string>
     <string name="paywall_billing_handoff">Play purchase screen opened. Finish there to activate Premium.</string>

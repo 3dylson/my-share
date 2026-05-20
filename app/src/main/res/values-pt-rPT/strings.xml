@@ -712,6 +712,7 @@
     <string name="paywall_badge_easy_start">INÍCIO FÁCIL</string>
     <string name="paywall_annual_savings_label">Poupe %1$s por ano</string>
     <string name="paywall_hero_trial_badge">Teste de %1$d dias</string>
+    <string name="paywall_hero_trial_badge_first_checkin">Teste até à primeira revisão</string>
     <string name="paywall_plan_section_title">Escolhe o teu plano</string>
     <string name="paywall_value_section_title">O que o Premium acrescenta de verdade</string>
     <string name="paywall_price_loading">A verificar preço no Play</string>
@@ -739,6 +740,7 @@
     <string name="paywall_trust_cancel_body">Gere ou cancela no Google Play. O acesso fica ativo até ao fim do período pago.</string>
     <string name="paywall_upgrade_button">Atualizar agora</string>
     <string name="paywall_start_trial_button">Iniciar teste grátis</string>
+    <string name="paywall_start_trial_button_first_checkin">Experimentar até à primeira revisão</string>
     <string name="paywall_upgrade_loading">A preparar compra…</string>
     <string name="paywall_billing_starting">A preparar o ecrã seguro de compra do Play…</string>
     <string name="paywall_billing_handoff">O ecrã de compra do Play abriu. Conclui lá para ativar o Premium.</string>

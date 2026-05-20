@@ -20,4 +20,12 @@
         <key>premium_proof_variant</key>
         <value>next_move</value>
     </entry>
+    <entry>
+        <key>onboarding_conversion_experiment</key>
+        <value>baseline</value>
+    </entry>
+    <entry>
+        <key>paywall_trial_framing</key>
+        <value>seven_day</value>
+    </entry>
 </defaultsMap>
