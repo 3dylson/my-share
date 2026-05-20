@@ -67,9 +67,12 @@ class MainComposeActivity : ComponentActivity() {
     private var isAppUpdateGateEvaluationInFlight = false
     private var lastAppUpdateGateEvaluationElapsedRealtime = 0L
     private var notificationHomeDestination by mutableStateOf<HomeDestination?>(null)
+    private var hasLoggedAppReady = false
+    private var appStartElapsedRealtime = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        appStartElapsedRealtime = SystemClock.elapsedRealtime()
         immediateAppUpdateCoordinator = ImmediateAppUpdateCoordinator(this)
         updateActivityResultLauncher = registerForActivityResult(
             ActivityResultContracts.StartIntentSenderForResult()
@@ -99,6 +102,9 @@ class MainComposeActivity : ComponentActivity() {
                 when (val gateState = appUpdateGateState) {
                     AppUpdateGateState.Loading -> AppUpdateLoadingScreen()
                     AppUpdateGateState.Ready -> {
+                        LaunchedEffect(Unit) {
+                            logAppReady("home")
+                        }
                         Surface(
                             modifier = Modifier.fillMaxSize()
                                 .background(MaterialTheme.colorScheme.background)
@@ -344,6 +350,21 @@ class MainComposeActivity : ComponentActivity() {
                 putString("is_system_dark_theme", this@MainComposeActivity.isDarkTheme().toString())
             },
         )
+    }
+
+    private fun logAppReady(destination: String) {
+        if (hasLoggedAppReady) return
+        hasLoggedAppReady = true
+        val elapsedMillis = SystemClock.elapsedRealtime() - appStartElapsedRealtime
+        FirebaseUtils.logEvent(
+            "app_ready",
+            Bundle().apply {
+                putString("destination", destination)
+                putLong("elapsed_ms", elapsedMillis)
+                putInt("session_count", sessionCountForAds)
+            }
+        )
+        Timber.d("App ready destination=%s elapsedMs=%d", destination, elapsedMillis)
     }
 
     companion object {

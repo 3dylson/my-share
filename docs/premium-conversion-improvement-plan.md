@@ -70,6 +70,8 @@ Status after implementation pass on 2026-05-19:
 - Guardrail: Firebase Performance collection is disabled in debug builds after emulator validation showed startup ANR risk from debug instrumentation; release builds keep collection enabled.
 - Done: Home reminder setup now logs source-aware reminder settings and notification permission outcomes so retention prompts can be measured from More and Premium check-in surfaces.
 - Done: Startup was tightened by removing the unused Firebase In-App Messaging Display SDK, moving founder-pass eligibility capture off the main startup path, and keeping StrictMode/debug observability out of release startup.
+- Done: Added `app_ready` analytics with startup elapsed time so Firebase can show when the app becomes usable, not only when the process starts.
+- Done: Replaced corrupted Inter font resources with real TTF assets after emulator validation showed blank rendering and Android typeface errors.
 - Done: Firestore rules protect the cap/config and grant records from client writes.
 - Done: Deployed `claimLegacyPremiumGrant` and Firestore rules explicitly to Firebase project `my-share-finance`.
 - Validated: Existing-user emulator state shows `A free year of Premium is waiting`; fresh-install onboarding and post-skip home do not show the founder pass.
