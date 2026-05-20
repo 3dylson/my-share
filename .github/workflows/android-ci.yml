@@ -5,9 +5,6 @@ on:
     branches:
       - main
       - development
-  push:
-    branches:
-      - development
 
 concurrency:
   group: android-ci-${{ github.ref }}
