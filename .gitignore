@@ -20,6 +20,7 @@ local.properties
 skills-lock.json
 /.gstack
 /.kotlin
+/.playwright-mcp/
 /docs/*
 !/docs/ui-ux-qa-notes-2026-05-15.md
 !/docs/ui-ux-qa-notes-2026-05-18.md
