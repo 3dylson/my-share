@@ -1187,6 +1187,21 @@ class HomeViewModel @Inject constructor(
         Timber.tag(TAG).d("Subscription retention continued to Google Play")
     }
 
+    fun logReminderSettingsOpened(source: String) {
+        FirebaseUtils.logEvent("reminder_settings_opened", android.os.Bundle().apply {
+            putString("source", source)
+        })
+        Timber.tag(TAG).d("Reminder settings opened source=%s", source)
+    }
+
+    fun logReminderPermissionResult(granted: Boolean, source: String) {
+        FirebaseUtils.logEvent(if (granted) "reminder_permission_granted" else "reminder_permission_denied", android.os.Bundle().apply {
+            putString("source", source)
+            putString("surface", "home")
+        })
+        Timber.tag(TAG).d("Reminder permission result granted=%s source=%s", granted, source)
+    }
+
     fun unlockPremium(activity: android.app.Activity, source: String = "more_inline") {
         val storeProductId = selectedStoreProductId()
         val realProduct = selectedStoreProduct()

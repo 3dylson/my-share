@@ -103,6 +103,8 @@ fun HomeRoute(
         onPremiumGateUpgradeClicked = viewModel::logPremiumGateUpgradeClicked,
         onSubscriptionRetentionViewed = viewModel::logSubscriptionRetentionViewed,
         onSubscriptionRetentionContinue = viewModel::logSubscriptionRetentionContinue,
+        onReminderSettingsOpened = viewModel::logReminderSettingsOpened,
+        onReminderPermissionResult = viewModel::logReminderPermissionResult,
         onClaimLegacyPremiumGrant = viewModel::claimLegacyPremiumGrant,
         onDismissLegacyPremiumGrant = viewModel::dismissLegacyPremiumGrant,
         onConnectGoogleAccount = viewModel::connectGoogleAccount,
@@ -149,6 +151,8 @@ fun HomeScreen(
     onPremiumGateUpgradeClicked: (HomePremiumGate) -> Unit,
     onSubscriptionRetentionViewed: () -> Unit,
     onSubscriptionRetentionContinue: () -> Unit,
+    onReminderSettingsOpened: (String) -> Unit,
+    onReminderPermissionResult: (Boolean, String) -> Unit,
     onClaimLegacyPremiumGrant: (android.app.Activity) -> Unit,
     onDismissLegacyPremiumGrant: () -> Unit,
     onConnectGoogleAccount: (String) -> Unit,
@@ -196,19 +200,23 @@ fun HomeScreen(
     var showPremiumAdjustmentHistory by remember { mutableStateOf(false) }
     var showPremiumReviewResultSheet by remember { mutableStateOf(false) }
     var showSubscriptionRetentionDialog by remember { mutableStateOf(false) }
+    var reminderSettingsSource by remember { mutableStateOf("more") }
     var recommendationPendingApply by remember { mutableStateOf<PaydayAdjustmentRecommendationState?>(null) }
     var showRecommendationAppliedSheet by remember { mutableStateOf(false) }
     var reviewBeingEdited by remember { mutableStateOf<ReviewHistoryItemState?>(null) }
     var reviewPendingDelete by remember { mutableStateOf<ReviewHistoryItemState?>(null) }
     var isGoogleCredentialRequestInProgress by remember { mutableStateOf(false) }
     var pendingReminderSelection by remember { mutableStateOf<ReminderSettingsSelection?>(null) }
+    var pendingReminderPermissionSource by remember { mutableStateOf("more") }
     val clearFocusOnScrollConnection = rememberKeyboardDismissOnScrollConnection()
     val notificationPermissionDeniedMessage = stringResource(R.string.onboarding_reminder_error_permission)
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { granted ->
             val selection = pendingReminderSelection
+            val source = pendingReminderPermissionSource
             pendingReminderSelection = null
+            onReminderPermissionResult(granted, source)
             if (granted && selection != null) {
                 onSaveReminderConfiguration(selection.hourOfDay, selection.minute, selection.cadence)
             } else {
@@ -225,6 +233,7 @@ fun HomeScreen(
             onSaveReminderConfiguration(selection.hourOfDay, selection.minute, selection.cadence)
         } else {
             pendingReminderSelection = selection
+            pendingReminderPermissionSource = reminderSettingsSource
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
@@ -770,7 +779,8 @@ fun HomeScreen(
                                 reviewPendingDelete = review
                             },
                             onConfigureReminder = {
-                                Timber.tag("HomeScreen").d("Reminder settings opened from Premium check-in")
+                                reminderSettingsSource = "premium_checkin"
+                                onReminderSettingsOpened(reminderSettingsSource)
                                 showReminderSettingsDialog = true
                             },
                             onApplyPaydayRecommendation = {
@@ -786,13 +796,16 @@ fun HomeScreen(
                             activity = activity,
                             onToggleReminder = { enabled ->
                                 if (enabled) {
+                                    reminderSettingsSource = "more_toggle"
+                                    onReminderSettingsOpened(reminderSettingsSource)
                                     showReminderSettingsDialog = true
                                 } else {
                                     onToggleReminder(false)
                                 }
                             },
                             onConfigureReminder = {
-                                Timber.tag("HomeScreen").d("Reminder settings opened from More tab")
+                                reminderSettingsSource = "more"
+                                onReminderSettingsOpened(reminderSettingsSource)
                                 showReminderSettingsDialog = true
                             },
                             onToggleAutomation = onToggleAutomation,
@@ -958,6 +971,8 @@ private fun HomeScreenPreview() {
             onPremiumGateUpgradeClicked = { _ -> },
             onSubscriptionRetentionViewed = {},
             onSubscriptionRetentionContinue = {},
+            onReminderSettingsOpened = {},
+            onReminderPermissionResult = { _, _ -> },
             onClaimLegacyPremiumGrant = { _ -> },
             onDismissLegacyPremiumGrant = {},
             onConnectGoogleAccount = { _ -> },

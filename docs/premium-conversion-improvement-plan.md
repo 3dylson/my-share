@@ -67,6 +67,8 @@ Status after implementation pass on 2026-05-19:
 - Done: The onboarding paywall supports a typed Remote Config copy variant, including the default `payday_proof` message and an experiment-ready `review_momentum` message that emphasizes each check-in becoming the next payday move.
 - Done: The first-review Premium proof moment supports the typed `premium_proof_variant`, including the default `next_move` proof and an experiment-ready `progress_loop` proof that frames Premium as a repeatable payday habit.
 - Done: Firebase Performance Monitoring is wired into the app with custom traces for weekly review save, onboarding purchase launch, and in-app Premium purchase launch so conversion-critical waits can be tracked alongside Analytics and Crashlytics.
+- Guardrail: Firebase Performance collection is disabled in debug builds after emulator validation showed startup ANR risk from debug instrumentation; release builds keep collection enabled.
+- Done: Home reminder setup now logs source-aware reminder settings and notification permission outcomes so retention prompts can be measured from More and Premium check-in surfaces.
 - Done: Firestore rules protect the cap/config and grant records from client writes.
 - Done: Deployed `claimLegacyPremiumGrant` and Firestore rules explicitly to Firebase project `my-share-finance`.
 - Validated: Existing-user emulator state shows `A free year of Premium is waiting`; fresh-install onboarding and post-skip home do not show the founder pass.
