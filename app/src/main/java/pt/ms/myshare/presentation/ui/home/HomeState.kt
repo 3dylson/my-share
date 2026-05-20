@@ -309,6 +309,7 @@ data class HomeState(
     val performanceStats: PerformanceStatsState = PerformanceStatsState(),
     val moreCard: MoreCardState = MoreCardState(),
     val reviewSavedEventId: Long = 0L,
+    val appReviewRequestEventId: Long = 0L,
     val isLoading: Boolean = true,
     val emptyMessage: String? = null,
     val error: String? = null

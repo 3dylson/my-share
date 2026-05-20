@@ -657,6 +657,8 @@
     <string name="preferences_currency_title">العملة</string>
     <string name="preferences_currency_search_hint">ابحث عن عملة أو رمز</string>
     <string name="home_more_pref_notifications">تذكيرات يوم الدفع</string>
+    <string name="home_more_pref_rate_app">تقييم My Share</string>
+    <string name="home_more_pref_rate_app_desc">افتح Google Play لترك تقييم</string>
     <string name="home_more_pref_automation">قواعد تلقائية</string>
     <string name="home_more_pref_automation_active">القواعد التلقائية مفعّلة</string>
     <string name="home_more_pref_automation_idle">جاهز لأتمتة قواعد يوم الدفع</string>

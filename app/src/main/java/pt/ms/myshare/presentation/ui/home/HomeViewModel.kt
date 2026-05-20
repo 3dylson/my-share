@@ -40,6 +40,7 @@ import pt.ms.myshare.domain.model.StoreProduct
 import pt.ms.myshare.domain.model.User
 import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.domain.repository.AuthRepository
+import pt.ms.myshare.domain.repository.AppReviewPromptRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
 import pt.ms.myshare.domain.repository.FirstRunExperienceRepository
 import pt.ms.myshare.domain.repository.LegacyPremiumGrantRepository
@@ -57,6 +58,7 @@ import pt.ms.myshare.domain.use_case.CreatePremiumReviewMomentumUseCase
 import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
 import pt.ms.myshare.domain.use_case.EnforcePremiumDowngradeUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
+import pt.ms.myshare.domain.use_case.ResolveAppReviewPromptEligibilityUseCase
 import pt.ms.myshare.domain.use_case.GetReviewHistoryUseCase
 import pt.ms.myshare.domain.use_case.UpdateGoalProgressUseCase
 import pt.ms.myshare.domain.use_case.GetPerformanceStatsUseCase
@@ -87,6 +89,7 @@ class HomeViewModel @Inject constructor(
     private val entitlementRepository: EntitlementRepository,
     private val legacyPremiumGrantRepository: LegacyPremiumGrantRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
+    private val appReviewPromptRepository: AppReviewPromptRepository,
     private val calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase,
     private val createPaydayAdjustmentRecommendationUseCase: CreatePaydayAdjustmentRecommendationUseCase,
     private val createPremiumCheckInPlanUseCase: CreatePremiumCheckInPlanUseCase,
@@ -97,6 +100,7 @@ class HomeViewModel @Inject constructor(
     private val createReviewInsightUseCase: CreateReviewInsightUseCase,
     private val enforcePremiumDowngradeUseCase: EnforcePremiumDowngradeUseCase,
     private val resolvePricingStrategyUseCase: ResolvePricingStrategyUseCase,
+    private val resolveAppReviewPromptEligibilityUseCase: ResolveAppReviewPromptEligibilityUseCase,
     private val getReviewHistoryUseCase: GetReviewHistoryUseCase,
     private val updateGoalProgressUseCase: UpdateGoalProgressUseCase,
     private val adjustGoalProgressForReviewCorrectionUseCase: AdjustGoalProgressForReviewCorrectionUseCase,
@@ -117,6 +121,7 @@ class HomeViewModel @Inject constructor(
     private var currentPaydayRecommendation: PaydayAdjustmentRecommendation? = null
     private var paydayRecommendationRollback: PaydayRecommendationRollback? = null
     private var nextReviewSavedEventId = 0L
+    private var nextAppReviewRequestEventId = 0L
     private var legacyPremiumGrantViewedLogged = false
     private var isFounderOfferBillingFlowPending = false
     private var currentProductConfig = ProductExperienceConfig()
@@ -601,6 +606,7 @@ class HomeViewModel @Inject constructor(
                     reviewHistory = planner.reviewHistory.asReversed().map { it.toState() },
                     moreCard = moreCard,
                     reviewSavedEventId = currentState.reviewSavedEventId,
+                    appReviewRequestEventId = currentState.appReviewRequestEventId,
                     isLoading = false,
                     emptyMessage = emptyMessage,
                     error = null
@@ -883,8 +889,34 @@ class HomeViewModel @Inject constructor(
                         })
                     }
                 }
+                recordAppReviewPositiveAction(historyAfterSave.size)
                 Timber.tag(TAG).d("Review saved with snapshots. planFlex=%s planPriority=%s", preview.flexibleSpendPerPayday, preview.priorityContributionPerPayday)
             }
+        }
+    }
+
+    private suspend fun recordAppReviewPositiveAction(reviewCount: Int) {
+        val promptState = appReviewPromptRepository.recordPositiveAction()
+        val nowMillis = System.currentTimeMillis()
+        val eligible = resolveAppReviewPromptEligibilityUseCase.execute(promptState, nowMillis)
+        FirebaseUtils.logEvent("app_review_prompt_eligibility_checked", android.os.Bundle().apply {
+            putInt("positive_action_count", promptState.positiveActionCount)
+            putInt("review_count", reviewCount)
+            putString("eligible", eligible.toString())
+        })
+        Timber.tag(TAG).d(
+            "App review prompt eligibility checked. positiveActions=%d reviewCount=%d eligible=%s",
+            promptState.positiveActionCount,
+            reviewCount,
+            eligible
+        )
+        if (eligible) {
+            nextAppReviewRequestEventId += 1
+            uiState.update { it.copy(appReviewRequestEventId = nextAppReviewRequestEventId) }
+            FirebaseUtils.logEvent("app_review_prompt_eligibility_reached", android.os.Bundle().apply {
+                putInt("positive_action_count", promptState.positiveActionCount)
+                putInt("review_count", reviewCount)
+            })
         }
     }
 
@@ -1058,6 +1090,32 @@ class HomeViewModel @Inject constructor(
             } else {
                 current
             }
+        }
+    }
+
+    fun markInAppReviewRequested(eventId: Long, launched: Boolean) {
+        if (eventId <= 0L || uiState.value.appReviewRequestEventId != eventId) return
+        viewModelScope.launch {
+            appReviewPromptRepository.markInAppReviewRequested(System.currentTimeMillis())
+            FirebaseUtils.logEvent("app_review_prompt_requested", android.os.Bundle().apply {
+                putString("launched", launched.toString())
+            })
+            Timber.tag(TAG).d("App review prompt requested. eventId=%d launched=%s", eventId, launched)
+            uiState.update { current ->
+                if (current.appReviewRequestEventId == eventId) {
+                    current.copy(appReviewRequestEventId = 0L)
+                } else {
+                    current
+                }
+            }
+        }
+    }
+
+    fun openPlayStoreRateEntry() {
+        viewModelScope.launch {
+            appReviewPromptRepository.markPlayStoreRateOpened()
+            FirebaseUtils.logEvent("play_store_rate_link_opened")
+            Timber.tag(TAG).d("Play Store rate link opened from More tab")
         }
     }
 

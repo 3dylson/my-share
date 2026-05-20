@@ -18,6 +18,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import pt.ms.myshare.domain.model.AllocationPreset
+import pt.ms.myshare.domain.model.AppReviewPromptState
 import pt.ms.myshare.domain.model.BillingFlowLaunchResult
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.BillingPurchaseEvent
@@ -37,6 +38,7 @@ import pt.ms.myshare.domain.model.ReminderConfiguration
 import pt.ms.myshare.domain.model.SalaryPlan
 import pt.ms.myshare.domain.model.StoreProduct
 import pt.ms.myshare.domain.repository.EntitlementRepository
+import pt.ms.myshare.domain.repository.AppReviewPromptRepository
 import pt.ms.myshare.domain.repository.FirstRunExperienceRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
@@ -49,6 +51,7 @@ import pt.ms.myshare.domain.use_case.CreatePremiumReviewMomentumUseCase
 import pt.ms.myshare.domain.use_case.CreateReviewInsightUseCase
 import pt.ms.myshare.domain.use_case.EnforcePremiumDowngradeUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
+import pt.ms.myshare.domain.use_case.ResolveAppReviewPromptEligibilityUseCase
 import java.math.BigDecimal
 
 import pt.ms.myshare.domain.repository.AuthRepository
@@ -91,6 +94,7 @@ class HomeViewModelTest {
     private lateinit var fakeLegacyPremiumGrantRepository: TestFakeLegacyPremiumGrantRepository
     private lateinit var fakeProductConfigRepository: TestProductConfigRepository
     private lateinit var fakeFirstRunExperienceRepository: TestFirstRunExperienceRepository
+    private lateinit var fakeAppReviewPromptRepository: TestAppReviewPromptRepository
     private lateinit var calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase
     private val mockAuthRepository = mockk<AuthRepository>(relaxed = true)
     private val mockGetReviewHistoryUseCase = mockk<GetReviewHistoryUseCase>(relaxed = true)
@@ -107,6 +111,7 @@ class HomeViewModelTest {
         fakeLegacyPremiumGrantRepository = TestFakeLegacyPremiumGrantRepository()
         fakeProductConfigRepository = TestProductConfigRepository()
         fakeFirstRunExperienceRepository = TestFirstRunExperienceRepository()
+        fakeAppReviewPromptRepository = TestAppReviewPromptRepository()
         calculatePlanPreviewUseCase = CalculatePlanPreviewUseCase(ResolveAllocationStrategyRulesUseCase())
         currentUserFlow = MutableStateFlow(null)
         
@@ -123,6 +128,7 @@ class HomeViewModelTest {
             entitlementRepository = fakeEntitlementRepository,
             legacyPremiumGrantRepository = fakeLegacyPremiumGrantRepository,
             userPreferencesRepository = TestUserPreferencesRepository(),
+            appReviewPromptRepository = fakeAppReviewPromptRepository,
             calculatePlanPreviewUseCase = calculatePlanPreviewUseCase,
             createPaydayAdjustmentRecommendationUseCase = CreatePaydayAdjustmentRecommendationUseCase(
                 calculatePlanPreviewUseCase,
@@ -136,6 +142,7 @@ class HomeViewModelTest {
             createReviewInsightUseCase = CreateReviewInsightUseCase(calculatePlanPreviewUseCase),
             enforcePremiumDowngradeUseCase = EnforcePremiumDowngradeUseCase(fakePlannerRepository),
             resolvePricingStrategyUseCase = ResolvePricingStrategyUseCase(),
+            resolveAppReviewPromptEligibilityUseCase = ResolveAppReviewPromptEligibilityUseCase(),
             getReviewHistoryUseCase = mockGetReviewHistoryUseCase,
             updateGoalProgressUseCase = mockUpdateGoalProgressUseCase,
             adjustGoalProgressForReviewCorrectionUseCase = AdjustGoalProgressForReviewCorrectionUseCase(
@@ -512,6 +519,45 @@ class HomeViewModelTest {
         advanceUntilIdle()
 
         assertEquals(0L, viewModel.state.value.reviewSavedEventId)
+    }
+
+    @Test
+    fun `saveReview requests app review after second positive action`() = runTest {
+        fakePlannerRepository.savePlan(defaultPlan())
+        advanceUntilIdle()
+
+        viewModel.onFlexibleSpendChanged("200")
+        viewModel.onGoalContributionChanged("100")
+        viewModel.saveReview()
+        advanceUntilIdle()
+
+        assertEquals(0L, viewModel.state.value.appReviewRequestEventId)
+
+        viewModel.onFlexibleSpendChanged("180")
+        viewModel.onGoalContributionChanged("120")
+        viewModel.saveReview()
+        advanceUntilIdle()
+
+        assertTrue(viewModel.state.value.appReviewRequestEventId > 0L)
+    }
+
+    @Test
+    fun `markInAppReviewRequested stores request and clears event`() = runTest {
+        fakePlannerRepository.savePlan(defaultPlan())
+        fakeAppReviewPromptRepository.state = AppReviewPromptState(positiveActionCount = 1)
+        advanceUntilIdle()
+
+        viewModel.onFlexibleSpendChanged("200")
+        viewModel.onGoalContributionChanged("100")
+        viewModel.saveReview()
+        advanceUntilIdle()
+
+        val eventId = viewModel.state.value.appReviewRequestEventId
+        viewModel.markInAppReviewRequested(eventId, launched = true)
+        advanceUntilIdle()
+
+        assertEquals(1, fakeAppReviewPromptRepository.state.inAppReviewRequestCount)
+        assertEquals(0L, viewModel.state.value.appReviewRequestEventId)
     }
 
     @Test
@@ -1308,6 +1354,30 @@ class TestFirstRunExperienceRepository : FirstRunExperienceRepository {
 
     override suspend fun setHomeCoachMarksPending(pending: Boolean) {
         this.pending = pending
+    }
+}
+
+class TestAppReviewPromptRepository : AppReviewPromptRepository {
+    var state = AppReviewPromptState()
+
+    override suspend fun loadState(): AppReviewPromptState = state
+
+    override suspend fun recordPositiveAction(): AppReviewPromptState {
+        state = state.copy(positiveActionCount = state.positiveActionCount + 1)
+        return state
+    }
+
+    override suspend fun markInAppReviewRequested(requestedAtMillis: Long): AppReviewPromptState {
+        state = state.copy(
+            inAppReviewRequestCount = state.inAppReviewRequestCount + 1,
+            lastInAppReviewRequestedAtMillis = requestedAtMillis
+        )
+        return state
+    }
+
+    override suspend fun markPlayStoreRateOpened(): AppReviewPromptState {
+        state = state.copy(playStoreRateOpenCount = state.playStoreRateOpenCount + 1)
+        return state
     }
 }
 

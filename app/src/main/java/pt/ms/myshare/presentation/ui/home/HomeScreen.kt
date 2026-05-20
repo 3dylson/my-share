@@ -41,6 +41,8 @@ import pt.ms.myshare.domain.model.LegacyPremiumGrantStatus
 import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReadResult
 import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReader
+import pt.ms.myshare.presentation.review.PlayInAppReviewRequester
+import pt.ms.myshare.presentation.review.PlayStoreListingOpener
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.paywall.BillingStatusMessageKeys
 import pt.ms.myshare.presentation.ui.preferences.CurrencyPickerDialog
@@ -111,6 +113,8 @@ fun HomeRoute(
         onGoogleConnectionCredentialError = viewModel::setGoogleConnectionCredentialError,
         onDismissPremiumAccountPrompt = viewModel::dismissPremiumAccountPrompt,
         onReviewSavedFeedbackShown = viewModel::clearReviewSavedFeedback,
+        onInAppReviewRequested = viewModel::markInAppReviewRequested,
+        onOpenPlayStoreRateEntry = viewModel::openPlayStoreRateEntry,
         onApplyPaydayRecommendation = viewModel::applyPaydayRecommendation,
         onUndoPaydayRecommendation = viewModel::undoPaydayRecommendation,
         onUpdateReview = viewModel::updateReview,
@@ -162,6 +166,8 @@ fun HomeScreen(
     onGoogleConnectionCredentialError: (String) -> Unit,
     onDismissPremiumAccountPrompt: () -> Unit,
     onReviewSavedFeedbackShown: (Long) -> Unit,
+    onInAppReviewRequested: (Long, Boolean) -> Unit,
+    onOpenPlayStoreRateEntry: () -> Unit,
     onApplyPaydayRecommendation: () -> Boolean,
     onUndoPaydayRecommendation: () -> Boolean,
     onUpdateReview: (String, String, String) -> Boolean,
@@ -182,6 +188,8 @@ fun HomeScreen(
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
     val coroutineScope = rememberCoroutineScope()
+    val inAppReviewRequester = remember(context) { PlayInAppReviewRequester(context) }
+    val playStoreListingOpener = remember(context) { PlayStoreListingOpener(context) }
     val googleIdTokenReader = remember(context) {
         GoogleIdTokenReader(
             credentialManager = CredentialManager.create(context),
@@ -296,6 +304,18 @@ fun HomeScreen(
                     duration = SnackbarDuration.Short
                 )
             }
+        }
+    }
+
+    LaunchedEffect(state.appReviewRequestEventId) {
+        val eventId = state.appReviewRequestEventId
+        val currentActivity = activity
+        if (eventId > 0L && currentActivity != null) {
+            val launched = inAppReviewRequester.requestReview(currentActivity)
+            onInAppReviewRequested(eventId, launched)
+        } else if (eventId > 0L) {
+            Timber.tag("HomeScreen").d("In-app review request skipped because Activity is unavailable")
+            onInAppReviewRequested(eventId, false)
         }
     }
 
@@ -867,6 +887,10 @@ fun HomeScreen(
                                 Timber.tag("HomeScreen").d("Smart adjustment review opened from More tab")
                                 onDestinationSelected(HomeDestination.REVIEW)
                             },
+                            onRateApp = {
+                                onOpenPlayStoreRateEntry()
+                                playStoreListingOpener.open(BuildConfig.APPLICATION_ID)
+                            },
                             isGoogleCredentialRequestInProgress = isGoogleCredentialRequestInProgress,
                             onConnectGoogle = startGoogleAccountConnection,
                             onLogout = {
@@ -1017,6 +1041,8 @@ private fun HomeScreenPreview() {
             onGoogleConnectionCredentialError = { _ -> },
             onDismissPremiumAccountPrompt = {},
             onReviewSavedFeedbackShown = { _ -> },
+            onInAppReviewRequested = { _, _ -> },
+            onOpenPlayStoreRateEntry = {},
             onApplyPaydayRecommendation = { true },
             onUndoPaydayRecommendation = { true },
             onUpdateReview = { _, _, _ -> true },

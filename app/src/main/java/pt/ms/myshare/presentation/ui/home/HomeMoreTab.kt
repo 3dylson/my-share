@@ -57,6 +57,7 @@ fun LazyListScope.homeMoreTab(
     onManageSubscription: () -> Unit,
     onOpenAdjustmentHistory: () -> Unit,
     onOpenReview: () -> Unit,
+    onRateApp: () -> Unit,
     isGoogleCredentialRequestInProgress: Boolean,
     onConnectGoogle: () -> Unit,
     onLogout: () -> Unit
@@ -150,6 +151,13 @@ fun LazyListScope.homeMoreTab(
                 icon = Icons.Default.Payments,
                 iconColor = MySharePrimary,
                 onClick = onShowCurrencyPicker
+            )
+            PremiumSettingsRow(
+                title = stringResource(R.string.home_more_pref_rate_app),
+                subtitle = stringResource(R.string.home_more_pref_rate_app_desc),
+                icon = Icons.Default.StarRate,
+                iconColor = Color(0xFFFFB300),
+                onClick = onRateApp
             )
             PremiumSettingsRow(
                 title = stringResource(R.string.home_more_pref_automation),
