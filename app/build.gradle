@@ -154,7 +154,6 @@ dependencies {
 
     // Add the dependencies for any other desired Firebase products
     implementation 'com.google.firebase:firebase-crashlytics'
-    implementation 'com.google.firebase:firebase-inappmessaging-display'
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.firebase:firebase-config'
     implementation 'com.google.firebase:firebase-firestore'

@@ -24,7 +24,7 @@ import javax.inject.Provider
 class MyShareApp : Application() {
 
     @Inject lateinit var userPreferencesRepositoryProvider: Provider<UserPreferencesRepository>
-    @Inject lateinit var legacyPremiumGrantEligibilityStore: LegacyPremiumGrantEligibilityStore
+    @Inject lateinit var legacyPremiumGrantEligibilityStoreProvider: Provider<LegacyPremiumGrantEligibilityStore>
     @Inject lateinit var userLocaleManager: UserLocaleManager
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
@@ -39,7 +39,7 @@ class MyShareApp : Application() {
         Timber.plant(CrashlyticsTree())
 
         FirebaseUtils.init(this)
-        legacyPremiumGrantEligibilityStore.captureInstallEligibilitySnapshot()
+        captureLegacyPremiumEligibilitySnapshot()
 
         applyStoredLocale()
 
@@ -54,6 +54,13 @@ class MyShareApp : Application() {
             }
             userLocaleManager.apply(preferences)
             Timber.tag(TAG).d("Stored locale applied")
+        }
+    }
+
+    private fun captureLegacyPremiumEligibilitySnapshot() {
+        applicationScope.launch(Dispatchers.IO) {
+            legacyPremiumGrantEligibilityStoreProvider.get().captureInstallEligibilitySnapshot()
+            Timber.tag(TAG).d("Legacy Premium eligibility snapshot captured")
         }
     }
 
