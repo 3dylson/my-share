@@ -66,6 +66,7 @@ Status after implementation pass on 2026-05-19:
 - Done: Firebase Remote Config now controls founder offer visibility, paywall default plan selection, onboarding paywall variant, Premium reminder messaging, and Premium proof variant so growth experiments can be rolled out or stopped without a new app release.
 - Done: The onboarding paywall supports a typed Remote Config copy variant, including the default `payday_proof` message and an experiment-ready `review_momentum` message that emphasizes each check-in becoming the next payday move.
 - Done: The first-review Premium proof moment supports the typed `premium_proof_variant`, including the default `next_move` proof and an experiment-ready `progress_loop` proof that frames Premium as a repeatable payday habit.
+- Done: Firebase Performance Monitoring is wired into the app with custom traces for weekly review save, onboarding purchase launch, and in-app Premium purchase launch so conversion-critical waits can be tracked alongside Analytics and Crashlytics.
 - Done: Firestore rules protect the cap/config and grant records from client writes.
 - Done: Deployed `claimLegacyPremiumGrant` and Firestore rules explicitly to Firebase project `my-share-finance`.
 - Validated: Existing-user emulator state shows `A free year of Premium is waiting`; fresh-install onboarding and post-skip home do not show the founder pass.

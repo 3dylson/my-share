@@ -39,6 +39,8 @@ import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
 import pt.ms.myshare.presentation.ui.localization.UserLocaleManager
 import pt.ms.myshare.presentation.ui.paywall.BillingStatusMessageKeys
 import pt.ms.myshare.presentation.ui.paywall.BillingStatusMessageMapper
+import pt.ms.myshare.utils.logs.FirebasePerformanceUtils
+import pt.ms.myshare.utils.logs.FirebasePerformanceUtils.putMetricSafely
 import pt.ms.myshare.utils.logs.FirebaseUtils
 import timber.log.Timber
 import java.math.BigDecimal
@@ -423,50 +425,60 @@ class OnboardingViewModel @Inject constructor(
     fun purchasePremium(activity: android.app.Activity) {
         val storeProductId = PremiumSubscriptionProducts.productIdFor(state.value.selectedBillingPlan)
         viewModelScope.launch {
-            state.update {
-                it.copy(
-                    isBillingActionInProgress = true,
-                    billingMessage = BillingStatusMessageKeys.STARTING
+            FirebasePerformanceUtils.traceSuspend(
+                name = "onboarding_purchase_launch",
+                attributes = mapOf(
+                    "billing_plan" to state.value.selectedBillingPlan.name.lowercase(Locale.US),
+                    "paywall_variant" to state.value.onboardingPaywallVariant.remoteValue
                 )
-            }
-            val products = entitlementRepository.availableProducts.first()
-            val product = PremiumStoreProductSelector.standardProduct(
-                products = products,
-                plan = state.value.selectedBillingPlan
-            )
-            if (product == null) {
+            ) { trace ->
                 state.update {
                     it.copy(
-                        isBillingActionInProgress = false,
-                        billingMessage = BillingStatusMessageKeys.PRODUCTS_UNAVAILABLE
+                        isBillingActionInProgress = true,
+                        billingMessage = BillingStatusMessageKeys.STARTING
                     )
                 }
-                FirebaseUtils.logEvent("purchase_unavailable", Bundle().apply {
+                val products = entitlementRepository.availableProducts.first()
+                val product = PremiumStoreProductSelector.standardProduct(
+                    products = products,
+                    plan = state.value.selectedBillingPlan
+                )
+                if (product == null) {
+                    trace?.putMetricSafely("product_available", 0L)
+                    state.update {
+                        it.copy(
+                            isBillingActionInProgress = false,
+                            billingMessage = BillingStatusMessageKeys.PRODUCTS_UNAVAILABLE
+                        )
+                    }
+                    FirebaseUtils.logEvent("purchase_unavailable", Bundle().apply {
+                        putString("billing_plan", state.value.selectedBillingPlan.name.lowercase(Locale.US))
+                        putString("price_cluster", state.value.pricingStrategy?.marketCluster)
+                        putString("product_id", storeProductId)
+                        putString("source", "onboarding_paywall")
+                        putString("onboarding_paywall_variant", state.value.onboardingPaywallVariant.remoteValue)
+                    })
+                    Timber.tag("OnboardingBilling").e("Cannot purchase: Product %s not found in store", storeProductId)
+                    return@traceSuspend
+                }
+                trace?.putMetricSafely("product_available", 1L)
+                FirebaseUtils.logEvent("purchase_started", Bundle().apply {
                     putString("billing_plan", state.value.selectedBillingPlan.name.lowercase(Locale.US))
                     putString("price_cluster", state.value.pricingStrategy?.marketCluster)
-                    putString("product_id", storeProductId)
+                    putString("product_id", product.productId)
+                    putBoolean("has_trial", product.hasFreeTrial)
                     putString("source", "onboarding_paywall")
                     putString("onboarding_paywall_variant", state.value.onboardingPaywallVariant.remoteValue)
                 })
-                Timber.tag("OnboardingBilling").e("Cannot purchase: Product %s not found in store", storeProductId)
-                return@launch
+                val launchResult = entitlementRepository.purchasePlan(activity, product)
+                state.update {
+                    it.copy(
+                        isBillingActionInProgress = false,
+                        billingMessage = BillingStatusMessageMapper.fromLaunchResult(launchResult)
+                    )
+                }
+                logBillingLaunchResult(launchResult, product.productId, "onboarding_paywall")
             }
-            FirebaseUtils.logEvent("purchase_started", Bundle().apply {
-                putString("billing_plan", state.value.selectedBillingPlan.name.lowercase(Locale.US))
-                putString("price_cluster", state.value.pricingStrategy?.marketCluster)
-                putString("product_id", product.productId)
-                putBoolean("has_trial", product.hasFreeTrial)
-                putString("source", "onboarding_paywall")
-                putString("onboarding_paywall_variant", state.value.onboardingPaywallVariant.remoteValue)
-            })
-            val launchResult = entitlementRepository.purchasePlan(activity, product)
-            state.update {
-                it.copy(
-                    isBillingActionInProgress = false,
-                    billingMessage = BillingStatusMessageMapper.fromLaunchResult(launchResult)
-                )
-            }
-            logBillingLaunchResult(launchResult, product.productId, "onboarding_paywall")
         }
     }
 

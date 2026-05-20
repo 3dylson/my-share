@@ -66,6 +66,8 @@ import pt.ms.myshare.presentation.ui.localization.UserLocaleManager
 import pt.ms.myshare.presentation.ui.onboarding.ReminderWorkScheduler
 import pt.ms.myshare.presentation.ui.paywall.BillingStatusMessageKeys
 import pt.ms.myshare.presentation.ui.paywall.BillingStatusMessageMapper
+import pt.ms.myshare.utils.logs.FirebasePerformanceUtils
+import pt.ms.myshare.utils.logs.FirebasePerformanceUtils.putMetricSafely
 import pt.ms.myshare.utils.logs.FirebaseUtils
 import timber.log.Timber
 import java.math.BigDecimal
@@ -763,61 +765,70 @@ class HomeViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val goals = plannerRepository.loadGoals()
-            val targetAmount = goals.firstOrNull()?.targetAmount ?: BigDecimal.ZERO
-            val preview = calculatePlanPreviewUseCase.execute(plan, targetAmount)
-
-            val review = ManualReview(
-                actualFlexibleSpend = actualFlexible,
-                actualGoalContribution = actualGoal,
-                plannedFlexibleSpend = preview.flexibleSpendPerPayday,
-                plannedGoalContribution = preview.priorityContributionPerPayday
-            )
-            plannerRepository.saveReview(review)
-            updateGoalProgressUseCase.execute(actualGoal)
-            emitReviewSavedFeedback()
-
-            val historyAfterSave = currentReviews
-                .filterNot { it.id == review.id } + review
-            val recommendationAfterSave = createPaydayAdjustmentRecommendationUseCase.execute(
-                plan.copy(rules = plannerRepository.loadRules()),
-                historyAfterSave
-            )
-            val isPremium = uiState.value.moreCard.isPremium
-            FirebaseUtils.logEvent("weekly_checkin_completed", android.os.Bundle().apply {
-                putString("is_premium", isPremium.toString())
-                putInt("review_count", historyAfterSave.size)
-                putString("has_recommendation", (recommendationAfterSave != null).toString())
-                putString(
-                    "recommendation_direction",
-                    recommendationAfterSave?.direction?.name?.lowercase(Locale.US) ?: "none"
+            FirebasePerformanceUtils.traceSuspend(
+                name = "weekly_checkin_save",
+                attributes = mapOf(
+                    "is_premium" to uiState.value.moreCard.isPremium.toString()
                 )
-                putString("recommendation_applyable", (recommendationAfterSave?.isApplyable == true).toString())
-            })
-            recommendationAfterSave?.let { recommendation ->
-                FirebaseUtils.logEvent("premium_review_recommendation_generated", android.os.Bundle().apply {
+            ) { trace ->
+                val goals = plannerRepository.loadGoals()
+                val targetAmount = goals.firstOrNull()?.targetAmount ?: BigDecimal.ZERO
+                val preview = calculatePlanPreviewUseCase.execute(plan, targetAmount)
+
+                val review = ManualReview(
+                    actualFlexibleSpend = actualFlexible,
+                    actualGoalContribution = actualGoal,
+                    plannedFlexibleSpend = preview.flexibleSpendPerPayday,
+                    plannedGoalContribution = preview.priorityContributionPerPayday
+                )
+                plannerRepository.saveReview(review)
+                updateGoalProgressUseCase.execute(actualGoal)
+                emitReviewSavedFeedback()
+
+                val historyAfterSave = currentReviews
+                    .filterNot { it.id == review.id } + review
+                val recommendationAfterSave = createPaydayAdjustmentRecommendationUseCase.execute(
+                    plan.copy(rules = plannerRepository.loadRules()),
+                    historyAfterSave
+                )
+                val isPremium = uiState.value.moreCard.isPremium
+                trace?.putMetricSafely("review_count_after", historyAfterSave.size.toLong())
+                trace?.putMetricSafely("has_recommendation", if (recommendationAfterSave != null) 1L else 0L)
+                FirebaseUtils.logEvent("weekly_checkin_completed", android.os.Bundle().apply {
                     putString("is_premium", isPremium.toString())
-                    putString("direction", recommendation.direction.name.lowercase(Locale.US))
-                    putInt("review_count", recommendation.analyzedReviewCount)
-                    putString("adjustment_amount", recommendation.adjustmentAmount.toPlainString())
-                    putString("is_applyable", recommendation.isApplyable.toString())
+                    putInt("review_count", historyAfterSave.size)
+                    putString("has_recommendation", (recommendationAfterSave != null).toString())
+                    putString(
+                        "recommendation_direction",
+                        recommendationAfterSave?.direction?.name?.lowercase(Locale.US) ?: "none"
+                    )
+                    putString("recommendation_applyable", (recommendationAfterSave?.isApplyable == true).toString())
                 })
-                if (isPremium) {
-                    FirebaseUtils.logEvent("premium_review_result_ready", android.os.Bundle().apply {
+                recommendationAfterSave?.let { recommendation ->
+                    FirebaseUtils.logEvent("premium_review_recommendation_generated", android.os.Bundle().apply {
+                        putString("is_premium", isPremium.toString())
                         putString("direction", recommendation.direction.name.lowercase(Locale.US))
                         putInt("review_count", recommendation.analyzedReviewCount)
+                        putString("adjustment_amount", recommendation.adjustmentAmount.toPlainString())
                         putString("is_applyable", recommendation.isApplyable.toString())
                     })
-                } else {
-                    FirebaseUtils.logEvent("post_review_premium_proof_ready", android.os.Bundle().apply {
-                        putString("premium_proof_variant", currentProductConfig.premiumProofVariant.remoteValue)
-                        putString("direction", recommendation.direction.name.lowercase(Locale.US))
-                        putInt("review_count", recommendation.analyzedReviewCount)
-                        putString("is_applyable", recommendation.isApplyable.toString())
-                    })
+                    if (isPremium) {
+                        FirebaseUtils.logEvent("premium_review_result_ready", android.os.Bundle().apply {
+                            putString("direction", recommendation.direction.name.lowercase(Locale.US))
+                            putInt("review_count", recommendation.analyzedReviewCount)
+                            putString("is_applyable", recommendation.isApplyable.toString())
+                        })
+                    } else {
+                        FirebaseUtils.logEvent("post_review_premium_proof_ready", android.os.Bundle().apply {
+                            putString("premium_proof_variant", currentProductConfig.premiumProofVariant.remoteValue)
+                            putString("direction", recommendation.direction.name.lowercase(Locale.US))
+                            putInt("review_count", recommendation.analyzedReviewCount)
+                            putString("is_applyable", recommendation.isApplyable.toString())
+                        })
+                    }
                 }
+                Timber.tag(TAG).d("Review saved with snapshots. planFlex=%s planPriority=%s", preview.flexibleSpendPerPayday, preview.priorityContributionPerPayday)
             }
-            Timber.tag(TAG).d("Review saved with snapshots. planFlex=%s planPriority=%s", preview.flexibleSpendPerPayday, preview.priorityContributionPerPayday)
         }
     }
 
@@ -1181,51 +1192,61 @@ class HomeViewModel @Inject constructor(
         val realProduct = selectedStoreProduct()
 
         viewModelScope.launch {
-            uiState.update {
-                it.copy(
-                    moreCard = it.moreCard.copy(
-                        isBillingActionInProgress = true,
-                        billingMessage = BillingStatusMessageKeys.STARTING,
-                        error = null
-                    )
+            FirebasePerformanceUtils.traceSuspend(
+                name = "premium_purchase_launch",
+                attributes = mapOf(
+                    "source" to source,
+                    "billing_plan" to uiState.value.moreCard.selectedBillingPlan.name.lowercase(Locale.US)
                 )
-            }
-            if (realProduct != null) {
-                FirebaseUtils.logEvent("purchase_started", android.os.Bundle().apply {
-                    putString("billing_plan", uiState.value.moreCard.selectedBillingPlan.name.lowercase(Locale.US))
-                    putString("price_cluster", currentPricingStrategy().marketCluster)
-                    putString("product_id", realProduct.productId)
-                    putBoolean("has_trial", realProduct.hasFreeTrial)
-                    putString("source", source)
-                })
-                val launchResult = entitlementRepository.purchasePlan(activity, realProduct)
+            ) { trace ->
                 uiState.update {
                     it.copy(
                         moreCard = it.moreCard.copy(
-                            isBillingActionInProgress = false,
-                            billingMessage = BillingStatusMessageMapper.fromLaunchResult(launchResult),
+                            isBillingActionInProgress = true,
+                            billingMessage = BillingStatusMessageKeys.STARTING,
                             error = null
                         )
                     )
                 }
-                logBillingLaunchResult(launchResult, realProduct.productId, source)
-            } else {
-                FirebaseUtils.logEvent("purchase_unavailable", android.os.Bundle().apply {
-                    putString("billing_plan", uiState.value.moreCard.selectedBillingPlan.name.lowercase(Locale.US))
-                    putString("price_cluster", currentPricingStrategy().marketCluster)
-                    putString("product_id", storeProductId)
-                    putString("source", source)
-                })
-                uiState.update {
-                    it.copy(
-                        moreCard = it.moreCard.copy(
-                            isBillingActionInProgress = false,
-                            billingMessage = BillingStatusMessageKeys.PRODUCTS_UNAVAILABLE,
-                            error = "more_error_products_not_loaded"
+                if (realProduct != null) {
+                    trace?.putMetricSafely("product_available", 1L)
+                    FirebaseUtils.logEvent("purchase_started", android.os.Bundle().apply {
+                        putString("billing_plan", uiState.value.moreCard.selectedBillingPlan.name.lowercase(Locale.US))
+                        putString("price_cluster", currentPricingStrategy().marketCluster)
+                        putString("product_id", realProduct.productId)
+                        putBoolean("has_trial", realProduct.hasFreeTrial)
+                        putString("source", source)
+                    })
+                    val launchResult = entitlementRepository.purchasePlan(activity, realProduct)
+                    uiState.update {
+                        it.copy(
+                            moreCard = it.moreCard.copy(
+                                isBillingActionInProgress = false,
+                                billingMessage = BillingStatusMessageMapper.fromLaunchResult(launchResult),
+                                error = null
+                            )
                         )
-                    )
+                    }
+                    logBillingLaunchResult(launchResult, realProduct.productId, source)
+                } else {
+                    trace?.putMetricSafely("product_available", 0L)
+                    FirebaseUtils.logEvent("purchase_unavailable", android.os.Bundle().apply {
+                        putString("billing_plan", uiState.value.moreCard.selectedBillingPlan.name.lowercase(Locale.US))
+                        putString("price_cluster", currentPricingStrategy().marketCluster)
+                        putString("product_id", storeProductId)
+                        putString("source", source)
+                    })
+                    uiState.update {
+                        it.copy(
+                            moreCard = it.moreCard.copy(
+                                isBillingActionInProgress = false,
+                                billingMessage = BillingStatusMessageKeys.PRODUCTS_UNAVAILABLE,
+                                error = "more_error_products_not_loaded"
+                            )
+                        )
+                    }
+                    Timber.tag(TAG).e("Cannot purchase: Product %s not found in store", storeProductId)
                 }
-                Timber.tag(TAG).e("Cannot purchase: Product %s not found in store", storeProductId)
             }
         }
     }
@@ -1825,7 +1846,7 @@ class HomeViewModel @Inject constructor(
         const val MIX_VISIBLE_RULE_COUNT = 3
         const val PREMIUM_ADJUSTMENT_HISTORY_LIMIT = 8
     }
-    }
+}
 
 private val Goal.defaultNameKey: String?
     get() = when {
