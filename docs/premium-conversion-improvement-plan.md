@@ -761,6 +761,13 @@ Status after adaptive paywall layout implementation pass on 2026-05-19:
 - Tested: full `testDebugUnitTest` and debug build.
 - Validated: debug install on `emulator-5554`, compact `720x1280 / 360dpi` paywall with slim Annual row, normal `1080x2400 / 420dpi` paywall with full Annual card, and no fatal crash or ANR in logcat.
 
+Status after Firebase Test Lab guardrail setup on 2026-05-20:
+- Done: Added `scripts/run_firebase_test_lab.sh` as the repeatable Firebase Test Lab entry point for release smoke validation.
+- Cost guardrail: the script defaults to `plan` mode and refuses to start remote Test Lab runs unless `TEST_LAB_CONFIRM_COST=yes` is set explicitly.
+- Cost guardrail: the default matrix is intentionally small: `SmallPhone.arm` API 35 portrait and `MediumPhone.arm` API 35 portrait, with a 5-minute timeout per device.
+- Usage guidance: run Robo before Play internal or closed test uploads; run instrumentation only after deterministic smoke tests are enabled; expand device or locale coverage only for a specific bug.
+- Cost note: Firebase Test Lab includes no-cost daily quota, but usage beyond quota can be billed on Blaze, so do not run broad matrices by default.
+
 Next:
 - Continue the next Premium product slice while keeping compact-screen validation in every pass.
 - Continue validating compact-screen layouts when new Premium controls are added.

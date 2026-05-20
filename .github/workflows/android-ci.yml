@@ -1,0 +1,47 @@
+name: Android CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - development
+  push:
+    branches:
+      - development
+
+concurrency:
+  group: android-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Unit Test And Debug Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set Up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set Up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Create CI Gradle Properties
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          MYSHARE_ADMOB_APP_OPEN_AD_UNIT_ID: ${{ secrets.MYSHARE_ADMOB_APP_OPEN_AD_UNIT_ID }}
+        run: |
+          [[ -n "$GOOGLE_CLIENT_ID" ]] && echo "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" >> gradle.properties
+          [[ -n "$MYSHARE_ADMOB_APP_OPEN_AD_UNIT_ID" ]] && echo "MYSHARE_ADMOB_APP_OPEN_AD_UNIT_ID=$MYSHARE_ADMOB_APP_OPEN_AD_UNIT_ID" >> gradle.properties
+
+      - name: Unit Tests
+        run: ./gradlew :app:testDebugUnitTest
+
+      - name: Debug Build
+        run: ./gradlew :app:assembleDebug
