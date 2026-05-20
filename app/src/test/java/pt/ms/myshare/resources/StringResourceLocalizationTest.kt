@@ -12,6 +12,7 @@ class StringResourceLocalizationTest {
 
     private val resourceDirectory = File("src/main/res")
     private val defaultStrings = resourceDirectory.resolve("values/strings.xml")
+    private val defaultArrayFile = resourceDirectory.resolve("values/arrays.xml")
     private val allowedSharedVisibleKeys = setOf(
         "premium_badge",
         "price_per_period",
@@ -27,6 +28,13 @@ class StringResourceLocalizationTest {
         "values-de/strings.xml",
         "values-ar/strings.xml"
     ).map(resourceDirectory::resolve)
+    private val localizedArrayFiles = listOf(
+        "values-pt-rPT/arrays.xml",
+        "values-es/arrays.xml",
+        "values-fr/arrays.xml",
+        "values-de/arrays.xml",
+        "values-ar/arrays.xml"
+    ).map(resourceDirectory::resolve)
 
     @Test
     fun `localized string files expose the same keys as default strings`() {
@@ -37,6 +45,20 @@ class StringResourceLocalizationTest {
                 "String keys must match default resources for ${file.parentFile?.name}",
                 defaultKeys,
                 file.readStringResources().keys
+            )
+        }
+    }
+
+    @Test
+    fun `localized array files expose the same translatable keys as default arrays`() {
+        val defaultArrays = defaultArrayFile.readArrayResources()
+
+        localizedArrayFiles.forEach { file ->
+            assertTrue("Missing localized array file for ${file.parentFile?.name}", file.exists())
+            assertEquals(
+                "Array keys must match default translatable arrays for ${file.parentFile?.name}",
+                defaultArrays.keys,
+                file.readArrayResources().keys
             )
         }
     }
@@ -63,6 +85,22 @@ class StringResourceLocalizationTest {
 
             assertTrue(
                 "Visible strings still match default English in ${file.parentFile?.name}: $untranslatedKeys",
+                untranslatedKeys.isEmpty()
+            )
+        }
+    }
+
+    @Test
+    fun `visible localized arrays do not fall back to default English values`() {
+        val defaultValues = defaultArrayFile.readArrayResources()
+
+        localizedArrayFiles.forEach { file ->
+            val localizedValues = file.readArrayResources()
+            val untranslatedKeys = defaultValues.keys
+                .filter { localizedValues.getValue(it) == defaultValues.getValue(it) }
+
+            assertTrue(
+                "Visible arrays still match default English in ${file.parentFile?.name}: $untranslatedKeys",
                 untranslatedKeys.isEmpty()
             )
         }
@@ -99,6 +137,29 @@ class StringResourceLocalizationTest {
                 if (element.getAttribute("translatable") != "false") {
                     put(element.getAttribute("name"), element.textContent)
                 }
+            }
+        }
+    }
+
+    private fun File.readArrayResources(): Map<String, List<String>> {
+        val builder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+        val document = builder.parse(this)
+        val nodes = document.getElementsByTagName("string-array")
+        return buildMap {
+            for (arrayIndex in 0 until nodes.length) {
+                val element = nodes.item(arrayIndex) as Element
+                if (element.getAttribute("translatable") != "false") {
+                    put(element.getAttribute("name"), element.readArrayItems())
+                }
+            }
+        }
+    }
+
+    private fun Element.readArrayItems(): List<String> {
+        val nodes = getElementsByTagName("item")
+        return buildList {
+            for (itemIndex in 0 until nodes.length) {
+                add(nodes.item(itemIndex).textContent)
             }
         }
     }

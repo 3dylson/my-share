@@ -38,13 +38,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import pt.ms.myshare.R
+import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.presentation.ui.components.PremiumBenefitCard
 import pt.ms.myshare.presentation.ui.components.PremiumProgressBar
 import pt.ms.myshare.presentation.ui.components.PremiumSectionHeader
 import pt.ms.myshare.presentation.ui.theme.MySharePositive
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
 import java.text.NumberFormat
-import java.util.Locale
 
 @OptIn(ExperimentalFoundationApi::class)
 fun LazyListScope.homeStrategyTab(
@@ -54,6 +54,7 @@ fun LazyListScope.homeStrategyTab(
     goalPaydaySplit: GoalPaydaySplitCardState?,
     rulePaydayMix: RulePaydayMixCardState?,
     isPremium: Boolean,
+    userPreferences: UserPreferences,
     onAddNewGoal: () -> Unit,
     onEditGoal: (String) -> Unit,
     onAddNewRule: () -> Unit,
@@ -163,6 +164,7 @@ fun LazyListScope.homeStrategyTab(
                 progressLabel = progressLabel,
                 targetDateLabel = targetDateLabel,
                 isLocked = goal.isLockedByEntitlement,
+                userPreferences = userPreferences,
                 onClick = {
                     if (goal.isLockedByEntitlement) {
                         onShowPaywall(HomePremiumGate.MultipleGoals)
@@ -382,6 +384,7 @@ fun LazyListScope.homeStrategyTab(
 @Composable
 fun StrategyGoalArchiveBottomSheet(
     goals: List<GoalCardState>,
+    userPreferences: UserPreferences,
     onDismissRequest: () -> Unit,
     onEditGoal: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -418,6 +421,7 @@ fun StrategyGoalArchiveBottomSheet(
                 ) { goal ->
                     StrategyGoalArchiveRow(
                         goal = goal,
+                        userPreferences = userPreferences,
                         goalName = localizedText(context, goal.goalNameKey, goal.goalName),
                         progressLabel = localizedFormattedText(
                             context = context,
@@ -569,6 +573,7 @@ private fun StrategyArchiveSheetHeader(
 @Composable
 private fun StrategyGoalArchiveRow(
     goal: GoalCardState,
+    userPreferences: UserPreferences,
     goalName: String,
     progressLabel: String,
     targetDateLabel: String,
@@ -620,7 +625,7 @@ private fun StrategyGoalArchiveRow(
                             )
                         }
                         Text(
-                            text = NumberFormat.getPercentInstance(Locale.getDefault()).format(goal.progress),
+                            text = NumberFormat.getPercentInstance(userPreferences.locale).format(goal.progress),
                             style = MaterialTheme.typography.labelLarge,
                             color = MySharePrimary,
                             fontWeight = FontWeight.Black
@@ -668,7 +673,7 @@ private fun StrategyGoalArchiveRow(
                         )
                     }
                     Text(
-                        text = NumberFormat.getPercentInstance(Locale.getDefault()).format(goal.progress),
+                        text = NumberFormat.getPercentInstance(userPreferences.locale).format(goal.progress),
                         style = MaterialTheme.typography.titleSmall,
                         color = MySharePrimary,
                         fontWeight = FontWeight.Black
@@ -1242,6 +1247,7 @@ private fun CompactStrategyGoalCard(
     progressLabel: String,
     targetDateLabel: String,
     isLocked: Boolean,
+    userPreferences: UserPreferences,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -1288,7 +1294,7 @@ private fun CompactStrategyGoalCard(
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = NumberFormat.getPercentInstance(Locale.getDefault()).format(progress),
+                        text = NumberFormat.getPercentInstance(userPreferences.locale).format(progress),
                         style = MaterialTheme.typography.titleMedium,
                         color = MySharePrimary,
                         fontWeight = FontWeight.Black

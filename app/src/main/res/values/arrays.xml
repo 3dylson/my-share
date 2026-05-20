@@ -5,7 +5,7 @@
         <item>Reply to all</item>
     </string-array>
 
-    <string-array name="reply_values">
+    <string-array name="reply_values" translatable="false">
         <item>reply</item>
         <item>reply_all</item>
     </string-array>

@@ -54,7 +54,6 @@ import pt.ms.myshare.presentation.ui.paywall.PaywallAutopilotPreviewMapper
 import pt.ms.myshare.presentation.ui.paywall.PaywallAutopilotPreviewUiState
 import pt.ms.myshare.presentation.ui.theme.*
 import timber.log.Timber
-import java.util.*
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -105,7 +104,7 @@ fun PaywallScreen(
         SubscriptionSavingsFormatter.formatAnnualComparison(
             monthlyProduct = monthlyProduct,
             annualProduct = annualProduct,
-            locale = Locale.getDefault()
+            locale = userPreferences.locale
         )
     }
     val autopilotPreview = remember(planPreview, userPreferences) {

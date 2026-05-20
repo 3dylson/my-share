@@ -1,0 +1,6 @@
+<resources>
+    <string-array name="reply_entries">
+        <item>Répondre</item>
+        <item>Répondre à tous</item>
+    </string-array>
+</resources>

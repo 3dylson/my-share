@@ -366,6 +366,7 @@ fun HomeScreen(
     if (showStrategyGoalArchive) {
         StrategyGoalArchiveBottomSheet(
             goals = state.goals,
+            userPreferences = state.moreCard.userPreferences,
             onDismissRequest = { showStrategyGoalArchive = false },
             onEditGoal = { goalId ->
                 showStrategyGoalArchive = false
@@ -780,6 +781,7 @@ fun HomeScreen(
                             goalPaydaySplit = state.goalPaydaySplit,
                             rulePaydayMix = state.rulePaydayMix,
                             isPremium = state.moreCard.isPremium,
+                            userPreferences = state.moreCard.userPreferences,
                             onAddNewGoal = onAddNewGoal,
                             onEditGoal = onEditGoal,
                             onAddNewRule = onAddNewRule,

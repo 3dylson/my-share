@@ -47,7 +47,7 @@ import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.presentation.ui.theme.MySharePositive
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
 import java.text.NumberFormat
-import java.util.Calendar
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -120,11 +120,7 @@ fun TrajectoryScreen(
                 TrajectorySummaryCard(
                     paydaySummary = paydaySummary,
                     goalDate = preview.goalTargetDate?.let { date ->
-                        val calendar = Calendar.getInstance().apply {
-                            set(Calendar.YEAR, date.year)
-                            set(Calendar.MONTH, date.monthValue - 1)
-                        }
-                        android.text.format.DateFormat.format("MMMM yyyy", calendar).toString()
+                        date.format(DateTimeFormatter.ofPattern("MMMM yyyy", userPreferences.locale))
                     },
                     contribution = currencyFormat.format(preview.priorityContributionPerPayday),
                     weeklyFlexibleSpend = formattedWeeklyFlexibleSpend,

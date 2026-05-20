@@ -28,6 +28,29 @@ class SubscriptionSavingsFormatterTest {
     }
 
     @Test
+    fun `formats annual comparison with selected user locale`() {
+        val monthly = storeProduct(
+            price = "4,99 €",
+            priceAmountMicros = 4_990_000,
+            priceCurrencyCode = "EUR"
+        )
+        val annual = storeProduct(
+            price = "39,88 €",
+            priceAmountMicros = 39_880_000,
+            priceCurrencyCode = "EUR"
+        )
+
+        val comparison = SubscriptionSavingsFormatter.formatAnnualComparison(
+            monthlyProduct = monthly,
+            annualProduct = annual,
+            locale = Locale.forLanguageTag("pt-PT")
+        )
+
+        assertEquals("59,88 €", comparison?.monthlyEquivalentPrice)
+        assertEquals("20,00 €", comparison?.savingsPrice)
+    }
+
+    @Test
     fun `returns no comparison without numeric monthly price`() {
         val comparison = SubscriptionSavingsFormatter.formatAnnualComparison(
             monthlyProduct = storeProduct(priceAmountMicros = null, priceCurrencyCode = "USD"),

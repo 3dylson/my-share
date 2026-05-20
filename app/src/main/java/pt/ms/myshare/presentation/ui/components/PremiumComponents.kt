@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalConfiguration
 import pt.ms.myshare.presentation.ui.theme.MyShareOnPrimary
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
 import androidx.compose.ui.viewinterop.AndroidView
@@ -261,6 +262,7 @@ fun PremiumGoalCard(
     onClick: (() -> Unit)? = null
 ) {
     val actualIcon = icon ?: Icons.Default.Flag
+    val locale = java.util.Locale.forLanguageTag(LocalConfiguration.current.locales[0].toLanguageTag())
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -317,7 +319,7 @@ fun PremiumGoalCard(
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = java.text.NumberFormat.getPercentInstance(java.util.Locale.getDefault()).format(progress),
+                        text = java.text.NumberFormat.getPercentInstance(locale).format(progress),
                         style = MaterialTheme.typography.labelSmall,
                         color = color,
                         fontWeight = FontWeight.Black
@@ -1507,14 +1509,16 @@ fun PremiumSliderCard(
     valueRange: ClosedFloatingPointRange<Float>,
     modifier: Modifier = Modifier,
     icon: androidx.compose.ui.graphics.vector.ImageVector? = null,
-    formatValue: (Float) -> String = {
-        java.text.NumberFormat.getNumberInstance(java.util.Locale.getDefault()).apply {
+    formatValue: ((Float) -> String)? = null
+) {
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+    val locale = java.util.Locale.forLanguageTag(LocalConfiguration.current.locales[0].toLanguageTag())
+    val resolvedFormatValue = formatValue ?: {
+        java.text.NumberFormat.getNumberInstance(locale).apply {
             minimumFractionDigits = 2
             maximumFractionDigits = 2
         }.format(it)
     }
-) {
-    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     
     PremiumCard(modifier = modifier) {
         Column(
@@ -1546,7 +1550,7 @@ fun PremiumSliderCard(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = formatValue(value),
+                    text = resolvedFormatValue(value),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
