@@ -110,6 +110,7 @@ class OnboardingViewModel @Inject constructor(
                     putString("onboarding_paywall_variant", productConfig.onboardingPaywallVariant.remoteValue)
                     putString("onboarding_experiment", productConfig.onboardingConversionExperiment)
                     putString("paywall_trial_framing", productConfig.paywallTrialFraming.remoteValue)
+                    putString("paywall_value_frame", PAYWALL_VALUE_FRAME)
                 })
                 Timber.tag(TAG).d(
                     "Onboarding product config applied paywallDefault=%s variant=%s",
@@ -392,6 +393,7 @@ class OnboardingViewModel @Inject constructor(
             putString("onboarding_paywall_variant", state.value.onboardingPaywallVariant.remoteValue)
             putString("onboarding_experiment", state.value.onboardingConversionExperiment)
             putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
+            putString("paywall_value_frame", PAYWALL_VALUE_FRAME)
         })
     }
 
@@ -472,6 +474,7 @@ class OnboardingViewModel @Inject constructor(
                         putString("onboarding_paywall_variant", state.value.onboardingPaywallVariant.remoteValue)
                         putString("onboarding_experiment", state.value.onboardingConversionExperiment)
                         putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
+                        putString("paywall_value_frame", PAYWALL_VALUE_FRAME)
                     })
                     Timber.tag("OnboardingBilling").e("Cannot purchase: Product %s not found in store", storeProductId)
                     return@traceSuspend
@@ -486,6 +489,7 @@ class OnboardingViewModel @Inject constructor(
                     putString("onboarding_paywall_variant", state.value.onboardingPaywallVariant.remoteValue)
                     putString("onboarding_experiment", state.value.onboardingConversionExperiment)
                     putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
+                    putString("paywall_value_frame", PAYWALL_VALUE_FRAME)
                 })
                 val launchResult = entitlementRepository.purchasePlan(activity, product)
                 state.update {
@@ -712,6 +716,7 @@ class OnboardingViewModel @Inject constructor(
                     putString("product_id", PremiumSubscriptionProducts.productIdFor(state.value.selectedBillingPlan))
                     putString("onboarding_experiment", state.value.onboardingConversionExperiment)
                     putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
+                    putString("paywall_value_frame", PAYWALL_VALUE_FRAME)
                 })
                 Timber.tag("OnboardingBilling").d(
                     "Billing purchase completed source=%s",
@@ -827,6 +832,7 @@ class OnboardingViewModel @Inject constructor(
             putString("onboarding_paywall_variant", state.value.onboardingPaywallVariant.remoteValue)
             putString("onboarding_experiment", state.value.onboardingConversionExperiment)
             putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
+            putString("paywall_value_frame", PAYWALL_VALUE_FRAME)
         })
     }
 
@@ -895,6 +901,7 @@ class OnboardingViewModel @Inject constructor(
 
     companion object {
         private const val TAG = "OnboardingViewModel"
+        private const val PAYWALL_VALUE_FRAME = "payday_cycle_proof"
         const val SETUP_STEP_TOTAL = 4
         const val FIXED_COSTS_EXCEED_INCOME_ERROR = "onboarding_fixed_costs_error_exceeds_income"
     }

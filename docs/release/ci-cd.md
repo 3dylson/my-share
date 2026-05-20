@@ -22,6 +22,7 @@ Every release increments `versionCode` by one.
 ## Required GitHub Secrets
 
 - `GOOGLE_CLIENT_ID`
+- `GOOGLE_SERVICES_JSON`
 - `MYSHARE_ADMOB_APP_OPEN_AD_UNIT_ID`
 - `MYSHARE_RELEASE_KEYSTORE_BASE64`
 - `MYSHARE_RELEASE_STORE_PASSWORD`

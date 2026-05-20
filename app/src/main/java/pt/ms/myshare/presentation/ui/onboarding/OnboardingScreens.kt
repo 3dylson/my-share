@@ -358,7 +358,15 @@ fun PaywallScreen(
                     }
                 }
 
-                Spacer(Modifier.height(if (isCompactHeight) 16.dp else 22.dp))
+                Spacer(Modifier.height(if (isCompactHeight) 12.dp else 16.dp))
+
+                PaywallSelectedPlanProof(
+                    selectedPlan = selectedPlan,
+                    showTrialLabel = selectedTrialDays != null && useFirstCheckInTrialFraming,
+                    compactHeight = isCompactHeight
+                )
+
+                Spacer(Modifier.height(if (isCompactHeight) 14.dp else 22.dp))
 
                 if (paywallLayoutMode != PaywallLayoutMode.Compact) {
                     PaywallTrustList()
@@ -380,6 +388,79 @@ private enum class PaywallLayoutMode {
             screenHeightDp < 720 || fontScale >= 1.25f -> Compact
             screenHeightDp >= 880 && fontScale < 1.15f -> Expanded
             else -> Standard
+        }
+    }
+}
+
+@Composable
+private fun PaywallSelectedPlanProof(
+    selectedPlan: BillingPlan,
+    showTrialLabel: Boolean,
+    compactHeight: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val icon = when (selectedPlan) {
+        BillingPlan.ANNUAL -> Icons.Default.EventAvailable
+        BillingPlan.MONTHLY -> Icons.Default.CreditCard
+    }
+    val title = when (selectedPlan) {
+        BillingPlan.ANNUAL -> stringResource(R.string.paywall_selected_annual_title)
+        BillingPlan.MONTHLY -> stringResource(R.string.paywall_selected_monthly_title)
+    }
+    val body = when (selectedPlan) {
+        BillingPlan.ANNUAL -> stringResource(R.string.paywall_selected_annual_body)
+        BillingPlan.MONTHLY -> stringResource(R.string.paywall_selected_monthly_body)
+    }
+
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.42f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.18f))
+    ) {
+        Row(
+            modifier = Modifier.padding(if (compactHeight) 12.dp else 14.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = MySharePrimary.copy(alpha = 0.14f)
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MySharePrimary,
+                    modifier = Modifier.padding(8.dp).size(20.dp)
+                )
+            }
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(if (compactHeight) 3.dp else 5.dp)
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    lineHeight = 20.sp
+                )
+                Text(
+                    text = body,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 18.sp
+                )
+                if (showTrialLabel) {
+                    Text(
+                        text = stringResource(R.string.paywall_selected_trial_label),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MySharePrimary,
+                        fontWeight = FontWeight.Bold,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
         }
     }
 }

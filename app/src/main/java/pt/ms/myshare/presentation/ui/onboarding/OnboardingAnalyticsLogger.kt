@@ -51,6 +51,7 @@ class OnboardingAnalyticsLogger @Inject constructor() {
             putString("price_cluster", pricingStrategy?.marketCluster)
             onboardingExperiment?.let { putString("onboarding_experiment", it) }
             paywallTrialFraming?.let { putString("paywall_trial_framing", it) }
+            putString("premium_value_frame", "payday_cycle_proof")
         })
         Timber.tag(TAG).d("Onboarding activation reached focus=%s", focus.analyticsName())
     }

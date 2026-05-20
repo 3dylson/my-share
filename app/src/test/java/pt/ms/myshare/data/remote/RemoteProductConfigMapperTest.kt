@@ -30,7 +30,7 @@ class RemoteProductConfigMapperTest {
         assertEquals(OnboardingPaywallVariant.PAYDAY_PROOF, config.onboardingPaywallVariant)
         assertEquals(PremiumProofVariant.NEXT_MOVE, config.premiumProofVariant)
         assertEquals(ProductExperienceConfig.DEFAULT_ONBOARDING_CONVERSION_EXPERIMENT, config.onboardingConversionExperiment)
-        assertEquals(PaywallTrialFraming.SEVEN_DAY, config.paywallTrialFraming)
+        assertEquals(PaywallTrialFraming.FIRST_CHECKIN, config.paywallTrialFraming)
     }
 
     @Test
@@ -73,8 +73,8 @@ class RemoteProductConfigMapperTest {
         founderOfferEnabled: Boolean = true,
         premiumRemindersEnabled: Boolean = true,
         premiumProofVariant: String = "next_move",
-        onboardingConversionExperiment: String = "baseline",
-        paywallTrialFraming: String = "seven_day"
+        onboardingConversionExperiment: String = ProductExperienceConfig.DEFAULT_ONBOARDING_CONVERSION_EXPERIMENT,
+        paywallTrialFraming: String = PaywallTrialFraming.FIRST_CHECKIN.remoteValue
     ): ProductExperienceConfig {
         return RemoteProductConfigMapper.fromValues(
             paywallDefaultPlan = paywallDefaultPlan,

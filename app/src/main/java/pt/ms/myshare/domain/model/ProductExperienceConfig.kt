@@ -7,12 +7,12 @@ data class ProductExperienceConfig(
     val premiumRemindersEnabled: Boolean = true,
     val premiumProofVariant: PremiumProofVariant = PremiumProofVariant.NEXT_MOVE,
     val onboardingConversionExperiment: String = DEFAULT_ONBOARDING_CONVERSION_EXPERIMENT,
-    val paywallTrialFraming: PaywallTrialFraming = PaywallTrialFraming.SEVEN_DAY
+    val paywallTrialFraming: PaywallTrialFraming = PaywallTrialFraming.FIRST_CHECKIN
 ) {
     companion object {
         const val DEFAULT_ONBOARDING_PAYWALL_VARIANT = "payday_proof"
         const val DEFAULT_PREMIUM_PROOF_VARIANT = "next_move"
-        const val DEFAULT_ONBOARDING_CONVERSION_EXPERIMENT = "baseline"
+        const val DEFAULT_ONBOARDING_CONVERSION_EXPERIMENT = "first_checkin_trial"
     }
 }
 

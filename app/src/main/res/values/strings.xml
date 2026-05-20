@@ -192,9 +192,15 @@
     <string name="onboarding_plan_preview_impact_body">At this pace, %1$s is on track around %2$s %3$s.</string>
     <string name="onboarding_plan_preview_reminder_callout">We will remind you on %1$s so the plan does not stay in your head.</string>
     <string name="onboarding_plan_preview_premium_label">Premium preview</string>
-    <string name="onboarding_plan_preview_premium_title">What Premium starts watching today</string>
+    <string name="onboarding_plan_preview_premium_title">Your next payday can improve itself</string>
     <string name="onboarding_plan_preview_premium_body">Premium would watch your %1$s weekly guide and your %2$s move to %3$s, then use your first review to suggest the next payday move.</string>
     <string name="onboarding_plan_preview_premium_body_without_priority">Premium would watch your %1$s weekly guide, then use your first review to suggest what should change next payday.</string>
+    <string name="onboarding_plan_preview_premium_timeline_today_label">Today</string>
+    <string name="onboarding_plan_preview_premium_timeline_today_body">Start with this payday split.</string>
+    <string name="onboarding_plan_preview_premium_timeline_review_label">After payday</string>
+    <string name="onboarding_plan_preview_premium_timeline_review_body">Review what really happened.</string>
+    <string name="onboarding_plan_preview_premium_timeline_next_label">Next payday</string>
+    <string name="onboarding_plan_preview_premium_timeline_next_body">Premium shows the next move.</string>
     <string name="onboarding_plan_preview_premium_watch_weekly_label">Weekly guide</string>
     <string name="onboarding_plan_preview_premium_watch_weekly_body">Keep everyday spending near %1$s.</string>
     <string name="onboarding_plan_preview_premium_watch_priority_label">Priority move</string>
@@ -750,13 +756,13 @@
     <string name="paywall_feature_tracking_desc">Keep the full timeline visible and recover when a review is skipped.</string>
     <string name="paywall_plan_monthly">Monthly</string>
     <string name="paywall_plan_annual">Annual</string>
-    <string name="paywall_desc_monthly">Flexible start</string>
-    <string name="paywall_desc_annual">Best value for long-term planning</string>
+    <string name="paywall_desc_monthly">Start monthly, upgrade later</string>
+    <string name="paywall_desc_annual">12 guided payday check-ins</string>
     <string name="paywall_badge_best_value">BEST VALUE</string>
     <string name="paywall_badge_easy_start">EASY START</string>
     <string name="paywall_annual_savings_label">Save %1$s per year</string>
     <string name="paywall_hero_trial_badge">%1$d-day trial</string>
-    <string name="paywall_hero_trial_badge_first_checkin">First check-in trial</string>
+    <string name="paywall_hero_trial_badge_first_checkin">First payday cycle free</string>
     <string name="paywall_plan_section_title">Choose your plan</string>
     <string name="paywall_value_section_title">What Premium really adds</string>
     <string name="paywall_price_loading">Checking Play price</string>
@@ -776,6 +782,11 @@
     <string name="paywall_autopilot_preview_free_label">Free plan</string>
     <string name="paywall_autopilot_preview_free_body">Follow this split manually.</string>
     <string name="paywall_autopilot_preview_premium_body">Reviews become next moves.</string>
+    <string name="paywall_selected_annual_title">Best for the payday habit</string>
+    <string name="paywall_selected_annual_body">Annual keeps every payday review, next move, and saved adjustment working together for the year.</string>
+    <string name="paywall_selected_monthly_title">A lighter way to start</string>
+    <string name="paywall_selected_monthly_body">Monthly is flexible. Annual is still the better value once you want Premium guiding each payday.</string>
+    <string name="paywall_selected_trial_label">Try the first payday cycle before you commit.</string>
     <string name="paywall_trust_play_title">Google Play checkout</string>
     <string name="paywall_trust_play_body">Price, trial eligibility, renewal, and cancellation are handled by Google Play.</string>
     <string name="paywall_trust_manual_title">Manual-first plan</string>
@@ -784,7 +795,7 @@
     <string name="paywall_trust_cancel_body">Manage or cancel from Google Play. Access stays active until the paid period ends.</string>
     <string name="paywall_upgrade_button">Upgrade Now</string>
     <string name="paywall_start_trial_button">Start Free Trial</string>
-    <string name="paywall_start_trial_button_first_checkin">Try through my first check-in</string>
+    <string name="paywall_start_trial_button_first_checkin">Try my first payday cycle</string>
     <string name="paywall_upgrade_loading">Preparing purchase…</string>
     <string name="paywall_billing_starting">Preparing the secure Play purchase screen…</string>
     <string name="paywall_billing_handoff">Play purchase screen opened. Finish there to activate Premium.</string>
@@ -819,10 +830,10 @@
     <string name="paywall_subhead_emerging">Start with Monthly if you want the lighter test. Premium watches each review and shows the next move.</string>
     <string name="paywall_headline_brazil">Keep this salary plan improving</string>
     <string name="paywall_subhead_brazil">Monthly is highlighted first so you can test review-powered guidance before committing.</string>
-    <string name="paywall_headline_default">Keep this plan improving</string>
-    <string name="paywall_subhead_default">Premium watches each review, remembers changes, and shows the next payday move.</string>
-    <string name="paywall_headline_review_momentum">Make every payday review count</string>
-    <string name="paywall_subhead_review_momentum">Premium turns each quick check-in into one clear move for the next payday.</string>
+    <string name="paywall_headline_default">Make this your payday system</string>
+    <string name="paywall_subhead_default">Try the first cycle free. Premium watches each review, remembers changes, and shows the next payday move.</string>
+    <string name="paywall_headline_review_momentum">Let every payday review pay off</string>
+    <string name="paywall_subhead_review_momentum">Try the first cycle free. Premium turns each quick check-in into one clear move for the next payday.</string>
 
     <!-- Review Insights -->
     <string name="insight_review_save_stress_success_headline">Safety net growing</string>

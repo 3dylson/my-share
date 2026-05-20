@@ -50,6 +50,8 @@ jobs:
         if: steps.version.outputs.release_needed == 'true'
         env:
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+          MYSHARE_ADMOB_APP_OPEN_AD_UNIT_ID: ${{ secrets.MYSHARE_ADMOB_APP_OPEN_AD_UNIT_ID }}
           MYSHARE_RELEASE_KEYSTORE_BASE64: ${{ secrets.MYSHARE_RELEASE_KEYSTORE_BASE64 }}
           MYSHARE_RELEASE_STORE_PASSWORD: ${{ secrets.MYSHARE_RELEASE_STORE_PASSWORD }}
           MYSHARE_RELEASE_KEY_ALIAS: ${{ secrets.MYSHARE_RELEASE_KEY_ALIAS }}
@@ -58,6 +60,8 @@ jobs:
           missing=0
           for name in \
             GOOGLE_CLIENT_ID \
+            GOOGLE_SERVICES_JSON \
+            MYSHARE_ADMOB_APP_OPEN_AD_UNIT_ID \
             MYSHARE_RELEASE_KEYSTORE_BASE64 \
             MYSHARE_RELEASE_STORE_PASSWORD \
             MYSHARE_RELEASE_KEY_ALIAS \
@@ -95,6 +99,13 @@ jobs:
             echo "MYSHARE_RELEASE_KEY_ALIAS=$MYSHARE_RELEASE_KEY_ALIAS"
             echo "MYSHARE_RELEASE_KEY_PASSWORD=$MYSHARE_RELEASE_KEY_PASSWORD"
           } >> gradle.properties
+
+      - name: Create Google Services Config
+        if: steps.version.outputs.release_needed == 'true'
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          printf '%s' "$GOOGLE_SERVICES_JSON" > app/google-services.json
 
       - name: Apply Android Version
         if: steps.version.outputs.release_needed == 'true'

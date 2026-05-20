@@ -899,4 +899,15 @@
     <string name="legacy_premium_grant_reason_watch">يتابع Premium خطتك بعد يوم الراتب ويقترح الخطوة التالية.</string>
     <string name="legacy_premium_grant_reason_no_charge">يعرض Google Play سعر التجديد أولاً. يمكنك الإلغاء في أي وقت.</string>
     <string name="legacy_premium_grant_error">حدث خطأ ما. حاول مرة أخرى بعد قليل.</string>
+    <string name="onboarding_plan_preview_premium_timeline_today_label">اليوم</string>
+    <string name="onboarding_plan_preview_premium_timeline_today_body">ابدأ بتقسيم هذا الراتب.</string>
+    <string name="onboarding_plan_preview_premium_timeline_review_label">بعد يوم الراتب</string>
+    <string name="onboarding_plan_preview_premium_timeline_review_body">راجع ما حدث فعلاً.</string>
+    <string name="onboarding_plan_preview_premium_timeline_next_label">يوم الراتب القادم</string>
+    <string name="onboarding_plan_preview_premium_timeline_next_body">يعرض Premium الخطوة التالية.</string>
+    <string name="paywall_selected_annual_title">الأفضل لبناء عادة يوم الراتب</string>
+    <string name="paywall_selected_annual_body">الخطة السنوية تبقي كل مراجعة راتب وخطوة تالية وتعديل محفوظ يعملون معاً طوال العام.</string>
+    <string name="paywall_selected_monthly_title">طريقة أخف للبدء</string>
+    <string name="paywall_selected_monthly_body">الخطة الشهرية مرنة. السنوية تظل أفضل قيمة عندما تريد أن يرشدك Premium في كل يوم راتب.</string>
+    <string name="paywall_selected_trial_label">جرّب أول دورة راتب قبل الالتزام.</string>
 </resources>

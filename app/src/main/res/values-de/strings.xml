@@ -899,4 +899,15 @@
     <string name="legacy_premium_grant_reason_watch">Premium beobachtet deinen Plan nach dem Zahltag und schlägt den nächsten Schritt vor.</string>
     <string name="legacy_premium_grant_reason_no_charge">Google Play zeigt zuerst den Verlängerungspreis. Du kannst jederzeit kündigen.</string>
     <string name="legacy_premium_grant_error">Etwas ist schiefgelaufen. Bitte versuche es gleich erneut.</string>
+    <string name="onboarding_plan_preview_premium_timeline_today_label">Heute</string>
+    <string name="onboarding_plan_preview_premium_timeline_today_body">Starte mit dieser Zahltagsaufteilung.</string>
+    <string name="onboarding_plan_preview_premium_timeline_review_label">Nach dem Zahltag</string>
+    <string name="onboarding_plan_preview_premium_timeline_review_body">Prüfe, was wirklich passiert ist.</string>
+    <string name="onboarding_plan_preview_premium_timeline_next_label">Nächster Zahltag</string>
+    <string name="onboarding_plan_preview_premium_timeline_next_body">Premium zeigt den nächsten Schritt.</string>
+    <string name="paywall_selected_annual_title">Am besten für die Zahltagsroutine</string>
+    <string name="paywall_selected_annual_body">Jährlich hält jede Zahltagsprüfung, den nächsten Schritt und gespeicherte Anpassungen das ganze Jahr zusammen.</string>
+    <string name="paywall_selected_monthly_title">Ein leichterer Einstieg</string>
+    <string name="paywall_selected_monthly_body">Monatlich ist flexibel. Jährlich bleibt der bessere Wert, sobald Premium jeden Zahltag begleiten soll.</string>
+    <string name="paywall_selected_trial_label">Teste den ersten Zahltagszyklus, bevor du dich festlegst.</string>
 </resources>

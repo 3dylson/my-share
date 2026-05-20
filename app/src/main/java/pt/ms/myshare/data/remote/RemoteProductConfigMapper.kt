@@ -52,7 +52,7 @@ object RemoteProductConfigMapper {
     private fun String.toPaywallTrialFraming(): PaywallTrialFraming {
         val normalized = trim().lowercase(Locale.US)
         return PaywallTrialFraming.entries.firstOrNull { it.remoteValue == normalized }
-            ?: PaywallTrialFraming.SEVEN_DAY
+            ?: PaywallTrialFraming.FIRST_CHECKIN
     }
 
     private fun String.toExperimentName(): String {

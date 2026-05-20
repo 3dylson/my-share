@@ -22,10 +22,10 @@
     </entry>
     <entry>
         <key>onboarding_conversion_experiment</key>
-        <value>baseline</value>
+        <value>first_checkin_trial</value>
     </entry>
     <entry>
         <key>paywall_trial_framing</key>
-        <value>seven_day</value>
+        <value>first_checkin</value>
     </entry>
 </defaultsMap>

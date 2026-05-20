@@ -899,4 +899,15 @@
     <string name="plan_summary_investing_first">Una división liderada por inversión para mantener activos en marcha.</string>
     <string name="plan_summary_flexible_budget_only">Un plan flexible centrado en claridad para gastar con seguridad.</string>
     <string name="plan_summary_custom_strategy">Una división personalizada según tus propias reglas de pago.</string>
+    <string name="onboarding_plan_preview_premium_timeline_today_label">Hoy</string>
+    <string name="onboarding_plan_preview_premium_timeline_today_body">Empieza con esta división del cobro.</string>
+    <string name="onboarding_plan_preview_premium_timeline_review_label">Después del cobro</string>
+    <string name="onboarding_plan_preview_premium_timeline_review_body">Revisa qué ocurrió de verdad.</string>
+    <string name="onboarding_plan_preview_premium_timeline_next_label">Próximo cobro</string>
+    <string name="onboarding_plan_preview_premium_timeline_next_body">Premium muestra el siguiente paso.</string>
+    <string name="paywall_selected_annual_title">Mejor para crear el hábito de cobro</string>
+    <string name="paywall_selected_annual_body">El anual mantiene cada revisión, siguiente paso y ajuste guardado trabajando juntos durante el año.</string>
+    <string name="paywall_selected_monthly_title">Una forma más ligera de empezar</string>
+    <string name="paywall_selected_monthly_body">El mensual es flexible. El anual sigue siendo mejor valor cuando quieres que Premium guíe cada cobro.</string>
+    <string name="paywall_selected_trial_label">Prueba el primer ciclo de cobro antes de decidir.</string>
 </resources>

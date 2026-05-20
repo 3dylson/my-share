@@ -900,4 +900,15 @@
     <string name="plan_summary_investing_first">Uma divisão liderada por investimento para manter ativos a crescer.</string>
     <string name="plan_summary_flexible_budget_only">Um plano flexível focado na clareza do dinheiro seguro para gastar.</string>
     <string name="plan_summary_custom_strategy">Uma divisão personalizada moldada pelas suas regras de pagamento.</string>
+    <string name="onboarding_plan_preview_premium_timeline_today_label">Hoje</string>
+    <string name="onboarding_plan_preview_premium_timeline_today_body">Comece com esta divisão do pagamento.</string>
+    <string name="onboarding_plan_preview_premium_timeline_review_label">Depois do pagamento</string>
+    <string name="onboarding_plan_preview_premium_timeline_review_body">Reveja o que aconteceu na prática.</string>
+    <string name="onboarding_plan_preview_premium_timeline_next_label">Próximo pagamento</string>
+    <string name="onboarding_plan_preview_premium_timeline_next_body">O Premium mostra o próximo passo.</string>
+    <string name="paywall_selected_annual_title">Melhor para criar o hábito de dia de pagamento</string>
+    <string name="paywall_selected_annual_body">O anual mantém cada revisão, próximo passo e ajuste guardado a trabalhar em conjunto durante o ano.</string>
+    <string name="paywall_selected_monthly_title">Uma forma mais leve de começar</string>
+    <string name="paywall_selected_monthly_body">O mensal é flexível. O anual continua a ter melhor valor quando quiser o Premium a orientar cada pagamento.</string>
+    <string name="paywall_selected_trial_label">Experimente o primeiro ciclo de pagamento antes de decidir.</string>
 </resources>

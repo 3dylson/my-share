@@ -899,4 +899,15 @@
     <string name="legacy_premium_grant_reason_watch">Premium suit votre plan après la paie et suggère le prochain pas.</string>
     <string name="legacy_premium_grant_reason_no_charge">Google Play affiche d’abord le prix de renouvellement. Annulez à tout moment.</string>
     <string name="legacy_premium_grant_error">Un problème est survenu. Réessayez dans un instant.</string>
+    <string name="onboarding_plan_preview_premium_timeline_today_label">Aujourd’hui</string>
+    <string name="onboarding_plan_preview_premium_timeline_today_body">Commencez avec cette répartition de paie.</string>
+    <string name="onboarding_plan_preview_premium_timeline_review_label">Après la paie</string>
+    <string name="onboarding_plan_preview_premium_timeline_review_body">Vérifiez ce qui s’est vraiment passé.</string>
+    <string name="onboarding_plan_preview_premium_timeline_next_label">Prochaine paie</string>
+    <string name="onboarding_plan_preview_premium_timeline_next_body">Premium montre la prochaine action.</string>
+    <string name="paywall_selected_annual_title">Le meilleur choix pour l’habitude de paie</string>
+    <string name="paywall_selected_annual_body">L’annuel garde chaque bilan, prochaine action et ajustement enregistré alignés pendant l’année.</string>
+    <string name="paywall_selected_monthly_title">Une façon plus légère de commencer</string>
+    <string name="paywall_selected_monthly_body">Le mensuel reste flexible. L’annuel offre toujours plus de valeur quand vous voulez que Premium guide chaque paie.</string>
+    <string name="paywall_selected_trial_label">Essayez le premier cycle de paie avant de vous engager.</string>
 </resources>

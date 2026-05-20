@@ -383,7 +383,7 @@ class OnboardingViewModelTest {
 
         verify { onboardingAnalyticsLogger.logStepViewed("goal_picker", 1, OnboardingViewModel.SETUP_STEP_TOTAL, any(), any()) }
         verify { onboardingAnalyticsLogger.logStepCompleted("goal_picker", 1, OnboardingViewModel.SETUP_STEP_TOTAL, any(), any()) }
-        verify(exactly = 1) { onboardingAnalyticsLogger.logActivationReached(any(), any()) }
+        verify(exactly = 1) { onboardingAnalyticsLogger.logActivationReached(any(), any(), any(), any()) }
     }
 
     @Test

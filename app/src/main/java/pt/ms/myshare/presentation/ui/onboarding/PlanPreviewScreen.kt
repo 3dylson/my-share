@@ -29,6 +29,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Celebration
+import androidx.compose.material.icons.filled.EventAvailable
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Savings
@@ -630,6 +631,7 @@ private fun PremiumAdjustmentTeaserCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 lineHeight = 21.sp
             )
+            PremiumTimelinePreview()
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 PremiumWatchItem(
                     icon = Icons.Default.Security,
@@ -662,6 +664,85 @@ private fun PremiumAdjustmentTeaserCard(
                     iconColor = MyShareWarning
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun PremiumTimelinePreview() {
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val shouldStack = maxWidth < 320.dp || LocalDensity.current.fontScale >= 1.25f
+        val items = listOf(
+            PremiumTimelineItemState(
+                icon = Icons.Default.CheckCircle,
+                label = stringResource(R.string.onboarding_plan_preview_premium_timeline_today_label),
+                body = stringResource(R.string.onboarding_plan_preview_premium_timeline_today_body),
+                color = MySharePrimary
+            ),
+            PremiumTimelineItemState(
+                icon = Icons.Default.Savings,
+                label = stringResource(R.string.onboarding_plan_preview_premium_timeline_review_label),
+                body = stringResource(R.string.onboarding_plan_preview_premium_timeline_review_body),
+                color = MySharePositive
+            ),
+            PremiumTimelineItemState(
+                icon = Icons.Default.EventAvailable,
+                label = stringResource(R.string.onboarding_plan_preview_premium_timeline_next_label),
+                body = stringResource(R.string.onboarding_plan_preview_premium_timeline_next_body),
+                color = MyShareWarning
+            )
+        )
+
+        if (shouldStack) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                items.forEach { item ->
+                    PremiumTimelineStep(item = item, modifier = Modifier.fillMaxWidth())
+                }
+            }
+        } else {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                items.forEach { item ->
+                    PremiumTimelineStep(item = item, modifier = Modifier.weight(1f))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PremiumTimelineStep(
+    item: PremiumTimelineItemState,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(14.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.34f),
+        border = BorderStroke(1.dp, item.color.copy(alpha = 0.16f))
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp)
+        ) {
+            Icon(
+                imageVector = item.icon,
+                contentDescription = null,
+                tint = item.color,
+                modifier = Modifier.size(18.dp)
+            )
+            Text(
+                text = item.label,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.onSurface,
+                lineHeight = 17.sp
+            )
+            Text(
+                text = item.body,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                lineHeight = 17.sp
+            )
         }
     }
 }
@@ -718,3 +799,10 @@ private fun PremiumWatchItem(
         }
     }
 }
+
+private data class PremiumTimelineItemState(
+    val icon: ImageVector,
+    val label: String,
+    val body: String,
+    val color: Color
+)
