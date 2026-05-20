@@ -262,7 +262,7 @@ fun HomeScreen(
             if (state.moreCard.isPremium) {
                 showPremiumReviewResultSheet = true
                 Timber.tag("HomeScreen").d("Premium review result sheet opened after saved review")
-            } else if (state.reviewCard.paydayRecommendation != null) {
+            } else if (state.reviewHistory.isEmpty() || state.reviewCard.paydayRecommendation != null) {
                 openPremiumGate(HomePremiumGate.FirstReview)
                 Timber.tag("HomeScreen").d("Post-review Premium proof opened for free user")
             } else {
