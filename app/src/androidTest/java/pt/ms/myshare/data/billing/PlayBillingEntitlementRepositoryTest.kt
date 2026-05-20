@@ -5,6 +5,7 @@ import com.android.billingclient.api.Purchase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import io.mockk.*
+import javax.inject.Provider
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -25,6 +26,8 @@ class PlayBillingEntitlementRepositoryTest {
     private val billingAuthSession = FakeBillingAuthSession()
     private val firestore: FirebaseFirestore = mockk(relaxed = true)
     private val firebaseFunctions: FirebaseFunctions = mockk()
+    private val firestoreProvider: Provider<FirebaseFirestore> = Provider { firestore }
+    private val firebaseFunctionsProvider: Provider<FirebaseFunctions> = Provider { firebaseFunctions }
     private val purchasesFlow = MutableStateFlow<List<Purchase>>(emptyList())
     private val hasLoadedActivePurchasesFlow = MutableStateFlow(false)
 
@@ -37,8 +40,8 @@ class PlayBillingEntitlementRepositoryTest {
         repository = PlayBillingEntitlementRepository(
             billingWrapper,
             billingAuthSession,
-            firestore,
-            firebaseFunctions,
+            firestoreProvider,
+            firebaseFunctionsProvider,
         )
     }
 

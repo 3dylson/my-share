@@ -80,6 +80,19 @@
     <string name="onboarding_reminder_subtitle">Eine sanfte Erinnerung hilft dir, den Schritt zu machen, bevor Alltagsausgaben übernehmen.</string>
     <string name="onboarding_reminder_cadence_payday_desc">Halten Sie sich bei jeder Einkommensveranstaltung an Ihren Plan.</string>
     <string name="onboarding_reminder_cadence_weekly_desc">Reflektieren und passen Sie Ihre Fortschritte jeden Sonntag an.</string>
+    <string name="home_coach_marks_pane_title">Home-Tour</string>
+    <string name="home_coach_marks_progress">%1$d von %2$d</string>
+    <string name="home_coach_marks_plan_title">Zahltagplan</string>
+    <string name="home_coach_marks_plan_body">Sieh, was du vor dem Zahltag sicher ausgeben kannst.</string>
+    <string name="home_coach_marks_strategy_title">Strategie</string>
+    <string name="home_coach_marks_strategy_body">Passe Ziele und Zahltagregeln an, wenn sich dein Plan ändert.</string>
+    <string name="home_coach_marks_review_title">Rückblick</string>
+    <string name="home_coach_marks_review_body">Prüfe, was passiert ist, und lerne den nächsten Schritt.</string>
+    <string name="home_coach_marks_more_title">Mehr</string>
+    <string name="home_coach_marks_more_body">Verwalte Erinnerungen, Premium, Konto und Einstellungen.</string>
+    <string name="home_coach_marks_skip">Überspringen</string>
+    <string name="home_coach_marks_next">Weiter</string>
+    <string name="home_coach_marks_done">Fertig</string>
     <string name="home_review_streak_label">Aktueller Streak</string>
     <string name="more_app_name" translatable="false">My Share</string>
     <string name="goal_add_delete_confirm_title">Ziel löschen</string>

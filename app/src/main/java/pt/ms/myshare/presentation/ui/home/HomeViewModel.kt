@@ -40,6 +40,7 @@ import pt.ms.myshare.domain.model.User
 import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
+import pt.ms.myshare.domain.repository.FirstRunExperienceRepository
 import pt.ms.myshare.domain.repository.LegacyPremiumGrantRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.repository.ProductConfigRepository
@@ -102,7 +103,8 @@ class HomeViewModel @Inject constructor(
     private val getCoachingInsightsUseCase: GetCoachingInsightsUseCase,
     private val reminderWorkScheduler: ReminderWorkScheduler,
     private val userLocaleManager: UserLocaleManager,
-    private val productConfigRepository: ProductConfigRepository
+    private val productConfigRepository: ProductConfigRepository,
+    private val firstRunExperienceRepository: FirstRunExperienceRepository
 ) : ViewModel() {
 
     private val uiState = MutableStateFlow(HomeState())
@@ -142,7 +144,20 @@ class HomeViewModel @Inject constructor(
         observeLegacyPremiumGrant()
         observePlannerData()
         observeReviewHistory()
+        restorePendingCoachMarks()
         FirebaseUtils.logScreen("home")
+    }
+
+    private fun restorePendingCoachMarks() {
+        if (!firstRunExperienceRepository.isHomeCoachMarksPending()) return
+        uiState.update {
+            it.copy(
+                selectedDestination = HomeCoachMarkStep.PLAN.destination,
+                coachMarks = HomeCoachMarksState(isVisible = true, currentStep = HomeCoachMarkStep.PLAN)
+            )
+        }
+        FirebaseUtils.logEvent("home_coach_marks_shown")
+        Timber.tag(TAG).d("Home coach marks shown")
     }
 
     private fun observeReviewHistory() {
@@ -564,6 +579,7 @@ class HomeViewModel @Inject constructor(
                 )
                 HomeState(
                     selectedDestination = currentState.selectedDestination,
+                    coachMarks = currentState.coachMarks,
                     plan = updatedPlan,
                     planCard = planCard,
                     goalPaydaySplit = goalPaydaySplit,
@@ -740,6 +756,45 @@ class HomeViewModel @Inject constructor(
         FirebaseUtils.logEvent("home_tab_opened", android.os.Bundle().apply {
             putString("tab", destination.name.lowercase(Locale.US))
         })
+    }
+
+    fun advanceHomeCoachMark() {
+        val currentStep = uiState.value.coachMarks.currentStep
+        if (currentStep.isLast) {
+            completeHomeCoachMarks()
+            return
+        }
+        val nextStep = HomeCoachMarkStep.entries[currentStep.ordinal + 1]
+        uiState.update {
+            it.copy(
+                selectedDestination = nextStep.destination,
+                coachMarks = it.coachMarks.copy(currentStep = nextStep)
+            )
+        }
+        FirebaseUtils.logEvent("home_coach_mark_advanced", android.os.Bundle().apply {
+            putString("step", nextStep.name.lowercase(Locale.US))
+            putInt("step_index", nextStep.stepNumber)
+        })
+        Timber.tag(TAG).d("Home coach mark advanced step=%s", nextStep.name)
+    }
+
+    fun completeHomeCoachMarks() {
+        clearHomeCoachMarks(completed = true)
+    }
+
+    fun dismissHomeCoachMarks() {
+        clearHomeCoachMarks(completed = false)
+    }
+
+    private fun clearHomeCoachMarks(completed: Boolean) {
+        viewModelScope.launch {
+            firstRunExperienceRepository.setHomeCoachMarksPending(false)
+            uiState.update { it.copy(coachMarks = HomeCoachMarksState()) }
+            FirebaseUtils.logEvent(
+                if (completed) "home_coach_marks_completed" else "home_coach_marks_dismissed"
+            )
+            Timber.tag(TAG).d("Home coach marks cleared completed=%s", completed)
+        }
     }
 
     fun onFlexibleSpendChanged(value: String) {

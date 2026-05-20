@@ -80,6 +80,19 @@
     <string name="onboarding_reminder_subtitle">تذكير لطيف يساعدك على القيام بالخطوة قبل أن تسيطر مصاريف اليوم.</string>
     <string name="onboarding_reminder_cadence_payday_desc">كن متوافقًا مع خطتك في كل حدث يتعلق بالدخل.</string>
     <string name="onboarding_reminder_cadence_weekly_desc">تعكس وتعديل التقدم المحرز الخاص بك كل يوم أحد.</string>
+    <string name="home_coach_marks_pane_title">جولة الصفحة الرئيسية</string>
+    <string name="home_coach_marks_progress">%1$d من %2$d</string>
+    <string name="home_coach_marks_plan_title">الخطة</string>
+    <string name="home_coach_marks_plan_body">اعرف ما يمكنك إنفاقه بأمان قبل يوم الدفع.</string>
+    <string name="home_coach_marks_strategy_title">الاستراتيجية</string>
+    <string name="home_coach_marks_strategy_body">عدّل الأهداف وقواعد يوم الدفع عندما تتغير خطتك.</string>
+    <string name="home_coach_marks_review_title">المراجعة</string>
+    <string name="home_coach_marks_review_body">راجع ما حدث وتعرّف على الخطوة التالية.</string>
+    <string name="home_coach_marks_more_title">المزيد</string>
+    <string name="home_coach_marks_more_body">أدِر التذكيرات وPremium والحساب والإعدادات.</string>
+    <string name="home_coach_marks_skip">تخطي</string>
+    <string name="home_coach_marks_next">التالي</string>
+    <string name="home_coach_marks_done">تم</string>
     <string name="home_review_streak_label">الخط الحالي</string>
     <string name="more_app_name" translatable="false">My Share</string>
     <string name="goal_add_delete_confirm_title">حذف الهدف</string>

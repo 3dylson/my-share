@@ -38,6 +38,7 @@ import pt.ms.myshare.domain.model.StoreProduct
 import pt.ms.myshare.domain.model.User
 import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
+import pt.ms.myshare.domain.repository.FirstRunExperienceRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.repository.ProductConfigRepository
 import pt.ms.myshare.TestUserPreferencesRepository
@@ -63,6 +64,7 @@ class OnboardingViewModelTest {
     private val userLocaleManager: UserLocaleManager = mockk(relaxed = true)
     private val onboardingAnalyticsLogger: OnboardingAnalyticsLogger = mockk(relaxed = true)
     private val productConfigRepository = TestProductConfigRepository()
+    private val firstRunExperienceRepository: FirstRunExperienceRepository = mockk(relaxed = true)
     private lateinit var isProFlow: MutableStateFlow<Boolean>
     private lateinit var availableProductsFlow: MutableStateFlow<List<StoreProduct>>
     private lateinit var purchaseEventsFlow: MutableSharedFlow<BillingPurchaseEvent>
@@ -106,7 +108,8 @@ class OnboardingViewModelTest {
             reminderWorkScheduler,
             userLocaleManager,
             onboardingAnalyticsLogger,
-            productConfigRepository
+            productConfigRepository,
+            firstRunExperienceRepository
         )
     }
 
@@ -332,6 +335,7 @@ class OnboardingViewModelTest {
         advanceUntilIdle()
 
         assertTrue(viewModel.uiState.value.onboardingCompleted)
+        coVerify { firstRunExperienceRepository.setHomeCoachMarksPending(true) }
     }
 
     @Test
@@ -372,6 +376,7 @@ class OnboardingViewModelTest {
         assertTrue(state.planSaved)
         assertTrue(state.reminderSkipped)
         coVerify { plannerRepository.setOnboardingCompleted(true) }
+        coVerify { firstRunExperienceRepository.setHomeCoachMarksPending(true) }
     }
 
     @Test

@@ -30,6 +30,7 @@ import pt.ms.myshare.domain.model.PaydayRule
 import pt.ms.myshare.domain.model.PaydayRuleType
 import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
+import pt.ms.myshare.domain.repository.FirstRunExperienceRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.repository.ProductConfigRepository
 import pt.ms.myshare.domain.repository.UserPreferencesRepository
@@ -61,7 +62,8 @@ class OnboardingViewModel @Inject constructor(
     private val reminderWorkScheduler: ReminderWorkScheduler,
     private val userLocaleManager: UserLocaleManager,
     private val onboardingAnalyticsLogger: OnboardingAnalyticsLogger,
-    private val productConfigRepository: ProductConfigRepository
+    private val productConfigRepository: ProductConfigRepository,
+    private val firstRunExperienceRepository: FirstRunExperienceRepository
 ) : ViewModel() {
 
     private val state = MutableStateFlow(OnboardingState())
@@ -652,6 +654,7 @@ class OnboardingViewModel @Inject constructor(
                     type = GoalType.EMERGENCY_FUND
                 )
             )
+            firstRunExperienceRepository.setHomeCoachMarksPending(true)
             plannerRepository.setOnboardingCompleted(true)
             state.update { it.copy(onboardingCompleted = true) }
         }
@@ -779,6 +782,7 @@ class OnboardingViewModel @Inject constructor(
         viewModelScope.launch {
             if (plannerRepository.loadPlan() != null) {
                 plannerRepository.setOnboardingCompleted(true)
+                firstRunExperienceRepository.setHomeCoachMarksPending(true)
                 if (state.value.isPremium) {
                     enablePremiumWatchForOnboarding("existing_entitlement")
                 }

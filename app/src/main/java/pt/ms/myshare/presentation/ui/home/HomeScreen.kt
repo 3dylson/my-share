@@ -117,6 +117,9 @@ fun HomeRoute(
         onDeleteReview = viewModel::deleteReview,
         onLanguageSelected = viewModel::updateLanguage,
         onCurrencySelected = viewModel::updateCurrency,
+        onAdvanceCoachMark = viewModel::advanceHomeCoachMark,
+        onCompleteCoachMarks = viewModel::completeHomeCoachMarks,
+        onDismissCoachMarks = viewModel::dismissHomeCoachMarks,
         onLogout = {
             viewModel.onLogout {
                 navController.navigate("onboarding") {
@@ -165,6 +168,9 @@ fun HomeScreen(
     onDeleteReview: (String) -> Unit,
     onLanguageSelected: (String) -> Unit,
     onCurrencySelected: (String) -> Unit,
+    onAdvanceCoachMark: () -> Unit,
+    onCompleteCoachMarks: () -> Unit,
+    onDismissCoachMarks: () -> Unit,
     onLogout: () -> Unit,
     onManageAdsConsent: () -> Unit,
     onAddNewGoal: () -> Unit,
@@ -600,11 +606,32 @@ fun HomeScreen(
         )
     }
 
-    Scaffold(
-        modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.background,
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        topBar = {
+    val hasBlockingModal = showPaywallSheet ||
+        showReviewHistoryTimeline ||
+        showPremiumReviewResultSheet ||
+        showStrategyGoalArchive ||
+        showStrategyRuleArchive ||
+        showPremiumAdjustmentHistory ||
+        recommendationPendingApply != null ||
+        showRecommendationAppliedSheet ||
+        reviewBeingEdited != null ||
+        reviewPendingDelete != null ||
+        showAutomationLockDialog ||
+        showReminderSettingsDialog ||
+        state.moreCard.showPremiumAccountPrompt ||
+        showAccountDetailsDialog ||
+        showSubscriptionRetentionDialog ||
+        (!state.moreCard.isPremium && state.moreCard.legacyPremiumGrant.shouldShowOffer) ||
+        showLanguagePicker ||
+        showCurrencyPicker ||
+        showSignOutDialog
+
+    Box(modifier = modifier) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            containerColor = MaterialTheme.colorScheme.background,
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+            topBar = {
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -856,6 +883,17 @@ fun HomeScreen(
                 }
             }
         }
+        }
+
+        if (!state.isLoading && state.coachMarks.isVisible && !hasBlockingModal) {
+            HomeCoachMarksOverlay(
+                state = state.coachMarks,
+                onNext = onAdvanceCoachMark,
+                onDone = onCompleteCoachMarks,
+                onSkip = onDismissCoachMarks,
+                modifier = Modifier.zIndex(10f)
+            )
+        }
     }
 }
 
@@ -985,6 +1023,9 @@ private fun HomeScreenPreview() {
             onDeleteReview = { _ -> },
             onLanguageSelected = { _ -> },
             onCurrencySelected = { _ -> },
+            onAdvanceCoachMark = {},
+            onCompleteCoachMarks = {},
+            onDismissCoachMarks = {},
             onLogout = {},
             onManageAdsConsent = {},
             onAddNewGoal = {},

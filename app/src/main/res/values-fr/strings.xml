@@ -80,6 +80,19 @@
     <string name="onboarding_reminder_subtitle">Un rappel discret vous aide à faire le mouvement avant que les dépenses du quotidien prennent le dessus.</string>
     <string name="onboarding_reminder_cadence_payday_desc">Restez aligné sur votre plan à chaque événement de revenus.</string>
     <string name="onboarding_reminder_cadence_weekly_desc">Réfléchissez et ajustez vos progrès chaque dimanche.</string>
+    <string name="home_coach_marks_pane_title">Tour d’accueil</string>
+    <string name="home_coach_marks_progress">%1$d sur %2$d</string>
+    <string name="home_coach_marks_plan_title">Plan de paie</string>
+    <string name="home_coach_marks_plan_body">Voyez ce que vous pouvez dépenser sans risque avant la paie.</string>
+    <string name="home_coach_marks_strategy_title">Stratégie</string>
+    <string name="home_coach_marks_strategy_body">Ajustez les objectifs et les règles de paie quand le plan change.</string>
+    <string name="home_coach_marks_review_title">Bilan</string>
+    <string name="home_coach_marks_review_body">Vérifiez ce qui s’est passé et découvrez le prochain geste.</string>
+    <string name="home_coach_marks_more_title">Plus</string>
+    <string name="home_coach_marks_more_body">Gérez les rappels, Premium, le compte et les réglages.</string>
+    <string name="home_coach_marks_skip">Ignorer</string>
+    <string name="home_coach_marks_next">Suivant</string>
+    <string name="home_coach_marks_done">Terminé</string>
     <string name="home_review_streak_label">Série actuelle</string>
     <string name="more_app_name" translatable="false">My Share</string>
     <string name="goal_add_delete_confirm_title">Supprimer l\'objectif</string>

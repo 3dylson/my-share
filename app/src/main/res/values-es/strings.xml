@@ -80,6 +80,19 @@
     <string name="onboarding_reminder_subtitle">Un recordatorio suave te ayuda a hacer el movimiento antes de que los gastos diarios tomen el control.</string>
     <string name="onboarding_reminder_cadence_payday_desc">Manténgase alineado con su plan en cada evento de ingresos.</string>
     <string name="onboarding_reminder_cadence_weekly_desc">Reflexiona y ajusta tu progreso cada domingo.</string>
+    <string name="home_coach_marks_pane_title">Tour de inicio</string>
+    <string name="home_coach_marks_progress">%1$d de %2$d</string>
+    <string name="home_coach_marks_plan_title">Planificación</string>
+    <string name="home_coach_marks_plan_body">Mira qué puedes gastar con seguridad antes del cobro.</string>
+    <string name="home_coach_marks_strategy_title">Estrategia</string>
+    <string name="home_coach_marks_strategy_body">Ajusta objetivos y reglas de cobro cuando cambie tu plan.</string>
+    <string name="home_coach_marks_review_title">Revisión</string>
+    <string name="home_coach_marks_review_body">Comprueba qué pasó y aprende el próximo paso.</string>
+    <string name="home_coach_marks_more_title">Más</string>
+    <string name="home_coach_marks_more_body">Gestiona recordatorios, Premium, cuenta y ajustes.</string>
+    <string name="home_coach_marks_skip">Saltar</string>
+    <string name="home_coach_marks_next">Siguiente</string>
+    <string name="home_coach_marks_done">Listo</string>
     <string name="home_review_streak_label">Racha actual</string>
     <string name="more_app_name" translatable="false">My Share</string>
     <string name="goal_add_delete_confirm_title">Eliminar objetivo</string>

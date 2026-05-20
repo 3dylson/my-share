@@ -96,6 +96,19 @@
     <string name="onboarding_reminder_cadence_weekly_desc">Reflect and adjust your progress every Sunday.</string>
 
     <!-- Home: Plan Tab -->
+    <string name="home_coach_marks_pane_title">Home tour</string>
+    <string name="home_coach_marks_progress">%1$d of %2$d</string>
+    <string name="home_coach_marks_plan_title">Plan</string>
+    <string name="home_coach_marks_plan_body">See what is safe to spend before payday.</string>
+    <string name="home_coach_marks_strategy_title">Strategy</string>
+    <string name="home_coach_marks_strategy_body">Adjust goals and payday rules when your plan changes.</string>
+    <string name="home_coach_marks_review_title">Review</string>
+    <string name="home_coach_marks_review_body">Check what happened and learn the next move.</string>
+    <string name="home_coach_marks_more_title">More</string>
+    <string name="home_coach_marks_more_body">Manage reminders, Premium, account, and settings.</string>
+    <string name="home_coach_marks_skip">Skip</string>
+    <string name="home_coach_marks_next">Next</string>
+    <string name="home_coach_marks_done">Done</string>
 
     <!-- Home: Strategy Tab -->
 

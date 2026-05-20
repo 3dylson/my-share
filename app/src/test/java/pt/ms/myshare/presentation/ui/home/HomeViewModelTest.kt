@@ -37,6 +37,7 @@ import pt.ms.myshare.domain.model.ReminderConfiguration
 import pt.ms.myshare.domain.model.SalaryPlan
 import pt.ms.myshare.domain.model.StoreProduct
 import pt.ms.myshare.domain.repository.EntitlementRepository
+import pt.ms.myshare.domain.repository.FirstRunExperienceRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.CreatePaydayAdjustmentRecommendationUseCase
@@ -86,6 +87,8 @@ class HomeViewModelTest {
     private lateinit var fakeEntitlementRepository: TestFakeEntitlementRepository
     private lateinit var fakeLegacyPremiumGrantRepository: TestFakeLegacyPremiumGrantRepository
     private lateinit var fakeProductConfigRepository: TestProductConfigRepository
+    private lateinit var fakeFirstRunExperienceRepository: TestFirstRunExperienceRepository
+    private lateinit var calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase
     private val mockAuthRepository = mockk<AuthRepository>(relaxed = true)
     private val mockGetReviewHistoryUseCase = mockk<GetReviewHistoryUseCase>(relaxed = true)
     private val mockUpdateGoalProgressUseCase = mockk<UpdateGoalProgressUseCase>(relaxed = true)
@@ -100,13 +103,18 @@ class HomeViewModelTest {
         fakeEntitlementRepository = TestFakeEntitlementRepository()
         fakeLegacyPremiumGrantRepository = TestFakeLegacyPremiumGrantRepository()
         fakeProductConfigRepository = TestProductConfigRepository()
-        val calculatePlanPreviewUseCase = CalculatePlanPreviewUseCase(ResolveAllocationStrategyRulesUseCase())
+        fakeFirstRunExperienceRepository = TestFirstRunExperienceRepository()
+        calculatePlanPreviewUseCase = CalculatePlanPreviewUseCase(ResolveAllocationStrategyRulesUseCase())
         currentUserFlow = MutableStateFlow(null)
         
         every { mockAuthRepository.currentUser } returns currentUserFlow
         every { mockGetReviewHistoryUseCase.execute() } returns flowOf(emptyList())
 
-        viewModel = HomeViewModel(
+        viewModel = createViewModel()
+    }
+
+    private fun createViewModel(): HomeViewModel {
+        return HomeViewModel(
             plannerRepository = fakePlannerRepository,
             authRepository = mockAuthRepository,
             entitlementRepository = fakeEntitlementRepository,
@@ -135,13 +143,90 @@ class HomeViewModelTest {
             getCoachingInsightsUseCase = GetCoachingInsightsUseCase(calculatePlanPreviewUseCase),
             reminderWorkScheduler = mockReminderWorkScheduler,
             userLocaleManager = mockUserLocaleManager,
-            productConfigRepository = fakeProductConfigRepository
+            productConfigRepository = fakeProductConfigRepository,
+            firstRunExperienceRepository = fakeFirstRunExperienceRepository
+        )
+    }
+
+    private fun defaultPlan(): SalaryPlan {
+        return SalaryPlan(
+            focus = PlanningFocus.SAVE_WITHOUT_STRESS,
+            netIncomePerPayday = BigDecimal("1000"),
+            monthlyFixedCosts = BigDecimal("400"),
+            payFrequency = PayFrequency.MONTHLY,
+            monthlyPayday = 1,
+            preset = AllocationPreset.BALANCED
         )
     }
 
     @After
     fun tearDown() {
         Dispatchers.resetMain()
+    }
+
+    @Test
+    fun `pending home coach marks show after Home loads`() = runTest {
+        fakeFirstRunExperienceRepository.pending = true
+        viewModel = createViewModel()
+        fakePlannerRepository.savePlan(defaultPlan())
+
+        advanceUntilIdle()
+
+        assertTrue(viewModel.state.value.coachMarks.isVisible)
+        assertEquals(HomeCoachMarkStep.PLAN, viewModel.state.value.coachMarks.currentStep)
+        assertEquals(HomeDestination.PLAN, viewModel.state.value.selectedDestination)
+    }
+
+    @Test
+    fun `advanceHomeCoachMark selects next Home destination`() = runTest {
+        fakeFirstRunExperienceRepository.pending = true
+        viewModel = createViewModel()
+        fakePlannerRepository.savePlan(defaultPlan())
+        advanceUntilIdle()
+
+        viewModel.advanceHomeCoachMark()
+
+        assertEquals(HomeCoachMarkStep.STRATEGY, viewModel.state.value.coachMarks.currentStep)
+        assertEquals(HomeDestination.STRATEGY, viewModel.state.value.selectedDestination)
+    }
+
+    @Test
+    fun `completeHomeCoachMarks clears pending state`() = runTest {
+        fakeFirstRunExperienceRepository.pending = true
+        viewModel = createViewModel()
+        fakePlannerRepository.savePlan(defaultPlan())
+        advanceUntilIdle()
+
+        viewModel.completeHomeCoachMarks()
+        advanceUntilIdle()
+
+        assertFalse(viewModel.state.value.coachMarks.isVisible)
+        assertFalse(fakeFirstRunExperienceRepository.pending)
+    }
+
+    @Test
+    fun `dismissHomeCoachMarks clears pending state`() = runTest {
+        fakeFirstRunExperienceRepository.pending = true
+        viewModel = createViewModel()
+        fakePlannerRepository.savePlan(defaultPlan())
+        advanceUntilIdle()
+
+        viewModel.dismissHomeCoachMarks()
+        advanceUntilIdle()
+
+        assertFalse(viewModel.state.value.coachMarks.isVisible)
+        assertFalse(fakeFirstRunExperienceRepository.pending)
+    }
+
+    @Test
+    fun `returning users do not see home coach marks`() = runTest {
+        fakeFirstRunExperienceRepository.pending = false
+        viewModel = createViewModel()
+        fakePlannerRepository.savePlan(defaultPlan())
+
+        advanceUntilIdle()
+
+        assertFalse(viewModel.state.value.coachMarks.isVisible)
     }
 
     @Test
@@ -1172,6 +1257,16 @@ class FakePlannerRepository : PlannerRepository {
     override suspend fun syncFromFirestore() {}
     override suspend fun syncLocalStateIfAuthenticated() {
         syncLocalStateIfAuthenticatedCalls += 1
+    }
+}
+
+class TestFirstRunExperienceRepository : FirstRunExperienceRepository {
+    var pending: Boolean = false
+
+    override fun isHomeCoachMarksPending(): Boolean = pending
+
+    override suspend fun setHomeCoachMarksPending(pending: Boolean) {
+        this.pending = pending
     }
 }
 

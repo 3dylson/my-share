@@ -23,10 +23,12 @@ import pt.ms.myshare.data.repository.FirestoreAppUpdatePolicyRepository
 import pt.ms.myshare.data.repository.AuthRepositoryImpl
 import pt.ms.myshare.data.repository.FirebaseProductConfigRepository
 import pt.ms.myshare.data.repository.PlannerRepositoryImpl
+import pt.ms.myshare.data.repository.SharedFirstRunExperienceRepository
 import pt.ms.myshare.data.repository.SharedUserPreferencesRepository
 import pt.ms.myshare.domain.repository.AppUpdatePolicyRepository
 import pt.ms.myshare.domain.repository.AuthRepository
 import pt.ms.myshare.domain.repository.EntitlementRepository
+import pt.ms.myshare.domain.repository.FirstRunExperienceRepository
 import pt.ms.myshare.domain.repository.LegacyPremiumGrantRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.repository.ProductConfigRepository
@@ -87,6 +89,12 @@ object AppModule {
         firebaseAuth: FirebaseAuth,
         firestore: FirebaseFirestore
     ): PlannerRepository = PlannerRepositoryImpl(context, firebaseAuth, firestore)
+
+    @Provides
+    @Singleton
+    fun provideFirstRunExperienceRepository(
+        @ApplicationContext context: Context
+    ): FirstRunExperienceRepository = SharedFirstRunExperienceRepository(context)
 
     @Provides
     @Singleton

@@ -24,6 +24,26 @@ enum class HomeDestination {
     MORE
 }
 
+enum class HomeCoachMarkStep(val destination: HomeDestination) {
+    PLAN(HomeDestination.PLAN),
+    STRATEGY(HomeDestination.STRATEGY),
+    REVIEW(HomeDestination.REVIEW),
+    MORE(HomeDestination.MORE);
+
+    val stepNumber: Int
+        get() = ordinal + 1
+
+    val isLast: Boolean
+        get() = this == entries.last()
+}
+
+data class HomeCoachMarksState(
+    val isVisible: Boolean = false,
+    val currentStep: HomeCoachMarkStep = HomeCoachMarkStep.PLAN
+) {
+    val totalSteps: Int = HomeCoachMarkStep.entries.size
+}
+
 data class HomePlanCardState(
     val nextPaydayLabel: String = "",
     val incomeLabel: String = "",
@@ -277,6 +297,7 @@ data class PerformanceStatsState(
 
 data class HomeState(
     val selectedDestination: HomeDestination = HomeDestination.PLAN,
+    val coachMarks: HomeCoachMarksState = HomeCoachMarksState(),
     val plan: SalaryPlan? = null,
     val planCard: HomePlanCardState? = null,
     val goalPaydaySplit: GoalPaydaySplitCardState? = null,
