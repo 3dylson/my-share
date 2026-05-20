@@ -4,6 +4,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
 import pt.ms.myshare.domain.model.ProductExperienceConfig
+import pt.ms.myshare.domain.model.OnboardingPaywallVariant
+import pt.ms.myshare.domain.model.PremiumProofVariant
 import pt.ms.myshare.domain.model.RemoteBillingPlanDefault
 
 class RemoteProductConfigMapperTest {
@@ -24,8 +26,20 @@ class RemoteProductConfigMapperTest {
         )
 
         assertEquals(RemoteBillingPlanDefault.MARKET, config.paywallDefaultPlan)
-        assertEquals(ProductExperienceConfig.DEFAULT_ONBOARDING_PAYWALL_VARIANT, config.onboardingPaywallVariant)
-        assertEquals(ProductExperienceConfig.DEFAULT_PREMIUM_PROOF_VARIANT, config.premiumProofVariant)
+        assertEquals(OnboardingPaywallVariant.PAYDAY_PROOF, config.onboardingPaywallVariant)
+        assertEquals(PremiumProofVariant.NEXT_MOVE, config.premiumProofVariant)
+    }
+
+    @Test
+    fun `maps supported onboarding paywall variants`() {
+        assertEquals(OnboardingPaywallVariant.PAYDAY_PROOF, config(onboardingPaywallVariant = "payday_proof").onboardingPaywallVariant)
+        assertEquals(OnboardingPaywallVariant.REVIEW_MOMENTUM, config(onboardingPaywallVariant = "review_momentum").onboardingPaywallVariant)
+    }
+
+    @Test
+    fun `maps supported premium proof variants`() {
+        assertEquals(PremiumProofVariant.NEXT_MOVE, config(premiumProofVariant = "next_move").premiumProofVariant)
+        assertEquals(PremiumProofVariant.PROGRESS_LOOP, config(premiumProofVariant = "progress_loop").premiumProofVariant)
     }
 
     @Test

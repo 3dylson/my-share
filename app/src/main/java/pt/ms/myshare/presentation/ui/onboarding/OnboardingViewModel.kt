@@ -92,6 +92,7 @@ class OnboardingViewModel @Inject constructor(
                 state.update { current ->
                     val currentPricing = current.pricingStrategy ?: pricing
                     current.copy(
+                        onboardingPaywallVariant = productConfig.onboardingPaywallVariant,
                         selectedBillingPlan = if (current.hasUserSelectedBillingPlan) {
                             current.selectedBillingPlan
                         } else {
@@ -102,12 +103,12 @@ class OnboardingViewModel @Inject constructor(
                 FirebaseUtils.logEvent("product_config_applied", Bundle().apply {
                     putString("screen", "onboarding")
                     putString("paywall_default_plan", productConfig.paywallDefaultPlan.name.lowercase(Locale.US))
-                    putString("onboarding_paywall_variant", productConfig.onboardingPaywallVariant)
+                    putString("onboarding_paywall_variant", productConfig.onboardingPaywallVariant.remoteValue)
                 })
                 Timber.tag(TAG).d(
                     "Onboarding product config applied paywallDefault=%s variant=%s",
                     productConfig.paywallDefaultPlan,
-                    productConfig.onboardingPaywallVariant
+                    productConfig.onboardingPaywallVariant.remoteValue
                 )
             }
         }
@@ -377,6 +378,7 @@ class OnboardingViewModel @Inject constructor(
             putString("billing_plan", plan.name.lowercase(Locale.US))
             putString("price_cluster", state.value.pricingStrategy?.marketCluster)
             putString("source", "onboarding_paywall")
+            putString("onboarding_paywall_variant", state.value.onboardingPaywallVariant.remoteValue)
         })
     }
 
@@ -444,6 +446,7 @@ class OnboardingViewModel @Inject constructor(
                     putString("price_cluster", state.value.pricingStrategy?.marketCluster)
                     putString("product_id", storeProductId)
                     putString("source", "onboarding_paywall")
+                    putString("onboarding_paywall_variant", state.value.onboardingPaywallVariant.remoteValue)
                 })
                 Timber.tag("OnboardingBilling").e("Cannot purchase: Product %s not found in store", storeProductId)
                 return@launch
@@ -454,6 +457,7 @@ class OnboardingViewModel @Inject constructor(
                 putString("product_id", product.productId)
                 putBoolean("has_trial", product.hasFreeTrial)
                 putString("source", "onboarding_paywall")
+                putString("onboarding_paywall_variant", state.value.onboardingPaywallVariant.remoteValue)
             })
             val launchResult = entitlementRepository.purchasePlan(activity, product)
             state.update {
@@ -783,6 +787,7 @@ class OnboardingViewModel @Inject constructor(
         FirebaseUtils.logEvent("paywall_viewed", Bundle().apply {
             putString("price_cluster", state.value.pricingStrategy?.marketCluster)
             putString("billing_plan", state.value.selectedBillingPlan.name.lowercase(Locale.US))
+            putString("onboarding_paywall_variant", state.value.onboardingPaywallVariant.remoteValue)
         })
     }
 

@@ -202,6 +202,7 @@
     <string name="premium_gate_review_body">يبقي Premium المخطط الزمني للأداء الكامل مرئيًا حتى تتمكن من اكتشاف أنماط الإنفاق بمرور الوقت.</string>
     <string name="premium_gate_first_review_title">حوّل أول مراجعة إلى خطوتك التالية</string>
     <string name="premium_gate_first_review_body">ابدأ Premium لمقارنة كل يوم دفع بدليلك، واكتشاف الانحراف مبكرًا، ورؤية التعديل قبل يوم الدفع التالي.</string>
+    <string name="premium_gate_first_review_body_progress_loop">ابدأ Premium للحفاظ على حلقة بسيطة: احفظ ما حدث، شاهد النمط، وابدأ الراتب التالي بخطوة أوضح.</string>
     <string name="premium_gate_automation_title">اعرف ما يجب تغييره في يوم الدفع التالي</string>
     <string name="premium_gate_automation_body">يقارن Premium المراجعات بدليلك الأسبوعي ويعرض ما يجب تغييره قبل يوم الدفع التالي.</string>
     <string name="onboarding_signup_title">قم بتأمين خطتك</string>
@@ -510,8 +511,10 @@
     <string name="home_review_result_done">تم</string>
     <string name="home_review_first_premium_label">أول مراجعة Premium</string>
     <string name="home_review_first_premium_title_locked">يمكن لأول مراجعة أن تفتح الخطوة التالية</string>
+    <string name="home_review_first_premium_title_progress_loop">ابنِ حلقة تقدم مع كل راتب</string>
     <string name="home_review_first_premium_title_unlocked">ابدأ أول تسجيل وصول Premium</string>
     <string name="home_review_first_premium_desc_locked">احفظ ما حدث في يوم الدفع هذا. يقارنه Premium بدليلك ويعرض ما يجب تعديله بعد ذلك.</string>
+    <string name="home_review_first_premium_desc_progress_loop">احفظ مراجعة سريعة بعد يوم الدفع. يبقي Premium النمط واضحًا ليبدأ كل راتب بوضوح أكبر من السابق.</string>
     <string name="home_review_first_premium_desc_unlocked">أدخل يوم الدفع هذا أدناه. سيحوّل Premium أول تسجيل وصول إلى دليل أوضح للخطوة التالية.</string>
     <string name="home_review_first_premium_step_review">راجع</string>
     <string name="home_review_first_premium_step_review_desc">احفظ القيم الفعلية.</string>
@@ -753,6 +756,8 @@
     <string name="paywall_subhead_brazil">يظهر الشهري أولًا حتى تختبر التوجيه القائم على المراجعات قبل الالتزام.</string>
     <string name="paywall_headline_default">اجعل هذه الخطة تتحسن</string>
     <string name="paywall_subhead_default">يراقب Premium كل مراجعة، ويتذكر التغييرات، ويعرض خطوة الراتب التالية.</string>
+    <string name="paywall_headline_review_momentum">اجعل كل مراجعة للراتب مفيدة</string>
+    <string name="paywall_subhead_review_momentum">يحوّل Premium كل مراجعة سريعة إلى خطوة واضحة للراتب التالي.</string>
     <string name="insight_review_save_stress_success_headline">شبكة الأمان تنمو</string>
     <string name="insight_review_save_stress_failure_headline">المخزن المؤقت يحتاج إلى الأولوية</string>
     <string name="insight_review_invest_discipline_success_headline">الانضباط يؤتي ثماره</string>

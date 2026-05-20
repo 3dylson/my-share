@@ -6,6 +6,7 @@ import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
 import pt.ms.myshare.domain.model.PremiumCheckInStatus
 import pt.ms.myshare.domain.model.PremiumAdjustmentStatus
+import pt.ms.myshare.domain.model.PremiumProofVariant
 import pt.ms.myshare.domain.model.PremiumReviewCoachingStatus
 import pt.ms.myshare.domain.model.PremiumReviewMomentumStatus
 import pt.ms.myshare.domain.model.PricingStrategy
@@ -81,6 +82,7 @@ data class ReviewCardState(
     val coachingInsights: List<ReviewInsightState> = emptyList(),
     val paydayRecommendation: PaydayAdjustmentRecommendationState? = null,
     val premiumCheckIn: PremiumCheckInState? = null,
+    val premiumProofVariant: PremiumProofVariant = PremiumProofVariant.NEXT_MOVE,
     val recommendationMessageKey: String? = null,
     val savedReviewDate: String? = null,
     val error: String? = null

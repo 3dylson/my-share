@@ -289,7 +289,7 @@ fun HomeScreen(
         PremiumPaywallBottomSheet(
             onDismissRequest = { showPaywallSheet = false },
             title = stringResource(premiumGate.titleRes),
-            body = stringResource(premiumGate.bodyRes),
+            body = stringResource(premiumGate.bodyResFor(state.reviewCard.premiumProofVariant)),
             isBillingActionInProgress = state.moreCard.isBillingActionInProgress || isPurchaseActivationPending,
             billingMessage = state.moreCard.billingMessage,
             onUpgradeClick = { 

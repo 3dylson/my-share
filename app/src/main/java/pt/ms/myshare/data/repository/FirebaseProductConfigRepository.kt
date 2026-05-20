@@ -65,8 +65,8 @@ class FirebaseProductConfigRepository @Inject constructor(
                 "remote_config_refreshed",
                 android.os.Bundle().apply {
                     putString("paywall_default_plan", updated.paywallDefaultPlan.name.lowercase())
-                    putString("onboarding_paywall_variant", updated.onboardingPaywallVariant)
-                    putString("premium_proof_variant", updated.premiumProofVariant)
+                    putString("onboarding_paywall_variant", updated.onboardingPaywallVariant.remoteValue)
+                    putString("premium_proof_variant", updated.premiumProofVariant.remoteValue)
                     putString("source", if (activated) "activated" else "cached")
                 }
             )

@@ -203,6 +203,7 @@
     <string name="premium_gate_review_body">O Premium mantém todo o seu cronograma de desempenho visível para que possa identificar padrões de gastos ao longo do tempo.</string>
     <string name="premium_gate_first_review_title">Transforme a primeira revisão no próximo passo</string>
     <string name="premium_gate_first_review_body">Inicie o Premium para comparar cada pagamento com o seu guia, detetar desvios cedo e ver o ajuste a fazer antes do próximo pagamento.</string>
+    <string name="premium_gate_first_review_body_progress_loop">Inicia o Premium para manter um ciclo simples: guardar o que aconteceu, ver o padrão e começar o próximo pagamento com um passo mais claro.</string>
     <string name="premium_gate_automation_title">Vê o que mudar no próximo pagamento</string>
     <string name="premium_gate_automation_body">O Premium compara revisões com o teu guia semanal e mostra o que mudar antes do próximo pagamento.</string>
     <string name="onboarding_signup_title">Garanta o seu plano</string>
@@ -511,8 +512,10 @@
     <string name="home_review_result_done">Concluído</string>
     <string name="home_review_first_premium_label">Primeira revisão Premium</string>
     <string name="home_review_first_premium_title_locked">A primeira revisão pode desbloquear o próximo passo</string>
+    <string name="home_review_first_premium_title_progress_loop">Cria um ciclo de progresso a cada pagamento</string>
     <string name="home_review_first_premium_title_unlocked">Comece o primeiro check-in Premium</string>
     <string name="home_review_first_premium_desc_locked">Guarde o que aconteceu neste pagamento. O Premium compara com o guia e mostra o que ajustar a seguir.</string>
+    <string name="home_review_first_premium_desc_progress_loop">Guarda um check-in rápido depois do pagamento. O Premium mantém o padrão visível para cada pagamento começar mais claro que o anterior.</string>
     <string name="home_review_first_premium_desc_unlocked">Preencha este pagamento abaixo. O Premium transforma o primeiro check-in num próximo guia mais claro.</string>
     <string name="home_review_first_premium_step_review">Rever</string>
     <string name="home_review_first_premium_step_review_desc">Guarde os valores reais.</string>
@@ -770,6 +773,8 @@
     <string name="paywall_subhead_brazil">O mensal aparece primeiro para poderes testar orientação baseada em revisões antes de te comprometeres.</string>
     <string name="paywall_headline_default">Mantém este plano a melhorar</string>
     <string name="paywall_subhead_default">O Premium acompanha cada revisão, lembra mudanças e mostra o próximo passo do pagamento.</string>
+    <string name="paywall_headline_review_momentum">Faz cada revisão de pagamento contar</string>
+    <string name="paywall_subhead_review_momentum">O Premium transforma cada check-in rápido num passo claro para o próximo pagamento.</string>
     <string name="insight_review_save_stress_success_headline">Crescimento da rede de segurança</string>
     <string name="insight_review_save_stress_failure_headline">Buffer precisa de prioridade</string>
     <string name="insight_review_invest_discipline_success_headline">Disciplina a valer a pena</string>

@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
 import pt.ms.myshare.domain.model.PremiumCheckInStatus
+import pt.ms.myshare.domain.model.PremiumProofVariant
 import pt.ms.myshare.domain.model.PremiumReviewMomentumStatus
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.theme.*
@@ -244,6 +245,7 @@ fun LazyListScope.homeReviewTab(
         item {
             FirstReviewPremiumProofCard(
                 isPremium = isPremium,
+                premiumProofVariant = state.premiumProofVariant,
                 onShowPaywall = onShowFirstReviewPaywall
             )
             Spacer(Modifier.height(16.dp))
@@ -481,16 +483,21 @@ private fun PremiumMomentumChip(
 @Composable
 private fun FirstReviewPremiumProofCard(
     isPremium: Boolean,
+    premiumProofVariant: PremiumProofVariant,
     onShowPaywall: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val title = if (isPremium) {
         stringResource(R.string.home_review_first_premium_title_unlocked)
+    } else if (premiumProofVariant == PremiumProofVariant.PROGRESS_LOOP) {
+        stringResource(R.string.home_review_first_premium_title_progress_loop)
     } else {
         stringResource(R.string.home_review_first_premium_title_locked)
     }
     val description = if (isPremium) {
         stringResource(R.string.home_review_first_premium_desc_unlocked)
+    } else if (premiumProofVariant == PremiumProofVariant.PROGRESS_LOOP) {
+        stringResource(R.string.home_review_first_premium_desc_progress_loop)
     } else {
         stringResource(R.string.home_review_first_premium_desc_locked)
     }

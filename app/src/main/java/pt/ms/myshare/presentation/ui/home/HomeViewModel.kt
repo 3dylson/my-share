@@ -576,6 +576,7 @@ class HomeViewModel @Inject constructor(
                         coachingInsights = coachingInsights,
                         paydayRecommendation = paydayRecommendationState,
                         premiumCheckIn = premiumCheckIn.takeIf { isPremium },
+                        premiumProofVariant = productConfig.premiumProofVariant,
                         recommendationMessageKey = recommendationMessageKey
                     ),
                     reviewHistory = planner.reviewHistory.asReversed().map { it.toState() },
@@ -809,6 +810,7 @@ class HomeViewModel @Inject constructor(
                     })
                 } else {
                     FirebaseUtils.logEvent("post_review_premium_proof_ready", android.os.Bundle().apply {
+                        putString("premium_proof_variant", currentProductConfig.premiumProofVariant.remoteValue)
                         putString("direction", recommendation.direction.name.lowercase(Locale.US))
                         putInt("review_count", recommendation.analyzedReviewCount)
                         putString("is_applyable", recommendation.isApplyable.toString())
@@ -1456,6 +1458,7 @@ class HomeViewModel @Inject constructor(
         val selectedProduct = selectedStoreProduct()
         FirebaseUtils.logEvent(eventName, android.os.Bundle().apply {
             putString("premium_gate", gate.analyticsName)
+            putString("premium_proof_variant", currentProductConfig.premiumProofVariant.remoteValue)
             putString("billing_plan", uiState.value.moreCard.selectedBillingPlan.name.lowercase(Locale.US))
             putString("price_cluster", currentPricingStrategy().marketCluster)
             putString("product_id", selectedStoreProductId())

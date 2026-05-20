@@ -34,6 +34,7 @@ import kotlinx.coroutines.launch
 import pt.ms.myshare.BuildConfig
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.BillingPlan
+import pt.ms.myshare.domain.model.OnboardingPaywallVariant
 import pt.ms.myshare.domain.model.PlanPreview
 import pt.ms.myshare.domain.model.PremiumStoreProductSelector
 import pt.ms.myshare.domain.model.PricingStrategy
@@ -63,6 +64,7 @@ fun PaywallScreen(
     goalName: String = "",
     availableProducts: List<StoreProduct> = emptyList(),
     selectedPlan: BillingPlan,
+    paywallVariant: OnboardingPaywallVariant = OnboardingPaywallVariant.PAYDAY_PROOF,
     isBillingActionInProgress: Boolean = false,
     billingMessage: String? = null,
     showSecurePremiumAccessPrompt: Boolean = false,
@@ -246,8 +248,8 @@ fun PaywallScreen(
             
             Spacer(Modifier.height(8.dp))
 
-            val headline = stringResource(R.string.paywall_headline_default)
-            val subhead = stringResource(R.string.paywall_subhead_default)
+            val headline = stringResource(paywallVariant.headlineRes)
+            val subhead = stringResource(paywallVariant.subheadRes)
 
             if (showSecurePremiumAccessPrompt) {
                 PaywallPurchaseSuccessContent(compactHeight = isCompactHeight)
@@ -1195,4 +1197,16 @@ private val BillingPlan.descriptionRes: Int
     get() = when (this) {
         BillingPlan.MONTHLY -> R.string.paywall_desc_monthly
         BillingPlan.ANNUAL -> R.string.paywall_desc_annual
+    }
+
+private val OnboardingPaywallVariant.headlineRes: Int
+    get() = when (this) {
+        OnboardingPaywallVariant.PAYDAY_PROOF -> R.string.paywall_headline_default
+        OnboardingPaywallVariant.REVIEW_MOMENTUM -> R.string.paywall_headline_review_momentum
+    }
+
+private val OnboardingPaywallVariant.subheadRes: Int
+    get() = when (this) {
+        OnboardingPaywallVariant.PAYDAY_PROOF -> R.string.paywall_subhead_default
+        OnboardingPaywallVariant.REVIEW_MOMENTUM -> R.string.paywall_subhead_review_momentum
     }

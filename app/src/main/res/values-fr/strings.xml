@@ -202,6 +202,7 @@
     <string name="premium_gate_review_body">Premium maintient la chronologie complète de vos performances visible afin que vous puissiez repérer les tendances de dépenses au fil du temps.</string>
     <string name="premium_gate_first_review_title">Transformez le premier bilan en prochain geste</string>
     <string name="premium_gate_first_review_body">Démarrez Premium pour comparer chaque paie à votre guide, repérer les écarts tôt et voir l’ajustement avant la prochaine paie.</string>
+    <string name="premium_gate_first_review_body_progress_loop">Démarrez Premium pour garder une boucle simple : notez ce qui s’est passé, voyez le schéma et commencez la prochaine paie avec un geste plus clair.</string>
     <string name="premium_gate_automation_title">Voir quoi changer à la prochaine paie</string>
     <string name="premium_gate_automation_body">Premium compare les bilans avec votre guide hebdomadaire et montre quoi changer avant la prochaine paie.</string>
     <string name="onboarding_signup_title">Sécurisez votre forfait</string>
@@ -510,8 +511,10 @@
     <string name="home_review_result_done">Terminé</string>
     <string name="home_review_first_premium_label">Première révision Premium</string>
     <string name="home_review_first_premium_title_locked">Votre première révision peut débloquer le prochain geste</string>
+    <string name="home_review_first_premium_title_progress_loop">Créez une boucle de progrès à chaque paie</string>
     <string name="home_review_first_premium_title_unlocked">Commencez le premier check-in Premium</string>
     <string name="home_review_first_premium_desc_locked">Enregistrez ce qui s’est passé sur cette paie. Premium le compare à votre guide et montre quoi ajuster ensuite.</string>
+    <string name="home_review_first_premium_desc_progress_loop">Enregistrez un bilan rapide après la paie. Premium garde le schéma visible pour que chaque paie commence plus clairement que la précédente.</string>
     <string name="home_review_first_premium_desc_unlocked">Remplissez cette paie ci-dessous. Premium transforme le premier check-in en prochain guide plus clair.</string>
     <string name="home_review_first_premium_step_review">Réviser</string>
     <string name="home_review_first_premium_step_review_desc">Enregistrez les montants réels.</string>
@@ -753,6 +756,8 @@
     <string name="paywall_subhead_brazil">Le mensuel est mis en avant pour tester les conseils fondés sur les bilans avant de s’engager.</string>
     <string name="paywall_headline_default">Garde ce plan en progrès</string>
     <string name="paywall_subhead_default">Premium suit chaque bilan, mémorise les changements et montre le prochain geste de paie.</string>
+    <string name="paywall_headline_review_momentum">Rends chaque bilan de paie utile</string>
+    <string name="paywall_subhead_review_momentum">Premium transforme chaque bilan rapide en un geste clair pour la prochaine paie.</string>
     <string name="insight_review_save_stress_success_headline">Le filet de sécurité s’agrandit</string>
     <string name="insight_review_save_stress_failure_headline">Le tampon a besoin d\'être prioritaire</string>
     <string name="insight_review_invest_discipline_success_headline">La discipline porte ses fruits</string>

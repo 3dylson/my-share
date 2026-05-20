@@ -5,6 +5,7 @@ import pt.ms.myshare.domain.model.AllocationStrategy
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.domain.model.PlanPreview
+import pt.ms.myshare.domain.model.OnboardingPaywallVariant
 import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.domain.model.PricingStrategy
 import pt.ms.myshare.domain.model.StoreProduct
@@ -33,6 +34,7 @@ data class OnboardingState(
     val planPreview: PlanPreview? = null,
     val userPreferences: UserPreferences = UserPreferences.defaults(),
     val pricingStrategy: PricingStrategy? = null,
+    val onboardingPaywallVariant: OnboardingPaywallVariant = OnboardingPaywallVariant.PAYDAY_PROOF,
     // Live prices fetched from Google Play Billing; empty until billing client connects
     val availableProducts: List<StoreProduct> = emptyList(),
     val selectedBillingPlan: BillingPlan = BillingPlan.MONTHLY,

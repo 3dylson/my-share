@@ -2,6 +2,7 @@ package pt.ms.myshare.presentation.ui.home
 
 import androidx.annotation.StringRes
 import pt.ms.myshare.R
+import pt.ms.myshare.domain.model.PremiumProofVariant
 
 enum class HomePremiumGate(
     @StringRes val titleRes: Int,
@@ -37,5 +38,14 @@ enum class HomePremiumGate(
         titleRes = R.string.premium_gate_automation_title,
         bodyRes = R.string.premium_gate_automation_body,
         analyticsName = "smart_automation"
-    )
+    );
+
+    @StringRes
+    fun bodyResFor(proofVariant: PremiumProofVariant): Int {
+        return when {
+            this == FirstReview && proofVariant == PremiumProofVariant.PROGRESS_LOOP ->
+                R.string.premium_gate_first_review_body_progress_loop
+            else -> bodyRes
+        }
+    }
 }

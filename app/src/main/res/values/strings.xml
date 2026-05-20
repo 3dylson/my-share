@@ -236,6 +236,7 @@
     <string name="premium_gate_review_body">Premium keeps your full performance timeline visible so you can spot spending patterns over time.</string>
     <string name="premium_gate_first_review_title">Turn the first review into your next move</string>
     <string name="premium_gate_first_review_body">Start Premium to compare each payday with your guide, catch drift early, and see the adjustment to make before the next payday.</string>
+    <string name="premium_gate_first_review_body_progress_loop">Start Premium to keep a simple review loop: save what happened, see the pattern, and begin the next payday with a clearer move.</string>
     <string name="premium_gate_automation_title">See what to change next payday</string>
     <string name="premium_gate_automation_body">Premium compares reviews with your weekly guide and shows what to change before the next payday.</string>
 
@@ -555,8 +556,10 @@
     <string name="home_review_result_done">Done</string>
     <string name="home_review_first_premium_label">First Premium review</string>
     <string name="home_review_first_premium_title_locked">Your first review can unlock the next move</string>
+    <string name="home_review_first_premium_title_progress_loop">Build a payday progress loop</string>
     <string name="home_review_first_premium_title_unlocked">Start the first Premium check-in</string>
     <string name="home_review_first_premium_desc_locked">Save what happened this payday. Premium can compare it with your guide and show what to adjust next.</string>
+    <string name="home_review_first_premium_desc_progress_loop">Save one quick check-in after payday. Premium keeps the pattern visible so each payday starts clearer than the last.</string>
     <string name="home_review_first_premium_desc_unlocked">Enter this payday below. Premium will turn the first check-in into a clearer next guide.</string>
     <string name="home_review_first_premium_step_review">Review</string>
     <string name="home_review_first_premium_step_review_desc">Save actual spending.</string>
@@ -816,6 +819,8 @@
     <string name="paywall_subhead_brazil">Monthly is highlighted first so you can test review-powered guidance before committing.</string>
     <string name="paywall_headline_default">Keep this plan improving</string>
     <string name="paywall_subhead_default">Premium watches each review, remembers changes, and shows the next payday move.</string>
+    <string name="paywall_headline_review_momentum">Make every payday review count</string>
+    <string name="paywall_subhead_review_momentum">Premium turns each quick check-in into one clear move for the next payday.</string>
 
     <!-- Review Insights -->
     <string name="insight_review_save_stress_success_headline">Safety net growing</string>

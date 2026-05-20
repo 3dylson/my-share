@@ -1,6 +1,8 @@
 package pt.ms.myshare.data.remote
 
 import pt.ms.myshare.domain.model.ProductExperienceConfig
+import pt.ms.myshare.domain.model.OnboardingPaywallVariant
+import pt.ms.myshare.domain.model.PremiumProofVariant
 import pt.ms.myshare.domain.model.RemoteBillingPlanDefault
 import java.util.Locale
 
@@ -15,14 +17,10 @@ object RemoteProductConfigMapper {
     ): ProductExperienceConfig {
         return ProductExperienceConfig(
             paywallDefaultPlan = paywallDefaultPlan.toRemoteBillingPlanDefault(),
-            onboardingPaywallVariant = onboardingPaywallVariant.ifBlank {
-                ProductExperienceConfig.DEFAULT_ONBOARDING_PAYWALL_VARIANT
-            },
+            onboardingPaywallVariant = onboardingPaywallVariant.toOnboardingPaywallVariant(),
             founderOfferEnabled = founderOfferEnabled,
             premiumRemindersEnabled = premiumRemindersEnabled,
-            premiumProofVariant = premiumProofVariant.ifBlank {
-                ProductExperienceConfig.DEFAULT_PREMIUM_PROOF_VARIANT
-            }
+            premiumProofVariant = premiumProofVariant.toPremiumProofVariant()
         )
     }
 
@@ -32,5 +30,17 @@ object RemoteProductConfigMapper {
             "annual" -> RemoteBillingPlanDefault.ANNUAL
             else -> RemoteBillingPlanDefault.MARKET
         }
+    }
+
+    private fun String.toOnboardingPaywallVariant(): OnboardingPaywallVariant {
+        val normalized = trim().lowercase(Locale.US)
+        return OnboardingPaywallVariant.entries.firstOrNull { it.remoteValue == normalized }
+            ?: OnboardingPaywallVariant.PAYDAY_PROOF
+    }
+
+    private fun String.toPremiumProofVariant(): PremiumProofVariant {
+        val normalized = trim().lowercase(Locale.US)
+        return PremiumProofVariant.entries.firstOrNull { it.remoteValue == normalized }
+            ?: PremiumProofVariant.NEXT_MOVE
     }
 }
