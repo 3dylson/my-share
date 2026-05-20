@@ -2,7 +2,6 @@ package pt.ms.myshare.presentation.ui.theme
 
 import android.app.Activity
 import android.os.Build
-import android.view.Window
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -10,7 +9,6 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
@@ -46,7 +44,6 @@ fun MyShareTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            setStatusBarColor(window, colorScheme.background.toArgb())
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
@@ -57,11 +54,6 @@ fun MyShareTheme(
         shapes = Shapes,
         content = content
     )
-}
-
-@Suppress("DEPRECATION")
-private fun setStatusBarColor(window: Window, color: Int) {
-    window.statusBarColor = color
 }
 
 private const val TAG = "MyShareTheme"

@@ -636,24 +636,50 @@ class OnboardingViewModel @Inject constructor(
 
     private fun logBillingPurchaseEvent(event: BillingPurchaseEvent, source: String) {
         when (event) {
-            BillingPurchaseEvent.Completed -> Timber.tag("OnboardingBilling").d(
-                "Billing purchase completed source=%s",
-                source
-            )
-            BillingPurchaseEvent.Pending -> Timber.tag("OnboardingBilling").d(
-                "Billing purchase pending source=%s",
-                source
-            )
-            BillingPurchaseEvent.Canceled -> Timber.tag("OnboardingBilling").d(
-                "Billing purchase canceled source=%s",
-                source
-            )
-            is BillingPurchaseEvent.Failed -> Timber.tag("OnboardingBilling").e(
-                "Billing purchase failed source=%s code=%d message=%s",
-                source,
-                event.responseCode,
-                event.debugMessage
-            )
+            BillingPurchaseEvent.Completed -> {
+                FirebaseUtils.logEvent("purchase_completed", Bundle().apply {
+                    putString("source", source)
+                    putString("billing_plan", state.value.selectedBillingPlan.name.lowercase(Locale.US))
+                    putString("product_id", PremiumSubscriptionProducts.productIdFor(state.value.selectedBillingPlan))
+                })
+                Timber.tag("OnboardingBilling").d(
+                    "Billing purchase completed source=%s",
+                    source
+                )
+            }
+            BillingPurchaseEvent.Pending -> {
+                FirebaseUtils.logEvent("purchase_pending", Bundle().apply {
+                    putString("source", source)
+                    putString("product_id", PremiumSubscriptionProducts.productIdFor(state.value.selectedBillingPlan))
+                })
+                Timber.tag("OnboardingBilling").d(
+                    "Billing purchase pending source=%s",
+                    source
+                )
+            }
+            BillingPurchaseEvent.Canceled -> {
+                FirebaseUtils.logEvent("purchase_canceled", Bundle().apply {
+                    putString("source", source)
+                    putString("product_id", PremiumSubscriptionProducts.productIdFor(state.value.selectedBillingPlan))
+                })
+                Timber.tag("OnboardingBilling").d(
+                    "Billing purchase canceled source=%s",
+                    source
+                )
+            }
+            is BillingPurchaseEvent.Failed -> {
+                FirebaseUtils.logEvent("purchase_failed", Bundle().apply {
+                    putString("source", source)
+                    putString("product_id", PremiumSubscriptionProducts.productIdFor(state.value.selectedBillingPlan))
+                    putInt("response_code", event.responseCode)
+                })
+                Timber.tag("OnboardingBilling").e(
+                    "Billing purchase failed source=%s code=%d message=%s",
+                    source,
+                    event.responseCode,
+                    event.debugMessage
+                )
+            }
         }
     }
 

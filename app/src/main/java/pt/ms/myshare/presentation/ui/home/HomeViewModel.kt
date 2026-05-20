@@ -1099,6 +1099,7 @@ class HomeViewModel @Inject constructor(
     fun logPremiumGateViewed(gate: HomePremiumGate) {
         clearIdleBillingFeedback()
         logPremiumGateEvent("premium_gate_viewed", gate)
+        logPremiumGateEvent("paywall_viewed", gate)
     }
 
     fun logPremiumGateUpgradeClicked(gate: HomePremiumGate) {
@@ -1357,14 +1358,40 @@ class HomeViewModel @Inject constructor(
 
     private fun logBillingPurchaseEvent(event: BillingPurchaseEvent) {
         when (event) {
-            BillingPurchaseEvent.Completed -> Timber.tag(TAG).d("Billing purchase completed")
-            BillingPurchaseEvent.Pending -> Timber.tag(TAG).d("Billing purchase pending")
-            BillingPurchaseEvent.Canceled -> Timber.tag(TAG).d("Billing purchase canceled")
-            is BillingPurchaseEvent.Failed -> Timber.tag(TAG).e(
-                "Billing purchase failed code=%d message=%s",
-                event.responseCode,
-                event.debugMessage
-            )
+            BillingPurchaseEvent.Completed -> {
+                FirebaseUtils.logEvent("purchase_completed", android.os.Bundle().apply {
+                    putString("source", "home_paywall")
+                    putString("billing_plan", uiState.value.moreCard.selectedBillingPlan.name.lowercase(Locale.US))
+                    putString("product_id", selectedStoreProductId())
+                })
+                Timber.tag(TAG).d("Billing purchase completed")
+            }
+            BillingPurchaseEvent.Pending -> {
+                FirebaseUtils.logEvent("purchase_pending", android.os.Bundle().apply {
+                    putString("source", "home_paywall")
+                    putString("product_id", selectedStoreProductId())
+                })
+                Timber.tag(TAG).d("Billing purchase pending")
+            }
+            BillingPurchaseEvent.Canceled -> {
+                FirebaseUtils.logEvent("purchase_canceled", android.os.Bundle().apply {
+                    putString("source", "home_paywall")
+                    putString("product_id", selectedStoreProductId())
+                })
+                Timber.tag(TAG).d("Billing purchase canceled")
+            }
+            is BillingPurchaseEvent.Failed -> {
+                FirebaseUtils.logEvent("purchase_failed", android.os.Bundle().apply {
+                    putString("source", "home_paywall")
+                    putString("product_id", selectedStoreProductId())
+                    putInt("response_code", event.responseCode)
+                })
+                Timber.tag(TAG).e(
+                    "Billing purchase failed code=%d message=%s",
+                    event.responseCode,
+                    event.debugMessage
+                )
+            }
         }
     }
 
