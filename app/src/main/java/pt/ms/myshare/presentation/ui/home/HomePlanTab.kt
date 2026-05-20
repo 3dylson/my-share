@@ -144,6 +144,8 @@ fun LazyListScope.homePlanTab(
                 PremiumPlanBriefCard(
                     smartAdjustment = smartAdjustment,
                     premiumCheckIn = premiumCheckIn,
+                    weeklyGuide = card.weeklySpendLabel,
+                    priorityMove = card.savingsLabel,
                     onOpenPremiumControls = onOpenPremiumControls
                 )
             }
@@ -155,6 +157,8 @@ fun LazyListScope.homePlanTab(
 private fun PremiumPlanBriefCard(
     smartAdjustment: SmartAdjustmentControlState,
     premiumCheckIn: PremiumCheckInState?,
+    weeklyGuide: String,
+    priorityMove: String,
     onOpenPremiumControls: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -171,7 +175,11 @@ private fun PremiumPlanBriefCard(
             smartAdjustment.currentPriorityContributionLabel
         )
         !isWatching -> stringResource(R.string.home_plan_premium_brief_body_paused)
-        else -> stringResource(R.string.home_plan_premium_brief_body_waiting)
+        else -> stringResource(
+            R.string.home_plan_premium_brief_body_waiting,
+            weeklyGuide,
+            priorityMove
+        )
     }
     val title = if (isWatching) {
         stringResource(R.string.home_plan_premium_brief_title_active)

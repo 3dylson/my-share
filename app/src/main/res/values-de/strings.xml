@@ -336,7 +336,7 @@
     <string name="home_plan_premium_brief_body_pending">Premium hat einen nächsten Leitwert von %1$s für Ausgaben und %2$s für deinen Prioritätsschritt gefunden. Prüfe ihn, bevor sich etwas ändert.</string>
     <string name="home_plan_premium_brief_body_steady">Dein Wochenleitwert von %1$s und der Prioritätsschritt von %2$s wirken weiter passend.</string>
     <string name="home_plan_premium_brief_body_paused">Schalte die Überwachung in Mehr ein, um nach jeder Prüfung den nächsten Schritt zu sehen.</string>
-    <string name="home_plan_premium_brief_body_waiting">Trage jede Zahltagprüfung ein und Premium zeigt den nächsten Schritt für diesen Plan.</string>
+    <string name="home_plan_premium_brief_body_waiting">Premium hält deinen Wochenrahmen von %1$s und deinen Prioritätsschritt von %2$s bereit. Nach dem ersten Check-in zeigt es, was sich ändern sollte.</string>
     <string name="home_plan_premium_brief_checkin_label">Nächste Prüfung</string>
     <string name="home_plan_premium_brief_checkin_waiting">Nach dem Zahltag</string>
     <string name="home_plan_premium_brief_watch_label">Planüberwachung</string>

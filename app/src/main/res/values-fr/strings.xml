@@ -336,7 +336,7 @@
     <string name="home_plan_premium_brief_body_pending">Premium a trouvé un prochain guide de %1$s pour les dépenses et %2$s pour votre action prioritaire. Vérifiez avant tout changement.</string>
     <string name="home_plan_premium_brief_body_steady">Votre guide hebdomadaire de %1$s et l’action prioritaire de %2$s restent bien alignés.</string>
     <string name="home_plan_premium_brief_body_paused">Activez le suivi dans Plus pour voir le prochain mouvement après chaque bilan.</string>
-    <string name="home_plan_premium_brief_body_waiting">Ajoutez chaque bilan de paie et Premium montrera le prochain mouvement pour ce plan.</string>
+    <string name="home_plan_premium_brief_body_waiting">Premium garde votre guide hebdomadaire de %1$s et votre mouvement prioritaire de %2$s prêts. Après le premier bilan, il montrera quoi ajuster.</string>
     <string name="home_plan_premium_brief_checkin_label">Prochain bilan</string>
     <string name="home_plan_premium_brief_checkin_waiting">Après la paie</string>
     <string name="home_plan_premium_brief_watch_label">Suivi du plan</string>

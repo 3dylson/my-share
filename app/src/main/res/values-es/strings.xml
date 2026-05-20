@@ -336,7 +336,7 @@
     <string name="home_plan_premium_brief_body_pending">Premium encontró una próxima guía de %1$s para gastos y %2$s para tu movimiento prioritario. Revísalo antes de cambiar nada.</string>
     <string name="home_plan_premium_brief_body_steady">Tu guía semanal de %1$s y el movimiento prioritario de %2$s siguen bien.</string>
     <string name="home_plan_premium_brief_body_paused">Activa el seguimiento en Más para ver el próximo movimiento tras cada revisión.</string>
-    <string name="home_plan_premium_brief_body_waiting">Registra cada revisión de cobro y Premium mostrará el próximo movimiento para este plan.</string>
+    <string name="home_plan_premium_brief_body_waiting">Premium mantiene lista tu guía semanal de %1$s y tu movimiento prioritario de %2$s. Después de la primera revisión, mostrará qué ajustar.</string>
     <string name="home_plan_premium_brief_checkin_label">Próxima revisión</string>
     <string name="home_plan_premium_brief_checkin_waiting">Después del cobro</string>
     <string name="home_plan_premium_brief_watch_label">Seguimiento</string>

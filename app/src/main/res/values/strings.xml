@@ -381,7 +381,7 @@
     <string name="home_plan_premium_brief_body_pending">Premium found a next guide of %1$s for spending and %2$s for your priority move. Review it before anything changes.</string>
     <string name="home_plan_premium_brief_body_steady">Your %1$s weekly guide and %2$s priority move still look steady.</string>
     <string name="home_plan_premium_brief_body_paused">Turn on watch in More to get the next move after each payday review.</string>
-    <string name="home_plan_premium_brief_body_waiting">Log each payday review and Premium will show the next move for this plan.</string>
+    <string name="home_plan_premium_brief_body_waiting">Premium is keeping your %1$s weekly guide and %2$s priority move ready. After the first review, it will show what to adjust next.</string>
     <string name="home_plan_premium_brief_checkin_label">Next review</string>
     <string name="home_plan_premium_brief_checkin_waiting">After payday</string>
     <string name="home_plan_premium_brief_watch_label">Plan watch</string>
