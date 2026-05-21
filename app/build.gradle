@@ -12,11 +12,6 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.compose'
 }
 
-def googleClientId = project.findProperty('GOOGLE_CLIENT_ID')?.toString()
-if (googleClientId == null || googleClientId.isBlank() || googleClientId == 'YOUR_CLIENT_ID_HERE') {
-    throw new GradleException("GOOGLE_CLIENT_ID must be configured with the Firebase Web OAuth client ID.")
-}
-
 android {
     def hasReleaseSigning = project.findProperty("MYSHARE_RELEASE_STORE_FILE") != null
     signingConfigs {
@@ -101,9 +96,6 @@ android {
         }
     }
     
-    defaultConfig {
-        buildConfigField "String", "GOOGLE_CLIENT_ID", "\"${googleClientId}\""
-    }
     namespace = appId
 }
 

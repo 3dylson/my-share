@@ -593,9 +593,9 @@
     <string name="home_review_first_premium_step_adjust_desc">Fixez le prochain guide.</string>
     <string name="home_review_first_premium_action">Voir l’essai Premium</string>
     <string name="home_review_manual_title">Enregistrement sur salaire</string>
-    <string name="home_review_manual_desc">Indique ce que tu as dépensé et mis de côté pour garder le prochain guide utile.</string>
-    <string name="home_review_input_flex_exact">Réel flexible</string>
-    <string name="home_review_input_goal_exact">Objectif réel</string>
+    <string name="home_review_manual_desc">Après la paie, indique ce qui s’est vraiment passé : combien tu as dépensé de l’argent flexible et combien tu as mis vers ton objectif.</string>
+    <string name="home_review_input_flex_exact">Dépensé depuis l’argent flexible</string>
+    <string name="home_review_input_goal_exact">Mis vers l’objectif</string>
     <string name="home_review_submit">Envoyer l\'avis</string>
     <string name="home_review_saved_feedback">Bilan enregistré. Ta vue de paie est à jour.</string>
     <string name="home_review_history_title">Historique de paie</string>

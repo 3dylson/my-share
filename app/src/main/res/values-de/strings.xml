@@ -593,9 +593,9 @@
     <string name="home_review_first_premium_step_adjust_desc">Nächsten Leitfaden setzen.</string>
     <string name="home_review_first_premium_action">Premium-Test ansehen</string>
     <string name="home_review_manual_title">Check-in am Zahltag</string>
-    <string name="home_review_manual_desc">Gib ein, was du ausgegeben und gespart hast, damit der nächste Leitwert nützlich bleibt.</string>
-    <string name="home_review_input_flex_exact">Flexibel aktuell</string>
-    <string name="home_review_input_goal_exact">Ziel tatsächlich</string>
+    <string name="home_review_manual_desc">Gib nach dem Zahltag ein, was wirklich passiert ist: wie viel flexibles Geld du ausgegeben hast und wie viel du zu deinem Ziel verschoben hast.</string>
+    <string name="home_review_input_flex_exact">Aus flexiblem Geld ausgegeben</string>
+    <string name="home_review_input_goal_exact">Zum Ziel verschoben</string>
     <string name="home_review_submit">Bewertung abgeben</string>
     <string name="home_review_saved_feedback">Überprüfung gespeichert. Dein Zahltag-Bild ist aktualisiert.</string>
     <string name="home_review_history_title">Zahltag-Verlauf</string>

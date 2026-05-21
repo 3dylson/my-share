@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.credentials.CredentialManager
 import kotlinx.coroutines.launch
-import pt.ms.myshare.BuildConfig
 import pt.ms.myshare.R
 import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReadResult
 import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReader
@@ -50,7 +49,7 @@ fun SignupScreen(
     val googleIdTokenReader = remember(context) {
         GoogleIdTokenReader(
             credentialManager = CredentialManager.create(context),
-            serverClientId = BuildConfig.GOOGLE_CLIENT_ID
+            serverClientId = context.getString(R.string.default_web_client_id)
         )
     }
     var googleSignInError by remember { mutableStateOf<String?>(null) }

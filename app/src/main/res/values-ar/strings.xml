@@ -593,9 +593,9 @@
     <string name="home_review_first_premium_step_adjust_desc">اضبط الدليل التالي.</string>
     <string name="home_review_first_premium_action">عرض تجربة Premium</string>
     <string name="home_review_manual_title">تسجيل الوصول ليوم الدفع</string>
-    <string name="home_review_manual_desc">أدخل ما أنفقته وادخرته حتى يبقى الدليل التالي مفيدًا.</string>
-    <string name="home_review_input_flex_exact">مرنة الفعلية</string>
-    <string name="home_review_input_goal_exact">الهدف الفعلي</string>
+    <string name="home_review_manual_desc">بعد يوم الدفع، أدخل ما حدث فعلاً: كم أنفقت من المال المرن وكم نقلت إلى هدفك.</string>
+    <string name="home_review_input_flex_exact">المصروف من المال المرن</string>
+    <string name="home_review_input_goal_exact">المنقول إلى الهدف</string>
     <string name="home_review_submit">إرسال المراجعة</string>
     <string name="home_review_saved_feedback">تم حفظ المراجعة. تم تحديث صورة يوم الدفع لديك.</string>
     <string name="home_review_history_title">سجل يوم الدفع</string>
