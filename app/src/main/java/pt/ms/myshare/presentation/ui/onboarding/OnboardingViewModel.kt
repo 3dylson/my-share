@@ -685,7 +685,7 @@ class OnboardingViewModel @Inject constructor(
                     type = GoalType.EMERGENCY_FUND
                 )
             )
-            firstRunExperienceRepository.setHomeCoachMarksPending(false)
+            firstRunExperienceRepository.setHomeCoachMarksPending(true)
             plannerRepository.setOnboardingCompleted(true)
             state.update { it.copy(onboardingCompleted = true) }
         }
@@ -813,7 +813,7 @@ class OnboardingViewModel @Inject constructor(
         viewModelScope.launch {
             if (plannerRepository.loadPlan() != null) {
                 plannerRepository.setOnboardingCompleted(true)
-                firstRunExperienceRepository.setHomeCoachMarksPending(false)
+                firstRunExperienceRepository.setHomeCoachMarksPending(true)
                 if (state.value.isPremium) {
                     enablePremiumWatchForOnboarding("existing_entitlement")
                 }
