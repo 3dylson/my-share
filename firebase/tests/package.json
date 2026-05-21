@@ -1,0 +1,17 @@
+{
+  "name": "firestore-tests",
+  "description": "Firestore + Storage rules emulator tests for My Share",
+  "scripts": {
+    "test": "jest --forceExit",
+    "test:ci": "firebase emulators:exec --only firestore,storage 'npm test' --project my-share-finance"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^3.0.4",
+    "firebase-admin": "^11.8.0",
+    "jest": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": ["**/*.test.js"]
+  }
+}

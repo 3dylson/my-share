@@ -1,0 +1,67 @@
+package pt.ms.myshare.data.repository
+
+import android.app.Activity
+import android.content.Context
+import androidx.preference.PreferenceManager
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
+import pt.ms.myshare.domain.model.BillingFlowLaunchResult
+import pt.ms.myshare.domain.model.BillingPurchaseEvent
+import pt.ms.myshare.domain.model.EntitlementState
+import pt.ms.myshare.domain.model.StoreProduct
+import pt.ms.myshare.domain.repository.EntitlementRepository
+import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class SharedPreferencesEntitlementRepository @Inject constructor(
+    @ApplicationContext context: Context
+) : EntitlementRepository {
+
+    private val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+    private val premiumState = MutableStateFlow(prefs.getBoolean(KEY_IS_PRO, false))
+
+    override val entitlementState: Flow<EntitlementState> = premiumState.map {
+        if (it) EntitlementState.PRO else EntitlementState.FREE
+    }
+    override val isPro: Flow<Boolean> = premiumState.asStateFlow()
+    override val availableProducts: Flow<List<StoreProduct>> = MutableStateFlow(emptyList())
+    override val purchaseEvents: Flow<BillingPurchaseEvent> = emptyFlow()
+
+    override suspend fun checkActiveEntitlement() {
+        // No-op for shared prefs
+    }
+
+    override suspend fun refreshProducts(): List<StoreProduct> {
+        Timber.tag(TAG).d("refreshProducts unavailable for shared preferences entitlement")
+        return emptyList()
+    }
+
+    override suspend fun purchasePlan(activity: Activity, product: StoreProduct): BillingFlowLaunchResult {
+        Timber.tag(TAG).d("purchasePlan unavailable for shared preferences entitlement")
+        return BillingFlowLaunchResult.ProductUnavailable
+    }
+
+    suspend fun setPro(value: Boolean) = withContext(Dispatchers.IO) {
+        Timber.tag(TAG).d("setPro value=%s", value)
+        prefs.edit().putBoolean(KEY_IS_PRO, value).apply()
+        premiumState.value = value
+    }
+
+    override suspend fun restorePurchases() = withContext(Dispatchers.IO) {
+        Timber.tag(TAG).d("restorePurchases placeholder current=%s", premiumState.value)
+        premiumState.value = prefs.getBoolean(KEY_IS_PRO, false)
+    }
+
+    private companion object {
+        const val TAG = "EntitlementRepository"
+        const val KEY_IS_PRO = "planner_is_pro"
+    }
+}

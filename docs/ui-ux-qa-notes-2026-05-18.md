@@ -1,0 +1,215 @@
+# UI/UX QA Notes - 2026-05-18
+
+## Scope
+
+Final onboarding-to-paywall evidence pass for the premium conversion flow:
+
+- Welcome
+- Goal Picker
+- Salary
+- Fixed Costs
+- Allocation
+- Plan Preview aha reveal
+- Signup
+- Trajectory adaptive bridge
+- Paywall
+
+Addendum: Phase 5 Plan, Strategy, and Review tab premium value-surface validation.
+
+## Environment
+
+- App: debug build installed from the current workspace
+- Test command: `./gradlew testDebugUnitTest :app:installDebug --console=plain`
+- Main-tab addendum test/install commands: `./gradlew testDebugUnitTest --console=plain` and `ANDROID_SERIAL=emulator-5554 ./gradlew :app:installDebug --console=plain`
+- Review addendum test/install commands: `./gradlew testDebugUnitTest --console=plain` and `ANDROID_SERIAL=emulator-5554 ./gradlew :app:installDebug --console=plain`
+- Device: `emulator-5554`
+- Normal profile: `1080x2400 / 420dpi`
+- Compact profile: `720x1280 / 320dpi`
+- Main-tab addendum compact profile: `720x1280 / 360dpi`
+- Inputs:
+  - Goal: Emergency fund
+  - Net income per payday: `$1,500`
+  - Monthly essentials: `$600`
+  - Default allocation split
+
+## Evidence
+
+Artifacts were saved under:
+
+`/tmp/myshare-onboarding-qa-2026-05-18`
+
+Main-tab addendum artifacts were saved under:
+
+`/tmp/myshare-main-tab-qa-2026-05-18`
+
+Review addendum artifacts were saved under:
+
+`/tmp/myshare-review-qa-2026-05-18`
+
+More addendum artifacts were saved under:
+
+`/tmp/myshare-more-qa-2026-05-18`
+
+Captured:
+
+- 23 screenshots
+- 23 UI-tree summaries
+- 23 raw UI XML dumps
+- Main-tab addendum captured normal and compact screenshots with matching UI-tree summaries and raw XML dumps.
+- Review addendum captured pre-implementation Review submissions, post-implementation normal and compact screenshots, UI-tree summaries, and raw XML dumps.
+- More addendum captured normal and compact screenshots with matching UI-tree summaries and raw XML dumps.
+
+Key files:
+
+- `normal-06-plan-preview.png`
+- `normal-09-trajectory-scrolled.png`
+- `normal-10-paywall-top.png`
+- `normal-11-paywall-scrolled.png`
+- `compact-06-plan-preview.png`
+- `compact-10-trajectory-bottom.png`
+- `compact-12-paywall-scrolled.png`
+- `normal-plan-initial.png`
+- `normal-plan-smart-preview.png`
+- `normal-plan-smart-gate.png`
+- `compact-plan-top.png`
+- `compact-plan-smart-preview-bottom.png`
+- `compact-plan-smart-gate.png`
+- `strategy-normal-top.png`
+- `strategy-normal-goal-gate.png`
+- `strategy-normal-rule-preview-clean.png`
+- `strategy-normal-rule-gate.png`
+- `strategy-compact-top-clean.png`
+- `strategy-compact-rule-preview-bottom.png`
+- `strategy-compact-rule-gate.png`
+- `review-initial-empty.png`
+- `review-after-first-submit.png`
+- `review-after-second-submit.png`
+- `review-history-after-two-clean.png`
+- `review-history-gate.png`
+- `review-implemented-normal-top.png`
+- `review-implemented-normal-history-lock.png`
+- `review-implemented-normal-gate.png`
+- `review-implemented-compact-recommendation.png`
+- `review-implemented-compact-history-lock-full.png`
+- `more-normal-top-final.png`
+- `more-normal-premium-final.png`
+- `more-normal-automation-lock.png`
+- `more-normal-automation-gate.png`
+- `more-compact-top.png`
+- `more-compact-premium.png`
+- `more-compact-pricing-cta-full.png`
+- `more-compact-bottom.png`
+- `more-compact-account.png`
+
+## Result
+
+Pass for the onboarding-to-paywall conversion path.
+
+The flow now communicates a coherent value ladder:
+
+- Plan Preview delivers the aha moment with `Safe weekly spend: $103.85`, bills protected, priority move, and ordered payday actions.
+- Signup preserves trust by keeping Google sync optional and local mode visible.
+- Trajectory makes the Premium bridge concrete with a locked adjustment example: unused money can move toward the selected goal while protecting the weekly guide.
+- Paywall continues the same story with a personalized Premium adjustment example and clear Free vs Premium contrast.
+- Trial terms and planning-vs-store currency copy remain visible near the sticky CTA.
+
+Main-tab addendum pass:
+
+- The Plan tab now shows a locked Premium preview explaining what Premium would adjust next using `$450.00` priority move and `$103.85` weekly guide values from the plan.
+- Tapping the preview opens the contextual `Unlock adaptive adjustments` Premium gate.
+- The allocation preview stays in two columns on the normal profile so money values are not cut off by the bottom nav on first view.
+- The locked preview stacks correctly on the compact profile, and the CTA remains reachable above the bottom nav after scrolling.
+- The Strategy tab now shows a locked multi-goal preview tied to the current priority move and `Emergency fund`, then opens the `Unlock multi-goal payday splits` Premium gate.
+- A free Savings rule was created during QA to validate the rule state. The rule card is labeled `STATIC MANUAL RULE`, and the locked preview explains how Premium would coordinate multiple rules after reviews.
+- Strategy locked preview cards stack correctly on the compact profile, with CTAs and contextual Premium gates reachable above the bottom nav after scrolling.
+
+Review addendum pass:
+
+- The Review feature was tested before implementation by submitting an on-plan review and then an off-plan review.
+- Pre-implementation behavior: review submission updated the trust score and history, but the latest off-plan same-day review was hidden behind the free history lock while the visible free row still showed the older on-plan review.
+- Pre-implementation behavior: the history gate copy was too generic, using `Trajectory insights` without showing the concrete value Premium would unlock.
+- Post-implementation behavior: the Review tab shows the latest off-plan review first with `Needs attention`, `$850.00` actual flexible spend, `$720.00 (+$130.00)` planned delta, `$50.00` actual goal contribution, and `$180.00 (-$130.00)` planned delta.
+- Post-implementation behavior: free users now see a locked `What Premium would adjust next` card after performance stats, using the saved planned values to explain the next adjustment Premium would preview.
+- Post-implementation behavior: the hidden-history lock now says `1 more review pattern locked` and explains that Premium compares hidden history with the latest review to produce a next-payday adjustment.
+- Tapping both the recommendation preview and hidden-history lock opens the contextual `See full review history` paywall.
+
+More addendum pass:
+
+- The More tab now starts with account status and a payday control-center summary instead of pricing.
+- The control-center summary uses the current `$166.16` weekly guide, `$180.00` priority move, `1` saved rule, and `2` reviews so the settings screen still reflects the user's plan.
+- Plan settings now appear before the Premium checkout section, keeping reminders, language, currency, and automation controls first.
+- The Premium upgrade section now explains review-based automation with the user's weekly guide, priority move, and saved rules before showing annual/monthly pricing.
+- The Auto rules lock now says Premium turns reviews into the next rule adjustment, and `See Premium` opens the contextual `Unlock adaptive adjustments` gate.
+- Legal links, ad preferences, Google account connection, subscription management, and sign-out remained reachable after the subscription section.
+
+## Compact Check
+
+The compact profile remained usable through the full path:
+
+- Sticky CTAs stayed visible.
+- Plan Preview first viewport showed the safe weekly spend and protected amounts without overlap.
+- Trajectory required scrolling, but the Premium example, Free vs Adaptive Premium comparison, and `See adaptive plan` CTA were reachable.
+- Paywall hero, personalized adjustment preview, pricing, currency notice, and `Start free trial` CTA were reachable.
+- Review recommendation, review form, latest review row, and locked history preview remained reachable on the compact profile without overlapping the bottom nav.
+- More control-center metrics stacked cleanly on the compact profile, and the Premium preview, pricing CTA, legal links, and account rows remained reachable.
+
+## Phase 6 Full Pass
+
+Evidence folder: `/tmp/myshare-phase6-qa-2026-05-18`
+
+Scope:
+
+- Target device: `emulator-5554` only. The connected physical USB tablet was not used.
+- Automated check: `./gradlew testDebugUnitTest --console=plain` passed.
+- Clean install flow: app uninstalled and reinstalled on the emulator, then launched from `pt.ms.myshare/.presentation.ui.MainComposeActivity`.
+- Artifacts captured: 209 screenshots, UI-tree XML files, summaries, and log files.
+
+Validated:
+
+- Full onboarding from Welcome through goal picker, salary, fixed costs, allocation, Plan Preview, signup, trajectory, paywall, reminder setup, bank-sync skip, and Home.
+- Salary blank validation and fixed-costs-over-income validation.
+- Plan Preview aha moment, including safe weekly spend, protected bills, priority move, ordered payday actions, goal path, and adaptive Premium teaser.
+- Paywall top, checkout error handling, restore feedback, close behavior, and in-app recovery copy.
+- Reminder permission deny from onboarding and allow from More.
+- Plan tab summary, locked smart-adjustment preview, and contextual Premium gate.
+- Strategy goal/rule entry points, locked multi-goal split preview, locked adaptive-rules preview, and related Premium gates.
+- Review submission with an on-plan review and an off-plan review, including latest-first history, planned deltas, trust score, recommendation preview, and locked history copy.
+- More as a control center, including reminder settings, language dialog, currency dialog, automation lock, Premium upgrade section, checkout error handling, legal/account rows, account details, and sign-out confirmation without signing out.
+- Compact profile at `720x1280 / 360dpi` for onboarding, Plan, Strategy, Review, and More. Content stayed scrollable and reachable, and the emulator was restored afterward to `1080x2400 / 420dpi`.
+
+Result:
+
+- Pass for Phase 6 full end-to-end verification.
+- No `pt.ms.myshare` fatal crash or ANR was found in the captured logs.
+- The crash buffer included an emulator Bluetooth system-process abort outside the app.
+- Captured app-related log noise includes Firebase/Google Play first-run warnings and StrictMode stack traces around Firebase/Auth initialization.
+
+## Residual Risk
+
+- Play Billing cannot be fully validated as a successful paid conversion until Play Console products/licensed tester setup can complete a real purchase/restore path.
+- On compact screens, the More paywall error message can push the `Start free trial` button slightly farther down after a failed checkout, but the CTA remains reachable with an extra scroll.
+- Reminder-denied onboarding returned cleanly to setup; the captured screen did not show a distinct denial snackbar, so that feedback can still be improved later.
+
+## Release Play Purchase Addendum
+
+Environment:
+
+- Target device: `emulator-5554` only. The connected physical USB tablet was not used.
+- Release artifact installed locally: `app/release/my-share-3.0.1-v9.aab`.
+- Installed package reported `versionCode=9` and `versionName=3.0.1`.
+
+Validated:
+
+- The release build launched cleanly and retained the completed onboarding state.
+- Google Play test checkout opened from the paywall with `Test card, always approves`.
+- Completing the annual test subscription returned to My Share and showed `Secure your Premium access`.
+- Firestore showed `entitlementState=PRO`, `subscriptionState=SUBSCRIPTION_STATE_ACTIVE`, and `isPro=true` for the test user.
+- More showed `PREMIUM MEMBER` and `Payday control center` after purchase.
+- A force-stop/cold-start returned to Home with the Premium pill and then More rebuilt the Premium control-center state.
+- Crash log buffer had no `pt.ms.myshare` fatal crash or ANR during the release smoke.
+- Firebase functions were updated afterward so callable purchase verification now attempts Android Publisher server-side acknowledgement before the app falls back to BillingClient acknowledgement.
+
+Residual:
+
+- The current successful purchase happened before the server-acknowledgement deploy, so the next fresh Play test purchase should confirm the new `serverAcknowledgementStatus=acknowledged` field.
+- The side-loaded release still is not equivalent to installing the reviewed build from Play; App Check/installer behavior should be retested once the Play review build is available.

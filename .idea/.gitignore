@@ -13,3 +13,10 @@
 /sonarlint/securityhotspotstore
 /migrations.xml
 /appInsightsSettings.xml
+/AndroidProjectSystem.xml
+/copilot.data.migration.agent.xml
+/copilot.data.migration.edit.xml
+/inspectionProfiles/Project_Default.xml
+/deviceManager.xml
+/copilot.data.migration.ask2agent.xml
+/markdown.xml
