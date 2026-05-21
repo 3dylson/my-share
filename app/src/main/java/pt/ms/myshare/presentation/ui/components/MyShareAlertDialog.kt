@@ -4,8 +4,9 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -67,12 +68,13 @@ fun MyShareAlertDialog(
     val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
     val scrimColor = Color.Black.copy(alpha = if (isDark) 0.72f else 0.42f)
     val interactionSource = remember { MutableInteractionSource() }
+    val contentScrollState = rememberScrollState()
 
     Dialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
-        Box(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
                 .background(scrimColor)
@@ -88,6 +90,7 @@ fun MyShareAlertDialog(
                 modifier = modifier
                     .fillMaxWidth()
                     .widthIn(max = 520.dp)
+                    .heightIn(max = maxHeight)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
@@ -123,7 +126,10 @@ fun MyShareAlertDialog(
                     if (message != null || content != null) {
                         Spacer(modifier = Modifier.height(14.dp))
                         Column(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f, fill = false)
+                                .verticalScroll(contentScrollState),
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                             horizontalAlignment = Alignment.Start
                         ) {

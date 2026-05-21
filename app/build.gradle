@@ -93,6 +93,13 @@ android {
         compose = true
         buildConfig = true
     }
+
+    bundle {
+        language {
+            // In-app language switching needs every supported values-* resource after Play Store delivery.
+            enableSplit = false
+        }
+    }
     
     defaultConfig {
         buildConfigField "String", "GOOGLE_CLIENT_ID", "\"${googleClientId}\""
