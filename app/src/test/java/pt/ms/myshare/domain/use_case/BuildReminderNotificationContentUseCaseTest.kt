@@ -48,6 +48,38 @@ class BuildReminderNotificationContentUseCaseTest {
     }
 
     @Test
+    fun `payday review due notification opens review with payday cue copy`() {
+        val content = useCase.execute(
+            plan = plan(),
+            type = ReminderNotificationType.PAYDAY_REVIEW_DUE,
+            locale = Locale.US,
+            currencyCode = "USD"
+        )
+
+        assertEquals("notification_payday_review_due_title", content.titleKey)
+        assertEquals("notification_payday_review_due_body", content.messageKey)
+        assertEquals("review", content.destination)
+        assertEquals("payday_review_due", content.analyticsType)
+        assertEquals(listOf("$103.85"), content.messageArgs)
+    }
+
+    @Test
+    fun `premium overdue notification keeps forgiving recovery framing`() {
+        val content = useCase.execute(
+            plan = plan(),
+            type = ReminderNotificationType.PREMIUM_CHECK_IN_OVERDUE,
+            locale = Locale.US,
+            currencyCode = "USD"
+        )
+
+        assertEquals("notification_premium_checkin_overdue_title", content.titleKey)
+        assertEquals("notification_premium_checkin_overdue_body", content.messageKey)
+        assertEquals("review", content.destination)
+        assertEquals("premium_checkin_overdue", content.analyticsType)
+        assertEquals(listOf("$103.85", "$450.00"), content.messageArgs)
+    }
+
+    @Test
     fun `premium check-in notification opens review with premium proof points`() {
         val content = useCase.execute(
             plan = plan(),

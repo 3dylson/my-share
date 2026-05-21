@@ -74,6 +74,7 @@
     <string name="onboarding_trajectory_goal_subtitle">At this pace, \"%1$s\" has a clear path.</string>
     <string name="onboarding_trajectory_footer">Keep this plan free, or let Premium guide the next move after each review.</string>
     <string name="onboarding_trajectory_button">See my Premium plan</string>
+    <string name="onboarding_trajectory_free_button">Keep free plan</string>
     <string name="onboarding_trajectory_premium_bridge_label">Premium preview</string>
     <string name="onboarding_trajectory_premium_bridge_title">Turn reviews into the next move</string>
     <string name="onboarding_trajectory_premium_bridge_body">Premium watches your %1$s weekly guide and shows whether %2$s toward %3$s should change next payday.</string>
@@ -114,6 +115,8 @@
 
     <!-- Home: Review Tab -->
     <string name="home_review_streak_label">Current Streak</string>
+    <string name="home_review_paycycle_consistency_label">Reviewed paydays</string>
+    <string name="home_review_paycycle_consistency_count">%1$d in a row</string>
 
     <!-- Home: More Tab -->
     <string name="more_app_name" translatable="false">My Share</string>
@@ -223,7 +226,7 @@
     <string name="onboarding_plan_preview_premium_watch_review_label">First review</string>
     <string name="onboarding_plan_preview_premium_watch_review_body">Turn what happened into the next clear move.</string>
     <string name="onboarding_plan_preview_default_goal">your goal</string>
-    <string name="onboarding_plan_preview_button_secure">Continue to account setup</string>
+    <string name="onboarding_plan_preview_button_secure">Save my plan</string>
     <string name="onboarding_plan_preview_button_basic">I’ll do it manually</string>
     <string name="onboarding_plan_preview_button_tune">Tune payday split</string>
 
@@ -254,7 +257,7 @@
     <string name="premium_gate_review_title">See full review history</string>
     <string name="premium_gate_review_body">Premium keeps your full performance timeline visible so you can spot spending patterns over time.</string>
     <string name="premium_gate_first_review_title">Turn the first review into your next move</string>
-    <string name="premium_gate_first_review_body">Start Premium to compare each payday with your guide, catch drift early, and see the adjustment to make before the next payday.</string>
+    <string name="premium_gate_first_review_body">Save what happened this payday. Premium turns it into the exact guide to use before the next one.</string>
     <string name="premium_gate_first_review_body_progress_loop">Start Premium to keep a simple review loop: save what happened, see the pattern, and begin the next payday with a clearer move.</string>
     <string name="premium_gate_automation_title">See what to change next payday</string>
     <string name="premium_gate_automation_body">Premium compares reviews with your weekly guide and shows what to change before the next payday.</string>
@@ -273,6 +276,7 @@
     <string name="onboarding_signup_feature_privacy_body">Start now without signing in.</string>
     <string name="onboarding_signup_local_note">Google is optional. Device-only mode keeps this plan here until you connect an account.</string>
     <string name="onboarding_goal_picker_label_name">Goal name</string>
+    <string name="onboarding_goal_picker_action">Choose this goal</string>
     <string name="onboarding_goal_picker_placeholder_name">Emergency fund</string>
     <string name="onboarding_goal_picker_label_amount">Target amount</string>
     <string name="onboarding_goal_picker_error_name">Enter a goal name.</string>
@@ -280,6 +284,7 @@
     <string name="onboarding_goal_picker_error_amount_positive">Target amount must be greater than zero.</string>
     <string name="onboarding_customize_goal">Customize your goal</string>
     <string name="onboarding_salary_label_amount">Net income per payday</string>
+    <string name="onboarding_salary_action">Use this income</string>
     <string name="onboarding_salary_frequency_title">Payday frequency</string>
     <string name="onboarding_salary_frequency_monthly_desc">Paid once per month.</string>
     <string name="onboarding_salary_frequency_biweekly_desc">Paid every two weeks.</string>
@@ -296,6 +301,7 @@
     <string name="onboarding_salary_error_payday_range">Use a payday day from 1 to 28.</string>
     <string name="onboarding_salary_error_next_date_required">Enter the next payday date.</string>
     <string name="onboarding_fixed_costs_label_amount">Monthly essentials</string>
+    <string name="onboarding_fixed_costs_action">Protect these essentials</string>
     <string name="onboarding_fixed_costs_error_required">Enter monthly fixed costs. Use 0 if none.</string>
     <string name="onboarding_fixed_costs_error_negative">Fixed costs cannot be negative.</string>
     <string name="onboarding_fixed_costs_error_exceeds_income">Fixed costs exceed your payday income. Lower fixed costs or increase income.</string>
@@ -304,8 +310,8 @@
     <string name="onboarding_fixed_costs_protection_amount">%1$s protected first</string>
     <string name="onboarding_fixed_costs_protection_amount_body">My Share will reserve this before shaping the rest of your payday plan.</string>
     <string name="onboarding_fixed_costs_remaining_label">Remaining for this plan</string>
-    <string name="onboarding_fixed_costs_automation_title">Premium keeps payday rules working together</string>
-    <string name="onboarding_fixed_costs_automation_body">Premium can keep savings, investing, debt, buffers, and goals working together after each review.</string>
+    <string name="onboarding_fixed_costs_automation_title">Reviews can keep this aligned later</string>
+    <string name="onboarding_fixed_costs_automation_body">Start with today’s clear split. After payday, a quick review can show whether savings, debt, buffers, or goals should change next.</string>
     <string name="onboarding_fixed_costs_preset_title">Choose your guardrail</string>
     <string name="onboarding_fixed_costs_preset_conservative">Strict</string>
     <string name="onboarding_fixed_costs_preset_conservative_desc">Keep extra cushion around bills before funding goals.</string>
@@ -314,6 +320,8 @@
     <string name="onboarding_fixed_costs_preset_growth">Goal-forward</string>
     <string name="onboarding_fixed_costs_preset_growth_desc">Push more of the remaining money toward goals.</string>
     <string name="onboarding_fixed_costs_strategy_title">Tell the rest where to go</string>
+    <string name="onboarding_strategy_default_label">Default strategy</string>
+    <string name="onboarding_strategy_adjust_action">Adjust strategy</string>
     <string name="onboarding_strategy_balanced_savings">Balanced savings</string>
     <string name="onboarding_strategy_balanced_savings_desc">Keep a savings goal while leaving room for life.</string>
     <string name="onboarding_strategy_no_savings">No savings for now</string>
@@ -382,6 +390,25 @@
     <string name="home_plan_label_income">Income per payday</string>
     <string name="home_plan_label_weekly">Weekly guide</string>
     <string name="home_plan_allocation_title">Allocation preview</string>
+    <string name="home_plan_readiness_label">Payday readiness</string>
+    <string name="home_plan_readiness_title_ready">Ready for payday</string>
+    <string name="home_plan_readiness_title_almost_ready">Almost ready</string>
+    <string name="home_plan_readiness_title_needs_attention">Needs attention</string>
+    <string name="home_plan_readiness_progress_label">%1$d of %2$d moves ready</string>
+    <string name="home_plan_readiness_mission_bills">Bills</string>
+    <string name="home_plan_readiness_mission_weekly">Weekly</string>
+    <string name="home_plan_readiness_mission_priority">Priority</string>
+    <string name="home_plan_readiness_next_action_ready">Your payday moves are clear. Review after payday so the next plan gets sharper.</string>
+    <string name="home_plan_readiness_next_action_bills">Start by protecting essentials before daily spending.</string>
+    <string name="home_plan_readiness_next_action_weekly">Create a weekly guide so everyday spending has a clear limit.</string>
+    <string name="home_plan_readiness_next_action_priority">Add a priority move when this payday can support a goal, buffer, debt, or investing.</string>
+    <string name="home_plan_payday_cue_title_today">Payday is today</string>
+    <string name="home_plan_payday_cue_title_tomorrow">Payday is tomorrow</string>
+    <string name="home_plan_payday_cue_title_days">%1$d days until payday</string>
+    <string name="home_plan_payday_cue_body_finish_setup">Finish the missing readiness move before money arrives.</string>
+    <string name="home_plan_payday_cue_body_keep_guide">Keep this guide handy so payday starts with a clear plan.</string>
+    <string name="home_plan_payday_cue_body_review">Review this payday while the numbers are still fresh.</string>
+    <string name="home_plan_payday_cue_body_review_premium">Review this payday so Premium can tune the next move.</string>
     <string name="home_plan_label_fixed">Fixed</string>
     <string name="home_plan_label_flexible">Flexible</string>
     <string name="home_plan_label_investing">Investing</string>
@@ -437,7 +464,11 @@
     <string name="home_strategy_goal_preview_premium_label">Premium</string>
     <string name="home_strategy_goal_preview_premium_body">Current goal plus another milestone</string>
     <string name="home_strategy_goal_preview_action">Preview multi-goal plan</string>
-    <string name="home_strategy_goal_locked_hidden_title">%1$d extra Premium goal(s) locked</string>
+    <string name="home_strategy_goal_locked_hidden_title">Extra Premium goals locked: %1$d</string>
+    <plurals name="home_strategy_goal_locked_hidden_title_count">
+        <item quantity="one">%1$d extra Premium goal locked</item>
+        <item quantity="other">%1$d extra Premium goals locked</item>
+    </plurals>
     <string name="home_strategy_goal_locked_hidden_desc">Your saved goals stay safe. Premium unlocks the full stack and splits payday moves across them.</string>
     <string name="home_strategy_rules_title">Automated rules</string>
     <string name="home_strategy_rule_empty_title">Create a rule</string>
@@ -470,7 +501,11 @@
     <string name="home_strategy_rule_preview_premium_label">Premium</string>
     <string name="home_strategy_rule_preview_premium_body">Several rules guided by reviews</string>
     <string name="home_strategy_rule_preview_action">See Premium rules</string>
-    <string name="home_strategy_rule_locked_hidden_title">%1$d extra Premium rule(s) locked</string>
+    <string name="home_strategy_rule_locked_hidden_title">Extra Premium rules locked: %1$d</string>
+    <plurals name="home_strategy_rule_locked_hidden_title_count">
+        <item quantity="one">%1$d extra Premium rule locked</item>
+        <item quantity="other">%1$d extra Premium rules locked</item>
+    </plurals>
     <string name="home_strategy_rule_locked_hidden_desc">Your saved rules stay safe. Premium unlocks every rule and keeps them coordinated after reviews.</string>
     <string name="home_review_performance_title">Payday patterns</string>
     <string name="home_review_score_label">Trust score</string>
@@ -503,7 +538,7 @@
     <string name="home_review_checkin_title_scheduled">Next check-in scheduled</string>
     <string name="home_review_checkin_title_reviewed">This payday is covered</string>
     <string name="home_review_checkin_body_ready">Enter what actually happened below. Premium will compare it with the active guide before suggesting the next change.</string>
-    <string name="home_review_checkin_body_overdue">%1$s was the planned check-in. Premium is waiting on this review before it can adjust your next payday.</string>
+    <string name="home_review_checkin_body_overdue">Still worth reviewing. A quick catch-up from %1$s helps Premium tune the next payday.</string>
     <string name="home_review_checkin_body_scheduled">Premium will check this plan again on %1$s. Keep the reminder on so the next review is easy to remember.</string>
     <string name="home_review_checkin_body_reviewed">This payday has a saved review. Premium will watch the plan again on %1$s.</string>
     <string name="home_review_checkin_reminder_on">Reminder on</string>
@@ -523,7 +558,15 @@
     <string name="home_review_recommendation_current_priority">Priority now</string>
     <string name="home_review_recommendation_next_priority">Next move</string>
     <string name="home_review_recommendation_confidence">%1$d%% confidence</string>
-    <string name="home_review_recommendation_review_count">Based on %1$d review(s)</string>
+    <string name="home_review_recommendation_review_count">Reviews used: %1$d</string>
+    <string name="paywall_recommendation_evidence_single">Based on this payday review. Save more reviews to sharpen the next move.</string>
+    <string name="paywall_recommendation_evidence_multiple">Based on your last %1$d payday reviews.</string>
+    <string name="paywall_recommendation_move_title">Premium found extra room for goals</string>
+    <string name="paywall_recommendation_move_body">This review shows you can keep spending near %1$s and move %2$s more toward goals. Premium can set the next priority move to %3$s.</string>
+    <string name="paywall_recommendation_restore_title">Premium found a safer next guide</string>
+    <string name="paywall_recommendation_restore_body">This review shows the current %1$s flexible guide may be too tight. Premium can raise the next guide to %2$s and keep %3$s for priority moves.</string>
+    <string name="paywall_recommendation_keep_title">Premium can keep this plan on track</string>
+    <string name="paywall_recommendation_keep_body">This review stayed close to the guide. Premium can keep watching %1$s for flexible spending and %2$s for priority moves.</string>
     <string name="home_review_recommendation_apply">Apply adjustment</string>
     <string name="home_review_recommendation_confirm_title">Apply this Premium adjustment?</string>
     <string name="home_review_recommendation_confirm_desc">My Share will update the payday rules behind your next guide. You can review or undo the change right after.</string>
@@ -531,7 +574,7 @@
     <string name="home_review_recommendation_confirm_after">After applying</string>
     <string name="home_review_recommendation_confirm_flexible">Flexible guide</string>
     <string name="home_review_recommendation_confirm_priority">Priority move</string>
-    <string name="home_review_recommendation_confirm_evidence">%1$d%% confidence from %2$d recent review(s).</string>
+    <string name="home_review_recommendation_confirm_evidence">%1$d%% confidence from recent reviews: %2$d.</string>
     <string name="home_review_recommendation_applied_title">Adjustment applied</string>
     <string name="home_review_recommendation_applied_desc">Your next payday rules now match this recommendation. Review the rules if you want to fine-tune any transfer.</string>
     <string name="home_review_recommendation_review_rules">Review rules</string>
@@ -573,6 +616,19 @@
     <string name="home_review_result_priority">Priority</string>
     <string name="home_review_result_review_adjustment">Review adjustment</string>
     <string name="home_review_result_done">Done</string>
+    <string name="home_review_saved_milestone_label">Review saved</string>
+    <string name="home_review_saved_milestone_title">Payday picture updated</string>
+    <string name="home_review_saved_milestone_title_first_cycle">First payday cycle complete</string>
+    <plurals name="home_review_saved_milestone_body">
+        <item quantity="one">Your %1$s review is saved. You now have %2$d reviewed payday.</item>
+        <item quantity="other">Your %1$s review is saved. You now have %2$d reviewed paydays.</item>
+    </plurals>
+    <string name="home_review_saved_milestone_next_move_title">Next move is ready to preview</string>
+    <string name="home_review_saved_milestone_next_move_body">Premium can turn this review into the next payday adjustment.</string>
+    <string name="home_review_saved_milestone_pattern_title">This review still helps</string>
+    <string name="home_review_saved_milestone_pattern_body">Each saved payday makes your plan easier to compare next time.</string>
+    <string name="home_review_saved_milestone_premium_action">See Premium next move</string>
+    <string name="home_review_saved_milestone_done">Keep planning</string>
     <string name="home_review_first_premium_label">First Premium review</string>
     <string name="home_review_first_premium_title_locked">Your first review can unlock the next move</string>
     <string name="home_review_first_premium_title_progress_loop">Build a payday progress loop</string>
@@ -641,7 +697,7 @@
     <string name="home_more_smart_adjustments_next_priority">Next priority</string>
     <string name="home_more_smart_adjustments_signal">Signal</string>
     <string name="home_more_smart_adjustments_evidence">Evidence</string>
-    <string name="home_more_smart_adjustments_evidence_value">%1$d%% / %2$d review(s)</string>
+    <string name="home_more_smart_adjustments_evidence_value">%1$d%% / reviews: %2$d</string>
     <string name="home_more_smart_adjustments_evidence_waiting">Needs reviews</string>
     <string name="home_more_smart_adjustments_direction_move">Move more</string>
     <string name="home_more_smart_adjustments_direction_restore">Restore buffer</string>
@@ -664,7 +720,11 @@
     <string name="home_more_adjustment_memory_flexible">Flexible</string>
     <string name="home_more_adjustment_memory_priority">Priority</string>
     <string name="home_more_adjustment_memory_change">%1$s to %2$s</string>
-    <string name="home_more_adjustment_memory_rules">%1$d rule(s) updated by Premium</string>
+    <string name="home_more_adjustment_memory_rules">Premium-updated rules: %1$d</string>
+    <plurals name="home_more_adjustment_memory_rules_count">
+        <item quantity="one">%1$d rule updated by Premium</item>
+        <item quantity="other">%1$d rules updated by Premium</item>
+    </plurals>
     <string name="home_more_adjustment_memory_history_action">See adjustment history</string>
     <string name="home_more_adjustment_history_title">Adjustment history</string>
     <string name="home_more_adjustment_history_body">See what Premium changed after each check-in, including reversals, so your plan stays easy to trust.</string>
@@ -680,14 +740,22 @@
     <string name="home_premium_checkin_relative_today">Due today</string>
     <string name="home_premium_checkin_relative_tomorrow">Tomorrow</string>
     <string name="home_premium_checkin_relative_in_days">In %1$s days</string>
-    <string name="home_premium_checkin_relative_overdue">%1$s day(s) late</string>
+    <string name="home_premium_checkin_relative_overdue">Days late: %1$s</string>
     <string name="home_more_smart_checkin_turn_reminders_on">Turn reminders on</string>
     <string name="home_more_subscription_title">Premium upgrade</string>
     <string name="home_more_premium_preview_label">Premium payday autopilot</string>
     <string name="home_more_premium_preview_title">Keep the plan improving</string>
-    <string name="home_more_premium_preview_body_with_reviews">Premium can use your %1$d saved review(s) to compare the %2$s weekly guide, protect the %3$s priority move, and suggest the next adjustment.</string>
+    <string name="home_more_premium_preview_body_with_reviews">Premium can use your review count (%1$d) to compare the %2$s weekly guide, protect the %3$s priority move, and suggest the next adjustment.</string>
+    <plurals name="home_more_premium_preview_body_with_reviews_count">
+        <item quantity="one">Premium can use 1 saved review to compare the %2$s weekly guide, protect the %3$s priority move, and suggest the next adjustment.</item>
+        <item quantity="other">Premium can use %1$d saved reviews to compare the %2$s weekly guide, protect the %3$s priority move, and suggest the next adjustment.</item>
+    </plurals>
     <string name="home_more_premium_preview_body_first_review">After your first check-in, Premium can compare the %1$s weekly guide with what happened and protect the %2$s priority move before the next payday.</string>
-    <string name="home_more_premium_preview_body_reviews_generic">Premium can use your %1$d saved review(s) to spot drift and suggest what to adjust before the next payday.</string>
+    <string name="home_more_premium_preview_body_reviews_generic">Premium can use your review count (%1$d) to spot drift and suggest what to adjust before the next payday.</string>
+    <plurals name="home_more_premium_preview_body_reviews_generic_count">
+        <item quantity="one">Premium can use 1 saved review to spot drift and suggest what to adjust before the next payday.</item>
+        <item quantity="other">Premium can use %1$d saved reviews to spot drift and suggest what to adjust before the next payday.</item>
+    </plurals>
     <string name="home_more_premium_preview_body_generic">Premium starts learning after the first review, then turns each payday check-in into the next adjustment.</string>
     <string name="home_more_premium_preview_signal_reviews">Reviews</string>
     <string name="home_more_premium_preview_signal_reviews_ready">%1$d ready</string>
@@ -787,13 +855,15 @@
     <string name="paywall_currency_mismatch_notice">Your plan uses %1$s. Google Play charges in %2$s based on your Play Store region.</string>
     <string name="paywall_autopilot_preview_goal_label">Built for %1$s</string>
     <string name="paywall_autopilot_preview_title">Next adjustment preview</string>
-    <string name="paywall_autopilot_preview_body">Premium starts with your %1$s weekly guide and %2$s priority move, then uses reviews and adjustment memory to guide the next payday.</string>
-    <string name="paywall_autopilot_preview_body_without_priority">Premium starts with your %1$s weekly guide, then uses reviews and adjustment memory to guide the next payday.</string>
-    <string name="paywall_autopilot_preview_body_generic">Premium starts with the plan you built, then uses reviews and adjustment memory to guide the next payday.</string>
+    <string name="paywall_autopilot_preview_body">After your review, Premium shows whether to keep your %1$s weekly guide or adjust the %2$s priority move before next payday.</string>
+    <string name="paywall_autopilot_preview_body_without_priority">After your review, Premium shows whether to keep your %1$s weekly guide or adjust it before next payday.</string>
+    <string name="paywall_autopilot_preview_body_generic">After your review, Premium turns the plan you built into the next payday guide.</string>
     <string name="paywall_autopilot_recommendation_title">What Premium will watch</string>
     <string name="paywall_autopilot_recommendation_body">If %1$s is left over, Premium can suggest moving it to %2$s while keeping %3$s/week safe.</string>
     <string name="paywall_autopilot_recommendation_body_without_priority">Premium watches your %1$s weekly guide and shows what to tighten or relax before next payday.</string>
     <string name="paywall_autopilot_recommendation_body_generic">After each review, Premium remembers what changed and shows what to adjust before next payday.</string>
+    <string name="paywall_recommendation_preview_label">Ready from your review</string>
+    <string name="paywall_unlock_next_move_button">Unlock this next move</string>
     <string name="paywall_autopilot_preview_free_label">Free plan</string>
     <string name="paywall_autopilot_preview_free_body">Follow this split manually.</string>
     <string name="paywall_autopilot_preview_premium_body">Reviews become next moves.</string>
@@ -847,6 +917,7 @@
     <string name="paywall_subhead_brazil">Monthly is highlighted first so you can test review-powered guidance before committing.</string>
     <string name="paywall_headline_default">Make this your payday system</string>
     <string name="paywall_subhead_default">Try the first cycle free. Premium watches each review, remembers changes, and shows the next payday move.</string>
+    <string name="paywall_subhead_no_trial">Premium watches each review, remembers changes, and shows the next payday move before you spend again.</string>
     <string name="paywall_headline_review_momentum">Let every payday review pay off</string>
     <string name="paywall_subhead_review_momentum">Try the first cycle free. Premium turns each quick check-in into one clear move for the next payday.</string>
 
@@ -882,6 +953,8 @@
 
     <string name="notification_payday_title">Your Payday Mission</string>
     <string name="notification_payday_body">Secure %1$s for bills and set aside %3$s. You have %2$s for safe spending.</string>
+    <string name="notification_payday_review_due_title">Payday is ready to review</string>
+    <string name="notification_payday_review_due_body">Check what happened while your %1$s weekly guide is still fresh.</string>
     <string name="notification_weekly_review_title">Quick weekly review</string>
     <string name="notification_weekly_review_body">Check if your %1$s weekly guide still feels right.</string>
     <string name="notification_premium_checkin_due_title">Your Premium check-in is ready</string>

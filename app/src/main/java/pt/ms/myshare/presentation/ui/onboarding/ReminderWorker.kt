@@ -93,10 +93,24 @@ class ReminderWorker(
         if (premiumNotificationType != null) return premiumNotificationType
 
         return when (cadence) {
-            ReminderCadence.PAYDAY -> ReminderNotificationType.PAYDAY_ACTION.takeIf { isPayday(plan, today) }
+            ReminderCadence.PAYDAY -> resolvePaydayReminderType(plan, today)
             ReminderCadence.WEEKLY_REVIEW -> ReminderNotificationType.WEEKLY_REVIEW.takeIf {
                 today.dayOfWeek == DayOfWeek.SUNDAY
             }
+        }
+    }
+
+    private fun resolvePaydayReminderType(
+        plan: pt.ms.myshare.domain.model.SalaryPlan,
+        today: LocalDate
+    ): ReminderNotificationType? {
+        if (!isPayday(plan, today)) return null
+
+        val latestReviewDate = plannerRepository.loadLatestReview()?.let { it.paydayDate ?: it.createdAt }
+        return if (latestReviewDate == today) {
+            ReminderNotificationType.PAYDAY_ACTION
+        } else {
+            ReminderNotificationType.PAYDAY_REVIEW_DUE
         }
     }
 

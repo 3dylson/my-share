@@ -64,6 +64,7 @@
     <string name="onboarding_trajectory_goal_subtitle">A este ritmo, \&quot;%1$s\&quot; tiene un camino claro.</string>
     <string name="onboarding_trajectory_footer">Mantén este plan gratis o deja que Premium guíe el próximo paso tras cada revisión.</string>
     <string name="onboarding_trajectory_button">Ver mi plan Premium</string>
+    <string name="onboarding_trajectory_free_button">Mantener plan gratis</string>
     <string name="onboarding_trajectory_premium_bridge_label">Vista Premium</string>
     <string name="onboarding_trajectory_premium_bridge_title">Convierte revisiones en el próximo movimiento</string>
     <string name="onboarding_trajectory_premium_bridge_body">Premium vigila tu guía semanal de %1$s y muestra si los %2$s hacia %3$s deberían cambiar en el próximo cobro.</string>
@@ -94,6 +95,8 @@
     <string name="home_coach_marks_next">Siguiente</string>
     <string name="home_coach_marks_done">Listo</string>
     <string name="home_review_streak_label">Racha actual</string>
+    <string name="home_review_paycycle_consistency_label">Cobros revisados</string>
+    <string name="home_review_paycycle_consistency_count">%1$d seguidos</string>
     <string name="more_app_name" translatable="false">My Share</string>
     <string name="goal_add_delete_confirm_title">Eliminar objetivo</string>
     <string name="goal_add_delete_confirm_msg">¿Está seguro de que desea eliminar este hito financiero? Esta acción no se puede deshacer.</string>
@@ -187,7 +190,7 @@
     <string name="onboarding_plan_preview_premium_watch_review_label">Primera revisión</string>
     <string name="onboarding_plan_preview_premium_watch_review_body">Convierte lo que pasó en el próximo paso claro.</string>
     <string name="onboarding_plan_preview_default_goal">tu objetivo</string>
-    <string name="onboarding_plan_preview_button_secure">Continuar a configurar la cuenta</string>
+    <string name="onboarding_plan_preview_button_secure">Guardar mi plan</string>
     <string name="onboarding_plan_preview_button_basic">lo haré manualmente</string>
     <string name="onboarding_plan_preview_button_tune">Ajustar división del cobro</string>
     <string name="paywall_close_content_description">Cerrar</string>
@@ -214,7 +217,7 @@
     <string name="premium_gate_review_title">Ver historial completo de reseñas</string>
     <string name="premium_gate_review_body">Premium mantiene visible su cronograma de desempeño completo para que pueda detectar patrones de gasto a lo largo del tiempo.</string>
     <string name="premium_gate_first_review_title">Convierte la primera revisión en tu próximo movimiento</string>
-    <string name="premium_gate_first_review_body">Inicia Premium para comparar cada cobro con tu guía, detectar desvíos pronto y ver el ajuste antes del próximo cobro.</string>
+    <string name="premium_gate_first_review_body">Guarda lo que pasó en este cobro. Premium lo convierte en la guía exacta para usar antes del próximo.</string>
     <string name="premium_gate_first_review_body_progress_loop">Inicia Premium para mantener un ciclo simple: guarda lo ocurrido, mira el patrón y empieza el próximo cobro con un paso más claro.</string>
     <string name="premium_gate_automation_title">Ve qué cambiar en el próximo cobro</string>
     <string name="premium_gate_automation_body">Premium compara las revisiones con tu guía semanal y muestra qué cambiar antes del próximo cobro.</string>
@@ -232,6 +235,7 @@
     <string name="onboarding_signup_feature_privacy_body">Empieza ahora sin iniciar sesión.</string>
     <string name="onboarding_signup_local_note">Google es opcional. El modo solo en este dispositivo mantiene el plan aquí hasta que conectes una cuenta.</string>
     <string name="onboarding_goal_picker_label_name">Nombre del objetivo</string>
+    <string name="onboarding_goal_picker_action">Elegir este objetivo</string>
     <string name="onboarding_goal_picker_placeholder_name">Fondo de emergencia</string>
     <string name="onboarding_goal_picker_label_amount">Cantidad objetivo</string>
     <string name="onboarding_goal_picker_error_name">Ingrese un nombre de objetivo.</string>
@@ -239,6 +243,7 @@
     <string name="onboarding_goal_picker_error_amount_positive">El importe objetivo debe ser mayor que cero.</string>
     <string name="onboarding_customize_goal">Personaliza tu objetivo</string>
     <string name="onboarding_salary_label_amount">Ingresos netos por día de pago</string>
+    <string name="onboarding_salary_action">Usar este ingreso</string>
     <string name="onboarding_salary_frequency_title">Frecuencia del día de pago</string>
     <string name="onboarding_salary_frequency_monthly_desc">Pagado una vez al mes.</string>
     <string name="onboarding_salary_frequency_biweekly_desc">Pagado cada dos semanas.</string>
@@ -255,6 +260,7 @@
     <string name="onboarding_salary_error_payday_range">Utilice un día de pago del 1 al 28.</string>
     <string name="onboarding_salary_error_next_date_required">Ingrese la fecha del próximo día de pago.</string>
     <string name="onboarding_fixed_costs_label_amount">Esenciales mensuales</string>
+    <string name="onboarding_fixed_costs_action">Proteger estos esenciales</string>
     <string name="onboarding_fixed_costs_error_required">Ingrese los costos fijos mensuales. Utilice 0 si no hay ninguno.</string>
     <string name="onboarding_fixed_costs_error_negative">Los costos fijos no pueden ser negativos.</string>
     <string name="onboarding_fixed_costs_error_exceeds_income">Los costos fijos exceden sus ingresos del día de pago. Reducir los costos fijos o aumentar los ingresos.</string>
@@ -263,8 +269,8 @@
     <string name="onboarding_fixed_costs_protection_amount">%1$s protegidos primero</string>
     <string name="onboarding_fixed_costs_protection_amount_body">My Share reserva esto antes de dar forma al resto de tu plan de cobro.</string>
     <string name="onboarding_fixed_costs_remaining_label">Restante para este plan</string>
-    <string name="onboarding_fixed_costs_automation_title">Premium coordina la mezcla de reglas</string>
-    <string name="onboarding_fixed_costs_automation_body">Premium puede mantener ahorro, inversión, deuda, colchones y metas trabajando juntos tras cada revisión.</string>
+    <string name="onboarding_fixed_costs_automation_title">Las revisiones pueden mantenerlo alineado después</string>
+    <string name="onboarding_fixed_costs_automation_body">Empieza con la división clara de hoy. Después del cobro, una revisión rápida puede mostrar si ahorro, deuda, colchones o metas deben cambiar.</string>
     <string name="onboarding_fixed_costs_preset_title">Elige tu límite de seguridad</string>
     <string name="onboarding_fixed_costs_preset_conservative">Estricto</string>
     <string name="onboarding_fixed_costs_preset_conservative_desc">Deja más colchón para facturas antes de financiar metas.</string>
@@ -273,6 +279,8 @@
     <string name="onboarding_fixed_costs_preset_growth">Orientado a metas</string>
     <string name="onboarding_fixed_costs_preset_growth_desc">Mueve más del dinero restante hacia metas.</string>
     <string name="onboarding_fixed_costs_strategy_title">Dile al resto adónde ir</string>
+    <string name="onboarding_strategy_default_label">Estrategia predeterminada</string>
+    <string name="onboarding_strategy_adjust_action">Ajustar estrategia</string>
     <string name="onboarding_strategy_balanced_savings">Ahorro equilibrado</string>
     <string name="onboarding_strategy_balanced_savings_desc">Mantén una meta de ahorro sin apretar la vida diaria.</string>
     <string name="onboarding_strategy_no_savings">Sin ahorro por ahora</string>
@@ -332,6 +340,25 @@
     <string name="home_plan_label_income">Ingresos por día de pago</string>
     <string name="home_plan_label_weekly">guía semanal</string>
     <string name="home_plan_allocation_title">Vista previa de asignación</string>
+    <string name="home_plan_readiness_label">Preparación del cobro</string>
+    <string name="home_plan_readiness_title_ready">Listo para el cobro</string>
+    <string name="home_plan_readiness_title_almost_ready">Casi listo</string>
+    <string name="home_plan_readiness_title_needs_attention">Necesita atención</string>
+    <string name="home_plan_readiness_progress_label">%1$d de %2$d movimientos listos</string>
+    <string name="home_plan_readiness_mission_bills">Facturas</string>
+    <string name="home_plan_readiness_mission_weekly">Semanal</string>
+    <string name="home_plan_readiness_mission_priority">Prioridad</string>
+    <string name="home_plan_readiness_next_action_ready">Tus movimientos del cobro están claros. Revisa después del cobro para afinar el próximo plan.</string>
+    <string name="home_plan_readiness_next_action_bills">Empieza protegiendo lo esencial antes del gasto diario.</string>
+    <string name="home_plan_readiness_next_action_weekly">Crea una guía semanal para que el gasto cotidiano tenga un límite claro.</string>
+    <string name="home_plan_readiness_next_action_priority">Añade un movimiento prioritario cuando este cobro pueda apoyar una meta, colchón, deuda o inversión.</string>
+    <string name="home_plan_payday_cue_title_today">El cobro es hoy</string>
+    <string name="home_plan_payday_cue_title_tomorrow">El cobro es mañana</string>
+    <string name="home_plan_payday_cue_title_days">Faltan %1$d días para el cobro</string>
+    <string name="home_plan_payday_cue_body_finish_setup">Termina el movimiento de preparación pendiente antes de que llegue el dinero.</string>
+    <string name="home_plan_payday_cue_body_keep_guide">Ten esta guía a mano para empezar el cobro con un plan claro.</string>
+    <string name="home_plan_payday_cue_body_review">Revisa este cobro mientras los números siguen frescos.</string>
+    <string name="home_plan_payday_cue_body_review_premium">Revisa este cobro para que Premium ajuste el próximo movimiento.</string>
     <string name="home_plan_label_fixed">Fijo</string>
     <string name="home_plan_label_flexible">Flexibles</string>
     <string name="home_plan_label_investing">Invertir</string>
@@ -386,7 +413,11 @@
     <string name="home_strategy_goal_preview_premium_label">De pago</string>
     <string name="home_strategy_goal_preview_premium_body">Meta actual más otro hito</string>
     <string name="home_strategy_goal_preview_action">Ver plan multimetas</string>
-    <string name="home_strategy_goal_locked_hidden_title">%1$d meta(s) Premium extra bloqueadas</string>
+    <string name="home_strategy_goal_locked_hidden_title">Metas Premium bloqueadas: %1$d</string>
+    <plurals name="home_strategy_goal_locked_hidden_title_count">
+        <item quantity="one">%1$d meta Premium extra bloqueada</item>
+        <item quantity="other">%1$d metas Premium extra bloqueadas</item>
+    </plurals>
     <string name="home_strategy_goal_locked_hidden_desc">Tus metas guardadas siguen seguras. Premium desbloquea toda la lista y reparte los movimientos de cobro entre ellas.</string>
     <string name="home_strategy_rules_title">Reglas automatizadas</string>
     <string name="home_strategy_rule_empty_title">Crear una regla</string>
@@ -419,7 +450,11 @@
     <string name="home_strategy_rule_preview_premium_label">Premium adaptable</string>
     <string name="home_strategy_rule_preview_premium_body">Varias reglas que aprenden de las revisiones</string>
     <string name="home_strategy_rule_preview_action">Ver reglas adaptables</string>
-    <string name="home_strategy_rule_locked_hidden_title">%1$d regla(s) Premium extra bloqueadas</string>
+    <string name="home_strategy_rule_locked_hidden_title">Reglas Premium bloqueadas: %1$d</string>
+    <plurals name="home_strategy_rule_locked_hidden_title_count">
+        <item quantity="one">%1$d regla Premium extra bloqueada</item>
+        <item quantity="other">%1$d reglas Premium extra bloqueadas</item>
+    </plurals>
     <string name="home_strategy_rule_locked_hidden_desc">Tus reglas guardadas siguen seguras. Premium desbloquea todas las reglas y las mantiene coordinadas después de las revisiones.</string>
     <string name="home_review_performance_title">Patrones de cobro</string>
     <string name="home_review_score_label">Puntuación de confianza</string>
@@ -452,7 +487,7 @@
     <string name="home_review_checkin_title_scheduled">Próximo check-in programado</string>
     <string name="home_review_checkin_title_reviewed">Este día de pago está cubierto</string>
     <string name="home_review_checkin_body_ready">Introduce abajo lo que ocurrió. Premium lo comparará con la guía activa antes de sugerir el próximo cambio.</string>
-    <string name="home_review_checkin_body_overdue">%1$s era el check-in previsto. Premium está esperando esta revisión antes de ajustar tu próximo cobro.</string>
+    <string name="home_review_checkin_body_overdue">Todavía vale la pena revisar. Una puesta al día rápida de %1$s ayuda a Premium a ajustar el próximo cobro.</string>
     <string name="home_review_checkin_body_scheduled">Premium revisará este plan otra vez el %1$s. Mantén el recordatorio activo para recordar fácilmente la próxima revisión.</string>
     <string name="home_review_checkin_body_reviewed">Este día de pago ya tiene una revisión guardada. Premium volverá a observar el plan el %1$s.</string>
     <string name="home_review_checkin_reminder_on">Recordatorio activo</string>
@@ -473,6 +508,14 @@
     <string name="home_review_recommendation_next_priority">Próximo movimiento</string>
     <string name="home_review_recommendation_confidence">%1$d%% de confianza</string>
     <string name="home_review_recommendation_review_count">Basado en %1$d revisión(es)</string>
+    <string name="paywall_recommendation_evidence_single">Basado en esta revisión de cobro. Guarda más revisiones para afinar el próximo movimiento.</string>
+    <string name="paywall_recommendation_evidence_multiple">Basado en tus últimas %1$d revisiones de cobro.</string>
+    <string name="paywall_recommendation_move_title">Premium encontró margen extra para objetivos</string>
+    <string name="paywall_recommendation_move_body">Esta revisión muestra que puedes mantener el gasto cerca de %1$s y mover %2$s más a objetivos. Premium puede fijar el próximo movimiento prioritario en %3$s.</string>
+    <string name="paywall_recommendation_restore_title">Premium encontró una próxima guía más segura</string>
+    <string name="paywall_recommendation_restore_body">Esta revisión muestra que la guía flexible actual de %1$s puede estar demasiado ajustada. Premium puede subir la próxima guía a %2$s y mantener %3$s para movimientos prioritarios.</string>
+    <string name="paywall_recommendation_keep_title">Premium puede mantener este plan encaminado</string>
+    <string name="paywall_recommendation_keep_body">Esta revisión se mantuvo cerca de la guía. Premium puede seguir vigilando %1$s para gasto flexible y %2$s para movimientos prioritarios.</string>
     <string name="home_review_recommendation_apply">Aplicar ajuste</string>
     <string name="home_review_recommendation_confirm_title">¿Aplicar este ajuste Premium?</string>
     <string name="home_review_recommendation_confirm_desc">My Share actualizará las reglas de cobro detrás de tu próxima guía. Podrás revisar o deshacer el cambio justo después.</string>
@@ -502,7 +545,7 @@
     <string name="home_review_momentum_headline_streaking">Tu racha de revisiones está funcionando</string>
     <string name="home_review_momentum_body">Faltan %1$d para llegar a %2$d revisiones. Más revisiones ayudan a Premium a detectar antes el próximo paso del cobro.</string>
     <string name="home_review_momentum_reviews">%1$d revisiones</string>
-    <string name="home_review_momentum_streak">Racha de %1$d día(s)</string>
+    <string name="home_review_momentum_streak">Racha: %1$d</string>
     <string name="home_review_momentum_next">Meta de %1$d revisiones</string>
     <string name="home_review_result_label">Revisión Premium</string>
     <string name="home_review_result_title">Revisión guardada</string>
@@ -522,6 +565,19 @@
     <string name="home_review_result_priority">Prioridad</string>
     <string name="home_review_result_review_adjustment">Revisar ajuste</string>
     <string name="home_review_result_done">Listo</string>
+    <string name="home_review_saved_milestone_label">Revisión guardada</string>
+    <string name="home_review_saved_milestone_title">Panorama de cobro actualizado</string>
+    <string name="home_review_saved_milestone_title_first_cycle">Primer ciclo de cobro completo</string>
+    <plurals name="home_review_saved_milestone_body">
+        <item quantity="one">La revisión de %1$s está guardada. Ahora tienes %2$d cobro revisado.</item>
+        <item quantity="other">La revisión de %1$s está guardada. Ahora tienes %2$d cobros revisados.</item>
+    </plurals>
+    <string name="home_review_saved_milestone_next_move_title">El próximo movimiento está listo para previsualizar</string>
+    <string name="home_review_saved_milestone_next_move_body">Premium puede convertir esta revisión en el próximo ajuste de cobro.</string>
+    <string name="home_review_saved_milestone_pattern_title">Esta revisión sigue ayudando</string>
+    <string name="home_review_saved_milestone_pattern_body">Cada cobro guardado hace que el próximo plan sea más fácil de comparar.</string>
+    <string name="home_review_saved_milestone_premium_action">Ver próximo movimiento Premium</string>
+    <string name="home_review_saved_milestone_done">Seguir planificando</string>
     <string name="home_review_first_premium_label">Primera revisión Premium</string>
     <string name="home_review_first_premium_title_locked">Tu primera revisión puede desbloquear el próximo movimiento</string>
     <string name="home_review_first_premium_title_progress_loop">Crea un ciclo de progreso en cada cobro</string>
@@ -613,7 +669,11 @@
     <string name="home_more_adjustment_memory_flexible">Gasto flexible</string>
     <string name="home_more_adjustment_memory_priority">Prioridad</string>
     <string name="home_more_adjustment_memory_change">%1$s a %2$s</string>
-    <string name="home_more_adjustment_memory_rules">%1$d regla(s) actualizadas por Premium</string>
+    <string name="home_more_adjustment_memory_rules">Reglas actualizadas por Premium: %1$d</string>
+    <plurals name="home_more_adjustment_memory_rules_count">
+        <item quantity="one">%1$d regla actualizada por Premium</item>
+        <item quantity="other">%1$d reglas actualizadas por Premium</item>
+    </plurals>
     <string name="home_more_adjustment_memory_history_action">Ver historial de ajustes</string>
     <string name="home_more_adjustment_history_title">Historial de ajustes</string>
     <string name="home_more_adjustment_history_body">Mira qué cambió Premium después de cada revisión, incluidas las reversiones, para confiar más fácilmente en tu plan.</string>
@@ -629,14 +689,22 @@
     <string name="home_premium_checkin_relative_today">Para hoy</string>
     <string name="home_premium_checkin_relative_tomorrow">Mañana</string>
     <string name="home_premium_checkin_relative_in_days">En %1$s días</string>
-    <string name="home_premium_checkin_relative_overdue">%1$s día(s) tarde</string>
+    <string name="home_premium_checkin_relative_overdue">Días tarde: %1$s</string>
     <string name="home_more_smart_checkin_turn_reminders_on">Activar recordatorios</string>
     <string name="home_more_subscription_title">Mejora de pago</string>
     <string name="home_more_premium_preview_label">Piloto automático de cobro</string>
     <string name="home_more_premium_preview_title">Mantén el plan mejorando</string>
     <string name="home_more_premium_preview_body_with_reviews">Premium puede usar tus %1$d revisiones guardadas para comparar la guía semanal de %2$s, proteger el movimiento prioritario de %3$s y sugerir el próximo ajuste.</string>
+    <plurals name="home_more_premium_preview_body_with_reviews_count">
+        <item quantity="one">Premium puede usar 1 revisión guardada para comparar la guía semanal de %2$s, proteger el movimiento prioritario de %3$s y sugerir el próximo ajuste.</item>
+        <item quantity="other">Premium puede usar %1$d revisiones guardadas para comparar la guía semanal de %2$s, proteger el movimiento prioritario de %3$s y sugerir el próximo ajuste.</item>
+    </plurals>
     <string name="home_more_premium_preview_body_first_review">Después del primer check-in, Premium compara la guía semanal de %1$s con lo que pasó y protege el movimiento prioritario de %2$s antes del próximo cobro.</string>
     <string name="home_more_premium_preview_body_reviews_generic">Premium puede usar tus %1$d revisiones guardadas para detectar desvíos y sugerir qué ajustar antes del próximo cobro.</string>
+    <plurals name="home_more_premium_preview_body_reviews_generic_count">
+        <item quantity="one">Premium puede usar 1 revisión guardada para detectar desvíos y sugerir qué ajustar antes del próximo cobro.</item>
+        <item quantity="other">Premium puede usar %1$d revisiones guardadas para detectar desvíos y sugerir qué ajustar antes del próximo cobro.</item>
+    </plurals>
     <string name="home_more_premium_preview_body_generic">Premium empieza a aprender después de la primera revisión y convierte cada check-in en el próximo ajuste.</string>
     <string name="home_more_premium_preview_signal_reviews">Revisiones</string>
     <string name="home_more_premium_preview_signal_reviews_ready">%1$d listas</string>
@@ -736,13 +804,15 @@
     <string name="paywall_currency_mismatch_notice">Tu plan usa %1$s. Google Play cobra en %2$s según la región de tu Play Store.</string>
     <string name="paywall_autopilot_preview_goal_label">Creado para %1$s</string>
     <string name="paywall_autopilot_preview_title">Vista del próximo ajuste</string>
-    <string name="paywall_autopilot_preview_body">Premium parte de tu guía semanal de %1$s y tu movimiento prioritario de %2$s, y usa revisiones y memoria de ajustes para guiar el próximo cobro.</string>
-    <string name="paywall_autopilot_preview_body_without_priority">Premium parte de tu guía semanal de %1$s y usa revisiones y memoria de ajustes para guiar el próximo cobro.</string>
-    <string name="paywall_autopilot_preview_body_generic">Premium parte del plan que creaste y usa revisiones y memoria de ajustes para guiar el próximo cobro.</string>
+    <string name="paywall_autopilot_preview_body">Después de tu revisión, Premium muestra si debes mantener tu guía semanal de %1$s o ajustar el movimiento prioritario de %2$s antes del próximo cobro.</string>
+    <string name="paywall_autopilot_preview_body_without_priority">Después de tu revisión, Premium muestra si debes mantener tu guía semanal de %1$s o ajustarla antes del próximo cobro.</string>
+    <string name="paywall_autopilot_preview_body_generic">Después de tu revisión, Premium convierte el plan que creaste en la guía del próximo cobro.</string>
     <string name="paywall_autopilot_recommendation_title">Lo que Premium vigilará</string>
     <string name="paywall_autopilot_recommendation_body">Si sobran %1$s, Premium puede sugerir moverlos a %2$s y mantener %3$s/semana seguros.</string>
     <string name="paywall_autopilot_recommendation_body_without_priority">Premium vigila tu guía semanal de %1$s y muestra qué ajustar antes del próximo cobro.</string>
     <string name="paywall_autopilot_recommendation_body_generic">Después de cada revisión, Premium recuerda qué cambió y muestra qué ajustar antes del próximo cobro.</string>
+    <string name="paywall_recommendation_preview_label">Listo desde tu revisión</string>
+    <string name="paywall_unlock_next_move_button">Desbloquear este próximo paso</string>
     <string name="paywall_autopilot_preview_free_label">Plan gratis</string>
     <string name="paywall_autopilot_preview_free_body">Sigue este reparto manualmente.</string>
     <string name="paywall_autopilot_preview_premium_body">Las revisiones se vuelven próximos movimientos.</string>
@@ -789,6 +859,7 @@
     <string name="paywall_subhead_brazil">El mensual aparece primero para que pruebes la guía basada en revisiones antes de comprometerte.</string>
     <string name="paywall_headline_default">Mantén este plan mejorando</string>
     <string name="paywall_subhead_default">Premium vigila cada revisión, recuerda cambios y muestra el próximo movimiento de cobro.</string>
+    <string name="paywall_subhead_no_trial">Premium vigila cada revisión, recuerda cambios y muestra el próximo movimiento de cobro antes de que vuelvas a gastar.</string>
     <string name="paywall_headline_review_momentum">Haz que cada revisión de cobro cuente</string>
     <string name="paywall_subhead_review_momentum">Premium convierte cada revisión rápida en un paso claro para el próximo cobro.</string>
     <string name="insight_review_save_stress_success_headline">Crece la red de seguridad</string>
@@ -818,6 +889,8 @@
     <string name="coaching_first_step_body">¡Buen comienzo con tu primera reseña! Cuanto más inicias sesión, más inteligente se vuelve tu ciclo de hábitos.</string>
     <string name="notification_payday_title">Tu misión de día de pago</string>
     <string name="notification_payday_body">Asegure %1$s para facturas y reserve %3$s. Tienes %2$s para gastar de forma segura.</string>
+    <string name="notification_payday_review_due_title">El cobro está listo para revisar</string>
+    <string name="notification_payday_review_due_body">Comprueba qué pasó mientras tu guía semanal de %1$s sigue fresca.</string>
     <string name="notification_weekly_review_title">Revisión semanal rápida</string>
     <string name="notification_weekly_review_body">Comprueba si tu guía semanal de %1$s todavía se siente bien.</string>
     <string name="notification_premium_checkin_due_title">Tu revisión Premium está lista</string>

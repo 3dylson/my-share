@@ -61,6 +61,28 @@ class PremiumStoreProductSelectorTest {
         assertNull(selected)
     }
 
+    @Test
+    fun `standard product ignores annual free year offer even without Play tags`() {
+        val products = listOf(
+            product(
+                productId = PremiumSubscriptionProducts.ANNUAL_ID,
+                offerId = null,
+                offerTags = emptyList(),
+                freeTrialDays = 365
+            ),
+            product(
+                productId = PremiumSubscriptionProducts.ANNUAL_ID,
+                offerId = null,
+                offerTags = emptyList(),
+                freeTrialDays = 7
+            )
+        )
+
+        val selected = PremiumStoreProductSelector.standardProduct(products, BillingPlan.ANNUAL)
+
+        assertEquals(7, selected?.freeTrialDays)
+    }
+
     private fun product(
         productId: String,
         offerId: String?,

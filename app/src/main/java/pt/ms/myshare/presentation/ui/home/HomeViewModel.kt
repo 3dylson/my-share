@@ -17,6 +17,9 @@ import pt.ms.myshare.domain.model.BillingPurchaseEvent
 import pt.ms.myshare.domain.model.LegacyPremiumGrantStatus
 import pt.ms.myshare.domain.model.PaydayRule
 import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendation
+import pt.ms.myshare.domain.model.PaydayCountdownCue
+import pt.ms.myshare.domain.model.PaydayReadiness
+import pt.ms.myshare.domain.model.PaydayReadinessStatus
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.PremiumCheckInPlan
 import pt.ms.myshare.domain.model.PremiumCheckInStatus
@@ -50,6 +53,8 @@ import pt.ms.myshare.domain.repository.UserPreferencesRepository
 import pt.ms.myshare.domain.use_case.AdjustGoalProgressForReviewCorrectionUseCase
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.CreatePaydayAdjustmentRecommendationUseCase
+import pt.ms.myshare.domain.use_case.CreatePaydayCountdownCueUseCase
+import pt.ms.myshare.domain.use_case.CreatePaydayReadinessUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumCheckInPlanUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumGoalPaydaySplitUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumRulePaydayMixUseCase
@@ -91,6 +96,8 @@ class HomeViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     private val appReviewPromptRepository: AppReviewPromptRepository,
     private val calculatePlanPreviewUseCase: CalculatePlanPreviewUseCase,
+    private val createPaydayCountdownCueUseCase: CreatePaydayCountdownCueUseCase,
+    private val createPaydayReadinessUseCase: CreatePaydayReadinessUseCase,
     private val createPaydayAdjustmentRecommendationUseCase: CreatePaydayAdjustmentRecommendationUseCase,
     private val createPremiumCheckInPlanUseCase: CreatePremiumCheckInPlanUseCase,
     private val createPremiumGoalPaydaySplitUseCase: CreatePremiumGoalPaydaySplitUseCase,
@@ -125,6 +132,9 @@ class HomeViewModel @Inject constructor(
     private var legacyPremiumGrantViewedLogged = false
     private var isFounderOfferBillingFlowPending = false
     private var currentProductConfig = ProductExperienceConfig()
+    private var lastLoggedPaydayReadinessStatus: PaydayReadinessStatus? = null
+    private var lastLoggedPaydayCountdownCueSignature: String? = null
+    private var lastLoggedReviewSavedMilestoneTotalReviews: Int? = null
 
     private var currentPreferences = userPreferencesRepository.loadPreferences()
 
@@ -134,6 +144,44 @@ class HomeViewModel @Inject constructor(
             FirebaseUtils.logEvent(if (enabled) "automation_enabled" else "automation_disabled")
             Timber.tag(TAG).d("Automation toggled: %s", enabled)
         }
+    }
+
+    fun logReviewSavedMilestoneViewed(milestone: ReviewSavedMilestoneState) {
+        if (lastLoggedReviewSavedMilestoneTotalReviews == milestone.totalReviews) return
+
+        lastLoggedReviewSavedMilestoneTotalReviews = milestone.totalReviews
+        FirebaseUtils.logEvent("review_saved_milestone_viewed", android.os.Bundle().apply {
+            putInt("total_reviews", milestone.totalReviews)
+            putString("first_payday_cycle", milestone.isFirstPaydayCycle.toString())
+            putString("has_next_move_preview", milestone.hasPremiumNextMovePreview.toString())
+        })
+        Timber.tag(TAG).d(
+            "Review saved milestone viewed. totalReviews=%d firstCycle=%s hasNextMovePreview=%s",
+            milestone.totalReviews,
+            milestone.isFirstPaydayCycle,
+            milestone.hasPremiumNextMovePreview
+        )
+    }
+
+    fun logReviewSavedMilestonePremiumClicked(milestone: ReviewSavedMilestoneState) {
+        FirebaseUtils.logEvent("review_saved_milestone_premium_cta_tapped", android.os.Bundle().apply {
+            putInt("total_reviews", milestone.totalReviews)
+            putString("first_payday_cycle", milestone.isFirstPaydayCycle.toString())
+            putString("has_next_move_preview", milestone.hasPremiumNextMovePreview.toString())
+        })
+        Timber.tag(TAG).d("Review saved milestone Premium CTA tapped totalReviews=%d", milestone.totalReviews)
+    }
+
+    fun logPaydayCountdownCueReviewTapped(cue: PaydayCountdownCueState) {
+        FirebaseUtils.logEvent("payday_countdown_review_cue_tapped", android.os.Bundle().apply {
+            putLong("days_until_payday", cue.daysUntilPayday)
+            putString("action", cue.action.name.lowercase(Locale.US))
+        })
+        Timber.tag(TAG).d(
+            "Payday countdown review cue tapped. daysUntilPayday=%d action=%s",
+            cue.daysUntilPayday,
+            cue.action
+        )
     }
 
     init {
@@ -402,7 +450,14 @@ class HomeViewModel @Inject constructor(
 
                 val emptyMessage = if (updatedPlan == null) "home_empty_build_plan_first" else null
                 val primaryGoal = goals.firstOrNull()
-                val planCard = updatedPlan?.let { buildPlanCard(it, primaryGoal?.targetAmount ?: BigDecimal.ZERO, preferences) }
+                val planCard = updatedPlan?.let {
+                    buildPlanCard(
+                        plan = it,
+                        goalAmount = primaryGoal?.targetAmount ?: BigDecimal.ZERO,
+                        latestReview = latestReview,
+                        preferences = preferences
+                    )
+                }
                 val goalPaydaySplit = if (isPremium && updatedPlan != null) {
                     val priorityPreview = calculatePlanPreviewUseCase.execute(updatedPlan, BigDecimal.ZERO)
                     createPremiumGoalPaydaySplitUseCase
@@ -521,6 +576,16 @@ class HomeViewModel @Inject constructor(
                 } else {
                     null
                 }
+                val reviewSavedMilestone = latestReview?.let {
+                    ReviewSavedMilestoneState(
+                        savedReviewDateLabel = it.createdAt.format(
+                            DateTimeFormatter.ofPattern("d MMM", preferences.locale)
+                        ),
+                        totalReviews = planner.reviewHistory.size,
+                        isFirstPaydayCycle = planner.reviewHistory.size == 1,
+                        hasPremiumNextMovePreview = paydayRecommendationState != null
+                    )
+                }
                 val recommendationMessageKey = currentState.reviewCard.recommendationMessageKey
                 val moreCard = MoreCardState(
                     reminderEnabled = reminder.enabled,
@@ -594,6 +659,7 @@ class HomeViewModel @Inject constructor(
                     rules = ruleCards,
                     performanceStats = performanceStats,
                     reviewCard = reviewCard.copy(
+                        reviewSavedMilestone = reviewSavedMilestone,
                         premiumReviewResult = premiumReviewResult,
                         coachingSummary = coachingSummary,
                         premiumMomentum = premiumMomentum,
@@ -664,9 +730,16 @@ class HomeViewModel @Inject constructor(
     private fun buildPlanCard(
         plan: pt.ms.myshare.domain.model.SalaryPlan,
         goalAmount: BigDecimal,
+        latestReview: ManualReview?,
         preferences: UserPreferences
     ): HomePlanCardState {
         val preview = calculatePlanPreviewUseCase.execute(plan, goalAmount)
+        val readinessModel = createPaydayReadinessUseCase.execute(preview)
+        logPaydayReadinessIfChanged(readinessModel)
+        val paydayCueModel = createPaydayCountdownCueUseCase.execute(preview, readinessModel, latestReview)
+        logPaydayCountdownCueIfChanged(paydayCueModel)
+        val paydayCue = paydayCueModel.toState()
+        val readiness = readinessModel.toState()
         val currencyFormat = currencyFormat(preferences)
         val dateFormatter = DateTimeFormatter.ofPattern("d MMM", preferences.locale)
         return HomePlanCardState(
@@ -677,8 +750,47 @@ class HomeViewModel @Inject constructor(
             investingLabel = currencyFormat.format(preview.investingPerPayday.add(preview.cryptoPerPayday)),
             weeklySpendLabel = currencyFormat.format(preview.weeklyFlexibleSpend),
             summary = preview.summary,
+            readiness = readiness,
+            paydayCue = paydayCue,
             nextPaydayKey = "home_plan_next_payday",
             nextPaydayArgs = listOf(preview.nextPayday.format(dateFormatter))
+        )
+    }
+
+    private fun logPaydayReadinessIfChanged(readiness: PaydayReadiness) {
+        if (lastLoggedPaydayReadinessStatus == readiness.status) return
+
+        lastLoggedPaydayReadinessStatus = readiness.status
+        FirebaseUtils.logEvent("payday_readiness_viewed", android.os.Bundle().apply {
+            putString("status", readiness.status.name.lowercase(Locale.US))
+            putInt("completed_missions", readiness.completedMissions)
+            putInt("total_missions", readiness.totalMissions)
+            putString("next_action", readiness.nextAction?.name?.lowercase(Locale.US) ?: "none")
+        })
+        Timber.tag(TAG).d(
+            "Payday readiness viewed. status=%s completed=%d total=%d nextAction=%s",
+            readiness.status,
+            readiness.completedMissions,
+            readiness.totalMissions,
+            readiness.nextAction
+        )
+    }
+
+    private fun logPaydayCountdownCueIfChanged(cue: PaydayCountdownCue) {
+        val signature = "${cue.nextPayday}:${cue.daysUntilPayday}:${cue.action}"
+        if (lastLoggedPaydayCountdownCueSignature == signature) return
+
+        lastLoggedPaydayCountdownCueSignature = signature
+        FirebaseUtils.logEvent("payday_countdown_cue_viewed", android.os.Bundle().apply {
+            putLong("days_until_payday", cue.daysUntilPayday)
+            putString("action", cue.action.name.lowercase(Locale.US))
+            putString("next_payday", cue.nextPayday.toString())
+        })
+        Timber.tag(TAG).d(
+            "Payday countdown cue viewed. nextPayday=%s daysUntilPayday=%d action=%s",
+            cue.nextPayday,
+            cue.daysUntilPayday,
+            cue.action
         )
     }
 
@@ -1688,7 +1800,13 @@ class HomeViewModel @Inject constructor(
 
     private fun StoreProduct.isFounderOffer(): Boolean {
         return offerId == PremiumSubscriptionProducts.ANNUAL_FOUNDER_OFFER_ID ||
-            PremiumSubscriptionProducts.FOUNDER_OFFER_TAG in offerTags
+            PremiumSubscriptionProducts.FOUNDER_OFFER_TAG in offerTags ||
+            isLegacyFreeYearOffer()
+    }
+
+    private fun StoreProduct.isLegacyFreeYearOffer(): Boolean {
+        return productId == PremiumSubscriptionProducts.ANNUAL_ID &&
+            (freeTrialDays ?: 0) >= LEGACY_FREE_YEAR_TRIAL_DAYS
     }
 
     private fun List<String>.toTelemetryValue(): String {
@@ -1756,6 +1874,7 @@ class HomeViewModel @Inject constructor(
         return PerformanceStatsState(
             healthScore = healthScore,
             currentStreak = currentStreak,
+            payCycleReviewStreak = payCycleReviewStreak,
             totalFlexSavingsLabel = currencyFormat(currentPreferences).format(totalSavingsBeyondGoal),
             totalSavings = totalSavingsBeyondGoal,
             totalReviews = totalReviews,
@@ -1931,6 +2050,29 @@ class HomeViewModel @Inject constructor(
         )
     }
 
+    private fun PaydayReadiness.toState(): PaydayReadinessState {
+        return PaydayReadinessState(
+            status = status,
+            progress = progress,
+            completedMissions = completedMissions,
+            totalMissions = totalMissions,
+            nextAction = nextAction,
+            missions = missions.map {
+                PaydayReadinessMissionItemState(
+                    mission = it.mission,
+                    isComplete = it.isComplete
+                )
+            }
+        )
+    }
+
+    private fun PaydayCountdownCue.toState(): PaydayCountdownCueState {
+        return PaydayCountdownCueState(
+            daysUntilPayday = daysUntilPayday,
+            action = action
+        )
+    }
+
     private fun PaydayAdjustmentRecommendationState?.toSmartAdjustmentControlState(
         hasPlan: Boolean,
         messageKey: String?
@@ -2004,6 +2146,7 @@ class HomeViewModel @Inject constructor(
         const val SPLIT_VISIBLE_GOAL_COUNT = 3
         const val MIX_VISIBLE_RULE_COUNT = 3
         const val PREMIUM_ADJUSTMENT_HISTORY_LIMIT = 8
+        const val LEGACY_FREE_YEAR_TRIAL_DAYS = 300
     }
 }
 

@@ -49,11 +49,11 @@ class PlannerRepositoryImpl @Inject constructor(
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     private val planState = MutableStateFlow(readPlan())
-    private val ruleState = MutableStateFlow<List<PaydayRule>>(emptyList())
+    private val ruleState = MutableStateFlow(readRules())
 
-    private val goalState = MutableStateFlow<List<Goal>>(emptyList())
+    private val goalState = MutableStateFlow(readGoals())
 
-    private val reviewState = MutableStateFlow<List<ManualReview>>(emptyList())
+    private val reviewState = MutableStateFlow(readReviews())
     private val premiumAdjustmentState = MutableStateFlow<List<PremiumAdjustmentRecord>>(emptyList())
 
     private val reminderState = MutableStateFlow(readReminderConfiguration())
@@ -124,6 +124,8 @@ class PlannerRepositoryImpl @Inject constructor(
             .remove(KEY_CUSTOM_STRATEGY_NAME)
             .remove(KEY_GOAL_NAME)
             .remove(KEY_GOAL_AMOUNT)
+            .remove(KEY_GOALS_V2)
+            .remove(KEY_RULES_V2)
             .remove(KEY_FLEXIBLE_SPEND)
             .remove(KEY_SAVINGS)
             .remove(KEY_INVESTING)
@@ -132,6 +134,7 @@ class PlannerRepositoryImpl @Inject constructor(
             .remove(KEY_REVIEW_FLEXIBLE_SPEND)
             .remove(KEY_REVIEW_GOAL_CONTRIBUTION)
             .remove(KEY_REVIEW_CREATED_AT_EPOCH)
+            .remove(KEY_REVIEWS_V2)
             .remove(KEY_REMINDER_ENABLED)
             .remove(KEY_REMINDER_HOUR)
             .remove(KEY_REMINDER_MINUTE)
@@ -400,6 +403,7 @@ class PlannerRepositoryImpl @Inject constructor(
                 }.getOrNull()
             }
             ruleState.value = rules
+            persistRules(rules)
         } catch (e: Exception) {
             Timber.tag(TAG).e(e, "syncRulesFromFirestore failed")
         }
@@ -427,6 +431,7 @@ class PlannerRepositoryImpl @Inject constructor(
                 }.getOrNull()
             }
             goalState.value = goals
+            persistGoals(goals)
         } catch (e: Exception) {
             Timber.tag(TAG).e(e, "syncGoalsFromFirestore failed")
         }
@@ -449,6 +454,7 @@ class PlannerRepositoryImpl @Inject constructor(
                 }.getOrNull()
             }
             reviewState.value = reviews
+            persistReviews(reviews)
         } catch (e: Exception) {
             Timber.tag(TAG).e(e, "syncReviewsFromFirestore failed")
         }
@@ -503,6 +509,7 @@ class PlannerRepositoryImpl @Inject constructor(
             currentRules.add(rule)
         }
         ruleState.value = currentRules
+        persistRules(currentRules)
 
         val user = firebaseAuth.currentUser ?: return
         coroutineScope.launch {
@@ -524,7 +531,9 @@ class PlannerRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteRule(ruleId: String) {
-        ruleState.value = ruleState.value.filter { it.id != ruleId }
+        val updatedRules = ruleState.value.filter { it.id != ruleId }
+        ruleState.value = updatedRules
+        persistRules(updatedRules)
         val user = firebaseAuth.currentUser ?: return
         coroutineScope.launch {
             try {
@@ -549,6 +558,7 @@ class PlannerRepositoryImpl @Inject constructor(
             currentGoals.add(goal)
         }
         goalState.value = currentGoals
+        persistGoals(currentGoals)
 
         val user = firebaseAuth.currentUser ?: return
         coroutineScope.launch {
@@ -571,7 +581,9 @@ class PlannerRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteGoal(goalId: String) {
-        goalState.value = goalState.value.filter { it.id != goalId }
+        val updatedGoals = goalState.value.filter { it.id != goalId }
+        goalState.value = updatedGoals
+        persistGoals(updatedGoals)
         val user = firebaseAuth.currentUser ?: return
         coroutineScope.launch {
             try {
@@ -601,6 +613,7 @@ class PlannerRepositoryImpl @Inject constructor(
             currentReviews.add(review)
         }
         reviewState.value = currentReviews
+        persistReviews(currentReviews)
     }
 
     override suspend fun updateReview(review: ManualReview) {
@@ -610,7 +623,9 @@ class PlannerRepositoryImpl @Inject constructor(
 
     override suspend fun deleteReview(reviewId: String) {
         Timber.tag(TAG).d("deleteReview id=%s", reviewId)
-        reviewState.value = reviewState.value.filterNot { it.id == reviewId }
+        val updatedReviews = reviewState.value.filterNot { it.id == reviewId }
+        reviewState.value = updatedReviews
+        persistReviews(updatedReviews)
 
         val user = firebaseAuth.currentUser ?: return
         coroutineScope.launch {
@@ -811,6 +826,39 @@ class PlannerRepositoryImpl @Inject constructor(
         )
     }
 
+    private fun readGoals(): List<Goal> =
+        PlannerCollectionPreferenceCodec.decodeGoals(prefs.getString(KEY_GOALS_V2, null))
+
+    private fun persistGoals(goals: List<Goal>) {
+        Timber.tag(TAG).d("Persisting local goals count=%d", goals.size)
+        prefs.edit()
+            .putString(KEY_GOALS_V2, PlannerCollectionPreferenceCodec.encodeGoals(goals))
+            .apply()
+    }
+
+    private fun readRules(): List<PaydayRule> =
+        PlannerCollectionPreferenceCodec.decodeRules(prefs.getString(KEY_RULES_V2, null))
+
+    private fun persistRules(rules: List<PaydayRule>) {
+        Timber.tag(TAG).d("Persisting local rules count=%d", rules.size)
+        prefs.edit()
+            .putString(KEY_RULES_V2, PlannerCollectionPreferenceCodec.encodeRules(rules))
+            .apply()
+    }
+
+    private fun readReviews(): List<ManualReview> {
+        val persistedReviews = PlannerCollectionPreferenceCodec.decodeReviews(prefs.getString(KEY_REVIEWS_V2, null))
+        if (persistedReviews.isNotEmpty()) return persistedReviews
+        return listOfNotNull(readLatestReview())
+    }
+
+    private fun persistReviews(reviews: List<ManualReview>) {
+        Timber.tag(TAG).d("Persisting local reviews count=%d", reviews.size)
+        prefs.edit()
+            .putString(KEY_REVIEWS_V2, PlannerCollectionPreferenceCodec.encodeReviews(reviews))
+            .apply()
+    }
+
 
     private fun readLatestReview(): ManualReview? {
         val actualFlexible = prefs.getString(KEY_REVIEW_FLEXIBLE_SPEND, null)?.toBigDecimalOrNull() ?: return null
@@ -854,6 +902,8 @@ class PlannerRepositoryImpl @Inject constructor(
         const val KEY_CUSTOM_STRATEGY_NAME = "planner_custom_strategy_name"
         const val KEY_GOAL_NAME = "planner_goal_name"
         const val KEY_GOAL_AMOUNT = "planner_goal_amount"
+        const val KEY_GOALS_V2 = "planner_goals_v2"
+        const val KEY_RULES_V2 = "planner_rules_v2"
         const val KEY_FLEXIBLE_SPEND = "planner_flexible_spend"
         const val KEY_SAVINGS = "planner_savings"
         const val KEY_INVESTING = "planner_investing"
@@ -862,6 +912,7 @@ class PlannerRepositoryImpl @Inject constructor(
         const val KEY_REVIEW_FLEXIBLE_SPEND = "planner_review_flexible_spend"
         const val KEY_REVIEW_GOAL_CONTRIBUTION = "planner_review_goal_contribution"
         const val KEY_REVIEW_CREATED_AT_EPOCH = "planner_review_created_at_epoch"
+        const val KEY_REVIEWS_V2 = "planner_reviews_v2"
         const val KEY_REMINDER_ENABLED = "planner_reminder_enabled"
         const val KEY_REMINDER_HOUR = "planner_reminder_hour"
         const val KEY_REMINDER_MINUTE = "planner_reminder_minute"

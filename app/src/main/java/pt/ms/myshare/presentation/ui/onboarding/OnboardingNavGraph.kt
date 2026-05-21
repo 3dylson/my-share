@@ -8,7 +8,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import pt.ms.myshare.BuildConfig
 import androidx.navigation.compose.rememberNavController
 
 @Composable
@@ -35,8 +34,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                 onLanguageSelected = viewModel::updateLanguage,
                 onCurrencySelected = viewModel::updateCurrency,
                 onContinue = { navController.navigate(OnboardingRoute.GoalPicker.route) },
-                // Only wire the dev skip in debug builds; null means the button is hidden
-                onSkipDev = if (BuildConfig.DEBUG) viewModel::skipToHomeWithDefaultPlan else null
+                onSkipDev = null
             )
         }
         composable(OnboardingRoute.GoalPicker.route) {
@@ -180,6 +178,9 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                 onNext = {
                     viewModel.logPaywallViewed()
                     navController.navigate(OnboardingRoute.Paywall.route)
+                },
+                onContinueFree = {
+                    navController.navigate(OnboardingRoute.ReminderSetup.route)
                 }
             )
         }

@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -179,8 +180,9 @@ fun LazyListScope.homeStrategyTab(
         if (!isPremium && goals.size > visibleGoals.size) {
             item {
                 LockedStrategyHiddenItemsCard(
-                    title = stringResource(
-                        R.string.home_strategy_goal_locked_hidden_title,
+                    title = pluralStringResource(
+                        R.plurals.home_strategy_goal_locked_hidden_title_count,
+                        goals.size - visibleGoals.size,
                         goals.size - visibleGoals.size
                     ),
                     body = stringResource(R.string.home_strategy_goal_locked_hidden_desc),
@@ -329,8 +331,9 @@ fun LazyListScope.homeStrategyTab(
         if (!isPremium && rules.size > visibleRules.size) {
             item {
                 LockedStrategyHiddenItemsCard(
-                    title = stringResource(
-                        R.string.home_strategy_rule_locked_hidden_title,
+                    title = pluralStringResource(
+                        R.plurals.home_strategy_rule_locked_hidden_title_count,
+                        rules.size - visibleRules.size,
                         rules.size - visibleRules.size
                     ),
                     body = stringResource(R.string.home_strategy_rule_locked_hidden_desc),

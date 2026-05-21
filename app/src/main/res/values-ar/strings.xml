@@ -64,6 +64,7 @@
     <string name="onboarding_trajectory_goal_subtitle">بهذا الإيقاع، لدى \&quot;%1$s\&quot; مسار واضح.</string>
     <string name="onboarding_trajectory_footer">احتفظ بهذه الخطة مجانًا، أو دع Premium يرشد الخطوة التالية بعد كل مراجعة.</string>
     <string name="onboarding_trajectory_button">عرض خطتي Premium</string>
+    <string name="onboarding_trajectory_free_button">الاحتفاظ بالخطة المجانية</string>
     <string name="onboarding_trajectory_premium_bridge_label">معاينة Premium</string>
     <string name="onboarding_trajectory_premium_bridge_title">حوّل المراجعات إلى الخطوة التالية</string>
     <string name="onboarding_trajectory_premium_bridge_body">يراقب Premium دليلك الأسبوعي %1$s ويعرض هل يجب تغيير %2$s نحو %3$s في الراتب التالي.</string>
@@ -94,6 +95,8 @@
     <string name="home_coach_marks_next">التالي</string>
     <string name="home_coach_marks_done">تم</string>
     <string name="home_review_streak_label">الخط الحالي</string>
+    <string name="home_review_paycycle_consistency_label">أيام دفع تمت مراجعتها</string>
+    <string name="home_review_paycycle_consistency_count">%1$d متتالية</string>
     <string name="more_app_name" translatable="false">My Share</string>
     <string name="goal_add_delete_confirm_title">حذف الهدف</string>
     <string name="goal_add_delete_confirm_msg">هل أنت متأكد أنك تريد إزالة هذا الحدث المالي؟ لا يمكن التراجع عن هذا الإجراء.</string>
@@ -187,7 +190,7 @@
     <string name="onboarding_plan_preview_premium_watch_review_label">أول مراجعة</string>
     <string name="onboarding_plan_preview_premium_watch_review_body">حوّل ما حدث إلى خطوة واضحة تالية.</string>
     <string name="onboarding_plan_preview_default_goal">هدفك</string>
-    <string name="onboarding_plan_preview_button_secure">متابعة إعداد الحساب</string>
+    <string name="onboarding_plan_preview_button_secure">احفظ خطتي</string>
     <string name="onboarding_plan_preview_button_basic">سأفعل ذلك يدويًا</string>
     <string name="onboarding_plan_preview_button_tune">اضبط تقسيم الراتب</string>
     <string name="paywall_close_content_description">إغلاق</string>
@@ -214,7 +217,7 @@
     <string name="premium_gate_review_title">انظر تاريخ المراجعة الكامل</string>
     <string name="premium_gate_review_body">يبقي Premium المخطط الزمني للأداء الكامل مرئيًا حتى تتمكن من اكتشاف أنماط الإنفاق بمرور الوقت.</string>
     <string name="premium_gate_first_review_title">حوّل أول مراجعة إلى خطوتك التالية</string>
-    <string name="premium_gate_first_review_body">ابدأ Premium لمقارنة كل يوم دفع بدليلك، واكتشاف الانحراف مبكرًا، ورؤية التعديل قبل يوم الدفع التالي.</string>
+    <string name="premium_gate_first_review_body">احفظ ما حدث في هذا الراتب. يحوله Premium إلى الدليل الدقيق الذي تستخدمه قبل الراتب التالي.</string>
     <string name="premium_gate_first_review_body_progress_loop">ابدأ Premium للحفاظ على حلقة بسيطة: احفظ ما حدث، شاهد النمط، وابدأ الراتب التالي بخطوة أوضح.</string>
     <string name="premium_gate_automation_title">اعرف ما يجب تغييره في يوم الدفع التالي</string>
     <string name="premium_gate_automation_body">يقارن Premium المراجعات بدليلك الأسبوعي ويعرض ما يجب تغييره قبل يوم الدفع التالي.</string>
@@ -232,6 +235,7 @@
     <string name="onboarding_signup_feature_privacy_body">ابدأ الآن دون تسجيل الدخول.</string>
     <string name="onboarding_signup_local_note">Google اختياري. وضع الجهاز فقط يبقي هذه الخطة هنا حتى تربط حسابًا.</string>
     <string name="onboarding_goal_picker_label_name">اسم الهدف</string>
+    <string name="onboarding_goal_picker_action">اختر هذا الهدف</string>
     <string name="onboarding_goal_picker_placeholder_name">صندوق الطوارئ</string>
     <string name="onboarding_goal_picker_label_amount">المبلغ المستهدف</string>
     <string name="onboarding_goal_picker_error_name">أدخل اسم الهدف.</string>
@@ -239,6 +243,7 @@
     <string name="onboarding_goal_picker_error_amount_positive">يجب أن يكون المبلغ المستهدف أكبر من الصفر.</string>
     <string name="onboarding_customize_goal">تخصيص هدفك</string>
     <string name="onboarding_salary_label_amount">صافي الدخل لكل يوم دفع</string>
+    <string name="onboarding_salary_action">استخدم هذا الدخل</string>
     <string name="onboarding_salary_frequency_title">تردد يوم الدفع</string>
     <string name="onboarding_salary_frequency_monthly_desc">تدفع مرة واحدة شهريا.</string>
     <string name="onboarding_salary_frequency_biweekly_desc">تدفع كل اسبوعين .</string>
@@ -255,6 +260,7 @@
     <string name="onboarding_salary_error_payday_range">استخدم يوم الدفع من 1 إلى 28.</string>
     <string name="onboarding_salary_error_next_date_required">أدخل تاريخ يوم الدفع التالي.</string>
     <string name="onboarding_fixed_costs_label_amount">الأساسيات الشهرية</string>
+    <string name="onboarding_fixed_costs_action">احمِ هذه الأساسيات</string>
     <string name="onboarding_fixed_costs_error_required">أدخل التكاليف الثابتة الشهرية. استخدم 0 إذا لم يكن هناك شيء.</string>
     <string name="onboarding_fixed_costs_error_negative">التكاليف الثابتة لا يمكن أن تكون سلبية.</string>
     <string name="onboarding_fixed_costs_error_exceeds_income">التكاليف الثابتة تتجاوز دخل يوم الدفع الخاص بك. خفض التكاليف الثابتة أو زيادة الدخل.</string>
@@ -263,8 +269,8 @@
     <string name="onboarding_fixed_costs_protection_amount">%1$s محمية أولاً</string>
     <string name="onboarding_fixed_costs_protection_amount_body">سيحجز My Share هذا المبلغ قبل تشكيل بقية خطة يوم الدفع.</string>
     <string name="onboarding_fixed_costs_remaining_label">المتبقي لهذه الخطة</string>
-    <string name="onboarding_fixed_costs_automation_title">ينسّق Premium مزيج القواعد</string>
-    <string name="onboarding_fixed_costs_automation_body">يمكن لـ Premium إبقاء الادخار والاستثمار والديون والاحتياطيات والأهداف تعمل معًا بعد كل مراجعة.</string>
+    <string name="onboarding_fixed_costs_automation_title">يمكن للمراجعات إبقاء هذا منسجمًا لاحقًا</string>
+    <string name="onboarding_fixed_costs_automation_body">ابدأ بتقسيم اليوم الواضح. بعد يوم الدفع، يمكن لمراجعة سريعة أن توضّح إن كان الادخار أو الدين أو الاحتياطي أو الأهداف تحتاج إلى تغيير.</string>
     <string name="onboarding_fixed_costs_preset_title">اختر مستوى الحماية</string>
     <string name="onboarding_fixed_costs_preset_conservative">صارم</string>
     <string name="onboarding_fixed_costs_preset_conservative_desc">اترك هامشاً أكبر للفواتير قبل تمويل الأهداف.</string>
@@ -273,6 +279,8 @@
     <string name="onboarding_fixed_costs_preset_growth">موجّه للأهداف</string>
     <string name="onboarding_fixed_costs_preset_growth_desc">وجّه المزيد من المال المتبقي نحو الأهداف.</string>
     <string name="onboarding_fixed_costs_strategy_title">حدّد أين يذهب الباقي</string>
+    <string name="onboarding_strategy_default_label">الاستراتيجية الافتراضية</string>
+    <string name="onboarding_strategy_adjust_action">تعديل الاستراتيجية</string>
     <string name="onboarding_strategy_balanced_savings">ادخار متوازن</string>
     <string name="onboarding_strategy_balanced_savings_desc">احتفظ بهدف ادخار مع مساحة للحياة اليومية.</string>
     <string name="onboarding_strategy_no_savings">بدون ادخار الآن</string>
@@ -332,6 +340,25 @@
     <string name="home_plan_label_income">الدخل لكل يوم دفع</string>
     <string name="home_plan_label_weekly">الدليل الأسبوعي</string>
     <string name="home_plan_allocation_title">معاينة التخصيص</string>
+    <string name="home_plan_readiness_label">جاهزية يوم الدفع</string>
+    <string name="home_plan_readiness_title_ready">جاهز ليوم الدفع</string>
+    <string name="home_plan_readiness_title_almost_ready">جاهز تقريبًا</string>
+    <string name="home_plan_readiness_title_needs_attention">يحتاج إلى انتباه</string>
+    <string name="home_plan_readiness_progress_label">%1$d من %2$d خطوات جاهزة</string>
+    <string name="home_plan_readiness_mission_bills">الفواتير</string>
+    <string name="home_plan_readiness_mission_weekly">أسبوعي</string>
+    <string name="home_plan_readiness_mission_priority">الأولوية</string>
+    <string name="home_plan_readiness_next_action_ready">خطوات يوم الدفع واضحة. راجع بعد يوم الدفع حتى تصبح الخطة التالية أدق.</string>
+    <string name="home_plan_readiness_next_action_bills">ابدأ بحماية الضروريات قبل المصروف اليومي.</string>
+    <string name="home_plan_readiness_next_action_weekly">أنشئ دليلًا أسبوعيًا حتى يكون للإنفاق اليومي حد واضح.</string>
+    <string name="home_plan_readiness_next_action_priority">أضف خطوة أولوية عندما يستطيع هذا الدفع دعم هدف أو احتياطي أو دين أو استثمار.</string>
+    <string name="home_plan_payday_cue_title_today">يوم الدفع هو اليوم</string>
+    <string name="home_plan_payday_cue_title_tomorrow">يوم الدفع غدًا</string>
+    <string name="home_plan_payday_cue_title_days">بقي %1$d أيام على يوم الدفع</string>
+    <string name="home_plan_payday_cue_body_finish_setup">أكمل خطوة الجاهزية الناقصة قبل وصول المال.</string>
+    <string name="home_plan_payday_cue_body_keep_guide">احتفظ بهذا الدليل قريبًا حتى يبدأ يوم الدفع بخطة واضحة.</string>
+    <string name="home_plan_payday_cue_body_review">راجع يوم الدفع هذا بينما الأرقام ما زالت واضحة.</string>
+    <string name="home_plan_payday_cue_body_review_premium">راجع يوم الدفع هذا حتى يستطيع Premium ضبط الخطوة التالية.</string>
     <string name="home_plan_label_fixed">ثابت</string>
     <string name="home_plan_label_flexible">مرنة</string>
     <string name="home_plan_label_investing">الاستثمار</string>
@@ -387,6 +414,10 @@
     <string name="home_strategy_goal_preview_premium_body">الهدف الحالي ومعلم آخر</string>
     <string name="home_strategy_goal_preview_action">معاينة خطة متعددة الأهداف</string>
     <string name="home_strategy_goal_locked_hidden_title">%1$d هدف Premium إضافي مقفل</string>
+    <plurals name="home_strategy_goal_locked_hidden_title_count">
+        <item quantity="one">%1$d هدف Premium إضافي مقفل</item>
+        <item quantity="other">%1$d أهداف Premium إضافية مقفلة</item>
+    </plurals>
     <string name="home_strategy_goal_locked_hidden_desc">تبقى أهدافك المحفوظة آمنة. يفتح Premium القائمة كاملة ويوزع حركات يوم الدفع بينها.</string>
     <string name="home_strategy_rules_title">القواعد الآلية</string>
     <string name="home_strategy_rule_empty_title">إنشاء قاعدة</string>
@@ -420,6 +451,10 @@
     <string name="home_strategy_rule_preview_premium_body">عدة قواعد تتعلم من المراجعات</string>
     <string name="home_strategy_rule_preview_action">معاينة قواعد متكيّفة</string>
     <string name="home_strategy_rule_locked_hidden_title">%1$d قاعدة Premium إضافية مقفلة</string>
+    <plurals name="home_strategy_rule_locked_hidden_title_count">
+        <item quantity="one">%1$d قاعدة Premium إضافية مقفلة</item>
+        <item quantity="other">%1$d قواعد Premium إضافية مقفلة</item>
+    </plurals>
     <string name="home_strategy_rule_locked_hidden_desc">تبقى قواعدك المحفوظة آمنة. يفتح Premium كل القواعد ويحافظ على تنسيقها بعد المراجعات.</string>
     <string name="home_review_performance_title">أنماط يوم الدفع</string>
     <string name="home_review_score_label">درجة الثقة</string>
@@ -452,7 +487,7 @@
     <string name="home_review_checkin_title_scheduled">تمت جدولة تسجيل المتابعة التالي</string>
     <string name="home_review_checkin_title_reviewed">تمت تغطية يوم الدفع هذا</string>
     <string name="home_review_checkin_body_ready">أدخل أدناه ما حدث فعليًا. سيقارنه Premium بالدليل النشط قبل اقتراح التغيير التالي.</string>
-    <string name="home_review_checkin_body_overdue">كان %1$s هو تسجيل المتابعة المخطط. ينتظر Premium هذه المراجعة قبل أن يتمكن من تعديل يوم الدفع التالي.</string>
+    <string name="home_review_checkin_body_overdue">ما زالت المراجعة مفيدة. متابعة سريعة من %1$s تساعد Premium على ضبط يوم الدفع التالي.</string>
     <string name="home_review_checkin_body_scheduled">سيراجع Premium هذه الخطة مرة أخرى في %1$s. أبقِ التذكير مفعّلًا لتسهيل تذكّر المراجعة التالية.</string>
     <string name="home_review_checkin_body_reviewed">يوم الدفع هذا لديه مراجعة محفوظة. سيراقب Premium الخطة مرة أخرى في %1$s.</string>
     <string name="home_review_checkin_reminder_on">التذكير مفعّل</string>
@@ -473,6 +508,14 @@
     <string name="home_review_recommendation_next_priority">الحركة التالية</string>
     <string name="home_review_recommendation_confidence">ثقة %1$d%%</string>
     <string name="home_review_recommendation_review_count">بناءً على %1$d مراجعة</string>
+    <string name="paywall_recommendation_evidence_single">بناءً على مراجعة يوم الدفع هذه. احفظ مراجعات أكثر لتحسين الحركة التالية.</string>
+    <string name="paywall_recommendation_evidence_multiple">بناءً على آخر %1$d مراجعات ليوم الدفع.</string>
+    <string name="paywall_recommendation_move_title">وجد Premium مساحة إضافية للأهداف</string>
+    <string name="paywall_recommendation_move_body">تُظهر هذه المراجعة أنك تستطيع إبقاء الإنفاق قريبًا من %1$s ونقل %2$s إضافية نحو الأهداف. يمكن لـ Premium ضبط حركة الأولوية التالية على %3$s.</string>
+    <string name="paywall_recommendation_restore_title">وجد Premium دليلًا تاليًا أكثر أمانًا</string>
+    <string name="paywall_recommendation_restore_body">تُظهر هذه المراجعة أن الدليل المرن الحالي %1$s قد يكون ضيقًا. يمكن لـ Premium رفع الدليل التالي إلى %2$s وإبقاء %3$s لحركات الأولوية.</string>
+    <string name="paywall_recommendation_keep_title">يمكن لـ Premium إبقاء هذه الخطة على المسار الصحيح</string>
+    <string name="paywall_recommendation_keep_body">بقيت هذه المراجعة قريبة من الدليل. يمكن لـ Premium متابعة %1$s للإنفاق المرن و%2$s لحركات الأولوية.</string>
     <string name="home_review_recommendation_apply">تطبيق التعديل</string>
     <string name="home_review_recommendation_confirm_title">هل تريد تطبيق تعديل Premium هذا؟</string>
     <string name="home_review_recommendation_confirm_desc">سيحدّث My Share قواعد يوم الدفع خلف دليلك التالي. يمكنك مراجعة التغيير أو التراجع عنه مباشرة بعد ذلك.</string>
@@ -522,6 +565,19 @@
     <string name="home_review_result_priority">أولوية</string>
     <string name="home_review_result_review_adjustment">مراجعة التعديل</string>
     <string name="home_review_result_done">تم</string>
+    <string name="home_review_saved_milestone_label">تم حفظ المراجعة</string>
+    <string name="home_review_saved_milestone_title">تم تحديث صورة يوم الدفع</string>
+    <string name="home_review_saved_milestone_title_first_cycle">اكتملت أول دورة ليوم الدفع</string>
+    <plurals name="home_review_saved_milestone_body">
+        <item quantity="one">تم حفظ مراجعة %1$s. لديك الآن يوم دفع واحد تمت مراجعته.</item>
+        <item quantity="other">تم حفظ مراجعة %1$s. لديك الآن %2$d أيام دفع تمت مراجعتها.</item>
+    </plurals>
+    <string name="home_review_saved_milestone_next_move_title">الخطوة التالية جاهزة للمعاينة</string>
+    <string name="home_review_saved_milestone_next_move_body">يمكن لـ Premium تحويل هذه المراجعة إلى تعديل يوم الدفع التالي.</string>
+    <string name="home_review_saved_milestone_pattern_title">هذه المراجعة ما زالت تساعد</string>
+    <string name="home_review_saved_milestone_pattern_body">كل يوم دفع محفوظ يجعل الخطة التالية أسهل للمقارنة.</string>
+    <string name="home_review_saved_milestone_premium_action">عرض خطوة Premium التالية</string>
+    <string name="home_review_saved_milestone_done">متابعة التخطيط</string>
     <string name="home_review_first_premium_label">أول مراجعة Premium</string>
     <string name="home_review_first_premium_title_locked">يمكن لأول مراجعة أن تفتح الخطوة التالية</string>
     <string name="home_review_first_premium_title_progress_loop">ابنِ حلقة تقدم مع كل راتب</string>
@@ -614,6 +670,10 @@
     <string name="home_more_adjustment_memory_priority">أولوية</string>
     <string name="home_more_adjustment_memory_change">%1$s إلى %2$s</string>
     <string name="home_more_adjustment_memory_rules">%1$d قاعدة حدّثها Premium</string>
+    <plurals name="home_more_adjustment_memory_rules_count">
+        <item quantity="one">%1$d قاعدة حدّثها Premium</item>
+        <item quantity="other">%1$d قواعد حدّثها Premium</item>
+    </plurals>
     <string name="home_more_adjustment_memory_history_action">عرض سجل التعديلات</string>
     <string name="home_more_adjustment_history_title">سجل التعديلات</string>
     <string name="home_more_adjustment_history_body">اطلع على ما غيّره Premium بعد كل مراجعة، بما في ذلك التراجعات، حتى تبقى خطتك واضحة وموثوقة.</string>
@@ -635,8 +695,16 @@
     <string name="home_more_premium_preview_label">الطيار الآلي ليوم الدفع</string>
     <string name="home_more_premium_preview_title">اجعل الخطة تتحسن باستمرار</string>
     <string name="home_more_premium_preview_body_with_reviews">يمكن لـ Premium استخدام %1$d مراجعات محفوظة لمقارنة دليلك الأسبوعي %2$s، وحماية حركة الأولوية %3$s، واقتراح التعديل التالي.</string>
+    <plurals name="home_more_premium_preview_body_with_reviews_count">
+        <item quantity="one">يمكن لـ Premium استخدام مراجعة محفوظة واحدة لمقارنة دليلك الأسبوعي %2$s، وحماية حركة الأولوية %3$s، واقتراح التعديل التالي.</item>
+        <item quantity="other">يمكن لـ Premium استخدام %1$d مراجعات محفوظة لمقارنة دليلك الأسبوعي %2$s، وحماية حركة الأولوية %3$s، واقتراح التعديل التالي.</item>
+    </plurals>
     <string name="home_more_premium_preview_body_first_review">بعد أول تسجيل وصول، يقارن Premium الدليل الأسبوعي %1$s بما حدث ويحمي حركة الأولوية %2$s قبل يوم الدفع التالي.</string>
     <string name="home_more_premium_preview_body_reviews_generic">يمكن لـ Premium استخدام %1$d مراجعات محفوظة لاكتشاف الانحراف واقتراح ما يجب تعديله قبل يوم الدفع التالي.</string>
+    <plurals name="home_more_premium_preview_body_reviews_generic_count">
+        <item quantity="one">يمكن لـ Premium استخدام مراجعة محفوظة واحدة لاكتشاف الانحراف واقتراح ما يجب تعديله قبل يوم الدفع التالي.</item>
+        <item quantity="other">يمكن لـ Premium استخدام %1$d مراجعات محفوظة لاكتشاف الانحراف واقتراح ما يجب تعديله قبل يوم الدفع التالي.</item>
+    </plurals>
     <string name="home_more_premium_preview_body_generic">يبدأ Premium بالتعلم بعد أول مراجعة، ثم يحوّل كل تسجيل وصول إلى التعديل التالي.</string>
     <string name="home_more_premium_preview_signal_reviews">المراجعات</string>
     <string name="home_more_premium_preview_signal_reviews_ready">%1$d جاهزة</string>
@@ -720,13 +788,15 @@
     <string name="paywall_currency_mismatch_notice">تستخدم خطتك %1$s. يفرض Google Play الرسوم بـ %2$s حسب منطقة Play Store لديك.</string>
     <string name="paywall_autopilot_preview_goal_label">مبنية من أجل %1$s</string>
     <string name="paywall_autopilot_preview_title">معاينة التعديل التالي</string>
-    <string name="paywall_autopilot_preview_body">يبدأ Premium من دليلك الأسبوعي %1$s ونقل الأولوية %2$s، ثم يستخدم المراجعات وذاكرة التعديلات لتوجيه الراتب التالي.</string>
-    <string name="paywall_autopilot_preview_body_without_priority">يبدأ Premium من دليلك الأسبوعي %1$s، ثم يستخدم المراجعات وذاكرة التعديلات لتوجيه الراتب التالي.</string>
-    <string name="paywall_autopilot_preview_body_generic">يبدأ Premium من الخطة التي أنشأتها، ثم يستخدم المراجعات وذاكرة التعديلات لتوجيه الراتب التالي.</string>
+    <string name="paywall_autopilot_preview_body">بعد مراجعتك، يعرض Premium هل تحتفظ بدليلك الأسبوعي %1$s أو تعدل حركة الأولوية %2$s قبل الراتب التالي.</string>
+    <string name="paywall_autopilot_preview_body_without_priority">بعد مراجعتك، يعرض Premium هل تحتفظ بدليلك الأسبوعي %1$s أو تعدله قبل الراتب التالي.</string>
+    <string name="paywall_autopilot_preview_body_generic">بعد مراجعتك، يحول Premium الخطة التي أنشأتها إلى دليل الراتب التالي.</string>
     <string name="paywall_autopilot_recommendation_title">ما سيراقبه Premium</string>
     <string name="paywall_autopilot_recommendation_body">إذا تبقى %1$s، يمكن لـ Premium اقتراح نقله إلى %2$s مع إبقاء %3$s/أسبوع آمنًا.</string>
     <string name="paywall_autopilot_recommendation_body_without_priority">يراقب Premium دليلك الأسبوعي %1$s ويعرض ما يجب تعديله قبل الراتب التالي.</string>
     <string name="paywall_autopilot_recommendation_body_generic">بعد كل مراجعة، يتذكر Premium ما تغيّر ويعرض ما يجب تعديله قبل الراتب التالي.</string>
+    <string name="paywall_recommendation_preview_label">جاهز من مراجعتك</string>
+    <string name="paywall_unlock_next_move_button">افتح هذه الخطوة التالية</string>
     <string name="paywall_autopilot_preview_free_label">الخطة المجانية</string>
     <string name="paywall_autopilot_preview_free_body">اتبع هذا التقسيم يدويًا.</string>
     <string name="paywall_autopilot_preview_premium_body">تصبح المراجعات خطواتك التالية.</string>
@@ -773,6 +843,7 @@
     <string name="paywall_subhead_brazil">يظهر الشهري أولًا حتى تختبر التوجيه القائم على المراجعات قبل الالتزام.</string>
     <string name="paywall_headline_default">اجعل هذه الخطة تتحسن</string>
     <string name="paywall_subhead_default">يراقب Premium كل مراجعة، ويتذكر التغييرات، ويعرض خطوة الراتب التالية.</string>
+    <string name="paywall_subhead_no_trial">يراقب Premium كل مراجعة، ويتذكر التغييرات، ويعرض خطوة الراتب التالية قبل أن تنفق مرة أخرى.</string>
     <string name="paywall_headline_review_momentum">اجعل كل مراجعة للراتب مفيدة</string>
     <string name="paywall_subhead_review_momentum">يحوّل Premium كل مراجعة سريعة إلى خطوة واضحة للراتب التالي.</string>
     <string name="insight_review_save_stress_success_headline">شبكة الأمان تنمو</string>
@@ -802,6 +873,8 @@
     <string name="coaching_first_step_body">بداية رائعة بمراجعتك الأولى! كلما قمت بتسجيل الدخول أكثر، أصبحت حلقة عادتك أكثر ذكاءً.</string>
     <string name="notification_payday_title">مهمة يوم الدفع الخاصة بك</string>
     <string name="notification_payday_body">قم بتأمين %1$s للفواتير وخصّص %3$s. لديك %2$s للإنفاق الآمن.</string>
+    <string name="notification_payday_review_due_title">يوم الدفع جاهز للمراجعة</string>
+    <string name="notification_payday_review_due_body">راجع ما حدث بينما دليلك الأسبوعي %1$s ما زال واضحًا.</string>
     <string name="notification_weekly_review_title">مراجعة أسبوعية سريعة</string>
     <string name="notification_weekly_review_body">تحقق مما إذا كان دليلك الأسبوعي %1$s لا يزال مناسبًا.</string>
     <string name="notification_premium_checkin_due_title">مراجعة Premium جاهزة</string>

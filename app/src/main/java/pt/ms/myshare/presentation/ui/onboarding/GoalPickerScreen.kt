@@ -110,7 +110,7 @@ fun GoalPickerScreen(
     OnboardingStepScaffold(
         title = stringResource(R.string.onboarding_goal_picker_title),
         subtitle = stringResource(R.string.onboarding_goal_picker_subtitle),
-        actionText = stringResource(R.string.continue_button),
+        actionText = stringResource(R.string.onboarding_goal_picker_action),
         progressStep = 1,
         progressTotal = OnboardingViewModel.SETUP_STEP_TOTAL,
         onBack = onBack,
@@ -133,12 +133,6 @@ fun GoalPickerScreen(
             }
         )
 
-        Spacer(Modifier.height(16.dp))
-
-        GoalPickerGuidanceCard()
-
-        Spacer(Modifier.height(16.dp))
-
         GoalDetailsCard(
             goalName = goalName,
             onGoalNameChange = { goalName = it },
@@ -152,6 +146,10 @@ fun GoalPickerScreen(
             amountPlaceholder = amountPlaceholder,
             keyboardActions = inputKeyboardActions
         )
+
+        Spacer(Modifier.height(14.dp))
+
+        GoalPickerGuidanceCard()
     }
 }
 
@@ -357,12 +355,12 @@ private fun GoalDetailsCard(
         shadowElevation = 1.dp
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(13.dp)
+            modifier = Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Surface(
                     shape = RoundedCornerShape(12.dp),
@@ -384,12 +382,6 @@ private fun GoalDetailsCard(
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = stringResource(R.string.onboarding_goal_picker_details_body),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        lineHeight = 17.sp
                     )
                 }
             }

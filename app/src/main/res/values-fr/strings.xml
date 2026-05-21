@@ -64,6 +64,7 @@
     <string name="onboarding_trajectory_goal_subtitle">À ce rythme, \&quot;%1$s\&quot; a un chemin clair.</string>
     <string name="onboarding_trajectory_footer">Gardez ce plan gratuit, ou laissez Premium guider le prochain geste après chaque bilan.</string>
     <string name="onboarding_trajectory_button">Voir mon plan Premium</string>
+    <string name="onboarding_trajectory_free_button">Garder le plan gratuit</string>
     <string name="onboarding_trajectory_premium_bridge_label">Aperçu Premium</string>
     <string name="onboarding_trajectory_premium_bridge_title">Transforme les bilans en prochain mouvement</string>
     <string name="onboarding_trajectory_premium_bridge_body">Premium suit votre guide hebdomadaire de %1$s et indique si les %2$s vers %3$s doivent changer à la prochaine paie.</string>
@@ -94,6 +95,8 @@
     <string name="home_coach_marks_next">Suivant</string>
     <string name="home_coach_marks_done">Terminé</string>
     <string name="home_review_streak_label">Série actuelle</string>
+    <string name="home_review_paycycle_consistency_label">Paies revues</string>
+    <string name="home_review_paycycle_consistency_count">%1$d d’affilée</string>
     <string name="more_app_name" translatable="false">My Share</string>
     <string name="goal_add_delete_confirm_title">Supprimer l\'objectif</string>
     <string name="goal_add_delete_confirm_msg">Êtes-vous sûr de vouloir supprimer ce jalon financier ? Cette action ne peut pas être annulée.</string>
@@ -187,7 +190,7 @@
     <string name="onboarding_plan_preview_premium_watch_review_label">Premier bilan</string>
     <string name="onboarding_plan_preview_premium_watch_review_body">Transformez ce qui s’est passé en prochaine action claire.</string>
     <string name="onboarding_plan_preview_default_goal">votre objectif</string>
-    <string name="onboarding_plan_preview_button_secure">Continuer vers la configuration du compte</string>
+    <string name="onboarding_plan_preview_button_secure">Enregistrer mon plan</string>
     <string name="onboarding_plan_preview_button_basic">je vais le faire manuellement</string>
     <string name="onboarding_plan_preview_button_tune">Ajuster la répartition de paie</string>
     <string name="paywall_close_content_description">Fermer</string>
@@ -214,7 +217,7 @@
     <string name="premium_gate_review_title">Voir l\'historique complet des avis</string>
     <string name="premium_gate_review_body">Premium maintient la chronologie complète de vos performances visible afin que vous puissiez repérer les tendances de dépenses au fil du temps.</string>
     <string name="premium_gate_first_review_title">Transformez le premier bilan en prochain geste</string>
-    <string name="premium_gate_first_review_body">Démarrez Premium pour comparer chaque paie à votre guide, repérer les écarts tôt et voir l’ajustement avant la prochaine paie.</string>
+    <string name="premium_gate_first_review_body">Enregistre ce qui s’est passé à cette paie. Premium le transforme en guide exact à utiliser avant la prochaine.</string>
     <string name="premium_gate_first_review_body_progress_loop">Démarrez Premium pour garder une boucle simple : notez ce qui s’est passé, voyez le schéma et commencez la prochaine paie avec un geste plus clair.</string>
     <string name="premium_gate_automation_title">Voir quoi changer à la prochaine paie</string>
     <string name="premium_gate_automation_body">Premium compare les bilans avec votre guide hebdomadaire et montre quoi changer avant la prochaine paie.</string>
@@ -232,6 +235,7 @@
     <string name="onboarding_signup_feature_privacy_body">Commencez maintenant sans vous connecter.</string>
     <string name="onboarding_signup_local_note">Google est facultatif. Le mode appareil garde ce plan ici jusqu\'à la connexion d\'un compte.</string>
     <string name="onboarding_goal_picker_label_name">Nom de l\'objectif</string>
+    <string name="onboarding_goal_picker_action">Choisir cet objectif</string>
     <string name="onboarding_goal_picker_placeholder_name">Fonds d\'urgence</string>
     <string name="onboarding_goal_picker_label_amount">Montant cible</string>
     <string name="onboarding_goal_picker_error_name">Saisissez un nom d\'objectif.</string>
@@ -239,6 +243,7 @@
     <string name="onboarding_goal_picker_error_amount_positive">Le montant cible doit être supérieur à zéro.</string>
     <string name="onboarding_customize_goal">Personnalisez votre objectif</string>
     <string name="onboarding_salary_label_amount">Revenu net par jour de paie</string>
+    <string name="onboarding_salary_action">Utiliser ce revenu</string>
     <string name="onboarding_salary_frequency_title">Fréquence des jours de paie</string>
     <string name="onboarding_salary_frequency_monthly_desc">Payé une fois par mois.</string>
     <string name="onboarding_salary_frequency_biweekly_desc">Payé toutes les deux semaines.</string>
@@ -255,6 +260,7 @@
     <string name="onboarding_salary_error_payday_range">Utilisez un jour de paie du 1 au 28.</string>
     <string name="onboarding_salary_error_next_date_required">Entrez la prochaine date de paie.</string>
     <string name="onboarding_fixed_costs_label_amount">Essentiels mensuels</string>
+    <string name="onboarding_fixed_costs_action">Protéger ces essentiels</string>
     <string name="onboarding_fixed_costs_error_required">Saisissez les coûts fixes mensuels. Utilisez 0 si aucun.</string>
     <string name="onboarding_fixed_costs_error_negative">Les coûts fixes ne peuvent pas être négatifs.</string>
     <string name="onboarding_fixed_costs_error_exceeds_income">Les coûts fixes dépassent votre revenu sur salaire. Réduisez les coûts fixes ou augmentez les revenus.</string>
@@ -263,8 +269,8 @@
     <string name="onboarding_fixed_costs_protection_amount">%1$s protégés en premier</string>
     <string name="onboarding_fixed_costs_protection_amount_body">My Share réserve ce montant avant d’organiser le reste de votre plan de paie.</string>
     <string name="onboarding_fixed_costs_remaining_label">Restant pour ce plan</string>
-    <string name="onboarding_fixed_costs_automation_title">Premium coordonne les règles mixtes</string>
-    <string name="onboarding_fixed_costs_automation_body">Premium peut garder épargne, investissement, dette, coussins et objectifs coordonnés après chaque bilan.</string>
+    <string name="onboarding_fixed_costs_automation_title">Les bilans peuvent garder ce plan aligné plus tard</string>
+    <string name="onboarding_fixed_costs_automation_body">Commencez avec la répartition claire d’aujourd’hui. Après la paie, un court bilan peut montrer si l’épargne, la dette, les coussins ou les objectifs doivent changer.</string>
     <string name="onboarding_fixed_costs_preset_title">Choisissez votre garde-fou</string>
     <string name="onboarding_fixed_costs_preset_conservative">Rigoureux</string>
     <string name="onboarding_fixed_costs_preset_conservative_desc">Gardez plus de marge pour les factures avant de financer les objectifs.</string>
@@ -273,6 +279,8 @@
     <string name="onboarding_fixed_costs_preset_growth">Axé objectifs</string>
     <string name="onboarding_fixed_costs_preset_growth_desc">Envoyez davantage du reste vers les objectifs.</string>
     <string name="onboarding_fixed_costs_strategy_title">Indiquez où va le reste</string>
+    <string name="onboarding_strategy_default_label">Stratégie par défaut</string>
+    <string name="onboarding_strategy_adjust_action">Ajuster la stratégie</string>
     <string name="onboarding_strategy_balanced_savings">Épargne équilibrée</string>
     <string name="onboarding_strategy_balanced_savings_desc">Gardez un objectif d’épargne sans serrer le quotidien.</string>
     <string name="onboarding_strategy_no_savings">Pas d’épargne pour l’instant</string>
@@ -332,6 +340,25 @@
     <string name="home_plan_label_income">Revenu par jour de paie</string>
     <string name="home_plan_label_weekly">Guide hebdomadaire</string>
     <string name="home_plan_allocation_title">Aperçu de l\'allocation</string>
+    <string name="home_plan_readiness_label">Préparation de la paie</string>
+    <string name="home_plan_readiness_title_ready">Prêt pour la paie</string>
+    <string name="home_plan_readiness_title_almost_ready">Presque prêt</string>
+    <string name="home_plan_readiness_title_needs_attention">À vérifier</string>
+    <string name="home_plan_readiness_progress_label">%1$d mouvements prêts sur %2$d</string>
+    <string name="home_plan_readiness_mission_bills">Factures</string>
+    <string name="home_plan_readiness_mission_weekly">Semaine</string>
+    <string name="home_plan_readiness_mission_priority">Priorité</string>
+    <string name="home_plan_readiness_next_action_ready">Tes mouvements de paie sont clairs. Fais le point après la paie pour affiner le prochain plan.</string>
+    <string name="home_plan_readiness_next_action_bills">Commence par protéger l’essentiel avant les dépenses du quotidien.</string>
+    <string name="home_plan_readiness_next_action_weekly">Crée un guide hebdomadaire pour donner une limite claire aux dépenses courantes.</string>
+    <string name="home_plan_readiness_next_action_priority">Ajoute un mouvement prioritaire quand cette paie peut soutenir un objectif, une réserve, une dette ou un investissement.</string>
+    <string name="home_plan_payday_cue_title_today">La paie est aujourd’hui</string>
+    <string name="home_plan_payday_cue_title_tomorrow">La paie est demain</string>
+    <string name="home_plan_payday_cue_title_days">%1$d jours avant la paie</string>
+    <string name="home_plan_payday_cue_body_finish_setup">Termine le mouvement de préparation manquant avant l’arrivée de l’argent.</string>
+    <string name="home_plan_payday_cue_body_keep_guide">Garde ce guide à portée de main pour commencer la paie avec un plan clair.</string>
+    <string name="home_plan_payday_cue_body_review">Passe cette paie en revue pendant que les chiffres sont encore frais.</string>
+    <string name="home_plan_payday_cue_body_review_premium">Passe cette paie en revue pour que Premium ajuste le prochain mouvement.</string>
     <string name="home_plan_label_fixed">Corrigé</string>
     <string name="home_plan_label_flexible">Dépenses flexibles</string>
     <string name="home_plan_label_investing">Investir</string>
@@ -386,7 +413,11 @@
     <string name="home_strategy_goal_preview_premium_label">Abonnement</string>
     <string name="home_strategy_goal_preview_premium_body">Objectif actuel plus autre jalon</string>
     <string name="home_strategy_goal_preview_action">Voir le plan multi-objectifs</string>
-    <string name="home_strategy_goal_locked_hidden_title">%1$d objectif(s) Premium supplémentaires verrouillés</string>
+    <string name="home_strategy_goal_locked_hidden_title">Objectifs Premium verrouillés : %1$d</string>
+    <plurals name="home_strategy_goal_locked_hidden_title_count">
+        <item quantity="one">%1$d objectif Premium supplémentaire verrouillé</item>
+        <item quantity="other">%1$d objectifs Premium supplémentaires verrouillés</item>
+    </plurals>
     <string name="home_strategy_goal_locked_hidden_desc">Vos objectifs enregistrés restent protégés. Premium déverrouille toute la liste et répartit les mouvements de paie entre eux.</string>
     <string name="home_strategy_rules_title">Règles automatisées</string>
     <string name="home_strategy_rule_empty_title">Créer une règle</string>
@@ -419,7 +450,11 @@
     <string name="home_strategy_rule_preview_premium_label">Premium adaptatif</string>
     <string name="home_strategy_rule_preview_premium_body">Plusieurs règles qui apprennent des bilans</string>
     <string name="home_strategy_rule_preview_action">Voir les règles adaptatives</string>
-    <string name="home_strategy_rule_locked_hidden_title">%1$d règle(s) Premium supplémentaires verrouillées</string>
+    <string name="home_strategy_rule_locked_hidden_title">Règles Premium verrouillées : %1$d</string>
+    <plurals name="home_strategy_rule_locked_hidden_title_count">
+        <item quantity="one">%1$d règle Premium supplémentaire verrouillée</item>
+        <item quantity="other">%1$d règles Premium supplémentaires verrouillées</item>
+    </plurals>
     <string name="home_strategy_rule_locked_hidden_desc">Vos règles enregistrées restent protégées. Premium déverrouille toutes les règles et les garde coordonnées après les bilans.</string>
     <string name="home_review_performance_title">Habitudes de paie</string>
     <string name="home_review_score_label">Score de confiance</string>
@@ -452,7 +487,7 @@
     <string name="home_review_checkin_title_scheduled">Prochain check-in programmé</string>
     <string name="home_review_checkin_title_reviewed">Cette paie est couverte</string>
     <string name="home_review_checkin_body_ready">Indiquez ci-dessous ce qui s’est passé. Premium comparera avec le guide actif avant de suggérer le prochain changement.</string>
-    <string name="home_review_checkin_body_overdue">%1$s était le check-in prévu. Premium attend ce bilan avant d’ajuster votre prochaine paie.</string>
+    <string name="home_review_checkin_body_overdue">Cela vaut encore la peine de faire le point. Un rattrapage rapide depuis %1$s aide Premium à ajuster la prochaine paie.</string>
     <string name="home_review_checkin_body_scheduled">Premium vérifiera de nouveau ce plan le %1$s. Gardez le rappel actif pour vous souvenir facilement du prochain bilan.</string>
     <string name="home_review_checkin_body_reviewed">Cette paie a déjà un bilan enregistré. Premium surveillera de nouveau le plan le %1$s.</string>
     <string name="home_review_checkin_reminder_on">Rappel actif</string>
@@ -472,7 +507,15 @@
     <string name="home_review_recommendation_current_priority">Priorité actuelle</string>
     <string name="home_review_recommendation_next_priority">Prochain mouvement</string>
     <string name="home_review_recommendation_confidence">%1$d%% de confiance</string>
-    <string name="home_review_recommendation_review_count">Basé sur %1$d bilan(s)</string>
+    <string name="home_review_recommendation_review_count">Bilans utilisés : %1$d</string>
+    <string name="paywall_recommendation_evidence_single">Basé sur ce bilan de paie. Enregistrez d’autres bilans pour affiner le prochain mouvement.</string>
+    <string name="paywall_recommendation_evidence_multiple">Basé sur vos %1$d derniers bilans de paie.</string>
+    <string name="paywall_recommendation_move_title">Premium a trouvé de la marge pour vos objectifs</string>
+    <string name="paywall_recommendation_move_body">Ce bilan montre que vous pouvez garder les dépenses autour de %1$s et déplacer %2$s de plus vers vos objectifs. Premium peut fixer le prochain mouvement prioritaire à %3$s.</string>
+    <string name="paywall_recommendation_restore_title">Premium a trouvé un prochain guide plus sûr</string>
+    <string name="paywall_recommendation_restore_body">Ce bilan montre que le guide flexible actuel de %1$s est peut-être trop serré. Premium peut monter le prochain guide à %2$s et garder %3$s pour les mouvements prioritaires.</string>
+    <string name="paywall_recommendation_keep_title">Premium peut garder ce plan sur la bonne voie</string>
+    <string name="paywall_recommendation_keep_body">Ce bilan est resté proche du guide. Premium peut continuer à suivre %1$s pour les dépenses flexibles et %2$s pour les mouvements prioritaires.</string>
     <string name="home_review_recommendation_apply">Appliquer l\'ajustement</string>
     <string name="home_review_recommendation_confirm_title">Appliquer cet ajustement Premium ?</string>
     <string name="home_review_recommendation_confirm_desc">My Share mettra à jour les règles de paie derrière votre prochain guide. Vous pourrez revoir ou annuler le changement juste après.</string>
@@ -480,7 +523,7 @@
     <string name="home_review_recommendation_confirm_after">Après application</string>
     <string name="home_review_recommendation_confirm_flexible">Guide flexible</string>
     <string name="home_review_recommendation_confirm_priority">Mouvement prioritaire</string>
-    <string name="home_review_recommendation_confirm_evidence">%1$d%% de confiance d\'après %2$d bilan(s) récent(s).</string>
+    <string name="home_review_recommendation_confirm_evidence">%1$d%% de confiance d’après bilans récents : %2$d.</string>
     <string name="home_review_recommendation_applied_title">Ajustement appliqué</string>
     <string name="home_review_recommendation_applied_desc">Vos règles de la prochaine paie correspondent maintenant à cette recommandation. Revoyez les règles si vous voulez affiner un transfert.</string>
     <string name="home_review_recommendation_review_rules">Revoir les règles</string>
@@ -502,7 +545,7 @@
     <string name="home_review_momentum_headline_streaking">Votre série de bilans fonctionne</string>
     <string name="home_review_momentum_body">Plus que %1$d pour atteindre %2$d bilans. Plus de bilans aident Premium à repérer plus tôt le prochain geste de paie.</string>
     <string name="home_review_momentum_reviews">%1$d bilans</string>
-    <string name="home_review_momentum_streak">Série de %1$d jour(s)</string>
+    <string name="home_review_momentum_streak">Série : %1$d</string>
     <string name="home_review_momentum_next">Objectif %1$d bilans</string>
     <string name="home_review_result_label">Bilan Premium</string>
     <string name="home_review_result_title">Bilan enregistré</string>
@@ -522,6 +565,19 @@
     <string name="home_review_result_priority">Priorité</string>
     <string name="home_review_result_review_adjustment">Vérifier ajustement</string>
     <string name="home_review_result_done">Terminé</string>
+    <string name="home_review_saved_milestone_label">Bilan enregistré</string>
+    <string name="home_review_saved_milestone_title">Vue de paie mise à jour</string>
+    <string name="home_review_saved_milestone_title_first_cycle">Premier cycle de paie terminé</string>
+    <plurals name="home_review_saved_milestone_body">
+        <item quantity="one">Le bilan du %1$s est enregistré. Tu as maintenant %2$d paie revue.</item>
+        <item quantity="other">Le bilan du %1$s est enregistré. Tu as maintenant %2$d paies revues.</item>
+    </plurals>
+    <string name="home_review_saved_milestone_next_move_title">Le prochain mouvement est prêt à prévisualiser</string>
+    <string name="home_review_saved_milestone_next_move_body">Premium peut transformer ce bilan en prochain ajustement de paie.</string>
+    <string name="home_review_saved_milestone_pattern_title">Ce bilan aide encore</string>
+    <string name="home_review_saved_milestone_pattern_body">Chaque paie enregistrée rend le prochain plan plus facile à comparer.</string>
+    <string name="home_review_saved_milestone_premium_action">Voir le prochain mouvement Premium</string>
+    <string name="home_review_saved_milestone_done">Continuer à planifier</string>
     <string name="home_review_first_premium_label">Première révision Premium</string>
     <string name="home_review_first_premium_title_locked">Votre première révision peut débloquer le prochain geste</string>
     <string name="home_review_first_premium_title_progress_loop">Créez une boucle de progrès à chaque paie</string>
@@ -590,7 +646,7 @@
     <string name="home_more_smart_adjustments_next_priority">Proch. priorité</string>
     <string name="home_more_smart_adjustments_signal">Indicateur</string>
     <string name="home_more_smart_adjustments_evidence">Preuve</string>
-    <string name="home_more_smart_adjustments_evidence_value">%1$d%% / %2$d bilan(s)</string>
+    <string name="home_more_smart_adjustments_evidence_value">%1$d%% / bilans : %2$d</string>
     <string name="home_more_smart_adjustments_evidence_waiting">Besoin de bilans</string>
     <string name="home_more_smart_adjustments_direction_move">Déplacer plus</string>
     <string name="home_more_smart_adjustments_direction_restore">Restaurer marge</string>
@@ -613,7 +669,11 @@
     <string name="home_more_adjustment_memory_flexible">Dépenses flexibles</string>
     <string name="home_more_adjustment_memory_priority">Priorité</string>
     <string name="home_more_adjustment_memory_change">%1$s à %2$s</string>
-    <string name="home_more_adjustment_memory_rules">%1$d règle(s) mises à jour par Premium</string>
+    <string name="home_more_adjustment_memory_rules">Règles mises à jour par Premium : %1$d</string>
+    <plurals name="home_more_adjustment_memory_rules_count">
+        <item quantity="one">%1$d règle mise à jour par Premium</item>
+        <item quantity="other">%1$d règles mises à jour par Premium</item>
+    </plurals>
     <string name="home_more_adjustment_memory_history_action">Voir l’historique des ajustements</string>
     <string name="home_more_adjustment_history_title">Historique des ajustements</string>
     <string name="home_more_adjustment_history_body">Voyez ce que Premium a changé après chaque bilan, y compris les annulations, pour garder confiance dans votre plan.</string>
@@ -629,14 +689,22 @@
     <string name="home_premium_checkin_relative_today">Prévu aujourd’hui</string>
     <string name="home_premium_checkin_relative_tomorrow">Demain</string>
     <string name="home_premium_checkin_relative_in_days">Dans %1$s jours</string>
-    <string name="home_premium_checkin_relative_overdue">%1$s jour(s) de retard</string>
+    <string name="home_premium_checkin_relative_overdue">Jours de retard : %1$s</string>
     <string name="home_more_smart_checkin_turn_reminders_on">Activer les rappels</string>
     <string name="home_more_subscription_title">Amélioration payante</string>
     <string name="home_more_premium_preview_label">Pilote automatique de paie</string>
     <string name="home_more_premium_preview_title">Gardez le plan en progrès</string>
     <string name="home_more_premium_preview_body_with_reviews">Premium peut utiliser vos %1$d bilans enregistrés pour comparer le guide hebdomadaire de %2$s, protéger l’action prioritaire de %3$s et suggérer le prochain ajustement.</string>
+    <plurals name="home_more_premium_preview_body_with_reviews_count">
+        <item quantity="one">Premium peut utiliser 1 bilan enregistré pour comparer le guide hebdomadaire de %2$s, protéger l’action prioritaire de %3$s et suggérer le prochain ajustement.</item>
+        <item quantity="other">Premium peut utiliser %1$d bilans enregistrés pour comparer le guide hebdomadaire de %2$s, protéger l’action prioritaire de %3$s et suggérer le prochain ajustement.</item>
+    </plurals>
     <string name="home_more_premium_preview_body_first_review">Après le premier check-in, Premium compare le guide hebdomadaire de %1$s avec ce qui s’est passé et protège l’action prioritaire de %2$s avant la prochaine paie.</string>
     <string name="home_more_premium_preview_body_reviews_generic">Premium peut utiliser vos %1$d bilans enregistrés pour repérer les écarts et suggérer quoi ajuster avant la prochaine paie.</string>
+    <plurals name="home_more_premium_preview_body_reviews_generic_count">
+        <item quantity="one">Premium peut utiliser 1 bilan enregistré pour repérer les écarts et suggérer quoi ajuster avant la prochaine paie.</item>
+        <item quantity="other">Premium peut utiliser %1$d bilans enregistrés pour repérer les écarts et suggérer quoi ajuster avant la prochaine paie.</item>
+    </plurals>
     <string name="home_more_premium_preview_body_generic">Premium commence à apprendre après le premier bilan, puis transforme chaque check-in en prochain ajustement.</string>
     <string name="home_more_premium_preview_signal_reviews">Bilans</string>
     <string name="home_more_premium_preview_signal_reviews_ready">%1$d prêts</string>
@@ -720,13 +788,15 @@
     <string name="paywall_currency_mismatch_notice">Ton plan utilise %1$s. Google Play facture en %2$s selon la région de ton Play Store.</string>
     <string name="paywall_autopilot_preview_goal_label">Créé pour %1$s</string>
     <string name="paywall_autopilot_preview_title">Aperçu du prochain ajustement</string>
-    <string name="paywall_autopilot_preview_body">Premium part de ton guide hebdomadaire de %1$s et de ton mouvement prioritaire de %2$s, puis utilise les bilans et la mémoire des ajustements pour guider la prochaine paie.</string>
-    <string name="paywall_autopilot_preview_body_without_priority">Premium part de ton guide hebdomadaire de %1$s, puis utilise les bilans et la mémoire des ajustements pour guider la prochaine paie.</string>
-    <string name="paywall_autopilot_preview_body_generic">Premium part du plan créé, puis utilise les bilans et la mémoire des ajustements pour guider la prochaine paie.</string>
+    <string name="paywall_autopilot_preview_body">Après ton bilan, Premium montre s’il faut garder ton guide hebdomadaire de %1$s ou ajuster le mouvement prioritaire de %2$s avant la prochaine paie.</string>
+    <string name="paywall_autopilot_preview_body_without_priority">Après ton bilan, Premium montre s’il faut garder ton guide hebdomadaire de %1$s ou l’ajuster avant la prochaine paie.</string>
+    <string name="paywall_autopilot_preview_body_generic">Après ton bilan, Premium transforme le plan créé en guide pour la prochaine paie.</string>
     <string name="paywall_autopilot_recommendation_title">Ce que Premium va suivre</string>
     <string name="paywall_autopilot_recommendation_body">S’il reste %1$s, Premium peut suggérer de les déplacer vers %2$s tout en gardant %3$s/semaine protégés.</string>
     <string name="paywall_autopilot_recommendation_body_without_priority">Premium suit ton guide hebdomadaire de %1$s et montre quoi ajuster avant la prochaine paie.</string>
     <string name="paywall_autopilot_recommendation_body_generic">Après chaque bilan, Premium mémorise ce qui a changé et montre quoi ajuster avant la prochaine paie.</string>
+    <string name="paywall_recommendation_preview_label">Prêt grâce à ton bilan</string>
+    <string name="paywall_unlock_next_move_button">Débloquer ce prochain pas</string>
     <string name="paywall_autopilot_preview_free_label">Plan gratuit</string>
     <string name="paywall_autopilot_preview_free_body">Suis cette répartition manuellement.</string>
     <string name="paywall_autopilot_preview_premium_body">Les bilans deviennent les prochains mouvements.</string>
@@ -773,6 +843,7 @@
     <string name="paywall_subhead_brazil">Le mensuel est mis en avant pour tester les conseils fondés sur les bilans avant de s’engager.</string>
     <string name="paywall_headline_default">Garde ce plan en progrès</string>
     <string name="paywall_subhead_default">Premium suit chaque bilan, mémorise les changements et montre le prochain geste de paie.</string>
+    <string name="paywall_subhead_no_trial">Premium suit chaque bilan, mémorise les changements et montre le prochain geste de paie avant que tu dépenses à nouveau.</string>
     <string name="paywall_headline_review_momentum">Rends chaque bilan de paie utile</string>
     <string name="paywall_subhead_review_momentum">Premium transforme chaque bilan rapide en un geste clair pour la prochaine paie.</string>
     <string name="insight_review_save_stress_success_headline">Le filet de sécurité s’agrandit</string>
@@ -802,6 +873,8 @@
     <string name="coaching_first_step_body">Bon début avec votre premier avis ! Plus vous vous connectez, plus votre boucle d’habitudes devient intelligente.</string>
     <string name="notification_payday_title">Votre mission sur salaire</string>
     <string name="notification_payday_body">Mets %1$s de côté pour les factures et réserve %3$s. Il te reste %2$s pour les dépenses sûres.</string>
+    <string name="notification_payday_review_due_title">La paie est prête à revoir</string>
+    <string name="notification_payday_review_due_body">Vérifie ce qui s’est passé pendant que ton guide hebdomadaire de %1$s est encore frais.</string>
     <string name="notification_weekly_review_title">Bilan hebdo rapide</string>
     <string name="notification_weekly_review_body">Vérifie si ton guide hebdomadaire de %1$s reste adapté.</string>
     <string name="notification_premium_checkin_due_title">Ton bilan Premium est prêt</string>

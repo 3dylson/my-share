@@ -29,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -55,7 +56,8 @@ fun TrajectoryScreen(
     preview: PlanPreview?,
     goalName: String,
     userPreferences: UserPreferences,
-    onNext: () -> Unit
+    onNext: () -> Unit,
+    onContinueFree: () -> Unit
 ) {
     val currencyFormat = NumberFormat.getCurrencyInstance(userPreferences.locale).apply {
         currency = userPreferences.currency
@@ -68,13 +70,27 @@ fun TrajectoryScreen(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             Surface(color = MaterialTheme.colorScheme.background) {
-                PremiumButton(
-                    text = stringResource(R.string.onboarding_trajectory_button),
-                    onClick = onNext,
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 24.dp, top = 12.dp, end = 24.dp, bottom = 28.dp)
-                )
+                        .padding(start = 24.dp, top = 12.dp, end = 24.dp, bottom = 20.dp)
+                ) {
+                    PremiumButton(
+                        text = stringResource(R.string.onboarding_trajectory_button),
+                        onClick = onNext,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    TextButton(
+                        onClick = onContinueFree,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = stringResource(R.string.onboarding_trajectory_free_button),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
         }
     ) { innerPadding ->

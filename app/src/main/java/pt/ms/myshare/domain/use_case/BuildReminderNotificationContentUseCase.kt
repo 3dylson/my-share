@@ -33,6 +33,13 @@ class BuildReminderNotificationContentUseCase @Inject constructor(
                 destination = DESTINATION_PLAN,
                 analyticsType = "payday_action"
             )
+            ReminderNotificationType.PAYDAY_REVIEW_DUE -> NotificationContent(
+                titleKey = "notification_payday_review_due_title",
+                messageKey = "notification_payday_review_due_body",
+                messageArgs = listOf(weeklyGuide),
+                destination = DESTINATION_REVIEW,
+                analyticsType = "payday_review_due"
+            )
             ReminderNotificationType.WEEKLY_REVIEW -> NotificationContent(
                 titleKey = "notification_weekly_review_title",
                 messageKey = "notification_weekly_review_body",

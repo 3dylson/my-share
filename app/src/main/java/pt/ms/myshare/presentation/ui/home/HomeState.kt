@@ -4,6 +4,9 @@ import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.LegacyPremiumGrantState
 import pt.ms.myshare.domain.model.ManualReview
 import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
+import pt.ms.myshare.domain.model.PaydayCountdownAction
+import pt.ms.myshare.domain.model.PaydayReadinessMission
+import pt.ms.myshare.domain.model.PaydayReadinessStatus
 import pt.ms.myshare.domain.model.PremiumCheckInStatus
 import pt.ms.myshare.domain.model.PremiumAdjustmentStatus
 import pt.ms.myshare.domain.model.PremiumProofVariant
@@ -53,8 +56,29 @@ data class HomePlanCardState(
     val investingLabel: String = "",
     val weeklySpendLabel: String = "",
     val summary: String = "",
+    val readiness: PaydayReadinessState? = null,
+    val paydayCue: PaydayCountdownCueState? = null,
     val nextPaydayKey: String? = null,
     val nextPaydayArgs: List<String> = emptyList()
+)
+
+data class PaydayCountdownCueState(
+    val daysUntilPayday: Long,
+    val action: PaydayCountdownAction
+)
+
+data class PaydayReadinessState(
+    val status: PaydayReadinessStatus,
+    val progress: Float,
+    val completedMissions: Int,
+    val totalMissions: Int,
+    val nextAction: PaydayReadinessMission?,
+    val missions: List<PaydayReadinessMissionItemState>
+)
+
+data class PaydayReadinessMissionItemState(
+    val mission: PaydayReadinessMission,
+    val isComplete: Boolean
 )
 
 data class GoalCardState(
@@ -96,6 +120,7 @@ data class ReviewCardState(
     val flexibleSpendMax: Float = 5000f,
     val goalContributionMax: Float = 5000f,
     val insight: ReviewInsight? = null,
+    val reviewSavedMilestone: ReviewSavedMilestoneState? = null,
     val premiumReviewResult: PremiumReviewResultState? = null,
     val coachingSummary: PremiumReviewCoachingSummaryState? = null,
     val premiumMomentum: PremiumReviewMomentumState? = null,
@@ -106,6 +131,13 @@ data class ReviewCardState(
     val recommendationMessageKey: String? = null,
     val savedReviewDate: String? = null,
     val error: String? = null
+)
+
+data class ReviewSavedMilestoneState(
+    val savedReviewDateLabel: String,
+    val totalReviews: Int,
+    val isFirstPaydayCycle: Boolean,
+    val hasPremiumNextMovePreview: Boolean
 )
 
 data class PaydayAdjustmentRecommendationState(
@@ -289,6 +321,7 @@ data class ReviewHistoryItemState(
 data class PerformanceStatsState(
     val healthScore: Int = 0,
     val currentStreak: Int = 0,
+    val payCycleReviewStreak: Int = 0,
     val totalFlexSavingsLabel: String = "",
     val totalSavings: java.math.BigDecimal = java.math.BigDecimal.ZERO,
     val totalReviews: Int = 0,

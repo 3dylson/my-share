@@ -134,13 +134,16 @@ fun LazyListScope.homeReviewTab(
 
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = stringResource(R.string.home_review_streak_label),
+                                text = stringResource(R.string.home_review_paycycle_consistency_label),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = stringResource(R.string.home_review_streak_count, performanceStats.currentStreak),
+                                text = stringResource(
+                                    R.string.home_review_paycycle_consistency_count,
+                                    performanceStats.payCycleReviewStreak
+                                ),
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Black,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -271,20 +274,10 @@ fun LazyListScope.homeReviewTab(
         )
     }
 
-    item {
-        PremiumSectionHeader(title = stringResource(R.string.home_review_history_title))
-    }
-
-    if (history.isEmpty()) {
+    if (history.isNotEmpty()) {
         item {
-            PremiumBenefitCard(
-                title = stringResource(R.string.home_review_empty_history_title),
-                description = stringResource(R.string.home_review_empty_history_desc),
-                icon = Icons.Default.BarChart,
-                onClick = {}
-            )
+            PremiumSectionHeader(title = stringResource(R.string.home_review_history_title))
         }
-    } else {
         val visibleHistory = if (isPremium) {
             history.take(PREMIUM_INLINE_HISTORY_LIMIT)
         } else {
@@ -504,13 +497,13 @@ private fun FirstReviewPremiumProofCard(
 
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        color = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(18.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.14f),
         border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.24f))
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            modifier = Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -552,52 +545,7 @@ private fun FirstReviewPremiumProofCard(
                 }
             }
 
-            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-                val shouldStack = maxWidth < 340.dp || LocalDensity.current.fontScale >= 1.25f
-                val steps = listOf(
-                    Triple(
-                        stringResource(R.string.home_review_first_premium_step_review),
-                        stringResource(R.string.home_review_first_premium_step_review_desc),
-                        Icons.Default.EditNote
-                    ),
-                    Triple(
-                        stringResource(R.string.home_review_first_premium_step_learn),
-                        stringResource(R.string.home_review_first_premium_step_learn_desc),
-                        Icons.Default.QueryStats
-                    ),
-                    Triple(
-                        stringResource(R.string.home_review_first_premium_step_adjust),
-                        stringResource(R.string.home_review_first_premium_step_adjust_desc),
-                        Icons.Default.Tune
-                    )
-                )
-
-                if (shouldStack) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        steps.forEach { step ->
-                            ReviewPreviewPill(
-                                label = step.first,
-                                body = step.second,
-                                icon = step.third,
-                                iconColor = MySharePrimary,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    }
-                } else {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        steps.forEach { step ->
-                            ReviewPreviewPill(
-                                label = step.first,
-                                body = step.second,
-                                icon = step.third,
-                                iconColor = MySharePrimary,
-                                modifier = Modifier.weight(1f)
-                            )
-                        }
-                    }
-                }
-            }
+            FirstReviewStepRail()
 
             if (!isPremium) {
                 TextButton(
@@ -617,6 +565,72 @@ private fun FirstReviewPremiumProofCard(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun FirstReviewStepRail(modifier: Modifier = Modifier) {
+    val steps = listOf(
+        stringResource(R.string.home_review_first_premium_step_review) to Icons.Default.EditNote,
+        stringResource(R.string.home_review_first_premium_step_learn) to Icons.Default.QueryStats,
+        stringResource(R.string.home_review_first_premium_step_adjust) to Icons.Default.Tune
+    )
+
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.62f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f))
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            steps.forEachIndexed { index, step ->
+                FirstReviewStepItem(
+                    label = step.first,
+                    icon = step.second,
+                    modifier = Modifier.weight(1f)
+                )
+                if (index != steps.lastIndex) {
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FirstReviewStepItem(
+    label: String,
+    icon: ImageVector,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MySharePrimary,
+            modifier = Modifier.size(18.dp)
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
@@ -1273,9 +1287,9 @@ private fun LockedPerformanceTrendCard(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(20.dp),
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.24f))
+        shape = RoundedCornerShape(18.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.18f),
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.26f))
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -1290,7 +1304,7 @@ private fun LockedPerformanceTrendCard(
                     color = MySharePrimary.copy(alpha = 0.12f)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Lock,
+                        imageVector = Icons.Default.WorkspacePremium,
                         contentDescription = null,
                         tint = MySharePrimary,
                         modifier = Modifier.padding(9.dp).size(20.dp)
@@ -1418,19 +1432,6 @@ private fun LockedPaydayRecommendationCard(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            val lockedBody = if (recommendation.direction == PaydayAdjustmentRecommendationDirection.KEEP_PLAN) {
-                stringResource(
-                    R.string.home_review_recommendation_locked_keep_body,
-                    recommendation.currentFlexibleSpendLabel,
-                    recommendation.currentPriorityContributionLabel
-                )
-            } else {
-                stringResource(
-                    R.string.home_review_recommendation_locked_specific_body,
-                    recommendation.recommendedFlexibleSpendLabel,
-                    recommendation.recommendedPriorityContributionLabel
-                )
-            }
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.Top
@@ -1451,19 +1452,19 @@ private fun LockedPaydayRecommendationCard(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.home_review_recommendation_label).uppercase(),
+                        text = stringResource(R.string.paywall_recommendation_preview_label).uppercase(),
                         style = MaterialTheme.typography.labelSmall,
                         color = MySharePrimary,
                         fontWeight = FontWeight.Black
                     )
                     Text(
-                        text = recommendationTitle(recommendation.direction),
+                        text = lockedRecommendationTitle(recommendation),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = lockedBody,
+                        text = lockedRecommendationBody(recommendation),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 18.sp
@@ -1471,20 +1472,74 @@ private fun LockedPaydayRecommendationCard(
                 }
             }
             RecommendationMetricsGrid(recommendation)
-            Text(
-                text = stringResource(R.string.home_review_recommendation_action),
-                style = MaterialTheme.typography.labelLarge,
-                color = MySharePrimary,
-                fontWeight = FontWeight.Bold
-            )
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = MySharePrimary.copy(alpha = 0.12f)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AutoAwesome,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Text(
+                        text = stringResource(R.string.home_review_recommendation_action),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MySharePrimary,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
         }
+    }
+}
+
+@Composable
+private fun lockedRecommendationTitle(recommendation: PaydayAdjustmentRecommendationState): String {
+    return when (recommendation.direction) {
+        PaydayAdjustmentRecommendationDirection.MOVE_MORE_TO_PRIORITY ->
+            stringResource(R.string.paywall_recommendation_move_title)
+        PaydayAdjustmentRecommendationDirection.RESTORE_FLEXIBLE_BUFFER ->
+            stringResource(R.string.paywall_recommendation_restore_title)
+        PaydayAdjustmentRecommendationDirection.KEEP_PLAN ->
+            stringResource(R.string.paywall_recommendation_keep_title)
+    }
+}
+
+@Composable
+private fun lockedRecommendationBody(recommendation: PaydayAdjustmentRecommendationState): String {
+    return when (recommendation.direction) {
+        PaydayAdjustmentRecommendationDirection.MOVE_MORE_TO_PRIORITY -> stringResource(
+            R.string.paywall_recommendation_move_body,
+            recommendation.recommendedFlexibleSpendLabel,
+            recommendation.adjustmentAmountLabel,
+            recommendation.recommendedPriorityContributionLabel
+        )
+        PaydayAdjustmentRecommendationDirection.RESTORE_FLEXIBLE_BUFFER -> stringResource(
+            R.string.paywall_recommendation_restore_body,
+            recommendation.currentFlexibleSpendLabel,
+            recommendation.recommendedFlexibleSpendLabel,
+            recommendation.recommendedPriorityContributionLabel
+        )
+        PaydayAdjustmentRecommendationDirection.KEEP_PLAN -> stringResource(
+            R.string.paywall_recommendation_keep_body,
+            recommendation.currentFlexibleSpendLabel,
+            recommendation.currentPriorityContributionLabel
+        )
     }
 }
 
 @Composable
 private fun RecommendationMetricsGrid(recommendation: PaydayAdjustmentRecommendationState) {
     BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-        val shouldStack = maxWidth < 340.dp || LocalDensity.current.fontScale >= 1.25f
+        val shouldStack = maxWidth < 320.dp || LocalDensity.current.fontScale >= 1.25f
         val metrics = listOf(
             Triple(
                 stringResource(R.string.home_review_recommendation_current_flex),

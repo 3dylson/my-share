@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -821,7 +822,11 @@ private fun PremiumAdjustmentMemoryCard(
             }
 
             Text(
-                text = stringResource(R.string.home_more_adjustment_memory_rules, memory.affectedRuleCount),
+                text = pluralStringResource(
+                    R.plurals.home_more_adjustment_memory_rules_count,
+                    memory.affectedRuleCount,
+                    memory.affectedRuleCount
+                ),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.Bold
@@ -1010,7 +1015,11 @@ private fun PremiumAdjustmentHistoryRow(
                 }
             }
             Text(
-                text = stringResource(R.string.home_more_adjustment_memory_rules, memory.affectedRuleCount),
+                text = pluralStringResource(
+                    R.plurals.home_more_adjustment_memory_rules_count,
+                    memory.affectedRuleCount,
+                    memory.affectedRuleCount
+                ),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.Bold
@@ -1543,8 +1552,9 @@ private fun MorePremiumPreviewCard(
     val hasPlanValues = state.weeklyGuideLabel.isNotBlank() && state.priorityMoveLabel.isNotBlank()
     val hasReviews = state.reviewCount > 0
     val body = when {
-        hasPlanValues && hasReviews -> stringResource(
-            R.string.home_more_premium_preview_body_with_reviews,
+        hasPlanValues && hasReviews -> pluralStringResource(
+            R.plurals.home_more_premium_preview_body_with_reviews_count,
+            state.reviewCount,
             state.reviewCount,
             state.weeklyGuideLabel,
             state.priorityMoveLabel
@@ -1554,8 +1564,9 @@ private fun MorePremiumPreviewCard(
             state.weeklyGuideLabel,
             state.priorityMoveLabel
         )
-        hasReviews -> stringResource(
-            R.string.home_more_premium_preview_body_reviews_generic,
+        hasReviews -> pluralStringResource(
+            R.plurals.home_more_premium_preview_body_reviews_generic_count,
+            state.reviewCount,
             state.reviewCount
         )
         else -> stringResource(R.string.home_more_premium_preview_body_generic)

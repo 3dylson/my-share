@@ -64,6 +64,7 @@
     <string name="onboarding_trajectory_goal_subtitle">In diesem Tempo hat \&quot;%1$s\&quot; einen klaren Weg.</string>
     <string name="onboarding_trajectory_footer">Behalte diesen Plan kostenlos oder lass Premium nach jedem Check-in den nächsten Schritt zeigen.</string>
     <string name="onboarding_trajectory_button">Meinen Premium-Plan ansehen</string>
+    <string name="onboarding_trajectory_free_button">Kostenlosen Plan behalten</string>
     <string name="onboarding_trajectory_premium_bridge_label">Premium-Vorschau</string>
     <string name="onboarding_trajectory_premium_bridge_title">Mach Bewertungen zum nächsten Schritt</string>
     <string name="onboarding_trajectory_premium_bridge_body">Premium beobachtet deinen Wochenleitwert von %1$s und zeigt, ob sich die %2$s für %3$s am nächsten Zahltag ändern sollten.</string>
@@ -94,6 +95,8 @@
     <string name="home_coach_marks_next">Weiter</string>
     <string name="home_coach_marks_done">Fertig</string>
     <string name="home_review_streak_label">Aktueller Streak</string>
+    <string name="home_review_paycycle_consistency_label">Geprüfte Zahltage</string>
+    <string name="home_review_paycycle_consistency_count">%1$d in Folge</string>
     <string name="more_app_name" translatable="false">My Share</string>
     <string name="goal_add_delete_confirm_title">Ziel löschen</string>
     <string name="goal_add_delete_confirm_msg">Sind Sie sicher, dass Sie diesen finanziellen Meilenstein entfernen möchten? Diese Aktion kann nicht rückgängig gemacht werden.</string>
@@ -187,7 +190,7 @@
     <string name="onboarding_plan_preview_premium_watch_review_label">Erster Check-in</string>
     <string name="onboarding_plan_preview_premium_watch_review_body">Aus dem Ergebnis den nächsten klaren Schritt machen.</string>
     <string name="onboarding_plan_preview_default_goal">Ihr Ziel</string>
-    <string name="onboarding_plan_preview_button_secure">Weiter zur Kontoeinrichtung</string>
+    <string name="onboarding_plan_preview_button_secure">Meinen Plan speichern</string>
     <string name="onboarding_plan_preview_button_basic">Ich mache es manuell</string>
     <string name="onboarding_plan_preview_button_tune">Zahltag-Aufteilung anpassen</string>
     <string name="paywall_close_content_description">Schließen</string>
@@ -214,7 +217,7 @@
     <string name="premium_gate_review_title">Sehen Sie sich den vollständigen Bewertungsverlauf an</string>
     <string name="premium_gate_review_body">Premium sorgt dafür, dass Ihr gesamter Leistungsverlauf sichtbar ist, sodass Sie Ausgabenmuster im Laufe der Zeit erkennen können.</string>
     <string name="premium_gate_first_review_title">Machen Sie aus der ersten Prüfung den nächsten Schritt</string>
-    <string name="premium_gate_first_review_body">Starten Sie Premium, um jeden Zahltag mit Ihrem Leitfaden zu vergleichen, Abweichungen früh zu erkennen und die nächste Anpassung zu sehen.</string>
+    <string name="premium_gate_first_review_body">Speichere, was an diesem Zahltag passiert ist. Premium macht daraus den genauen Leitwert für den nächsten.</string>
     <string name="premium_gate_first_review_body_progress_loop">Starten Sie Premium für eine einfache Routine: festhalten, was passiert ist, das Muster sehen und den nächsten Zahltag klarer beginnen.</string>
     <string name="premium_gate_automation_title">Sieh, was am nächsten Zahltag zu ändern ist</string>
     <string name="premium_gate_automation_body">Premium vergleicht Prüfungen mit deinem Wochenleitwert und zeigt, was vor dem nächsten Zahltag zu ändern ist.</string>
@@ -232,6 +235,7 @@
     <string name="onboarding_signup_feature_privacy_body">Starte jetzt ohne Anmeldung.</string>
     <string name="onboarding_signup_local_note">Google ist optional. Der Gerätemodus behält diesen Plan hier, bis du ein Konto verbindest.</string>
     <string name="onboarding_goal_picker_label_name">Zielname</string>
+    <string name="onboarding_goal_picker_action">Dieses Ziel wählen</string>
     <string name="onboarding_goal_picker_placeholder_name">Notfallfonds</string>
     <string name="onboarding_goal_picker_label_amount">Zielbetrag</string>
     <string name="onboarding_goal_picker_error_name">Geben Sie einen Zielnamen ein.</string>
@@ -239,6 +243,7 @@
     <string name="onboarding_goal_picker_error_amount_positive">Der Zielbetrag muss größer als Null sein.</string>
     <string name="onboarding_customize_goal">Passen Sie Ihr Ziel an</string>
     <string name="onboarding_salary_label_amount">Nettoeinkommen pro Zahltag</string>
+    <string name="onboarding_salary_action">Dieses Einkommen nutzen</string>
     <string name="onboarding_salary_frequency_title">Häufigkeit der Zahltage</string>
     <string name="onboarding_salary_frequency_monthly_desc">Einmal im Monat bezahlt.</string>
     <string name="onboarding_salary_frequency_biweekly_desc">Wird alle zwei Wochen bezahlt.</string>
@@ -255,6 +260,7 @@
     <string name="onboarding_salary_error_payday_range">Verwenden Sie einen Zahltag von 1 bis 28.</string>
     <string name="onboarding_salary_error_next_date_required">Geben Sie das nächste Zahltagsdatum ein.</string>
     <string name="onboarding_fixed_costs_label_amount">Monatliche Grundkosten</string>
+    <string name="onboarding_fixed_costs_action">Diese Grundkosten schützen</string>
     <string name="onboarding_fixed_costs_error_required">Geben Sie monatliche Fixkosten ein. Verwenden Sie 0, wenn keine vorhanden ist.</string>
     <string name="onboarding_fixed_costs_error_negative">Fixkosten können nicht negativ sein.</string>
     <string name="onboarding_fixed_costs_error_exceeds_income">Die Fixkosten übersteigen Ihr Tageseinkommen. Fixkosten senken oder Einnahmen steigern.</string>
@@ -263,8 +269,8 @@
     <string name="onboarding_fixed_costs_protection_amount">%1$s zuerst geschützt</string>
     <string name="onboarding_fixed_costs_protection_amount_body">My Share reserviert diesen Betrag, bevor der restliche Zahltagsplan geformt wird.</string>
     <string name="onboarding_fixed_costs_remaining_label">Verbleibend für diesen Plan</string>
-    <string name="onboarding_fixed_costs_automation_title">Premium koordiniert den Regelmix</string>
-    <string name="onboarding_fixed_costs_automation_body">Premium kann Sparen, Investieren, Schulden, Puffer und Ziele nach jeder Bewertung gemeinsam ausrichten.</string>
+    <string name="onboarding_fixed_costs_automation_title">Reviews können dies später ausrichten</string>
+    <string name="onboarding_fixed_costs_automation_body">Starte mit der klaren Aufteilung von heute. Nach dem Zahltag kann ein kurzer Check-in zeigen, ob Sparen, Schulden, Puffer oder Ziele geändert werden sollten.</string>
     <string name="onboarding_fixed_costs_preset_title">Wählen Sie den Sicherheitsrahmen</string>
     <string name="onboarding_fixed_costs_preset_conservative">Streng</string>
     <string name="onboarding_fixed_costs_preset_conservative_desc">Halten Sie mehr Puffer für Rechnungen, bevor Ziele finanziert werden.</string>
@@ -273,6 +279,8 @@
     <string name="onboarding_fixed_costs_preset_growth">Zielfokussiert</string>
     <string name="onboarding_fixed_costs_preset_growth_desc">Leiten Sie mehr vom verbleibenden Geld in Ziele.</string>
     <string name="onboarding_fixed_costs_strategy_title">Wohin soll der Rest fließen?</string>
+    <string name="onboarding_strategy_default_label">Standardstrategie</string>
+    <string name="onboarding_strategy_adjust_action">Strategie anpassen</string>
     <string name="onboarding_strategy_balanced_savings">Ausgewogenes Sparen</string>
     <string name="onboarding_strategy_balanced_savings_desc">Behalten Sie ein Sparziel, ohne den Alltag zu stark einzuschränken.</string>
     <string name="onboarding_strategy_no_savings">Vorerst kein Sparen</string>
@@ -332,6 +340,25 @@
     <string name="home_plan_label_income">Einkommen pro Zahltag</string>
     <string name="home_plan_label_weekly">Wöchentlicher Führer</string>
     <string name="home_plan_allocation_title">Zuordnungsvorschau</string>
+    <string name="home_plan_readiness_label">Zahltag-Bereitschaft</string>
+    <string name="home_plan_readiness_title_ready">Bereit für den Zahltag</string>
+    <string name="home_plan_readiness_title_almost_ready">Fast bereit</string>
+    <string name="home_plan_readiness_title_needs_attention">Braucht Aufmerksamkeit</string>
+    <string name="home_plan_readiness_progress_label">%1$d von %2$d Schritten bereit</string>
+    <string name="home_plan_readiness_mission_bills">Rechnungen</string>
+    <string name="home_plan_readiness_mission_weekly">Wöchentlich</string>
+    <string name="home_plan_readiness_mission_priority">Priorität</string>
+    <string name="home_plan_readiness_next_action_ready">Deine Zahltag-Schritte sind klar. Prüfe sie nach dem Zahltag, damit der nächste Plan genauer wird.</string>
+    <string name="home_plan_readiness_next_action_bills">Schütze zuerst die wichtigsten Kosten, bevor tägliche Ausgaben starten.</string>
+    <string name="home_plan_readiness_next_action_weekly">Erstelle einen Wochenleitwert, damit Alltagsausgaben eine klare Grenze haben.</string>
+    <string name="home_plan_readiness_next_action_priority">Füge einen Prioritätsschritt hinzu, wenn dieser Zahltag ein Ziel, einen Puffer, Schulden oder Investments unterstützen kann.</string>
+    <string name="home_plan_payday_cue_title_today">Zahltag ist heute</string>
+    <string name="home_plan_payday_cue_title_tomorrow">Zahltag ist morgen</string>
+    <string name="home_plan_payday_cue_title_days">%1$d Tage bis zum Zahltag</string>
+    <string name="home_plan_payday_cue_body_finish_setup">Beende den fehlenden Bereitschaftsschritt, bevor das Geld ankommt.</string>
+    <string name="home_plan_payday_cue_body_keep_guide">Halte diesen Leitwert bereit, damit der Zahltag mit einem klaren Plan beginnt.</string>
+    <string name="home_plan_payday_cue_body_review">Prüfe diesen Zahltag, solange die Zahlen noch frisch sind.</string>
+    <string name="home_plan_payday_cue_body_review_premium">Prüfe diesen Zahltag, damit Premium den nächsten Schritt anpassen kann.</string>
     <string name="home_plan_label_fixed">Behoben</string>
     <string name="home_plan_label_flexible">Flexibel</string>
     <string name="home_plan_label_investing">Investieren</string>
@@ -386,7 +413,11 @@
     <string name="home_strategy_goal_preview_premium_label">Abo</string>
     <string name="home_strategy_goal_preview_premium_body">Aktuelles Ziel plus weiterer Meilenstein</string>
     <string name="home_strategy_goal_preview_action">Multi-Ziel-Plan ansehen</string>
-    <string name="home_strategy_goal_locked_hidden_title">%1$d zusätzliche Premium-Ziel(e) gesperrt</string>
+    <string name="home_strategy_goal_locked_hidden_title">Gesperrte Premium-Ziele: %1$d</string>
+    <plurals name="home_strategy_goal_locked_hidden_title_count">
+        <item quantity="one">%1$d zusätzliches Premium-Ziel gesperrt</item>
+        <item quantity="other">%1$d zusätzliche Premium-Ziele gesperrt</item>
+    </plurals>
     <string name="home_strategy_goal_locked_hidden_desc">Deine gespeicherten Ziele bleiben sicher. Premium entsperrt die gesamte Liste und teilt Zahltagsschritte auf sie auf.</string>
     <string name="home_strategy_rules_title">Automatisierte Regeln</string>
     <string name="home_strategy_rule_empty_title">Erstellen Sie eine Regel</string>
@@ -419,7 +450,11 @@
     <string name="home_strategy_rule_preview_premium_label">Adaptives Abo</string>
     <string name="home_strategy_rule_preview_premium_body">Mehrere Regeln, die aus Prüfungen lernen</string>
     <string name="home_strategy_rule_preview_action">Adaptive Regeln ansehen</string>
-    <string name="home_strategy_rule_locked_hidden_title">%1$d zusätzliche Premium-Regel(n) gesperrt</string>
+    <string name="home_strategy_rule_locked_hidden_title">Gesperrte Premium-Regeln: %1$d</string>
+    <plurals name="home_strategy_rule_locked_hidden_title_count">
+        <item quantity="one">%1$d zusätzliche Premium-Regel gesperrt</item>
+        <item quantity="other">%1$d zusätzliche Premium-Regeln gesperrt</item>
+    </plurals>
     <string name="home_strategy_rule_locked_hidden_desc">Deine gespeicherten Regeln bleiben sicher. Premium entsperrt alle Regeln und hält sie nach Prüfungen koordiniert.</string>
     <string name="home_review_performance_title">Zahltag-Muster</string>
     <string name="home_review_score_label">Vertrauenswert</string>
@@ -452,7 +487,7 @@
     <string name="home_review_checkin_title_scheduled">Nächster Check-in geplant</string>
     <string name="home_review_checkin_title_reviewed">Dieser Zahltag ist abgedeckt</string>
     <string name="home_review_checkin_body_ready">Trage unten ein, was passiert ist. Premium vergleicht es mit dem aktiven Leitwert, bevor die nächste Änderung vorgeschlagen wird.</string>
-    <string name="home_review_checkin_body_overdue">%1$s war der geplante Check-in. Premium wartet auf diese Prüfung, bevor der nächste Zahltag angepasst werden kann.</string>
+    <string name="home_review_checkin_body_overdue">Eine Prüfung lohnt sich noch. Ein kurzer Nachtrag zu %1$s hilft Premium, den nächsten Zahltag anzupassen.</string>
     <string name="home_review_checkin_body_scheduled">Premium prüft diesen Plan am %1$s erneut. Lass die Erinnerung aktiv, damit du dich leicht an die nächste Überprüfung erinnerst.</string>
     <string name="home_review_checkin_body_reviewed">Dieser Zahltag hat eine gespeicherte Prüfung. Premium beobachtet den Plan wieder am %1$s.</string>
     <string name="home_review_checkin_reminder_on">Erinnerung aktiv</string>
@@ -473,6 +508,14 @@
     <string name="home_review_recommendation_next_priority">Nächster Schritt</string>
     <string name="home_review_recommendation_confidence">%1$d%% Vertrauen</string>
     <string name="home_review_recommendation_review_count">Basierend auf %1$d Prüfung(en)</string>
+    <string name="paywall_recommendation_evidence_single">Basierend auf dieser Zahltagsprüfung. Speichere weitere Prüfungen, um den nächsten Schritt zu schärfen.</string>
+    <string name="paywall_recommendation_evidence_multiple">Basierend auf deinen letzten %1$d Zahltagsprüfungen.</string>
+    <string name="paywall_recommendation_move_title">Premium hat zusätzlichen Raum für Ziele gefunden</string>
+    <string name="paywall_recommendation_move_body">Diese Prüfung zeigt, dass du Ausgaben nahe %1$s halten und %2$s mehr zu Zielen bewegen kannst. Premium kann den nächsten Prioritätsschritt auf %3$s setzen.</string>
+    <string name="paywall_recommendation_restore_title">Premium hat einen sichereren nächsten Leitwert gefunden</string>
+    <string name="paywall_recommendation_restore_body">Diese Prüfung zeigt, dass der aktuelle flexible Leitwert von %1$s zu eng sein könnte. Premium kann den nächsten Leitwert auf %2$s erhöhen und %3$s für Prioritätsschritte behalten.</string>
+    <string name="paywall_recommendation_keep_title">Premium kann diesen Plan auf Kurs halten</string>
+    <string name="paywall_recommendation_keep_body">Diese Prüfung blieb nahe am Leitwert. Premium kann %1$s für flexible Ausgaben und %2$s für Prioritätsschritte weiter beobachten.</string>
     <string name="home_review_recommendation_apply">Anpassung anwenden</string>
     <string name="home_review_recommendation_confirm_title">Diese Premium-Anpassung anwenden?</string>
     <string name="home_review_recommendation_confirm_desc">My Share aktualisiert die Zahltagsregeln hinter deinem nächsten Leitwert. Du kannst die Änderung direkt danach prüfen oder rückgängig machen.</string>
@@ -522,6 +565,19 @@
     <string name="home_review_result_priority">Priorität</string>
     <string name="home_review_result_review_adjustment">Anpassung prüfen</string>
     <string name="home_review_result_done">Fertig</string>
+    <string name="home_review_saved_milestone_label">Prüfung gespeichert</string>
+    <string name="home_review_saved_milestone_title">Zahltag-Bild aktualisiert</string>
+    <string name="home_review_saved_milestone_title_first_cycle">Erster Zahltag-Zyklus abgeschlossen</string>
+    <plurals name="home_review_saved_milestone_body">
+        <item quantity="one">Deine Prüfung vom %1$s ist gespeichert. Du hast jetzt %2$d geprüften Zahltag.</item>
+        <item quantity="other">Deine Prüfung vom %1$s ist gespeichert. Du hast jetzt %2$d geprüfte Zahltage.</item>
+    </plurals>
+    <string name="home_review_saved_milestone_next_move_title">Der nächste Schritt ist bereit zur Vorschau</string>
+    <string name="home_review_saved_milestone_next_move_body">Premium kann diese Prüfung in die nächste Zahltag-Anpassung verwandeln.</string>
+    <string name="home_review_saved_milestone_pattern_title">Diese Prüfung hilft weiterhin</string>
+    <string name="home_review_saved_milestone_pattern_body">Jeder gespeicherte Zahltag macht den nächsten Plan leichter vergleichbar.</string>
+    <string name="home_review_saved_milestone_premium_action">Nächsten Premium-Schritt ansehen</string>
+    <string name="home_review_saved_milestone_done">Weiter planen</string>
     <string name="home_review_first_premium_label">Erste Premium-Prüfung</string>
     <string name="home_review_first_premium_title_locked">Ihre erste Prüfung kann den nächsten Schritt freischalten</string>
     <string name="home_review_first_premium_title_progress_loop">Bauen Sie eine Zahltags-Fortschrittsroutine auf</string>
@@ -613,7 +669,11 @@
     <string name="home_more_adjustment_memory_flexible">Flexibel</string>
     <string name="home_more_adjustment_memory_priority">Priorität</string>
     <string name="home_more_adjustment_memory_change">%1$s zu %2$s</string>
-    <string name="home_more_adjustment_memory_rules">%1$d Regel(n) von Premium aktualisiert</string>
+    <string name="home_more_adjustment_memory_rules">Von Premium aktualisierte Regeln: %1$d</string>
+    <plurals name="home_more_adjustment_memory_rules_count">
+        <item quantity="one">%1$d Regel von Premium aktualisiert</item>
+        <item quantity="other">%1$d Regeln von Premium aktualisiert</item>
+    </plurals>
     <string name="home_more_adjustment_memory_history_action">Anpassungsverlauf ansehen</string>
     <string name="home_more_adjustment_history_title">Anpassungsverlauf</string>
     <string name="home_more_adjustment_history_body">Sehen Sie, was Premium nach jeder Prüfung geändert hat, einschließlich Rücknahmen, damit Ihr Plan nachvollziehbar bleibt.</string>
@@ -635,8 +695,16 @@
     <string name="home_more_premium_preview_label">Premium-Zahltag-Autopilot</string>
     <string name="home_more_premium_preview_title">Den Plan weiter verbessern</string>
     <string name="home_more_premium_preview_body_with_reviews">Premium kann deine %1$d gespeicherten Prüfungen nutzen, den Wochenleitwert von %2$s vergleichen, den Prioritätsschritt von %3$s schützen und die nächste Anpassung vorschlagen.</string>
+    <plurals name="home_more_premium_preview_body_with_reviews_count">
+        <item quantity="one">Premium kann 1 gespeicherte Prüfung nutzen, den Wochenleitwert von %2$s vergleichen, den Prioritätsschritt von %3$s schützen und die nächste Anpassung vorschlagen.</item>
+        <item quantity="other">Premium kann %1$d gespeicherte Prüfungen nutzen, den Wochenleitwert von %2$s vergleichen, den Prioritätsschritt von %3$s schützen und die nächste Anpassung vorschlagen.</item>
+    </plurals>
     <string name="home_more_premium_preview_body_first_review">Nach dem ersten Check-in vergleicht Premium den Wochenleitwert von %1$s mit dem Ergebnis und schützt den Prioritätsschritt von %2$s vor dem nächsten Zahltag.</string>
     <string name="home_more_premium_preview_body_reviews_generic">Premium kann deine %1$d gespeicherten Prüfungen nutzen, Abweichungen erkennen und vorschlagen, was vor dem nächsten Zahltag anzupassen ist.</string>
+    <plurals name="home_more_premium_preview_body_reviews_generic_count">
+        <item quantity="one">Premium kann 1 gespeicherte Prüfung nutzen, Abweichungen erkennen und vorschlagen, was vor dem nächsten Zahltag anzupassen ist.</item>
+        <item quantity="other">Premium kann %1$d gespeicherte Prüfungen nutzen, Abweichungen erkennen und vorschlagen, was vor dem nächsten Zahltag anzupassen ist.</item>
+    </plurals>
     <string name="home_more_premium_preview_body_generic">Premium lernt nach der ersten Prüfung und macht aus jedem Check-in die nächste Anpassung.</string>
     <string name="home_more_premium_preview_signal_reviews">Prüfungen</string>
     <string name="home_more_premium_preview_signal_reviews_ready">%1$d bereit</string>
@@ -720,13 +788,15 @@
     <string name="paywall_currency_mismatch_notice">Dein Plan verwendet %1$s. Google Play berechnet in %2$s basierend auf deiner Play Store-Region.</string>
     <string name="paywall_autopilot_preview_goal_label">Erstellt für %1$s</string>
     <string name="paywall_autopilot_preview_title">Vorschau der nächsten Anpassung</string>
-    <string name="paywall_autopilot_preview_body">Premium beginnt mit deinem Wochenleitwert von %1$s und deiner Prioritätsbewegung von %2$s und nutzt dann Bewertungen und Anpassungsgedächtnis für den nächsten Zahltag.</string>
-    <string name="paywall_autopilot_preview_body_without_priority">Premium beginnt mit deinem Wochenleitwert von %1$s und nutzt dann Bewertungen und Anpassungsgedächtnis für den nächsten Zahltag.</string>
-    <string name="paywall_autopilot_preview_body_generic">Premium beginnt mit deinem Plan und nutzt dann Bewertungen und Anpassungsgedächtnis für den nächsten Zahltag.</string>
+    <string name="paywall_autopilot_preview_body">Nach deiner Prüfung zeigt Premium, ob du den Wochenleitwert von %1$s behalten oder den Prioritätsbetrag von %2$s vor dem nächsten Zahltag anpassen solltest.</string>
+    <string name="paywall_autopilot_preview_body_without_priority">Nach deiner Prüfung zeigt Premium, ob du den Wochenleitwert von %1$s behalten oder vor dem nächsten Zahltag anpassen solltest.</string>
+    <string name="paywall_autopilot_preview_body_generic">Nach deiner Prüfung macht Premium aus deinem Plan den Leitwert für den nächsten Zahltag.</string>
     <string name="paywall_autopilot_recommendation_title">Was Premium beobachtet</string>
     <string name="paywall_autopilot_recommendation_body">Wenn %1$s übrig bleiben, kann Premium vorschlagen, sie zu %2$s zu verschieben und %3$s/Woche sicher zu halten.</string>
     <string name="paywall_autopilot_recommendation_body_without_priority">Premium beobachtet deinen Wochenleitwert von %1$s und zeigt, was vor dem nächsten Zahltag angepasst werden sollte.</string>
     <string name="paywall_autopilot_recommendation_body_generic">Nach jeder Bewertung merkt Premium, was sich geändert hat, und zeigt, was vor dem nächsten Zahltag angepasst werden sollte.</string>
+    <string name="paywall_recommendation_preview_label">Aus deiner Prüfung bereit</string>
+    <string name="paywall_unlock_next_move_button">Diesen nächsten Schritt freischalten</string>
     <string name="paywall_autopilot_preview_free_label">Gratisplan</string>
     <string name="paywall_autopilot_preview_free_body">Folge dieser Aufteilung manuell.</string>
     <string name="paywall_autopilot_preview_premium_body">Bewertungen werden nächste Schritte.</string>
@@ -773,6 +843,7 @@
     <string name="paywall_subhead_brazil">Monatlich wird zuerst gezeigt, damit du bewertungsgesteuerte Hinweise testen kannst.</string>
     <string name="paywall_headline_default">Lass diesen Plan besser werden</string>
     <string name="paywall_subhead_default">Premium beobachtet jeden Check-in, merkt Änderungen und zeigt den nächsten Zahltagsschritt.</string>
+    <string name="paywall_subhead_no_trial">Premium beobachtet jeden Check-in, merkt Änderungen und zeigt den nächsten Zahltagsschritt, bevor du wieder ausgibst.</string>
     <string name="paywall_headline_review_momentum">Mach jeden Zahltags-Check-in wertvoll</string>
     <string name="paywall_subhead_review_momentum">Premium macht aus jedem kurzen Check-in einen klaren Schritt für den nächsten Zahltag.</string>
     <string name="insight_review_save_stress_success_headline">Sicherheitsnetz wächst</string>
@@ -802,6 +873,8 @@
     <string name="coaching_first_step_body">Toller Start mit Ihrer ersten Bewertung! Je mehr Sie protokollieren, desto intelligenter wird Ihre Gewohnheitsschleife.</string>
     <string name="notification_payday_title">Ihre Zahltag-Mission</string>
     <string name="notification_payday_body">Sichern Sie %1$s für Rechnungen und legen Sie %3$s zurück. Sie haben %2$s für sichere Ausgaben.</string>
+    <string name="notification_payday_review_due_title">Zahltag ist bereit zur Prüfung</string>
+    <string name="notification_payday_review_due_body">Prüfe, was passiert ist, solange dein Wochenleitwert von %1$s noch frisch ist.</string>
     <string name="notification_weekly_review_title">Kurzer Wochencheck</string>
     <string name="notification_weekly_review_body">Prüfe, ob dein Wochenleitwert von %1$s noch passt.</string>
     <string name="notification_premium_checkin_due_title">Dein Premium-Check-in ist bereit</string>

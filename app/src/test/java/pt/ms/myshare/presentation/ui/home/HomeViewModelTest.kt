@@ -43,6 +43,8 @@ import pt.ms.myshare.domain.repository.FirstRunExperienceRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.CreatePaydayAdjustmentRecommendationUseCase
+import pt.ms.myshare.domain.use_case.CreatePaydayCountdownCueUseCase
+import pt.ms.myshare.domain.use_case.CreatePaydayReadinessUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumCheckInPlanUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumGoalPaydaySplitUseCase
 import pt.ms.myshare.domain.use_case.CreatePremiumRulePaydayMixUseCase
@@ -130,6 +132,8 @@ class HomeViewModelTest {
             userPreferencesRepository = TestUserPreferencesRepository(),
             appReviewPromptRepository = fakeAppReviewPromptRepository,
             calculatePlanPreviewUseCase = calculatePlanPreviewUseCase,
+            createPaydayCountdownCueUseCase = CreatePaydayCountdownCueUseCase(),
+            createPaydayReadinessUseCase = CreatePaydayReadinessUseCase(),
             createPaydayAdjustmentRecommendationUseCase = CreatePaydayAdjustmentRecommendationUseCase(
                 calculatePlanPreviewUseCase,
                 ResolveAllocationStrategyRulesUseCase()
@@ -588,6 +592,25 @@ class HomeViewModelTest {
     }
 
     @Test
+    fun `free saveReview prepares first cycle milestone`() = runTest {
+        fakeEntitlementRepository.setEntitlementState(EntitlementState.FREE)
+        fakePlannerRepository.savePlan(defaultPlan())
+        advanceUntilIdle()
+
+        viewModel.onFlexibleSpendChanged("240")
+        viewModel.onGoalContributionChanged("170")
+        viewModel.saveReview()
+        advanceUntilIdle()
+
+        val milestone = viewModel.state.value.reviewCard.reviewSavedMilestone
+
+        assertTrue(viewModel.state.value.reviewSavedEventId > 0L)
+        assertEquals(1, milestone?.totalReviews)
+        assertEquals(true, milestone?.isFirstPaydayCycle)
+        assertTrue(milestone?.savedReviewDateLabel?.isNotBlank() == true)
+    }
+
+    @Test
     fun `downgrade to free disables premium automation and locks more card`() = runTest {
         fakeEntitlementRepository.setEntitlementState(EntitlementState.PRO)
         fakePlannerRepository.saveAutomationEnabled(true)
@@ -614,6 +637,7 @@ class HomeViewModelTest {
 
         assertEquals(0, stats.healthScore)
         assertEquals(0, stats.currentStreak)
+        assertEquals(0, stats.payCycleReviewStreak)
         assertEquals(BigDecimal.ZERO, stats.totalSavings)
         assertTrue(stats.performanceTrend.isEmpty())
         assertEquals(2, stats.totalReviews)
@@ -630,6 +654,7 @@ class HomeViewModelTest {
 
         assertEquals(50, stats.healthScore)
         assertEquals(1, stats.currentStreak)
+        assertEquals(2, stats.payCycleReviewStreak)
         assertEquals(BigDecimal("50"), stats.totalSavings)
         assertEquals(2, stats.performanceTrend.size)
         assertEquals(2, stats.totalReviews)
@@ -1194,7 +1219,8 @@ class HomeViewModelTest {
                 actualGoalContribution = BigDecimal("80"),
                 plannedFlexibleSpend = BigDecimal("300"),
                 plannedGoalContribution = BigDecimal("100"),
-                createdAt = LocalDate.of(2026, 5, 1)
+                createdAt = LocalDate.of(2026, 5, 1),
+                paydayDate = LocalDate.of(2026, 4, 1)
             )
         )
         fakePlannerRepository.saveReview(
@@ -1204,7 +1230,8 @@ class HomeViewModelTest {
                 actualGoalContribution = BigDecimal("150"),
                 plannedFlexibleSpend = BigDecimal("300"),
                 plannedGoalContribution = BigDecimal("100"),
-                createdAt = LocalDate.of(2026, 5, 2)
+                createdAt = LocalDate.of(2026, 5, 2),
+                paydayDate = LocalDate.of(2026, 5, 1)
             )
         )
     }

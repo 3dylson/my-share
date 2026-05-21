@@ -38,6 +38,7 @@ import pt.ms.myshare.BuildConfig
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.LegacyPremiumGrantStatus
+import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
 import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReadResult
 import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReader
@@ -107,6 +108,9 @@ fun HomeRoute(
         onSubscriptionRetentionContinue = viewModel::logSubscriptionRetentionContinue,
         onReminderSettingsOpened = viewModel::logReminderSettingsOpened,
         onReminderPermissionResult = viewModel::logReminderPermissionResult,
+        onPaydayCountdownCueReviewTapped = viewModel::logPaydayCountdownCueReviewTapped,
+        onReviewSavedMilestoneViewed = viewModel::logReviewSavedMilestoneViewed,
+        onReviewSavedMilestonePremiumClicked = viewModel::logReviewSavedMilestonePremiumClicked,
         onClaimLegacyPremiumGrant = viewModel::claimLegacyPremiumGrant,
         onDismissLegacyPremiumGrant = viewModel::dismissLegacyPremiumGrant,
         onConnectGoogleAccount = viewModel::connectGoogleAccount,
@@ -160,6 +164,9 @@ fun HomeScreen(
     onSubscriptionRetentionContinue: () -> Unit,
     onReminderSettingsOpened: (String) -> Unit,
     onReminderPermissionResult: (Boolean, String) -> Unit,
+    onPaydayCountdownCueReviewTapped: (PaydayCountdownCueState) -> Unit,
+    onReviewSavedMilestoneViewed: (ReviewSavedMilestoneState) -> Unit,
+    onReviewSavedMilestonePremiumClicked: (ReviewSavedMilestoneState) -> Unit,
     onClaimLegacyPremiumGrant: (android.app.Activity) -> Unit,
     onDismissLegacyPremiumGrant: () -> Unit,
     onConnectGoogleAccount: (String) -> Unit,
@@ -213,6 +220,7 @@ fun HomeScreen(
     var showStrategyRuleArchive by remember { mutableStateOf(false) }
     var showPremiumAdjustmentHistory by remember { mutableStateOf(false) }
     var showPremiumReviewResultSheet by remember { mutableStateOf(false) }
+    var showReviewSavedMilestoneSheet by remember { mutableStateOf(false) }
     var showSubscriptionRetentionDialog by remember { mutableStateOf(false) }
     var reminderSettingsSource by remember { mutableStateOf("more") }
     var recommendationPendingApply by remember { mutableStateOf<PaydayAdjustmentRecommendationState?>(null) }
@@ -295,9 +303,10 @@ fun HomeScreen(
             if (state.moreCard.isPremium) {
                 showPremiumReviewResultSheet = true
                 Timber.tag("HomeScreen").d("Premium review result sheet opened after saved review")
-            } else if (state.reviewHistory.isEmpty() || state.reviewCard.paydayRecommendation != null) {
-                openPremiumGate(HomePremiumGate.FirstReview)
-                Timber.tag("HomeScreen").d("Post-review Premium proof opened for free user")
+            } else if (state.reviewCard.reviewSavedMilestone != null) {
+                onReviewSavedMilestoneViewed(state.reviewCard.reviewSavedMilestone)
+                showReviewSavedMilestoneSheet = true
+                Timber.tag("HomeScreen").d("Review saved milestone sheet opened after saved review")
             } else {
                 snackbarHostState.showSnackbar(
                     message = reviewSavedMessage,
@@ -321,10 +330,144 @@ fun HomeScreen(
 
     if (showPaywallSheet) {
         val isPurchaseActivationPending = state.moreCard.billingMessage == BillingStatusMessageKeys.COMPLETED
+        val selectedPrice = if (state.moreCard.selectedBillingPlan == BillingPlan.ANNUAL) {
+            state.moreCard.actualAnnualPrice
+        } else {
+            state.moreCard.actualMonthlyPrice
+        }
+        val selectedPeriod = if (state.moreCard.selectedBillingPlan == BillingPlan.ANNUAL) {
+            stringResource(R.string.paywall_period_year)
+        } else {
+            stringResource(R.string.paywall_period_month)
+        }
+        val selectedTrialDays = if (state.moreCard.selectedBillingPlan == BillingPlan.ANNUAL) {
+            state.moreCard.actualAnnualTrialDays
+        } else {
+            state.moreCard.actualMonthlyTrialDays
+        }
+        val selectedPriceCurrencyCode = if (state.moreCard.selectedBillingPlan == BillingPlan.ANNUAL) {
+            state.moreCard.actualAnnualPriceCurrencyCode
+        } else {
+            state.moreCard.actualMonthlyPriceCurrencyCode
+        }
+        val checkoutTerms = when {
+            selectedPrice == null -> stringResource(R.string.paywall_footer_store_terms_unavailable)
+            selectedTrialDays != null -> stringResource(
+                R.string.paywall_footer_trial_terms,
+                selectedTrialDays,
+                selectedPrice,
+                selectedPeriod
+            )
+            else -> stringResource(R.string.paywall_footer_no_trial_terms, selectedPrice, selectedPeriod)
+        }
+        val currencyNotice = selectedPriceCurrencyCode
+            ?.takeUnless { it.equals(state.moreCard.userPreferences.currencyCode, ignoreCase = true) }
+            ?.let {
+                stringResource(
+                    R.string.paywall_currency_mismatch_notice,
+                    state.moreCard.userPreferences.currencyCode,
+                    it
+                )
+            }
+        val planOrder = if (state.moreCard.pricingStrategy?.heroPlan == BillingPlan.ANNUAL) {
+            listOf(BillingPlan.ANNUAL, BillingPlan.MONTHLY)
+        } else {
+            listOf(BillingPlan.MONTHLY, BillingPlan.ANNUAL)
+        }
+        val planOptions = planOrder.map { plan ->
+            PremiumPaywallPlanOption(
+                plan = plan,
+                title = stringResource(plan.paywallTitleRes),
+                price = when (plan) {
+                    BillingPlan.MONTHLY -> state.moreCard.actualMonthlyPrice
+                    BillingPlan.ANNUAL -> state.moreCard.actualAnnualPrice
+                } ?: stringResource(R.string.paywall_price_loading),
+                period = stringResource(plan.paywallPeriodRes),
+                badge = when {
+                    plan == BillingPlan.ANNUAL -> stringResource(R.string.paywall_badge_best_value)
+                    plan == state.moreCard.pricingStrategy?.heroPlan -> stringResource(R.string.paywall_badge_easy_start)
+                    else -> null
+                },
+                comparisonPrice = if (plan == BillingPlan.ANNUAL) {
+                    state.moreCard.annualMonthlyEquivalentPrice
+                } else {
+                    null
+                },
+                savingsLabel = if (plan == BillingPlan.ANNUAL) {
+                    state.moreCard.annualSavingsPrice?.let { stringResource(R.string.paywall_annual_savings_label, it) }
+                } else {
+                    null
+                },
+                isSelected = state.moreCard.selectedBillingPlan == plan
+            )
+        }
+        val planProofBody = when {
+            state.moreCard.weeklyGuideLabel.isNotBlank() && state.moreCard.priorityMoveLabel.isNotBlank() ->
+                stringResource(
+                    R.string.paywall_autopilot_preview_body,
+                    state.moreCard.weeklyGuideLabel,
+                    state.moreCard.priorityMoveLabel
+                )
+            state.moreCard.weeklyGuideLabel.isNotBlank() ->
+                stringResource(
+                    R.string.paywall_autopilot_preview_body_without_priority,
+                    state.moreCard.weeklyGuideLabel
+                )
+            else -> stringResource(R.string.paywall_autopilot_preview_body_generic)
+        }
+        val recommendationPreview = state.reviewCard.paydayRecommendation?.let { recommendation ->
+            val evidenceLabel = if (recommendation.analyzedReviewCount == 1) {
+                stringResource(R.string.paywall_recommendation_evidence_single)
+            } else {
+                stringResource(
+                    R.string.paywall_recommendation_evidence_multiple,
+                    recommendation.analyzedReviewCount
+                )
+            }
+            PremiumPaywallRecommendationPreview(
+                label = stringResource(R.string.paywall_recommendation_preview_label),
+                title = recommendation.paywallTitle(),
+                body = recommendation.paywallBody(),
+                currentFlexibleLabel = recommendation.currentFlexibleSpendLabel,
+                recommendedFlexibleLabel = recommendation.recommendedFlexibleSpendLabel,
+                currentPriorityLabel = recommendation.currentPriorityContributionLabel,
+                recommendedPriorityLabel = recommendation.recommendedPriorityContributionLabel,
+                flexibleMetricLabel = stringResource(R.string.home_review_recommendation_current_flex),
+                nextFlexibleMetricLabel = stringResource(R.string.home_review_recommendation_next_flex),
+                priorityMetricLabel = stringResource(R.string.home_review_recommendation_current_priority),
+                nextPriorityMetricLabel = stringResource(R.string.home_review_recommendation_next_priority),
+                confidenceLabel = evidenceLabel
+            )
+        }
+        val proofItems = if (recommendationPreview == null) {
+            listOf(
+                PremiumPaywallProofItem(
+                    label = stringResource(R.string.premium_badge),
+                    title = stringResource(R.string.paywall_autopilot_preview_title),
+                    body = planProofBody,
+                    icon = Icons.Default.AutoAwesome
+                )
+            )
+        } else {
+            emptyList()
+        }
         PremiumPaywallBottomSheet(
             onDismissRequest = { showPaywallSheet = false },
             title = stringResource(premiumGate.titleRes),
             body = stringResource(premiumGate.bodyResFor(state.reviewCard.premiumProofVariant)),
+            recommendationPreview = recommendationPreview,
+            proofItems = proofItems,
+            planOptions = planOptions,
+            checkoutTerms = checkoutTerms,
+            currencyNotice = currencyNotice,
+            upgradeButtonText = if (recommendationPreview != null) {
+                stringResource(R.string.paywall_unlock_next_move_button)
+            } else if (selectedTrialDays != null) {
+                stringResource(R.string.paywall_start_trial_button_first_checkin)
+            } else {
+                stringResource(R.string.paywall_upgrade_button)
+            },
+            onPlanSelected = onBillingPlanSelected,
             isBillingActionInProgress = state.moreCard.isBillingActionInProgress || isPurchaseActivationPending,
             billingMessage = state.moreCard.billingMessage,
             onUpgradeClick = { 
@@ -347,6 +490,21 @@ fun HomeScreen(
                 reviewPendingDelete = review
             }
         )
+    }
+
+    if (showReviewSavedMilestoneSheet) {
+        state.reviewCard.reviewSavedMilestone?.let { milestone ->
+            ReviewSavedMilestoneBottomSheet(
+                milestone = milestone,
+                onDismissRequest = { showReviewSavedMilestoneSheet = false },
+                onShowPremium = {
+                    showReviewSavedMilestoneSheet = false
+                    onReviewSavedMilestonePremiumClicked(milestone)
+                    openPremiumGate(HomePremiumGate.FirstReview)
+                    Timber.tag("HomeScreen").d("Post-review Premium proof opened from milestone sheet")
+                }
+            )
+        }
     }
 
     if (showPremiumReviewResultSheet) {
@@ -630,6 +788,7 @@ fun HomeScreen(
     val hasBlockingModal = showPaywallSheet ||
         showReviewHistoryTimeline ||
         showPremiumReviewResultSheet ||
+        showReviewSavedMilestoneSheet ||
         showStrategyGoalArchive ||
         showStrategyRuleArchive ||
         showPremiumAdjustmentHistory ||
@@ -767,6 +926,10 @@ fun HomeScreen(
                             premiumCheckIn = state.moreCard.premiumCheckIn,
                             onOpenPremiumControls = {
                                 onDestinationSelected(HomeDestination.MORE)
+                            },
+                            onPaydayCueReviewClick = { cue ->
+                                onPaydayCountdownCueReviewTapped(cue)
+                                onDestinationSelected(HomeDestination.REVIEW)
                             },
                             onShowPaywall = { gate ->
                                 openPremiumGate(gate)
@@ -992,6 +1155,53 @@ private data class ReminderSettingsSelection(
     val cadence: ReminderCadence
 )
 
+@Composable
+private fun PaydayAdjustmentRecommendationState.paywallTitle(): String {
+    return when (direction) {
+        PaydayAdjustmentRecommendationDirection.MOVE_MORE_TO_PRIORITY ->
+            stringResource(R.string.paywall_recommendation_move_title)
+        PaydayAdjustmentRecommendationDirection.RESTORE_FLEXIBLE_BUFFER ->
+            stringResource(R.string.paywall_recommendation_restore_title)
+        PaydayAdjustmentRecommendationDirection.KEEP_PLAN ->
+            stringResource(R.string.paywall_recommendation_keep_title)
+    }
+}
+
+@Composable
+private fun PaydayAdjustmentRecommendationState.paywallBody(): String {
+    return when (direction) {
+        PaydayAdjustmentRecommendationDirection.MOVE_MORE_TO_PRIORITY -> stringResource(
+            R.string.paywall_recommendation_move_body,
+            recommendedFlexibleSpendLabel,
+            adjustmentAmountLabel,
+            recommendedPriorityContributionLabel
+        )
+        PaydayAdjustmentRecommendationDirection.RESTORE_FLEXIBLE_BUFFER -> stringResource(
+            R.string.paywall_recommendation_restore_body,
+            currentFlexibleSpendLabel,
+            recommendedFlexibleSpendLabel,
+            recommendedPriorityContributionLabel
+        )
+        PaydayAdjustmentRecommendationDirection.KEEP_PLAN -> stringResource(
+            R.string.paywall_recommendation_keep_body,
+            currentFlexibleSpendLabel,
+            currentPriorityContributionLabel
+        )
+    }
+}
+
+private val BillingPlan.paywallTitleRes: Int
+    get() = when (this) {
+        BillingPlan.MONTHLY -> R.string.paywall_plan_monthly
+        BillingPlan.ANNUAL -> R.string.paywall_plan_annual
+    }
+
+private val BillingPlan.paywallPeriodRes: Int
+    get() = when (this) {
+        BillingPlan.MONTHLY -> R.string.paywall_period_month
+        BillingPlan.ANNUAL -> R.string.paywall_period_year
+    }
+
 @Preview(showBackground = true)
 @Composable
 private fun HomeScreenPreview() {
@@ -1037,6 +1247,9 @@ private fun HomeScreenPreview() {
             onSubscriptionRetentionContinue = {},
             onReminderSettingsOpened = {},
             onReminderPermissionResult = { _, _ -> },
+            onPaydayCountdownCueReviewTapped = { _ -> },
+            onReviewSavedMilestoneViewed = { _ -> },
+            onReviewSavedMilestonePremiumClicked = { _ -> },
             onClaimLegacyPremiumGrant = { _ -> },
             onDismissLegacyPremiumGrant = {},
             onConnectGoogleAccount = { _ -> },

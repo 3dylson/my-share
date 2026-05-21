@@ -57,6 +57,9 @@ fun FixedCostsScreen(
     var preset by remember { mutableStateOf(initialPreset) }
     var strategy by remember { mutableStateOf(initialStrategy) }
     var customStrategyName by remember { mutableStateOf(initialCustomStrategyName) }
+    var showStrategyOptions by remember {
+        mutableStateOf(initialStrategy != AllocationStrategy.BALANCED_SAVINGS || initialCustomStrategyName.isNotBlank())
+    }
     var validationRequested by remember { mutableStateOf(false) }
 
     val currencySymbol = remember(locale, userPreferences.currencyCode) {
@@ -110,7 +113,7 @@ fun FixedCostsScreen(
     OnboardingStepScaffold(
         title = stringResource(R.string.onboarding_fixed_costs_title),
         subtitle = stringResource(R.string.onboarding_fixed_costs_subtitle),
-        actionText = stringResource(R.string.continue_button),
+        actionText = stringResource(R.string.onboarding_fixed_costs_action),
         progressStep = 3,
         progressTotal = OnboardingViewModel.SETUP_STEP_TOTAL,
         onBack = onBack,
@@ -184,16 +187,6 @@ fun FixedCostsScreen(
             onPresetSelected = { preset = it }
         )
 
-        Spacer(Modifier.height(22.dp))
-
-        Text(
-            stringResource(R.string.onboarding_fixed_costs_strategy_title),
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Spacer(Modifier.height(10.dp))
-
         val strategyOptions = listOf(
             FixedCostStrategyOption(
                 strategy = AllocationStrategy.BALANCED_SAVINGS,
@@ -238,21 +231,43 @@ fun FixedCostsScreen(
                 accentColor = MaterialTheme.colorScheme.onSurfaceVariant
             )
         )
-        FixedCostStrategyGrid(
-            options = strategyOptions,
-            selectedStrategy = strategy,
-            onStrategySelected = { strategy = it }
-        )
+        val selectedStrategyOption = strategyOptions.first { it.strategy == strategy }
 
-        if (strategy == AllocationStrategy.CUSTOM) {
-            Spacer(Modifier.height(16.dp))
-            PremiumTextField(
-                value = customStrategyName,
-                onValueChange = { customStrategyName = it },
-                label = stringResource(R.string.onboarding_strategy_custom_label),
-                placeholder = stringResource(R.string.onboarding_strategy_custom_placeholder),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = inputKeyboardActions
+        Spacer(Modifier.height(18.dp))
+
+        if (showStrategyOptions) {
+            Text(
+                stringResource(R.string.onboarding_fixed_costs_strategy_title),
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(Modifier.height(10.dp))
+
+            FixedCostStrategyGrid(
+                options = strategyOptions,
+                selectedStrategy = strategy,
+                onStrategySelected = { strategy = it }
+            )
+
+            if (strategy == AllocationStrategy.CUSTOM) {
+                Spacer(Modifier.height(16.dp))
+                PremiumTextField(
+                    value = customStrategyName,
+                    onValueChange = { customStrategyName = it },
+                    label = stringResource(R.string.onboarding_strategy_custom_label),
+                    placeholder = stringResource(R.string.onboarding_strategy_custom_placeholder),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = inputKeyboardActions
+                )
+            }
+        } else {
+            FixedCostStrategyCollapsedCard(
+                title = selectedStrategyOption.title,
+                description = selectedStrategyOption.description,
+                icon = selectedStrategyOption.icon,
+                tint = selectedStrategyOption.accentColor,
+                onAdjustClick = { showStrategyOptions = true }
             )
         }
 
@@ -367,6 +382,66 @@ private fun FixedCostsAutomationCue() {
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = 17.sp
                 )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FixedCostStrategyCollapsedCard(
+    title: String,
+    description: String,
+    icon: ImageVector,
+    tint: Color,
+    onAdjustClick: () -> Unit
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.22f))
+    ) {
+        Row(
+            modifier = Modifier.padding(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = tint.copy(alpha = 0.12f)
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = tint,
+                    modifier = Modifier.padding(8.dp).size(19.dp)
+                )
+            }
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.onboarding_strategy_default_label),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 17.sp
+                )
+            }
+            TextButton(onClick = onAdjustClick) {
+                Text(stringResource(R.string.onboarding_strategy_adjust_action))
             }
         }
     }

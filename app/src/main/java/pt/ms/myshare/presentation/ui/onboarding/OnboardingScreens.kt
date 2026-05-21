@@ -120,9 +120,6 @@ fun PaywallScreen(
     }
     val selectedTrialDays = selectedProduct?.freeTrialDays?.takeIf { it > 0 }
     val useFirstCheckInTrialFraming = trialFraming == PaywallTrialFraming.FIRST_CHECKIN
-    val displayTrialDays = availableProducts
-        .mapNotNull { product -> product.freeTrialDays?.takeIf { days -> days > 0 } }
-        .maxOrNull()
     val currencyMismatchNotice = selectedProduct?.priceCurrencyCode
         ?.takeUnless { it.equals(userPreferences.currencyCode, ignoreCase = true) }
         ?.let {
@@ -254,7 +251,11 @@ fun PaywallScreen(
             Spacer(Modifier.height(8.dp))
 
             val headline = stringResource(paywallVariant.headlineRes)
-            val subhead = stringResource(paywallVariant.subheadRes)
+            val subhead = if (selectedTrialDays == null) {
+                stringResource(R.string.paywall_subhead_no_trial)
+            } else {
+                stringResource(paywallVariant.subheadRes)
+            }
 
             if (showSecurePremiumAccessPrompt) {
                 PaywallPurchaseSuccessContent(compactHeight = isCompactHeight)
@@ -275,11 +276,11 @@ fun PaywallScreen(
                     goalName = goalName,
                     headline = headline,
                     subhead = subhead,
-                    badge = if (displayTrialDays != null) {
+                    badge = if (selectedTrialDays != null) {
                         if (useFirstCheckInTrialFraming) {
                             stringResource(R.string.paywall_hero_trial_badge_first_checkin)
                         } else {
-                            stringResource(R.string.paywall_hero_trial_badge, displayTrialDays)
+                            stringResource(R.string.paywall_hero_trial_badge, selectedTrialDays)
                         }
                     } else {
                         stringResource(R.string.premium_badge)
@@ -602,90 +603,98 @@ private fun PaywallAutopilotPreviewCard(
 
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.78f),
-        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.55f))
+        shape = RoundedCornerShape(22.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.34f),
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.30f)),
+        tonalElevation = 2.dp
     ) {
         Column(
-            modifier = Modifier.padding(if (compactHeight) 12.dp else 18.dp),
-            verticalArrangement = Arrangement.spacedBy(if (compactHeight) 8.dp else 14.dp)
+            modifier = Modifier.padding(if (compactHeight) 14.dp else 18.dp),
+            verticalArrangement = Arrangement.spacedBy(if (compactHeight) 9.dp else 13.dp)
         ) {
             Surface(
                 shape = RoundedCornerShape(999.dp),
-                color = MySharePrimary
+                color = MySharePrimary.copy(alpha = 0.16f),
+                border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.24f))
             ) {
                 Text(
                     text = badge.uppercase(),
                     style = MaterialTheme.typography.labelSmall,
-                    color = Color.White,
-                    fontWeight = FontWeight.Black,
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp)
                 )
             }
             Text(
                 text = headline,
-                style = if (compactHeight) MaterialTheme.typography.titleMedium else MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.ExtraBold,
-                lineHeight = if (compactHeight) 23.sp else 31.sp,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                style = if (compactHeight) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                lineHeight = if (compactHeight) 23.sp else 29.sp,
+                color = MaterialTheme.colorScheme.onSurface
             )
             if (!compactHeight) {
                 Text(
                     text = subhead,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.78f),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = 21.sp
                 )
             }
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(if (compactHeight) 8.dp else 12.dp),
-                verticalAlignment = Alignment.Top
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.44f),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.14f))
             ) {
-                if (!compactHeight) {
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = MySharePrimary.copy(alpha = 0.14f)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.AutoAwesome,
-                            contentDescription = null,
-                            tint = MySharePrimary,
-                            modifier = Modifier.padding(8.dp).size(22.dp)
-                        )
-                    }
-                }
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(5.dp)
+                Row(
+                    modifier = Modifier.padding(if (compactHeight) 12.dp else 14.dp),
+                    horizontalArrangement = Arrangement.spacedBy(if (compactHeight) 8.dp else 12.dp),
+                    verticalAlignment = Alignment.Top
                 ) {
-                    if (goalName.isNotBlank()) {
+                    if (!compactHeight) {
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = MySharePrimary.copy(alpha = 0.14f)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.AutoAwesome,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(8.dp).size(20.dp)
+                            )
+                        }
+                    }
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(5.dp)
+                    ) {
+                        if (goalName.isNotBlank()) {
+                            Text(
+                                text = stringResource(R.string.paywall_autopilot_preview_goal_label, goalName),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.SemiBold,
+                                lineHeight = 14.sp
+                            )
+                        }
                         Text(
-                            text = stringResource(R.string.paywall_autopilot_preview_goal_label, goalName),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MySharePrimary,
+                            text = stringResource(R.string.paywall_autopilot_recommendation_title),
+                            style = if (compactHeight) MaterialTheme.typography.titleSmall else MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            lineHeight = 14.sp
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = recommendationBody,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            lineHeight = 18.sp
                         )
                     }
-                    Text(
-                        text = stringResource(R.string.paywall_autopilot_recommendation_title),
-                        style = if (compactHeight) MaterialTheme.typography.titleSmall else MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                    Text(
-                        text = recommendationBody,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.78f),
-                        lineHeight = 18.sp
-                    )
                 }
             }
 
             if (!compactHeight) {
-                HorizontalDivider(color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.14f))
-
                 PaywallAutopilotComparisonGrid()
             }
         }
@@ -747,13 +756,25 @@ private fun PaywallAutopilotComparisonPill(
 ) {
     Surface(
         modifier = modifier,
-        shape = RoundedCornerShape(8.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.38f)
+        shape = RoundedCornerShape(12.dp),
+        color = if (label.equals(stringResource(R.string.premium_badge), ignoreCase = true)) {
+            MySharePrimary.copy(alpha = 0.10f)
+        } else {
+            MaterialTheme.colorScheme.surface.copy(alpha = 0.34f)
+        },
+        border = BorderStroke(
+            1.dp,
+            if (label.equals(stringResource(R.string.premium_badge), ignoreCase = true)) {
+                MySharePrimary.copy(alpha = 0.22f)
+            } else {
+                MaterialTheme.colorScheme.outline.copy(alpha = 0.14f)
+            }
+        )
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 9.dp),
+            modifier = Modifier.padding(horizontal = 11.dp, vertical = 10.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.Top
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = icon,

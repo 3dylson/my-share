@@ -52,6 +52,7 @@ fun LazyListScope.homePlanTab(
     smartAdjustment: SmartAdjustmentControlState,
     premiumCheckIn: PremiumCheckInState?,
     onOpenPremiumControls: () -> Unit,
+    onPaydayCueReviewClick: (PaydayCountdownCueState) -> Unit,
     onShowPaywall: (HomePremiumGate) -> Unit
 ) {
     planCard?.let { card ->
@@ -72,6 +73,25 @@ fun LazyListScope.homePlanTab(
                 headline = headline,
                 body = summary
             )
+        }
+        card.paydayCue?.let { cue ->
+            item {
+                PaydayCountdownCueCard(
+                    cue = cue,
+                    isPremium = isPremium,
+                    onReviewClick = { onPaydayCueReviewClick(cue) }
+                )
+            }
+        }
+        card.readiness?.let { readiness ->
+            item {
+                PaydayReadinessCard(
+                    readiness = readiness,
+                    fixedCostsLabel = card.fixedCostsLabel,
+                    weeklyGuideLabel = card.weeklySpendLabel,
+                    priorityMoveLabel = card.savingsLabel
+                )
+            }
         }
         item {
             PremiumSectionHeader(title = stringResource(R.string.home_plan_metrics_title))

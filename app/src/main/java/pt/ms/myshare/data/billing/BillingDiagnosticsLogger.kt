@@ -104,7 +104,13 @@ internal object BillingDiagnosticsLogger {
 
     private fun StoreProduct.isFounderOffer(): Boolean {
         return offerId == PremiumSubscriptionProducts.ANNUAL_FOUNDER_OFFER_ID ||
-            PremiumSubscriptionProducts.FOUNDER_OFFER_TAG in offerTags
+            PremiumSubscriptionProducts.FOUNDER_OFFER_TAG in offerTags ||
+            isLegacyFreeYearOffer()
+    }
+
+    private fun StoreProduct.isLegacyFreeYearOffer(): Boolean {
+        return productId == PremiumSubscriptionProducts.ANNUAL_ID &&
+            (freeTrialDays ?: 0) >= LEGACY_FREE_YEAR_TRIAL_DAYS
     }
 
     private fun List<String>.toAnalyticsValue(): String {
@@ -125,6 +131,7 @@ internal object BillingDiagnosticsLogger {
 
     private const val TAG = "BillingDiagnostics"
     private const val VALUE_NONE = "none"
+    private const val LEGACY_FREE_YEAR_TRIAL_DAYS = 300
     private const val MAX_ANALYTICS_VALUE_LENGTH = 100
     private const val MAX_CRASHLYTICS_VALUE_LENGTH = 120
 }
