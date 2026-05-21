@@ -1,7 +1,9 @@
 package pt.ms.myshare.presentation.ui.localization
 
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.res.Configuration
+import android.content.res.Resources
 import android.os.Build
 import android.os.LocaleList
 import android.text.TextUtils
@@ -26,7 +28,10 @@ fun UserLocaleProvider(
         Configuration(baseConfiguration).applySelectedLocale(locale)
     }
     val localizedContext = remember(baseContext, localizedConfiguration) {
-        baseContext.createConfigurationContext(localizedConfiguration)
+        ActivityBackedLocalizedContext(
+            base = baseContext,
+            localized = baseContext.createConfigurationContext(localizedConfiguration)
+        )
     }
     val layoutDirection = remember(locale) {
         if (TextUtils.getLayoutDirectionFromLocale(locale) == android.view.View.LAYOUT_DIRECTION_RTL) {
@@ -42,6 +47,14 @@ fun UserLocaleProvider(
         LocalLayoutDirection provides layoutDirection,
         content = content
     )
+}
+
+private class ActivityBackedLocalizedContext(
+    base: Context,
+    private val localized: Context
+) : ContextWrapper(base) {
+    override fun getResources(): Resources = localized.resources
+    override fun getAssets() = localized.assets
 }
 
 private fun Configuration.applySelectedLocale(locale: Locale): Configuration {
