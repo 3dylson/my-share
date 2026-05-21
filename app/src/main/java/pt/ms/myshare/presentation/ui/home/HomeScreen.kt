@@ -200,7 +200,7 @@ fun HomeScreen(
     val googleIdTokenReader = remember(context) {
         GoogleIdTokenReader(
             credentialManager = CredentialManager.create(context),
-            serverClientId = BuildConfig.GOOGLE_CLIENT_ID
+            serverClientId = context.getString(R.string.default_web_client_id)
         )
     }
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current

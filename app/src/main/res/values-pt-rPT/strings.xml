@@ -594,9 +594,9 @@
     <string name="home_review_first_premium_step_adjust_desc">Defina o próximo guia.</string>
     <string name="home_review_first_premium_action">Ver teste Premium</string>
     <string name="home_review_manual_title">Check-in no dia de pagamento</string>
-    <string name="home_review_manual_desc">Introduz o que gastaste e guardaste para manter o próximo guia útil.</string>
-    <string name="home_review_input_flex_exact">Real flexível</string>
-    <string name="home_review_input_goal_exact">Meta real</string>
+    <string name="home_review_manual_desc">Depois do pagamento, introduz o que aconteceu mesmo: quanto gastaste do dinheiro flexível e quanto moveste para a tua meta.</string>
+    <string name="home_review_input_flex_exact">Gasto do dinheiro flexível</string>
+    <string name="home_review_input_goal_exact">Movido para a meta</string>
     <string name="home_review_submit">Enviar avaliação</string>
     <string name="home_review_saved_feedback">Revisão guardada. A tua visão do pagamento foi atualizada.</string>
     <string name="home_review_history_title">Histórico de pagamentos</string>

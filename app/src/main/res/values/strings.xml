@@ -644,9 +644,9 @@
     <string name="home_review_first_premium_step_adjust_desc">Set the next guide.</string>
     <string name="home_review_first_premium_action">See Premium trial</string>
     <string name="home_review_manual_title">Payday check-in</string>
-    <string name="home_review_manual_desc">Enter what you spent and saved so the next guide stays useful.</string>
-    <string name="home_review_input_flex_exact">Flexible actual</string>
-    <string name="home_review_input_goal_exact">Goal actual</string>
+    <string name="home_review_manual_desc">After payday, enter what really happened: how much flexible money you spent, and how much you moved to your goal.</string>
+    <string name="home_review_input_flex_exact">Spent from flexible money</string>
+    <string name="home_review_input_goal_exact">Moved to goal</string>
     <string name="home_review_submit">Submit review</string>
     <string name="home_review_saved_feedback">Review saved. Your payday picture is updated.</string>
     <string name="home_review_history_title">Payday history</string>
