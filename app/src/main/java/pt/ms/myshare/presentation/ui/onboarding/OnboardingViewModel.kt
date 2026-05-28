@@ -545,7 +545,7 @@ class OnboardingViewModel @Inject constructor(
                                 googleConnectionError = "home_more_account_connect_google_error_generic"
                             )
                         }
-                        FirebaseUtils.logEvent("google_account_connect_failed", Bundle().apply {
+                        FirebaseUtils.logEvent("account_google_connect_failed", Bundle().apply {
                             putString("source", "onboarding_paywall")
                         })
                         Timber.tag(TAG).e("Google account connected but onboarding local state merge failed")
@@ -562,7 +562,7 @@ class OnboardingViewModel @Inject constructor(
                             googleConnectionError = null
                         )
                     }
-                    FirebaseUtils.logEvent("google_account_connected", Bundle().apply {
+                    FirebaseUtils.logEvent("account_google_connected", Bundle().apply {
                         putString("source", "onboarding_paywall")
                     })
                     Timber.tag(TAG).d("Google account connected from onboarding paywall")
@@ -575,7 +575,7 @@ class OnboardingViewModel @Inject constructor(
                             googleConnectionError = "home_more_account_connect_google_error_generic"
                         )
                     }
-                    FirebaseUtils.logEvent("google_account_connect_failed", Bundle().apply {
+                    FirebaseUtils.logEvent("account_google_connect_failed", Bundle().apply {
                         putString("source", "onboarding_paywall")
                     })
                     Timber.tag(TAG).e(throwable, "Google account connection failed from onboarding paywall")
@@ -693,7 +693,7 @@ class OnboardingViewModel @Inject constructor(
 
     fun restorePurchases(onRestored: (Boolean) -> Unit) {
         viewModelScope.launch {
-            state.update { it.copy(isBillingActionInProgress = true, billingMessage = "paywall_restore_checking") }
+            state.update { it.copy(isBillingActionInProgress = true, billingMessage = BillingStatusMessageKeys.RESTORE_CHECKING) }
             FirebaseUtils.logEvent("purchase_restore_started", Bundle().apply {
                 putString("source", "onboarding_paywall")
             })
@@ -703,7 +703,11 @@ class OnboardingViewModel @Inject constructor(
                 it.copy(
                     isPremium = restored,
                     isBillingActionInProgress = false,
-                    billingMessage = if (restored) "paywall_restore_success" else "paywall_restore_none"
+                    billingMessage = if (restored) {
+                        BillingStatusMessageKeys.RESTORE_SUCCESS
+                    } else {
+                        BillingStatusMessageKeys.RESTORE_NONE
+                    }
                 )
             }
             FirebaseUtils.logEvent("purchase_restore_completed", Bundle().apply {

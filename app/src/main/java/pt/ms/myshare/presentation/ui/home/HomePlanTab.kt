@@ -58,20 +58,19 @@ fun LazyListScope.homePlanTab(
     planCard?.let { card ->
         item {
             val context = LocalContext.current
-            val headline = if (card.nextPaydayKey != null) {
+            val nextPaydayText = if (card.nextPaydayKey != null) {
                 stringResource(
                     context.resources.getIdentifier(card.nextPaydayKey, "string", context.packageName),
                     *card.nextPaydayArgs.toTypedArray()
                 )
-            } else card.nextPaydayLabel
-            val summary = remember(card.summary) {
-                val resId = context.resources.getIdentifier(card.summary, "string", context.packageName)
-                if (resId != 0) context.getString(resId) else card.summary
+            } else {
+                card.nextPaydayLabel
             }
-
-            CompactPaydaySummary(
-                headline = headline,
-                body = summary
+            TodayPaydayMoveCard(
+                nextPaydayText = nextPaydayText,
+                fixedCostsLabel = card.fixedCostsLabel,
+                weeklyGuideLabel = card.weeklySpendLabel,
+                priorityMoveLabel = card.savingsLabel
             )
         }
         card.paydayCue?.let { cue ->
@@ -170,6 +169,126 @@ fun LazyListScope.homePlanTab(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun TodayPaydayMoveCard(
+    nextPaydayText: String,
+    fixedCostsLabel: String,
+    weeklyGuideLabel: String,
+    priorityMoveLabel: String,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
+        border = BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.24f))
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = MySharePrimary.copy(alpha = 0.14f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.PlayCircle,
+                        contentDescription = null,
+                        tint = MySharePrimary,
+                        modifier = Modifier.padding(10.dp).size(22.dp)
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_plan_today_move_label).uppercase(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MySharePrimary,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = stringResource(R.string.home_plan_today_move_title),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = nextPaydayText,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                TodayMoveRow(
+                    icon = Icons.Default.Savings,
+                    label = stringResource(R.string.home_plan_today_move_priority),
+                    value = priorityMoveLabel
+                )
+                TodayMoveRow(
+                    icon = Icons.Default.ShoppingBag,
+                    label = stringResource(R.string.home_plan_today_move_weekly),
+                    value = weeklyGuideLabel,
+                    accentColor = MySharePositive
+                )
+                TodayMoveRow(
+                    icon = Icons.Default.AccountBalance,
+                    label = stringResource(R.string.home_plan_today_move_bills),
+                    value = fixedCostsLabel
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TodayMoveRow(
+    icon: ImageVector,
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+    accentColor: Color = MySharePrimary
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = accentColor.copy(alpha = 0.12f)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = accentColor,
+                modifier = Modifier.padding(8.dp).size(18.dp)
+            )
+        }
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 

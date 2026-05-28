@@ -337,6 +337,11 @@
     <string name="onboarding_reminder_button">Activer les rappels</string>
     <string name="onboarding_reminder_skip">Passer les rappels</string>
     <string name="home_plan_metrics_title">Indicateurs de base</string>
+    <string name="home_plan_today_move_label">Action de paie</string>
+    <string name="home_plan_today_move_title">Fais ceci le jour de paie</string>
+    <string name="home_plan_today_move_priority">Déplacer vers l’objectif</string>
+    <string name="home_plan_today_move_weekly">Garder par semaine</string>
+    <string name="home_plan_today_move_bills">Protéger pour les factures</string>
     <string name="home_plan_label_income">Revenu par jour de paie</string>
     <string name="home_plan_label_weekly">Guide hebdomadaire</string>
     <string name="home_plan_allocation_title">Aperçu de l\'allocation</string>
@@ -883,6 +888,10 @@
     <string name="notification_premium_checkin_due_body">Fais le bilan de cette paie pour que Premium protège %1$s/semaine et ton prochain mouvement de %2$s.</string>
     <string name="notification_premium_checkin_overdue_title">Le bilan reste utile</string>
     <string name="notification_premium_checkin_overdue_body">Un bilan rapide peut encore aider Premium à ajuster ton guide de %1$s/semaine et ton prochain mouvement de %2$s.</string>
+    <string name="notification_action_fine">Ça va</string>
+    <string name="notification_action_tight">Serré</string>
+    <string name="notification_action_almost_gone">Presque fini</string>
+    <string name="notification_action_moved_goal_money">Objectif déplacé</string>
     <string name="home_plan_next_payday">Prochain jour de paie : %1$s</string>
     <string name="home_goal_mission_accomplished">Mission accomplie !</string>
     <string name="home_goal_on_pace">Au rythme pour %1$s</string>

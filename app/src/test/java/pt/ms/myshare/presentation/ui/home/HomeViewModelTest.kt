@@ -63,6 +63,7 @@ import pt.ms.myshare.domain.use_case.UpdateGoalProgressUseCase
 import pt.ms.myshare.domain.use_case.GetPerformanceStatsUseCase
 import pt.ms.myshare.domain.use_case.GetCoachingInsightsUseCase
 import pt.ms.myshare.domain.use_case.ResolveAllocationStrategyRulesUseCase
+import pt.ms.myshare.domain.use_case.SavePaydayReviewUseCase
 import pt.ms.myshare.domain.model.Goal
 import pt.ms.myshare.domain.model.GoogleAccountConnection
 import pt.ms.myshare.domain.model.GoogleAccountConnectionMode
@@ -78,6 +79,7 @@ import pt.ms.myshare.domain.repository.ProductConfigRepository
 import pt.ms.myshare.TestUserPreferencesRepository
 import pt.ms.myshare.presentation.ui.localization.UserLocaleManager
 import pt.ms.myshare.presentation.ui.onboarding.ReminderWorkScheduler
+import pt.ms.myshare.presentation.ui.paywall.BillingStatusMessageKeys
 import io.mockk.mockk
 import io.mockk.every
 import io.mockk.coEvery
@@ -152,6 +154,11 @@ class HomeViewModelTest {
             adjustGoalProgressForReviewCorrectionUseCase = AdjustGoalProgressForReviewCorrectionUseCase(
                 fakePlannerRepository,
                 fakeEntitlementRepository
+            ),
+            savePaydayReviewUseCase = SavePaydayReviewUseCase(
+                fakePlannerRepository,
+                calculatePlanPreviewUseCase,
+                mockUpdateGoalProgressUseCase
             ),
             getPerformanceStatsUseCase = GetPerformanceStatsUseCase(fakePlannerRepository),
             getCoachingInsightsUseCase = GetCoachingInsightsUseCase(calculatePlanPreviewUseCase),
@@ -389,7 +396,7 @@ class HomeViewModelTest {
         advanceUntilIdle()
 
         assertEquals(
-            "paywall_billing_products_unavailable",
+            BillingStatusMessageKeys.PRODUCTS_UNAVAILABLE,
             viewModel.state.value.moreCard.billingMessage
         )
         assertEquals("more_error_products_not_loaded", viewModel.state.value.moreCard.error)
@@ -405,7 +412,7 @@ class HomeViewModelTest {
         advanceUntilIdle()
 
         assertEquals(
-            "paywall_billing_products_unavailable",
+            BillingStatusMessageKeys.PRODUCTS_UNAVAILABLE,
             viewModel.state.value.moreCard.billingMessage
         )
         assertEquals("more_error_products_not_loaded", viewModel.state.value.moreCard.error)
@@ -453,7 +460,7 @@ class HomeViewModelTest {
         advanceUntilIdle()
 
         assertEquals(
-            "paywall_billing_checkout_failed",
+            BillingStatusMessageKeys.CHECKOUT_FAILED,
             viewModel.state.value.moreCard.billingMessage
         )
         assertEquals(false, viewModel.state.value.moreCard.isBillingActionInProgress)
@@ -480,7 +487,7 @@ class HomeViewModelTest {
         advanceUntilIdle()
 
         assertEquals(
-            "paywall_billing_handoff",
+            BillingStatusMessageKeys.HANDOFF,
             viewModel.state.value.moreCard.billingMessage
         )
 
@@ -488,7 +495,7 @@ class HomeViewModelTest {
         advanceUntilIdle()
 
         assertEquals(
-            "paywall_billing_canceled",
+            BillingStatusMessageKeys.CANCELED,
             viewModel.state.value.moreCard.billingMessage
         )
     }
@@ -505,7 +512,7 @@ class HomeViewModelTest {
         assertTrue(fakePlannerRepository.automationEnabled())
         assertTrue(viewModel.state.value.moreCard.automationEnabled)
         assertEquals(
-            "paywall_billing_completed",
+            BillingStatusMessageKeys.COMPLETED,
             viewModel.state.value.moreCard.billingMessage
         )
     }

@@ -34,6 +34,7 @@ import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
 import pt.ms.myshare.domain.model.PremiumAdjustmentStatus
 import pt.ms.myshare.domain.model.PremiumCheckInStatus
 import pt.ms.myshare.presentation.ui.components.*
+import pt.ms.myshare.presentation.ui.localization.resolve
 import pt.ms.myshare.presentation.ui.preferences.currencyLabel
 import pt.ms.myshare.presentation.ui.preferences.languageLabel
 import pt.ms.myshare.presentation.ui.theme.*
@@ -1509,9 +1510,8 @@ private fun MorePremiumUpgradeSection(
             )
         }
         if (state.billingMessage != null) {
-            val billingMessage = remember(state.billingMessage) {
-                val resId = context.resources.getIdentifier(state.billingMessage, "string", context.packageName)
-                if (resId != 0) context.getString(resId) else state.billingMessage
+            val billingMessage = remember(state.billingMessage, context) {
+                state.billingMessage.resolve(context)
             }
             PremiumInfoCard(
                 title = billingMessage,

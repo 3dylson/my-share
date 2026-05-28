@@ -26,6 +26,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.BillingPlan
+import pt.ms.myshare.presentation.ui.localization.UiText
+import pt.ms.myshare.presentation.ui.localization.resolve
 
 data class PremiumPaywallProofItem(
     val label: String,
@@ -75,7 +77,7 @@ fun PremiumPaywallBottomSheet(
     upgradeButtonText: String? = null,
     onPlanSelected: (BillingPlan) -> Unit = {},
     isBillingActionInProgress: Boolean = false,
-    billingMessage: String? = null,
+    billingMessage: UiText? = null,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 ) {
     val resolvedTitle = title ?: stringResource(R.string.premium_gate_general_title)
@@ -157,8 +159,7 @@ fun PremiumPaywallBottomSheet(
 
             if (billingMessage != null) {
                 val resolvedBillingMessage = remember(billingMessage, context) {
-                    val resId = context.resources.getIdentifier(billingMessage, "string", context.packageName)
-                    if (resId != 0) context.getString(resId) else billingMessage
+                    billingMessage.resolve(context)
                 }
                 Surface(
                     modifier = Modifier

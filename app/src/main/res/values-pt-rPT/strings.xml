@@ -338,6 +338,11 @@
     <string name="onboarding_reminder_button">Ativar lembretes</string>
     <string name="onboarding_reminder_skip">Ignorar lembretes</string>
     <string name="home_plan_metrics_title">Métricas principais</string>
+    <string name="home_plan_today_move_label">Movimento do pagamento</string>
+    <string name="home_plan_today_move_title">Faz isto no pagamento</string>
+    <string name="home_plan_today_move_priority">Mover para a meta</string>
+    <string name="home_plan_today_move_weekly">Guardar por semana</string>
+    <string name="home_plan_today_move_bills">Proteger para contas</string>
     <string name="home_plan_label_income">Rendimento por dia de pagamento</string>
     <string name="home_plan_label_weekly">Guia semanal</string>
     <string name="home_plan_allocation_title">Visualização de alocação</string>
@@ -900,6 +905,10 @@
     <string name="notification_premium_checkin_due_body">Revê este pagamento para o Premium proteger %1$s/semana e o teu próximo movimento de %2$s.</string>
     <string name="notification_premium_checkin_overdue_title">Ainda vale a pena rever</string>
     <string name="notification_premium_checkin_overdue_body">Uma revisão rápida ainda pode ajudar o Premium a ajustar o guia semanal de %1$s e o próximo movimento de %2$s.</string>
+    <string name="notification_action_fine">Tudo bem</string>
+    <string name="notification_action_tight">Apertado</string>
+    <string name="notification_action_almost_gone">Quase acabou</string>
+    <string name="notification_action_moved_goal_money">Meta movida</string>
     <string name="home_plan_next_payday">Próximo dia de pagamento: %1$s</string>
     <string name="home_goal_mission_accomplished">Missão Cumprida!</string>
     <string name="home_goal_on_pace">Ao ritmo por %1$s</string>

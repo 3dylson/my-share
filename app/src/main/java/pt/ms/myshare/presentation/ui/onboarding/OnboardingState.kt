@@ -11,6 +11,7 @@ import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.domain.model.PricingStrategy
 import pt.ms.myshare.domain.model.StoreProduct
 import pt.ms.myshare.domain.model.UserPreferences
+import pt.ms.myshare.presentation.ui.localization.UiText
 import java.math.BigDecimal
 
 data class OnboardingState(
@@ -43,7 +44,7 @@ data class OnboardingState(
     val selectedBillingPlan: BillingPlan = BillingPlan.MONTHLY,
     val hasUserSelectedBillingPlan: Boolean = false,
     val isBillingActionInProgress: Boolean = false,
-    val billingMessage: String? = null,
+    val billingMessage: UiText? = null,
     val planSaved: Boolean = false,
     val reminderSaved: Boolean = false,
     val reminderSkipped: Boolean = false,

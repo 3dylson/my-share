@@ -387,6 +387,11 @@
     <string name="onboarding_reminder_skip">Skip reminders</string>
 
     <string name="home_plan_metrics_title">Core metrics</string>
+    <string name="home_plan_today_move_label">Payday move</string>
+    <string name="home_plan_today_move_title">Do this on payday</string>
+    <string name="home_plan_today_move_priority">Move to your goal</string>
+    <string name="home_plan_today_move_weekly">Keep for each week</string>
+    <string name="home_plan_today_move_bills">Protect for bills</string>
     <string name="home_plan_label_income">Income per payday</string>
     <string name="home_plan_label_weekly">Weekly guide</string>
     <string name="home_plan_allocation_title">Allocation preview</string>
@@ -963,6 +968,10 @@
     <string name="notification_premium_checkin_due_body">Review this payday so Premium can protect %1$s/week and your %2$s next move.</string>
     <string name="notification_premium_checkin_overdue_title">Still worth reviewing</string>
     <string name="notification_premium_checkin_overdue_body">A quick check-in can still help Premium tune your %1$s weekly guide and %2$s next move.</string>
+    <string name="notification_action_fine">Fine</string>
+    <string name="notification_action_tight">Tight</string>
+    <string name="notification_action_almost_gone">Almost gone</string>
+    <string name="notification_action_moved_goal_money">Moved goal money</string>
 
     <!-- Home ViewModel Additions -->
     <string name="home_plan_next_payday">Next payday: %1$s</string>

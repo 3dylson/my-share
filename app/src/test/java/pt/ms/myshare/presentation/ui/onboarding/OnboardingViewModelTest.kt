@@ -48,6 +48,7 @@ import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.ResolveAllocationStrategyRulesUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
 import pt.ms.myshare.presentation.ui.localization.UserLocaleManager
+import pt.ms.myshare.presentation.ui.paywall.BillingStatusMessageKeys
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -409,7 +410,7 @@ class OnboardingViewModelTest {
         viewModel.purchasePremium(activity)
         advanceUntilIdle()
         coVerify { entitlementRepository.purchasePlan(activity, monthlyProduct) }
-        assertEquals("paywall_billing_handoff", viewModel.uiState.value.billingMessage)
+        assertEquals(BillingStatusMessageKeys.HANDOFF, viewModel.uiState.value.billingMessage)
     }
 
     @Test
@@ -432,7 +433,7 @@ class OnboardingViewModelTest {
         viewModel.purchasePremium(mockk(relaxed = true))
         advanceUntilIdle()
 
-        assertEquals("paywall_billing_checkout_failed", viewModel.uiState.value.billingMessage)
+        assertEquals(BillingStatusMessageKeys.CHECKOUT_FAILED, viewModel.uiState.value.billingMessage)
         assertFalse(viewModel.uiState.value.isBillingActionInProgress)
     }
 
@@ -442,7 +443,7 @@ class OnboardingViewModelTest {
         val activity = mockk<android.app.Activity>(relaxed = true)
         viewModel.purchasePremium(activity)
         advanceUntilIdle()
-        assertEquals("paywall_billing_products_unavailable", viewModel.uiState.value.billingMessage)
+        assertEquals(BillingStatusMessageKeys.PRODUCTS_UNAVAILABLE, viewModel.uiState.value.billingMessage)
         assertFalse(viewModel.uiState.value.isBillingActionInProgress)
         coVerify(exactly = 0) { entitlementRepository.purchasePlan(any(), any()) }
     }
@@ -504,7 +505,7 @@ class OnboardingViewModelTest {
         advanceUntilIdle()
 
         assertTrue(viewModel.uiState.value.shouldSecurePremiumAccess)
-        assertEquals("paywall_billing_completed", viewModel.uiState.value.billingMessage)
+        assertEquals(BillingStatusMessageKeys.COMPLETED, viewModel.uiState.value.billingMessage)
         coVerify { plannerRepository.saveAutomationEnabled(true) }
     }
 

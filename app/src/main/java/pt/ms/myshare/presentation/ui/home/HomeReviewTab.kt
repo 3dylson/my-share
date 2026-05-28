@@ -93,6 +93,26 @@ fun LazyListScope.homeReviewTab(
             Spacer(Modifier.height(16.dp))
         }
     }
+
+    item {
+        val context = LocalContext.current
+        val errorMessage = remember(state.error) {
+            state.error?.let {
+                val resId = context.resources.getIdentifier(it, "string", context.packageName)
+                if (resId != 0) context.getString(resId) else it
+            }
+        }
+        CompactReviewEntryCard(
+            flexibleSpend = state.actualFlexibleSpend,
+            goalContribution = state.actualGoalContribution,
+            currencySymbol = state.currencySymbol,
+            errorMessage = errorMessage,
+            onFlexibleSpendChanged = onFlexibleSpendChanged,
+            onGoalContributionChanged = onGoalContributionChanged,
+            onSaveReview = onSaveReview
+        )
+        Spacer(Modifier.height(16.dp))
+    }
     
     if (history.isNotEmpty()) {
         item {
@@ -267,25 +287,6 @@ fun LazyListScope.homeReviewTab(
             )
             Spacer(Modifier.height(16.dp))
         }
-    }
-
-    item {
-        val context = LocalContext.current
-        val errorMessage = remember(state.error) {
-            state.error?.let {
-                val resId = context.resources.getIdentifier(it, "string", context.packageName)
-                if (resId != 0) context.getString(resId) else it
-            }
-        }
-        CompactReviewEntryCard(
-            flexibleSpend = state.actualFlexibleSpend,
-            goalContribution = state.actualGoalContribution,
-            currencySymbol = state.currencySymbol,
-            errorMessage = errorMessage,
-            onFlexibleSpendChanged = onFlexibleSpendChanged,
-            onGoalContributionChanged = onGoalContributionChanged,
-            onSaveReview = onSaveReview
-        )
     }
 
     if (history.isNotEmpty()) {

@@ -29,6 +29,7 @@ class BuildReminderNotificationContentUseCaseTest {
         assertEquals("plan", content.destination)
         assertEquals("payday_action", content.analyticsType)
         assertEquals(listOf("$600.00", "$450.00", "$450.00"), content.messageArgs)
+        assertEquals(ReminderResponseAction.entries, content.responseActions)
     }
 
     @Test
@@ -45,6 +46,7 @@ class BuildReminderNotificationContentUseCaseTest {
         assertEquals("review", content.destination)
         assertEquals("weekly_review", content.analyticsType)
         assertEquals(listOf("$103.85"), content.messageArgs)
+        assertEquals(ReminderResponseAction.entries, content.responseActions)
     }
 
     @Test

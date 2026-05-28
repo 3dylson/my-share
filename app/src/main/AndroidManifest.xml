@@ -31,6 +31,10 @@
             </intent-filter>
         </activity>
 
+        <receiver
+            android:name=".presentation.ui.onboarding.ReminderResponseActionReceiver"
+            android:exported="false" />
+
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"
             android:value="true" />

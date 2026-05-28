@@ -48,6 +48,8 @@ import pt.ms.myshare.presentation.ui.components.PremiumInfoCard
 import pt.ms.myshare.presentation.ui.components.PremiumPaywallCard
 import pt.ms.myshare.presentation.ui.components.dismissKeyboardOnUserDrag
 import pt.ms.myshare.presentation.ui.formatting.SubscriptionSavingsFormatter
+import pt.ms.myshare.presentation.ui.localization.UiText
+import pt.ms.myshare.presentation.ui.localization.resolve
 import pt.ms.myshare.presentation.ui.paywall.PaywallAutopilotPreviewMapper
 import pt.ms.myshare.presentation.ui.paywall.PaywallAutopilotPreviewUiState
 import pt.ms.myshare.presentation.ui.theme.*
@@ -65,7 +67,7 @@ fun PaywallScreen(
     paywallVariant: OnboardingPaywallVariant = OnboardingPaywallVariant.PAYDAY_PROOF,
     trialFraming: PaywallTrialFraming = PaywallTrialFraming.SEVEN_DAY,
     isBillingActionInProgress: Boolean = false,
-    billingMessage: String? = null,
+    billingMessage: UiText? = null,
     showSecurePremiumAccessPrompt: Boolean = false,
     isGoogleConnectionInProgress: Boolean = false,
     googleConnectionMessage: String? = null,
@@ -142,10 +144,7 @@ fun PaywallScreen(
     }
     val isPurchaseReady = selectedProduct != null && !isBillingActionInProgress
     val resolvedBillingMessage = remember(billingMessage, context) {
-        billingMessage?.let {
-            val resId = context.resources.getIdentifier(it, "string", context.packageName)
-            if (resId != 0) context.getString(resId) else it
-        }
+        billingMessage?.resolve(context)
     }
     val googleConnectionFeedback = remember(googleConnectionMessage, googleConnectionError, context) {
         val messageKey = googleConnectionError ?: googleConnectionMessage

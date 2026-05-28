@@ -25,6 +25,7 @@ import pt.ms.myshare.data.repository.FirebaseProductConfigRepository
 import pt.ms.myshare.data.repository.PlannerRepositoryImpl
 import pt.ms.myshare.data.repository.SharedPreferencesAppReviewPromptRepository
 import pt.ms.myshare.data.repository.SharedFirstRunExperienceRepository
+import pt.ms.myshare.data.repository.SharedReminderResponseRepository
 import pt.ms.myshare.data.repository.SharedUserPreferencesRepository
 import pt.ms.myshare.domain.repository.AppReviewPromptRepository
 import pt.ms.myshare.domain.repository.AppUpdatePolicyRepository
@@ -34,6 +35,7 @@ import pt.ms.myshare.domain.repository.FirstRunExperienceRepository
 import pt.ms.myshare.domain.repository.LegacyPremiumGrantRepository
 import pt.ms.myshare.domain.repository.PlannerRepository
 import pt.ms.myshare.domain.repository.ProductConfigRepository
+import pt.ms.myshare.domain.repository.ReminderResponseRepository
 import pt.ms.myshare.domain.repository.UserPreferencesRepository
 import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.CheckEntitlementLimitUseCase
@@ -103,6 +105,12 @@ object AppModule {
     fun provideFirstRunExperienceRepository(
         @ApplicationContext context: Context
     ): FirstRunExperienceRepository = SharedFirstRunExperienceRepository(context)
+
+    @Provides
+    @Singleton
+    fun provideReminderResponseRepository(
+        repository: SharedReminderResponseRepository
+    ): ReminderResponseRepository = repository
 
     @Provides
     @Singleton

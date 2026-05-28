@@ -8,5 +8,6 @@ data class NotificationContent(
     val messageKey: String,
     val messageArgs: List<String>,
     val destination: String,
-    val analyticsType: String
+    val analyticsType: String,
+    val responseActions: List<ReminderResponseAction> = emptyList()
 )

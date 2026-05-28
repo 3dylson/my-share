@@ -337,6 +337,11 @@
     <string name="onboarding_reminder_button">تمكين التذكيرات</string>
     <string name="onboarding_reminder_skip">تخطي التذكيرات</string>
     <string name="home_plan_metrics_title">المقاييس الأساسية</string>
+    <string name="home_plan_today_move_label">خطوة يوم الدفع</string>
+    <string name="home_plan_today_move_title">افعل هذا في يوم الراتب</string>
+    <string name="home_plan_today_move_priority">انقل إلى الهدف</string>
+    <string name="home_plan_today_move_weekly">احتفظ به لكل أسبوع</string>
+    <string name="home_plan_today_move_bills">احمه للفواتير</string>
     <string name="home_plan_label_income">الدخل لكل يوم دفع</string>
     <string name="home_plan_label_weekly">الدليل الأسبوعي</string>
     <string name="home_plan_allocation_title">معاينة التخصيص</string>
@@ -883,6 +888,10 @@
     <string name="notification_premium_checkin_due_body">راجع يوم الدفع هذا حتى يحمي Premium %1$s/أسبوع وخطوتك التالية %2$s.</string>
     <string name="notification_premium_checkin_overdue_title">ما زالت المراجعة مفيدة</string>
     <string name="notification_premium_checkin_overdue_body">يمكن لمراجعة سريعة أن تساعد Premium على تعديل دليلك الأسبوعي %1$s وخطوتك التالية %2$s.</string>
+    <string name="notification_action_fine">جيد</string>
+    <string name="notification_action_tight">ضيق</string>
+    <string name="notification_action_almost_gone">كاد ينفد</string>
+    <string name="notification_action_moved_goal_money">نقلت مال الهدف</string>
     <string name="home_plan_next_payday">يوم الدفع التالي: %1$s</string>
     <string name="home_goal_mission_accomplished">المهمة أنجزت!</string>
     <string name="home_goal_on_pace">على وتيرة %1$s</string>

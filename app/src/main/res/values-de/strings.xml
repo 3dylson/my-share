@@ -337,6 +337,11 @@
     <string name="onboarding_reminder_button">Aktivieren Sie Erinnerungen</string>
     <string name="onboarding_reminder_skip">Erinnerungen überspringen</string>
     <string name="home_plan_metrics_title">Kernkennzahlen</string>
+    <string name="home_plan_today_move_label">Zahltagsschritt</string>
+    <string name="home_plan_today_move_title">Tu das am Zahltag</string>
+    <string name="home_plan_today_move_priority">Zum Ziel verschieben</string>
+    <string name="home_plan_today_move_weekly">Pro Woche behalten</string>
+    <string name="home_plan_today_move_bills">Für Rechnungen schützen</string>
     <string name="home_plan_label_income">Einkommen pro Zahltag</string>
     <string name="home_plan_label_weekly">Wöchentlicher Führer</string>
     <string name="home_plan_allocation_title">Zuordnungsvorschau</string>
@@ -883,6 +888,10 @@
     <string name="notification_premium_checkin_due_body">Prüfe diesen Zahltag, damit Premium %1$s/Woche und deinen nächsten Schritt von %2$s schützen kann.</string>
     <string name="notification_premium_checkin_overdue_title">Prüfen lohnt sich noch</string>
     <string name="notification_premium_checkin_overdue_body">Ein kurzer Check-in kann Premium noch helfen, deinen Wochenleitwert von %1$s und deinen nächsten Schritt von %2$s anzupassen.</string>
+    <string name="notification_action_fine">Passt</string>
+    <string name="notification_action_tight">Knapp</string>
+    <string name="notification_action_almost_gone">Fast weg</string>
+    <string name="notification_action_moved_goal_money">Zielgeld verschoben</string>
     <string name="home_plan_next_payday">Nächster Zahltag: %1$s</string>
     <string name="home_goal_mission_accomplished">Mission erfüllt!</string>
     <string name="home_goal_on_pace">Auf Tempo für %1$s</string>
