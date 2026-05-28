@@ -599,6 +599,15 @@
     <string name="home_review_first_premium_action">Premium-Test ansehen</string>
     <string name="home_review_manual_title">Check-in am Zahltag</string>
     <string name="home_review_manual_desc">Keine Detektivarbeit im Bankkonto. Gib ein, was im Ausgabentopf übrig ist und ob Geld zum Ziel verschoben wurde.</string>
+    <string name="home_review_quick_title">Wähle die beste Antwort</string>
+    <string name="home_review_quick_on_track">Gut</string>
+    <string name="home_review_quick_on_track_desc">Diese Beträge behalten</string>
+    <string name="home_review_quick_tight">Knapp</string>
+    <string name="home_review_quick_tight_desc">Kein Ausgabegeld übrig</string>
+    <string name="home_review_quick_almost_gone">Fast weg</string>
+    <string name="home_review_quick_almost_gone_desc">Nichts extra verschoben</string>
+    <string name="home_review_quick_skipped_goal">Ziel ausgelassen</string>
+    <string name="home_review_quick_skipped_goal_desc">Nicht zum Ziel verschoben</string>
     <string name="home_review_input_flex_exact">Aus flexiblem Geld ausgegeben</string>
     <string name="home_review_input_left_exact">Zum Ausgeben übrig</string>
     <string name="home_review_edit_input_spent_exact">Aus flexiblem Geld ausgegeben</string>

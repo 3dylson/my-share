@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.ms.myshare.R
+import pt.ms.myshare.domain.model.PaydayReadinessStatus
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
 import pt.ms.myshare.presentation.ui.theme.MySharePositive
@@ -82,7 +83,7 @@ fun LazyListScope.homePlanTab(
                 )
             }
         }
-        card.readiness?.let { readiness ->
+        card.readiness?.takeIf { it.status != PaydayReadinessStatus.READY }?.let { readiness ->
             item {
                 PaydayReadinessCard(
                     readiness = readiness,
@@ -408,39 +409,22 @@ private fun PremiumPlanBriefCard(
                 }
             }
 
-            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-                val shouldStack = maxWidth < 330.dp || LocalDensity.current.fontScale >= 1.3f
-                if (shouldStack) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        PremiumPlanBriefSignal(
-                            label = stringResource(R.string.home_plan_premium_brief_checkin_label),
-                            value = checkInLabel,
-                            icon = if (premiumCheckIn?.isDue == true) Icons.Default.PlayCircle else Icons.Default.EventAvailable,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        PremiumPlanBriefSignal(
-                            label = stringResource(R.string.home_plan_premium_brief_watch_label),
-                            value = watchLabel,
-                            icon = Icons.Default.CheckCircle,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                } else {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        PremiumPlanBriefSignal(
-                            label = stringResource(R.string.home_plan_premium_brief_checkin_label),
-                            value = checkInLabel,
-                            icon = if (premiumCheckIn?.isDue == true) Icons.Default.PlayCircle else Icons.Default.EventAvailable,
-                            modifier = Modifier.weight(1f)
-                        )
-                        PremiumPlanBriefSignal(
-                            label = stringResource(R.string.home_plan_premium_brief_watch_label),
-                            value = watchLabel,
-                            icon = Icons.Default.CheckCircle,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                }
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                PremiumPlanBriefSignal(
+                    label = stringResource(R.string.home_plan_premium_brief_checkin_label),
+                    value = checkInLabel,
+                    icon = if (premiumCheckIn?.isDue == true) Icons.Default.PlayCircle else Icons.Default.EventAvailable,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                PremiumPlanBriefSignal(
+                    label = stringResource(R.string.home_plan_premium_brief_watch_label),
+                    value = watchLabel,
+                    icon = Icons.Default.CheckCircle,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }
@@ -482,8 +466,7 @@ private fun PremiumPlanBriefSignal(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    lineHeight = 19.sp
                 )
             }
         }

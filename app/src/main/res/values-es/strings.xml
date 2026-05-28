@@ -599,6 +599,15 @@
     <string name="home_review_first_premium_action">Ver prueba Premium</string>
     <string name="home_review_manual_title">check-in de día de pago</string>
     <string name="home_review_manual_desc">Sin investigar el banco. Ingresa lo que queda en tu dinero para gastar y si moviste dinero a tu meta.</string>
+    <string name="home_review_quick_title">Toca la respuesta más cercana</string>
+    <string name="home_review_quick_on_track">Bien</string>
+    <string name="home_review_quick_on_track_desc">Mantener estos importes</string>
+    <string name="home_review_quick_tight">Justo</string>
+    <string name="home_review_quick_tight_desc">Sin dinero para gastar</string>
+    <string name="home_review_quick_almost_gone">Casi agotado</string>
+    <string name="home_review_quick_almost_gone_desc">Nada extra movido</string>
+    <string name="home_review_quick_skipped_goal">Meta omitida</string>
+    <string name="home_review_quick_skipped_goal_desc">No moví a la meta</string>
     <string name="home_review_input_flex_exact">Gastado del dinero flexible</string>
     <string name="home_review_input_left_exact">Queda para gastar</string>
     <string name="home_review_edit_input_spent_exact">Gastado del dinero flexible</string>

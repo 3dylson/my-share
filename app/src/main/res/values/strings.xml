@@ -650,6 +650,15 @@
     <string name="home_review_first_premium_action">See Premium trial</string>
     <string name="home_review_manual_title">Payday check-in</string>
     <string name="home_review_manual_desc">No bank detective work. Enter what is left in your spending pot and whether the goal move happened.</string>
+    <string name="home_review_quick_title">Tap the closest answer</string>
+    <string name="home_review_quick_on_track">Fine</string>
+    <string name="home_review_quick_on_track_desc">Keep these amounts</string>
+    <string name="home_review_quick_tight">Tight</string>
+    <string name="home_review_quick_tight_desc">No spending money left</string>
+    <string name="home_review_quick_almost_gone">Almost gone</string>
+    <string name="home_review_quick_almost_gone_desc">No spare money moved</string>
+    <string name="home_review_quick_skipped_goal">Skipped goal</string>
+    <string name="home_review_quick_skipped_goal_desc">Goal move did not happen</string>
     <string name="home_review_input_flex_exact">Spent from flexible money</string>
     <string name="home_review_input_left_exact">Left in spending pot</string>
     <string name="home_review_edit_input_spent_exact">Spent from flexible money</string>

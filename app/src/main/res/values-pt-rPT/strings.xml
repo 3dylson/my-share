@@ -600,6 +600,15 @@
     <string name="home_review_first_premium_action">Ver teste Premium</string>
     <string name="home_review_manual_title">Check-in no dia de pagamento</string>
     <string name="home_review_manual_desc">Sem trabalho de detetive no banco. Introduz o que sobrou no dinheiro para gastar e se moveste dinheiro para a meta.</string>
+    <string name="home_review_quick_title">Toca na resposta mais próxima</string>
+    <string name="home_review_quick_on_track">Correu bem</string>
+    <string name="home_review_quick_on_track_desc">Manter estes valores</string>
+    <string name="home_review_quick_tight">Apertado</string>
+    <string name="home_review_quick_tight_desc">Sem dinheiro para gastar</string>
+    <string name="home_review_quick_almost_gone">Quase acabou</string>
+    <string name="home_review_quick_almost_gone_desc">Nada extra movido</string>
+    <string name="home_review_quick_skipped_goal">Meta falhou</string>
+    <string name="home_review_quick_skipped_goal_desc">Não movi para a meta</string>
     <string name="home_review_input_flex_exact">Gasto do dinheiro flexível</string>
     <string name="home_review_input_left_exact">Sobrou para gastar</string>
     <string name="home_review_edit_input_spent_exact">Gasto do dinheiro flexível</string>

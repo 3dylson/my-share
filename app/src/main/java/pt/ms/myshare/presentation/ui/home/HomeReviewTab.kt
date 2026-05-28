@@ -84,16 +84,6 @@ fun LazyListScope.homeReviewTab(
     val premiumCheckIn = state.premiumCheckIn
     val premiumMomentum = state.premiumMomentum
 
-    if (isPremium && premiumCheckIn != null) {
-        item {
-            PremiumCheckInReviewCard(
-                checkIn = premiumCheckIn,
-                onConfigureReminder = onConfigureReminder
-            )
-            Spacer(Modifier.height(16.dp))
-        }
-    }
-
     item {
         val context = LocalContext.current
         val errorMessage = remember(state.error) {
@@ -112,6 +102,16 @@ fun LazyListScope.homeReviewTab(
             onSaveReview = onSaveReview
         )
         Spacer(Modifier.height(16.dp))
+    }
+
+    if (isPremium && premiumCheckIn != null) {
+        item {
+            PremiumCheckInReviewCard(
+                checkIn = premiumCheckIn,
+                onConfigureReminder = onConfigureReminder
+            )
+            Spacer(Modifier.height(16.dp))
+        }
     }
     
     if (history.isNotEmpty()) {
@@ -2281,6 +2281,21 @@ private fun CompactHistoryMetric(
 
 private const val PREMIUM_INLINE_HISTORY_LIMIT = 3
 
+private enum class ReviewQuickChoice {
+    ON_TRACK,
+    TIGHT,
+    ALMOST_GONE,
+    SKIPPED_GOAL
+}
+
+private data class ReviewQuickChoiceUi(
+    val choice: ReviewQuickChoice,
+    val labelRes: Int,
+    val descriptionRes: Int,
+    val icon: ImageVector,
+    val accent: Color
+)
+
 @Composable
 private fun ReviewAmountField(
     label: String,
@@ -2331,6 +2346,7 @@ private fun CompactReviewEntryCard(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val goalContributionFocusRequester = remember { FocusRequester() }
+    var selectedQuickChoice by remember { mutableStateOf<ReviewQuickChoice?>(null) }
     val inputKeyboardActions = remember(focusManager, keyboardController, goalContributionFocusRequester, onSaveReview) {
         KeyboardActions(
             onNext = {
@@ -2387,6 +2403,31 @@ private fun CompactReviewEntryCard(
                 }
             }
 
+            ReviewQuickChoices(
+                selectedChoice = selectedQuickChoice,
+                onChoiceSelected = { choice ->
+                    selectedQuickChoice = choice
+                    when (choice) {
+                        ReviewQuickChoice.ON_TRACK -> {
+                            Timber.tag("HomeReviewTab").d("Quick review selected: on track")
+                        }
+                        ReviewQuickChoice.TIGHT -> {
+                            onFlexibleSpendChanged("0")
+                            Timber.tag("HomeReviewTab").d("Quick review selected: tight")
+                        }
+                        ReviewQuickChoice.ALMOST_GONE -> {
+                            onFlexibleSpendChanged("0")
+                            onGoalContributionChanged("0")
+                            Timber.tag("HomeReviewTab").d("Quick review selected: almost gone")
+                        }
+                        ReviewQuickChoice.SKIPPED_GOAL -> {
+                            onGoalContributionChanged("0")
+                            Timber.tag("HomeReviewTab").d("Quick review selected: skipped goal")
+                        }
+                    }
+                }
+            )
+
             BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
                 val shouldStack = maxWidth < 360.dp || LocalDensity.current.fontScale >= 1.3f
                 if (shouldStack) {
@@ -2395,7 +2436,10 @@ private fun CompactReviewEntryCard(
                             label = stringResource(R.string.home_review_input_left_exact),
                             value = flexibleSpend,
                             currencySymbol = currencySymbol,
-                            onValueChange = onFlexibleSpendChanged,
+                            onValueChange = {
+                                selectedQuickChoice = null
+                                onFlexibleSpendChanged(it)
+                            },
                             modifier = Modifier.fillMaxWidth(),
                             imeAction = ImeAction.Next,
                             keyboardActions = inputKeyboardActions,
@@ -2407,7 +2451,10 @@ private fun CompactReviewEntryCard(
                             label = stringResource(R.string.home_review_input_goal_exact),
                             value = goalContribution,
                             currencySymbol = currencySymbol,
-                            onValueChange = onGoalContributionChanged,
+                            onValueChange = {
+                                selectedQuickChoice = null
+                                onGoalContributionChanged(it)
+                            },
                             modifier = Modifier.fillMaxWidth(),
                             imeAction = ImeAction.Done,
                             keyboardActions = inputKeyboardActions,
@@ -2423,7 +2470,10 @@ private fun CompactReviewEntryCard(
                             label = stringResource(R.string.home_review_input_left_exact),
                             value = flexibleSpend,
                             currencySymbol = currencySymbol,
-                            onValueChange = onFlexibleSpendChanged,
+                            onValueChange = {
+                                selectedQuickChoice = null
+                                onFlexibleSpendChanged(it)
+                            },
                             modifier = Modifier.weight(1f),
                             imeAction = ImeAction.Next,
                             keyboardActions = inputKeyboardActions,
@@ -2435,7 +2485,10 @@ private fun CompactReviewEntryCard(
                             label = stringResource(R.string.home_review_input_goal_exact),
                             value = goalContribution,
                             currencySymbol = currencySymbol,
-                            onValueChange = onGoalContributionChanged,
+                            onValueChange = {
+                                selectedQuickChoice = null
+                                onGoalContributionChanged(it)
+                            },
                             modifier = Modifier.weight(1f),
                             imeAction = ImeAction.Done,
                             keyboardActions = inputKeyboardActions,
@@ -2460,6 +2513,168 @@ private fun CompactReviewEntryCard(
             PremiumButton(
                 text = stringResource(R.string.home_review_submit),
                 onClick = onSaveReview
+            )
+        }
+    }
+}
+
+@Composable
+private fun ReviewQuickChoices(
+    selectedChoice: ReviewQuickChoice?,
+    onChoiceSelected: (ReviewQuickChoice) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val choices = listOf(
+        ReviewQuickChoiceUi(
+            choice = ReviewQuickChoice.ON_TRACK,
+            labelRes = R.string.home_review_quick_on_track,
+            descriptionRes = R.string.home_review_quick_on_track_desc,
+            icon = Icons.Default.CheckCircle,
+            accent = MySharePositive
+        ),
+        ReviewQuickChoiceUi(
+            choice = ReviewQuickChoice.TIGHT,
+            labelRes = R.string.home_review_quick_tight,
+            descriptionRes = R.string.home_review_quick_tight_desc,
+            icon = Icons.AutoMirrored.Filled.TrendingDown,
+            accent = MaterialTheme.colorScheme.tertiary
+        ),
+        ReviewQuickChoiceUi(
+            choice = ReviewQuickChoice.ALMOST_GONE,
+            labelRes = R.string.home_review_quick_almost_gone,
+            descriptionRes = R.string.home_review_quick_almost_gone_desc,
+            icon = Icons.Default.Warning,
+            accent = MaterialTheme.colorScheme.error
+        ),
+        ReviewQuickChoiceUi(
+            choice = ReviewQuickChoice.SKIPPED_GOAL,
+            labelRes = R.string.home_review_quick_skipped_goal,
+            descriptionRes = R.string.home_review_quick_skipped_goal_desc,
+            icon = Icons.Default.RemoveCircleOutline,
+            accent = MaterialTheme.colorScheme.secondary
+        )
+    )
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.home_review_quick_title),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = FontWeight.Bold
+        )
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            val shouldStack = maxWidth < 300.dp || LocalDensity.current.fontScale >= 1.3f
+            if (shouldStack) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    choices.forEach { choice ->
+                        ReviewQuickChoiceChip(
+                            choice = choice,
+                            isSelected = selectedChoice == choice.choice,
+                            onClick = { onChoiceSelected(choice.choice) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            } else {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    choices.chunked(2).forEach { rowChoices ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            rowChoices.forEach { choice ->
+                                ReviewQuickChoiceChip(
+                                    choice = choice,
+                                    isSelected = selectedChoice == choice.choice,
+                                    onClick = { onChoiceSelected(choice.choice) },
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        selectedChoice?.let { selected ->
+            val selectedUi = choices.first { it.choice == selected }
+            ReviewQuickChoiceSelectedNote(choice = selectedUi)
+        }
+    }
+}
+
+@Composable
+private fun ReviewQuickChoiceChip(
+    choice: ReviewQuickChoiceUi,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val borderColor = if (isSelected) choice.accent.copy(alpha = 0.52f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.16f)
+    val containerColor = if (isSelected) choice.accent.copy(alpha = 0.13f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.34f)
+    Surface(
+        modifier = modifier
+            .heightIn(min = 52.dp)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
+        color = containerColor,
+        border = BorderStroke(1.dp, borderColor)
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = choice.icon,
+                contentDescription = null,
+                tint = choice.accent,
+                modifier = Modifier.size(18.dp)
+            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                Text(
+                    text = stringResource(choice.labelRes),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Black,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReviewQuickChoiceSelectedNote(
+    choice: ReviewQuickChoiceUi,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        color = choice.accent.copy(alpha = 0.10f),
+        border = BorderStroke(1.dp, choice.accent.copy(alpha = 0.24f))
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Icon(
+                imageVector = choice.icon,
+                contentDescription = null,
+                tint = choice.accent,
+                modifier = Modifier.size(16.dp)
+            )
+            Text(
+                text = stringResource(choice.descriptionRes),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                lineHeight = 18.sp,
+                modifier = Modifier.weight(1f)
             )
         }
     }

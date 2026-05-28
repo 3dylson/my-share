@@ -599,6 +599,15 @@
     <string name="home_review_first_premium_action">Voir l’essai Premium</string>
     <string name="home_review_manual_title">Enregistrement sur salaire</string>
     <string name="home_review_manual_desc">Pas besoin d’enquête bancaire. Indique ce qu’il reste dans ton argent à dépenser et si tu as déplacé l’argent vers ton objectif.</string>
+    <string name="home_review_quick_title">Touchez la réponse la plus proche</string>
+    <string name="home_review_quick_on_track">Bien</string>
+    <string name="home_review_quick_on_track_desc">Garder ces montants</string>
+    <string name="home_review_quick_tight">Serré</string>
+    <string name="home_review_quick_tight_desc">Plus d’argent à dépenser</string>
+    <string name="home_review_quick_almost_gone">Presque fini</string>
+    <string name="home_review_quick_almost_gone_desc">Rien de plus déplacé</string>
+    <string name="home_review_quick_skipped_goal">Objectif sauté</string>
+    <string name="home_review_quick_skipped_goal_desc">Pas déplacé vers l’objectif</string>
     <string name="home_review_input_flex_exact">Dépensé depuis l’argent flexible</string>
     <string name="home_review_input_left_exact">Reste à dépenser</string>
     <string name="home_review_edit_input_spent_exact">Dépensé depuis l’argent flexible</string>

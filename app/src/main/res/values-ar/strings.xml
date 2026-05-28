@@ -599,6 +599,15 @@
     <string name="home_review_first_premium_action">عرض تجربة Premium</string>
     <string name="home_review_manual_title">تسجيل الوصول ليوم الدفع</string>
     <string name="home_review_manual_desc">لا حاجة للتحقق من البنك. أدخل ما تبقى في مال الإنفاق وما إذا نقلت المال إلى هدفك.</string>
+    <string name="home_review_quick_title">اضغط أقرب إجابة</string>
+    <string name="home_review_quick_on_track">جيد</string>
+    <string name="home_review_quick_on_track_desc">احتفظ بهذه المبالغ</string>
+    <string name="home_review_quick_tight">ضيق</string>
+    <string name="home_review_quick_tight_desc">لا مال متبقٍ للإنفاق</string>
+    <string name="home_review_quick_almost_gone">كاد ينفد</string>
+    <string name="home_review_quick_almost_gone_desc">لم يُنقل أي فائض</string>
+    <string name="home_review_quick_skipped_goal">تخطي الهدف</string>
+    <string name="home_review_quick_skipped_goal_desc">لم أنقل إلى الهدف</string>
     <string name="home_review_input_flex_exact">المصروف من المال المرن</string>
     <string name="home_review_input_left_exact">المتبقي للإنفاق</string>
     <string name="home_review_edit_input_spent_exact">المصروف من المال المرن</string>

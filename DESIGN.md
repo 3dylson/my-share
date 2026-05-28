@@ -88,7 +88,7 @@ Use **4 top-level destinations max** on compact phones.
 
 Recommended:
 1. **Plan** – current salary plan and dashboard
-2. **Goals** – goal list and goal detail
+2. **Strategy** – goals, payday rules, and priority setup
 3. **Review** – plan versus actual, weekly or monthly check-ins
 4. **More** – reminders, recurring rules, settings, account, help
 
@@ -358,7 +358,41 @@ Avoid:
 - “Don’t miss out”
 - “You failed your plan”
 
-### 6.3 Error messaging
+### 6.3 Localization and readable-copy rules
+All product copy must survive translation, font scaling, and compact Android screens.
+
+Rules:
+- Assume translated strings can grow by 30-50%.
+- Do not rely on one-line English length when designing components.
+- Do not truncate copy that explains a decision, amount, Premium promise, form field, error, or primary action.
+- Use ellipsis only for secondary identifiers where truncation is expected, such as long goal names, emails, merchant-like labels, or archive row titles.
+- If text is required to understand the action, the component must wrap, stack, resize, or move the text to a larger container.
+- Validate new copy in English and Portuguese at minimum, and inspect emulator screenshots or UI trees for clipped labels, hidden CTAs, overlapping text, and bottom-nav coverage.
+- Prefer short, translatable labels with plain verbs. Avoid idioms, jokes, and metaphor-heavy phrasing that will not localize cleanly.
+
+### 6.4 Copy-to-component fit
+Match the amount of copy to the component's job.
+
+Use:
+- **Chip / pill / segmented choice:** short label only, such as “Fine”, “Tight”, “Skipped goal”.
+- **Button:** direct command, such as “Save review”, “Apply adjustment”, “Set reminder”.
+- **Card:** one title plus one short explanation.
+- **Bottom sheet:** decision support, tradeoffs, and confirmation details.
+- **Inline selected note:** the full explanation for a selected compact choice.
+
+Avoid:
+- putting title + explanatory body inside a compact chip
+- using `maxLines = 1` for action labels or financial instructions
+- shrinking text below readable Material typography just to make English copy fit
+- repeating Premium explanations above the user's primary task
+
+Recommended scalable pattern for translated choices:
+1. Show a compact grid of short labels.
+2. Let labels wrap if needed.
+3. Show the selected option's full explanation below the grid in a full-width wrapping area.
+4. Keep the primary task fields and CTA reachable in the first viewport on Pixel 7 when possible.
+
+### 6.5 Error messaging
 Errors must explain what happened and what to do next.
 
 Good pattern:
@@ -519,6 +553,21 @@ Rules:
 - use outlined or text for secondary actions
 - loading buttons must preserve width to avoid layout jump
 - disabled buttons must also explain why when practical
+- labels must wrap or the layout must stack before truncating decision-critical text
+- critical status pairs should stack full-width on phone layouts unless the longest localized values are validated without truncation
+- icon-only buttons require accessible labels and should be used only when the icon is familiar or repeatedly established
+
+### 9.3.1 Chips, pills, and quick choices
+Use chips and pills for compact status or selection, not explanation.
+
+Rules:
+- Short labels only inside the control.
+- Do not place explanatory subtext inside compact choice controls.
+- Do not use ellipsis for labels that are required to choose correctly.
+- If explanation is useful, show it outside the chip in a full-width selected-note or helper area.
+- Choices should support two-line labels when translated text requires it.
+- Keep hit targets at least 48dp high.
+- When a choice writes values into a form, keep the edited fields visible and editable so users can correct the preset.
 
 ### 9.4 Text fields
 Supported field types:
@@ -795,6 +844,8 @@ Recommended order:
 5. subtle premium or reminder suggestion if relevant
 
 ### 10.11 Goals overview
+In the current app navigation this content lives under **Strategy**, not a standalone Goals tab.
+
 Must support:
 - multiple goals
 - sorting by urgency or progress
@@ -978,6 +1029,13 @@ Must support locale-aware:
 
 ### 14.2 Copy length tolerance
 Design for longer strings in Portuguese, Hindi, Urdu, and other localized contexts.
+
+Minimum acceptance:
+- No decision-critical copy is hidden behind ellipsis.
+- Compact controls do not carry explanatory body text.
+- Long translated labels can wrap, stack, or move into a selected-note pattern.
+- Scrollable tab content uses the scaffold inset as the viewport boundary so content does not pass underneath fixed app bars.
+- Keyboard-open states keep active money fields reachable on Pixel 7.
 
 ### 14.3 Category naming
 Prefer simple, culturally portable categories.

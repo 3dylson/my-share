@@ -7,7 +7,7 @@ My Share is a manual-first, salary and payday planning companion for Android. It
 ## 🎯 V1 Release Candidate Features
 
 - **The Hub**: A focused, Jetpack Compose-driven interface to allocate and preview upcoming paydays.
-- **Goals & Drift**: Keep track of financial goals and identify budget drift before it happens.
+- **Strategy & Drift**: Keep track of financial goals, payday rules, and budget drift before it happens.
 - **Paywall & Premium Options**: Google Play Billing (8.3.0) integration offering deeper review histories and multiple recurring rules.
 - **Privacy-First Ads**: AdMob integration fortified by the Google User Messaging Platform (UMP) SDK to respect GDPR/CCPA. Free-user ads are limited to low-sensitivity surfaces such as More, with capped interstitials only when leaving More and app-open ads only for returning free users after Home has loaded. Ads are never placed inside onboarding, paywall, plan, goal, review, or other financial decision flows, and are disabled entirely for Premium users.
 - **Background Reminders**: WorkManager-powered local notifications for payday and weekly check-ins.
@@ -34,5 +34,7 @@ My Share is a manual-first, salary and payday planning companion for Android. It
 
 ## 📄 Documentation
 
+* Agent and contributor rules live in [AGENTS.md](./AGENTS.md).
 * For the extensive UI/UX component guidance, explore [DESIGN.md](./DESIGN.md).
+* Dated files in `docs/ui-ux-qa-notes-*` are historical QA evidence. Use them for context, but treat `AGENTS.md` and `DESIGN.md` as the current source of truth.
 * For Play Console Data Safety constraints, refer to our internal Data Safety Artifacts.

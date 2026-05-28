@@ -899,7 +899,9 @@ fun HomeScreen(
                 .togetherWith(fadeOut(animationSpec = tween(150)))
             },
             label = "TabTransition",
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
         ) { targetDestination ->
             LazyColumn(
                 modifier = Modifier
@@ -910,8 +912,8 @@ fun HomeScreen(
                 contentPadding = PaddingValues(
                     start = 24.dp,
                     end = 24.dp,
-                    top = innerPadding.calculateTopPadding() + 24.dp,
-                    bottom = innerPadding.calculateBottomPadding() + 24.dp
+                    top = 24.dp,
+                    bottom = 24.dp
                 ),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
