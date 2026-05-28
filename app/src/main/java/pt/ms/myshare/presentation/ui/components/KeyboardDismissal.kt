@@ -1,15 +1,20 @@
 package pt.ms.myshare.presentation.ui.components
 
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.composed
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.unit.Velocity
+import androidx.compose.ui.platform.LocalViewConfiguration
+import timber.log.Timber
 import kotlin.math.abs
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -25,33 +30,37 @@ fun KeyboardDismissEffect(key: Any? = Unit) {
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun rememberKeyboardDismissOnScrollConnection(): NestedScrollConnection {
+fun Modifier.dismissKeyboardOnUserDrag(debugLabel: String): Modifier = composed {
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
+    val touchSlop = LocalViewConfiguration.current.touchSlop
 
-    return remember(focusManager, keyboardController) {
-        object : NestedScrollConnection {
-            private var accumulatedUserScrollPx = 0f
+    pointerInput(focusManager, keyboardController, touchSlop, debugLabel) {
+        awaitEachGesture {
+            val down = awaitFirstDown(requireUnconsumed = false)
+            var activePointerId = down.id
+            var accumulatedDrag = Offset.Zero
+            var hasDismissedForGesture = false
 
-            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                if (source != NestedScrollSource.UserInput) return Offset.Zero
+            while (true) {
+                val event = awaitPointerEvent(PointerEventPass.Initial)
+                val change = event.changes.firstOrNull { it.id == activePointerId }
+                    ?: event.changes.firstOrNull { it.pressed }
+                    ?: break
 
-                accumulatedUserScrollPx += abs(available.y)
-                if (accumulatedUserScrollPx >= KEYBOARD_DISMISS_SCROLL_THRESHOLD_PX) {
+                activePointerId = change.id
+                if (!change.pressed) break
+
+                accumulatedDrag += change.positionChange()
+                val verticalDrag = abs(accumulatedDrag.y)
+                val horizontalDrag = abs(accumulatedDrag.x)
+                if (!hasDismissedForGesture && verticalDrag > touchSlop && verticalDrag > horizontalDrag) {
                     focusManager.clearFocus(force = true)
                     keyboardController?.hide()
-                    accumulatedUserScrollPx = 0f
+                    Timber.d("Keyboard dismissed after user drag on %s", debugLabel)
+                    hasDismissedForGesture = true
                 }
-                return Offset.Zero
-            }
-
-            override suspend fun onPreFling(available: Velocity): Velocity {
-                accumulatedUserScrollPx = 0f
-                return Velocity.Zero
             }
         }
     }
 }
-
-private const val KEYBOARD_DISMISS_SCROLL_THRESHOLD_PX = 24f

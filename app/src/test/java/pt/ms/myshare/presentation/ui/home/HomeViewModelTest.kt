@@ -261,7 +261,7 @@ class HomeViewModelTest {
         // Wait for View model flow combination
         advanceUntilIdle()
 
-        // When user enters valid review fields
+        // When user enters the money left in the spending pot and the goal move
         viewModel.onFlexibleSpendChanged("200")
         viewModel.onGoalContributionChanged("100")
         viewModel.saveReview()
@@ -271,7 +271,31 @@ class HomeViewModelTest {
         // Then repository should have the newly saved review
         val savedReview = fakePlannerRepository.observeLatestReview().value
         assertTrue(savedReview != null)
-        assertEquals(BigDecimal("200"), savedReview?.actualFlexibleSpend)
+        assertEquals(BigDecimal("100.00"), savedReview?.actualFlexibleSpend)
+        assertEquals(BigDecimal("100"), savedReview?.actualGoalContribution)
+    }
+
+    @Test
+    fun `saveReview converts leftover above plan to zero flexible spend`() = runTest {
+        fakePlannerRepository.savePlan(
+            SalaryPlan(
+                focus = PlanningFocus.SAVE_WITHOUT_STRESS,
+                netIncomePerPayday = BigDecimal("1000"),
+                monthlyFixedCosts = BigDecimal("400"),
+                payFrequency = PayFrequency.MONTHLY,
+                monthlyPayday = 1,
+                preset = AllocationPreset.BALANCED
+            )
+        )
+        advanceUntilIdle()
+
+        viewModel.onFlexibleSpendChanged("500")
+        viewModel.onGoalContributionChanged("100")
+        viewModel.saveReview()
+        advanceUntilIdle()
+
+        val savedReview = fakePlannerRepository.observeLatestReview().value
+        assertEquals(BigDecimal("0"), savedReview?.actualFlexibleSpend)
         assertEquals(BigDecimal("100"), savedReview?.actualGoalContribution)
     }
 

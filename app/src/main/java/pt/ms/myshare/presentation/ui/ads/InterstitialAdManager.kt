@@ -22,6 +22,11 @@ object InterstitialAdManager {
         isLoading = true
         val adRequest = AdRequest.Builder().build()
         val adUnitId = context.getString(R.string.admob_interstitial_ad_unit_id)
+        if (adUnitId.isBlank()) {
+            Timber.tag("InterstitialAd").d("Interstitial Ad disabled because no ad unit is configured")
+            isLoading = false
+            return
+        }
 
         InterstitialAd.load(
             context,

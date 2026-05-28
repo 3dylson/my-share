@@ -854,7 +854,12 @@ class HomeViewModel @Inject constructor(
             null
         }
         val preview = plan?.let { calculatePlanPreviewUseCase.execute(it, BigDecimal.ZERO) }
-        val defaultFlexibleSpend = review?.actualFlexibleSpend ?: preview?.flexibleSpendPerPayday
+        val defaultFlexibleSpend = if (review != null) {
+            val plannedFlexible = review.plannedFlexibleSpend ?: preview?.flexibleSpendPerPayday ?: BigDecimal.ZERO
+            plannedFlexible.subtract(review.actualFlexibleSpend).max(BigDecimal.ZERO)
+        } else {
+            preview?.flexibleSpendPerPayday
+        }
         val defaultGoalContribution = review?.actualGoalContribution ?: preview?.priorityContributionPerPayday
         val flexibleMax = reviewRangeMax(defaultFlexibleSpend ?: BigDecimal.ZERO)
         val goalMax = reviewRangeMax(defaultGoalContribution ?: BigDecimal.ZERO)
@@ -931,9 +936,9 @@ class HomeViewModel @Inject constructor(
             return
         }
 
-        val actualFlexible = LocalizedAmountFormatter.parseAmount(uiState.value.reviewCard.actualFlexibleSpend, currentPreferences.locale)
+        val flexibleLeft = LocalizedAmountFormatter.parseAmount(uiState.value.reviewCard.actualFlexibleSpend, currentPreferences.locale)
         val actualGoal = LocalizedAmountFormatter.parseAmount(uiState.value.reviewCard.actualGoalContribution, currentPreferences.locale)
-        if (actualFlexible == null || actualGoal == null) {
+        if (flexibleLeft == null || actualGoal == null) {
             uiState.update { it.copy(reviewCard = it.reviewCard.copy(error = "home_review_error_invalid_amounts")) }
             return
         }
@@ -948,6 +953,9 @@ class HomeViewModel @Inject constructor(
                 val goals = plannerRepository.loadGoals()
                 val targetAmount = goals.firstOrNull()?.targetAmount ?: BigDecimal.ZERO
                 val preview = calculatePlanPreviewUseCase.execute(plan, targetAmount)
+                val actualFlexible = preview.flexibleSpendPerPayday
+                    .subtract(flexibleLeft)
+                    .max(BigDecimal.ZERO)
 
                 val review = ManualReview(
                     actualFlexibleSpend = actualFlexible,
@@ -977,6 +985,7 @@ class HomeViewModel @Inject constructor(
                         recommendationAfterSave?.direction?.name?.lowercase(Locale.US) ?: "none"
                     )
                     putString("recommendation_applyable", (recommendationAfterSave?.isApplyable == true).toString())
+                    putString("flexible_left", flexibleLeft.toPlainString())
                 })
                 recommendationAfterSave?.let { recommendation ->
                     FirebaseUtils.logEvent("premium_review_recommendation_generated", android.os.Bundle().apply {
@@ -1002,7 +1011,13 @@ class HomeViewModel @Inject constructor(
                     }
                 }
                 recordAppReviewPositiveAction(historyAfterSave.size)
-                Timber.tag(TAG).d("Review saved with snapshots. planFlex=%s planPriority=%s", preview.flexibleSpendPerPayday, preview.priorityContributionPerPayday)
+                Timber.tag(TAG).d(
+                    "Review saved with snapshots. planFlex=%s flexLeft=%s actualFlex=%s planPriority=%s",
+                    preview.flexibleSpendPerPayday,
+                    flexibleLeft,
+                    actualFlexible,
+                    preview.priorityContributionPerPayday
+                )
             }
         }
     }

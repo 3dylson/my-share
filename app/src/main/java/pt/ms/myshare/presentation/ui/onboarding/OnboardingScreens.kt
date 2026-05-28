@@ -9,7 +9,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -47,7 +46,7 @@ import pt.ms.myshare.presentation.ui.components.KeyboardDismissEffect
 import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.components.PremiumInfoCard
 import pt.ms.myshare.presentation.ui.components.PremiumPaywallCard
-import pt.ms.myshare.presentation.ui.components.rememberKeyboardDismissOnScrollConnection
+import pt.ms.myshare.presentation.ui.components.dismissKeyboardOnUserDrag
 import pt.ms.myshare.presentation.ui.formatting.SubscriptionSavingsFormatter
 import pt.ms.myshare.presentation.ui.paywall.PaywallAutopilotPreviewMapper
 import pt.ms.myshare.presentation.ui.paywall.PaywallAutopilotPreviewUiState
@@ -95,7 +94,6 @@ fun PaywallScreen(
         )
     }
     val scrollState = rememberScrollState()
-    val keyboardDismissOnScrollConnection = rememberKeyboardDismissOnScrollConnection()
     var isGoogleCredentialRequestInProgress by remember { mutableStateOf(false) }
     val monthlyProduct = PremiumStoreProductSelector.standardProduct(availableProducts, BillingPlan.MONTHLY)
     val annualProduct = PremiumStoreProductSelector.standardProduct(availableProducts, BillingPlan.ANNUAL)
@@ -219,7 +217,7 @@ fun PaywallScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(horizontal = 24.dp)
-                .nestedScroll(keyboardDismissOnScrollConnection)
+                .dismissKeyboardOnUserDrag(debugLabel = "PaywallScreen")
                 .verticalScroll(scrollState)
         ) {
             Spacer(Modifier.height(16.dp))

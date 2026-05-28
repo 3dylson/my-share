@@ -19,7 +19,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.text.font.FontWeight
@@ -230,7 +229,6 @@ fun HomeScreen(
     var isGoogleCredentialRequestInProgress by remember { mutableStateOf(false) }
     var pendingReminderSelection by remember { mutableStateOf<ReminderSettingsSelection?>(null) }
     var pendingReminderPermissionSource by remember { mutableStateOf("more") }
-    val clearFocusOnScrollConnection = rememberKeyboardDismissOnScrollConnection()
     val notificationPermissionDeniedMessage = stringResource(R.string.onboarding_reminder_error_permission)
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -906,7 +904,7 @@ fun HomeScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .nestedScroll(clearFocusOnScrollConnection)
+                    .dismissKeyboardOnUserDrag(debugLabel = "HomeScreen")
                     .imePadding()
                     .background(MaterialTheme.colorScheme.background),
                 contentPadding = PaddingValues(

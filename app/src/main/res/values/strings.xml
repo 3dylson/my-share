@@ -94,7 +94,7 @@
     <string name="onboarding_reminder_title">Stay on track</string>
     <string name="onboarding_reminder_subtitle">A gentle reminder helps you make the move before daily spending takes over.</string>
     <string name="onboarding_reminder_cadence_payday_desc">Stay aligned with your plan at every income event.</string>
-    <string name="onboarding_reminder_cadence_weekly_desc">Reflect and adjust your progress every Sunday.</string>
+    <string name="onboarding_reminder_cadence_weekly_desc">A quick pulse: fine, tight, or running low. No bank homework.</string>
 
     <!-- Home: Plan Tab -->
     <string name="home_coach_marks_pane_title">Home tour</string>
@@ -378,11 +378,11 @@
     <string name="onboarding_trajectory_flexible_desc">This strategy keeps the remaining payday money flexible.</string>
     <string name="onboarding_reminder_error_permission">Notification permission is required for reminders.</string>
     <string name="onboarding_reminder_cadence_payday">Every payday</string>
-    <string name="onboarding_reminder_cadence_weekly">Weekly review</string>
+    <string name="onboarding_reminder_cadence_weekly">Weekly pulse</string>
     <string name="onboarding_reminder_time_title">Reminder time</string>
     <string name="onboarding_reminder_routine_title">Your routine</string>
     <string name="onboarding_reminder_selected_format">%1$s at %2$s</string>
-    <string name="onboarding_reminder_routine_body">A short nudge helps you execute the plan before spending starts. You can change it later in More.</string>
+    <string name="onboarding_reminder_routine_body">A short nudge asks what is left or whether you feel tight, so you do not need to remember every purchase. You can change it later in More.</string>
     <string name="onboarding_reminder_button">Enable reminders</string>
     <string name="onboarding_reminder_skip">Skip reminders</string>
 
@@ -537,7 +537,7 @@
     <string name="home_review_checkin_title_overdue">Catch up this payday review</string>
     <string name="home_review_checkin_title_scheduled">Next check-in scheduled</string>
     <string name="home_review_checkin_title_reviewed">This payday is covered</string>
-    <string name="home_review_checkin_body_ready">Enter what actually happened below. Premium will compare it with the active guide before suggesting the next change.</string>
+    <string name="home_review_checkin_body_ready">Enter what is left in your spending pot and whether the goal move happened. Premium turns that into the next change.</string>
     <string name="home_review_checkin_body_overdue">Still worth reviewing. A quick catch-up from %1$s helps Premium tune the next payday.</string>
     <string name="home_review_checkin_body_scheduled">Premium will check this plan again on %1$s. Keep the reminder on so the next review is easy to remember.</string>
     <string name="home_review_checkin_body_reviewed">This payday has a saved review. Premium will watch the plan again on %1$s.</string>
@@ -637,15 +637,17 @@
     <string name="home_review_first_premium_desc_progress_loop">Save one quick check-in after payday. Premium keeps the pattern visible so each payday starts clearer than the last.</string>
     <string name="home_review_first_premium_desc_unlocked">Enter this payday below. Premium will turn the first check-in into a clearer next guide.</string>
     <string name="home_review_first_premium_step_review">Review</string>
-    <string name="home_review_first_premium_step_review_desc">Save actual spending.</string>
+    <string name="home_review_first_premium_step_review_desc">Save what is left.</string>
     <string name="home_review_first_premium_step_learn">Learn</string>
     <string name="home_review_first_premium_step_learn_desc">Spot what changed.</string>
     <string name="home_review_first_premium_step_adjust">Adjust</string>
     <string name="home_review_first_premium_step_adjust_desc">Set the next guide.</string>
     <string name="home_review_first_premium_action">See Premium trial</string>
     <string name="home_review_manual_title">Payday check-in</string>
-    <string name="home_review_manual_desc">After payday, enter what really happened: how much flexible money you spent, and how much you moved to your goal.</string>
+    <string name="home_review_manual_desc">No bank detective work. Enter what is left in your spending pot and whether the goal move happened.</string>
     <string name="home_review_input_flex_exact">Spent from flexible money</string>
+    <string name="home_review_input_left_exact">Left in spending pot</string>
+    <string name="home_review_edit_input_spent_exact">Spent from flexible money</string>
     <string name="home_review_input_goal_exact">Moved to goal</string>
     <string name="home_review_submit">Submit review</string>
     <string name="home_review_saved_feedback">Review saved. Your payday picture is updated.</string>
@@ -670,7 +672,7 @@
     <string name="home_review_history_edit">Edit review</string>
     <string name="home_review_history_delete">Delete review</string>
     <string name="home_review_edit_title">Edit %1$s review</string>
-    <string name="home_review_edit_desc">Correct the actual amounts. Your history, progress, and recommendations update immediately.</string>
+    <string name="home_review_edit_desc">Correct the saved spending and goal amounts. Your history, progress, and recommendations update immediately.</string>
     <string name="home_review_edit_save">Save changes</string>
     <string name="home_review_delete_title">Delete review?</string>
     <string name="home_review_delete_desc">Remove the %1$s review and reverse its goal contribution. This cannot be undone.</string>

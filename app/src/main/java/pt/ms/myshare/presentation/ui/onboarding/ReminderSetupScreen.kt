@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -31,7 +30,7 @@ import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.presentation.ui.components.KeyboardDismissEffect
 import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.components.PremiumChoiceCard
-import pt.ms.myshare.presentation.ui.components.rememberKeyboardDismissOnScrollConnection
+import pt.ms.myshare.presentation.ui.components.dismissKeyboardOnUserDrag
 import pt.ms.myshare.presentation.ui.theme.*
 import java.time.LocalTime
 
@@ -46,7 +45,6 @@ fun ReminderSetupScreen(
     var cadence by remember { mutableStateOf(ReminderCadence.PAYDAY) }
     var message by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
-    val keyboardDismissOnScrollConnection = rememberKeyboardDismissOnScrollConnection()
 
     KeyboardDismissEffect()
 
@@ -112,7 +110,7 @@ fun ReminderSetupScreen(
                 .padding(innerPadding)
                 .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
                 .padding(horizontal = 24.dp)
-                .nestedScroll(keyboardDismissOnScrollConnection)
+                .dismissKeyboardOnUserDrag(debugLabel = "ReminderSetupScreen")
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

@@ -30,7 +30,15 @@ import pt.ms.myshare.domain.model.PremiumCheckInStatus
 import pt.ms.myshare.domain.model.PremiumProofVariant
 import pt.ms.myshare.domain.model.PremiumReviewMomentumStatus
 import pt.ms.myshare.presentation.ui.components.*
+import pt.ms.myshare.presentation.ui.components.PremiumBenefitCard
+import pt.ms.myshare.presentation.ui.components.PremiumButton
+import pt.ms.myshare.presentation.ui.components.PremiumSectionHeader
+import pt.ms.myshare.presentation.ui.components.PremiumSparkline
+import pt.ms.myshare.presentation.ui.components.bringFocusedInputIntoView
+import pt.ms.myshare.presentation.ui.components.rememberInputKeyboardActions
 import pt.ms.myshare.presentation.ui.theme.*
+import pt.ms.myshare.presentation.ui.theme.MySharePositive
+import pt.ms.myshare.presentation.ui.theme.MySharePrimary
 import java.math.BigDecimal
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,9 +47,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.graphics.vector.ImageVector
+import timber.log.Timber
 
 /**
  * Responsibility: Renders the Manual Review form and historical performance records.
@@ -1023,7 +1037,7 @@ fun ReviewCorrectionBottomSheet(
                 if (shouldStack) {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         ReviewAmountField(
-                            label = stringResource(R.string.home_review_input_flex_exact),
+                            label = stringResource(R.string.home_review_edit_input_spent_exact),
                             value = flexibleSpend,
                             currencySymbol = currencySymbol,
                             onValueChange = {
@@ -1050,7 +1064,7 @@ fun ReviewCorrectionBottomSheet(
                 } else {
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         ReviewAmountField(
-                            label = stringResource(R.string.home_review_input_flex_exact),
+                            label = stringResource(R.string.home_review_edit_input_spent_exact),
                             value = flexibleSpend,
                             currencySymbol = currencySymbol,
                             onValueChange = {
@@ -2274,8 +2288,16 @@ private fun ReviewAmountField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     imeAction: ImeAction,
-    keyboardActions: KeyboardActions
+    keyboardActions: KeyboardActions,
+    focusRequester: FocusRequester? = null,
+    onFocusChanged: (Boolean) -> Unit = {}
 ) {
+    val focusModifier = if (focusRequester != null) {
+        Modifier.focusRequester(focusRequester)
+    } else {
+        Modifier
+    }
+
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -2287,7 +2309,10 @@ private fun ReviewAmountField(
             imeAction = imeAction
         ),
         keyboardActions = keyboardActions,
-        modifier = modifier.bringFocusedInputIntoView(debugLabel = label),
+        modifier = modifier
+            .then(focusModifier)
+            .onFocusChanged { focusState -> onFocusChanged(focusState.isFocused) }
+            .bringFocusedInputIntoView(debugLabel = label),
         shape = RoundedCornerShape(16.dp)
     )
 }
@@ -2302,7 +2327,23 @@ private fun CompactReviewEntryCard(
     onGoalContributionChanged: (String) -> Unit,
     onSaveReview: () -> Unit
 ) {
-    val inputKeyboardActions = rememberInputKeyboardActions(onDone = onSaveReview)
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val goalContributionFocusRequester = remember { FocusRequester() }
+    val inputKeyboardActions = remember(focusManager, keyboardController, goalContributionFocusRequester, onSaveReview) {
+        KeyboardActions(
+            onNext = {
+                Timber.tag("HomeReviewTab").d("Review flexible spend input advancing focus to goal contribution")
+                goalContributionFocusRequester.requestFocus()
+            },
+            onDone = {
+                focusManager.clearFocus(force = true)
+                keyboardController?.hide()
+                Timber.tag("HomeReviewTab").d("Review goal contribution input submitted from keyboard")
+                onSaveReview()
+            }
+        )
+    }
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -2350,13 +2391,16 @@ private fun CompactReviewEntryCard(
                 if (shouldStack) {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         ReviewAmountField(
-                            label = stringResource(R.string.home_review_input_flex_exact),
+                            label = stringResource(R.string.home_review_input_left_exact),
                             value = flexibleSpend,
                             currencySymbol = currencySymbol,
                             onValueChange = onFlexibleSpendChanged,
                             modifier = Modifier.fillMaxWidth(),
                             imeAction = ImeAction.Next,
-                            keyboardActions = inputKeyboardActions
+                            keyboardActions = inputKeyboardActions,
+                            onFocusChanged = { isFocused ->
+                                if (isFocused) Timber.tag("HomeReviewTab").d("Review flexible spend input focused")
+                            }
                         )
                         ReviewAmountField(
                             label = stringResource(R.string.home_review_input_goal_exact),
@@ -2365,19 +2409,26 @@ private fun CompactReviewEntryCard(
                             onValueChange = onGoalContributionChanged,
                             modifier = Modifier.fillMaxWidth(),
                             imeAction = ImeAction.Done,
-                            keyboardActions = inputKeyboardActions
+                            keyboardActions = inputKeyboardActions,
+                            focusRequester = goalContributionFocusRequester,
+                            onFocusChanged = { isFocused ->
+                                if (isFocused) Timber.tag("HomeReviewTab").d("Review goal contribution input focused")
+                            }
                         )
                     }
                 } else {
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         ReviewAmountField(
-                            label = stringResource(R.string.home_review_input_flex_exact),
+                            label = stringResource(R.string.home_review_input_left_exact),
                             value = flexibleSpend,
                             currencySymbol = currencySymbol,
                             onValueChange = onFlexibleSpendChanged,
                             modifier = Modifier.weight(1f),
                             imeAction = ImeAction.Next,
-                            keyboardActions = inputKeyboardActions
+                            keyboardActions = inputKeyboardActions,
+                            onFocusChanged = { isFocused ->
+                                if (isFocused) Timber.tag("HomeReviewTab").d("Review flexible spend input focused")
+                            }
                         )
                         ReviewAmountField(
                             label = stringResource(R.string.home_review_input_goal_exact),
@@ -2386,7 +2437,11 @@ private fun CompactReviewEntryCard(
                             onValueChange = onGoalContributionChanged,
                             modifier = Modifier.weight(1f),
                             imeAction = ImeAction.Done,
-                            keyboardActions = inputKeyboardActions
+                            keyboardActions = inputKeyboardActions,
+                            focusRequester = goalContributionFocusRequester,
+                            onFocusChanged = { isFocused ->
+                                if (isFocused) Timber.tag("HomeReviewTab").d("Review goal contribution input focused")
+                            }
                         )
                     }
                 }

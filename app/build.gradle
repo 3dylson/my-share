@@ -54,8 +54,8 @@ android {
             }
             manifestPlaceholders = [admobAppId: "ca-app-pub-9538602323287593~1471105513"] // Production AdMob App ID
             resValue "string", "admob_banner_ad_unit_id", '"ca-app-pub-9538602323287593/2154982867"' // Production Banner Ad Unit ID
-            resValue "string", "admob_interstitial_ad_unit_id", '"ca-app-pub-9538602323287593/1001683294"' // Production Interstitial Ad Unit ID
-            resValue "string", "admob_app_open_ad_unit_id", "\"${project.findProperty('MYSHARE_ADMOB_APP_OPEN_AD_UNIT_ID') ?: ''}\""
+            resValue "string", "admob_interstitial_ad_unit_id", '""'
+            resValue "string", "admob_app_open_ad_unit_id", '"ca-app-pub-9538602323287593/1001683294"' // Production App Open Ad Unit ID
 
         }
     }
