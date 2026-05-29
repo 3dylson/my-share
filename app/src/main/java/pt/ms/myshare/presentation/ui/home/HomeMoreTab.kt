@@ -33,6 +33,7 @@ import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
 import pt.ms.myshare.domain.model.PremiumAdjustmentStatus
 import pt.ms.myshare.domain.model.PremiumCheckInStatus
+import pt.ms.myshare.presentation.ui.ads.NativeSponsoredAdCard
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.localization.resolve
 import pt.ms.myshare.presentation.ui.preferences.currencyLabel
@@ -62,6 +63,7 @@ fun LazyListScope.homeMoreTab(
     onOpenPaydayRecommendation: () -> Unit,
     onRateApp: () -> Unit,
     isGoogleCredentialRequestInProgress: Boolean,
+    hasFirstPlan: Boolean,
     onConnectGoogle: () -> Unit,
     onLogout: () -> Unit
 ) {
@@ -222,6 +224,16 @@ fun LazyListScope.homeMoreTab(
         }
     }
 
+    if (!state.isPremium) {
+        item {
+            NativeSponsoredAdCard(
+                isPremium = state.isPremium,
+                hasFirstPlan = hasFirstPlan,
+                modifier = Modifier.padding(bottom = 20.dp)
+            )
+        }
+    }
+
     item {
         val uriHandler = LocalUriHandler.current
         PremiumSettingsGroup(title = stringResource(R.string.home_more_legal_title)) {
@@ -318,12 +330,6 @@ fun LazyListScope.homeMoreTab(
                 }
             )
         }
-
-        if (!state.isPremium) {
-            Spacer(modifier = Modifier.height(24.dp))
-            PremiumAdBanner()
-        }
-        
         Spacer(modifier = Modifier.height(48.dp))
         Column(
             modifier = Modifier.fillMaxWidth(),

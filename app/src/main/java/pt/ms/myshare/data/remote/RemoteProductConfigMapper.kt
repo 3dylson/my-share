@@ -1,6 +1,7 @@
 package pt.ms.myshare.data.remote
 
 import pt.ms.myshare.domain.model.ProductExperienceConfig
+import pt.ms.myshare.domain.model.AdsExperimentVariant
 import pt.ms.myshare.domain.model.OnboardingIntroVariant
 import pt.ms.myshare.domain.model.OnboardingPaywallVariant
 import pt.ms.myshare.domain.model.PaywallTrialFraming
@@ -18,7 +19,20 @@ object RemoteProductConfigMapper {
         premiumProofVariant: String,
         onboardingConversionExperiment: String,
         paywallTrialFraming: String,
-        onboardingIntroVariant: String
+        onboardingIntroVariant: String,
+        adsExperimentVariant: String,
+        adsRolloutPercent: Long,
+        adsAnchoredBannerEnabled: Boolean,
+        adsNativeMoreEnabled: Boolean,
+        adsAppOpenEnabled: Boolean,
+        adsInterstitialEnabled: Boolean,
+        adsRewardedEnabled: Boolean,
+        adsMinSessionsAppOpen: Long,
+        adsAppOpenCooldownHours: Long,
+        adsInterstitialDailyCap: Long,
+        adsRewardedDailyCap: Long,
+        adsNativeDailyCap: Long,
+        adsNonBannerDailyCap: Long
     ): ProductExperienceConfig {
         return ProductExperienceConfig(
             paywallDefaultPlan = paywallDefaultPlan.toRemoteBillingPlanDefault(),
@@ -28,7 +42,20 @@ object RemoteProductConfigMapper {
             premiumProofVariant = premiumProofVariant.toPremiumProofVariant(),
             onboardingConversionExperiment = onboardingConversionExperiment.toExperimentName(),
             paywallTrialFraming = paywallTrialFraming.toPaywallTrialFraming(),
-            onboardingIntroVariant = onboardingIntroVariant.toOnboardingIntroVariant()
+            onboardingIntroVariant = onboardingIntroVariant.toOnboardingIntroVariant(),
+            adsExperimentVariant = adsExperimentVariant.toAdsExperimentVariant(),
+            adsRolloutPercent = adsRolloutPercent.toPercent(),
+            adsAnchoredBannerEnabled = adsAnchoredBannerEnabled,
+            adsNativeMoreEnabled = adsNativeMoreEnabled,
+            adsAppOpenEnabled = adsAppOpenEnabled,
+            adsInterstitialEnabled = adsInterstitialEnabled,
+            adsRewardedEnabled = adsRewardedEnabled,
+            adsMinSessionsAppOpen = adsMinSessionsAppOpen.toPositiveInt(ProductExperienceConfig.DEFAULT_ADS_MIN_SESSIONS_APP_OPEN),
+            adsAppOpenCooldownHours = adsAppOpenCooldownHours.toPositiveInt(ProductExperienceConfig.DEFAULT_ADS_APP_OPEN_COOLDOWN_HOURS),
+            adsInterstitialDailyCap = adsInterstitialDailyCap.toNonNegativeInt(ProductExperienceConfig.DEFAULT_ADS_INTERSTITIAL_DAILY_CAP),
+            adsRewardedDailyCap = adsRewardedDailyCap.toNonNegativeInt(ProductExperienceConfig.DEFAULT_ADS_REWARDED_DAILY_CAP),
+            adsNativeDailyCap = adsNativeDailyCap.toNonNegativeInt(ProductExperienceConfig.DEFAULT_ADS_NATIVE_DAILY_CAP),
+            adsNonBannerDailyCap = adsNonBannerDailyCap.toNonNegativeInt(ProductExperienceConfig.DEFAULT_ADS_NON_BANNER_DAILY_CAP)
         )
     }
 
@@ -64,6 +91,24 @@ object RemoteProductConfigMapper {
             ?: OnboardingIntroVariant.PLAN_FIRST
     }
 
+    private fun String.toAdsExperimentVariant(): AdsExperimentVariant {
+        val normalized = trim().lowercase(Locale.US)
+        return AdsExperimentVariant.entries.firstOrNull { it.remoteValue == normalized }
+            ?: AdsExperimentVariant.CONTROL
+    }
+
+    private fun Long.toPercent(): Int {
+        return coerceIn(MIN_PERCENT.toLong(), MAX_PERCENT.toLong()).toInt()
+    }
+
+    private fun Long.toPositiveInt(defaultValue: Int): Int {
+        return if (this > 0) coerceAtMost(MAX_REMOTE_CAP_VALUE).toInt() else defaultValue
+    }
+
+    private fun Long.toNonNegativeInt(defaultValue: Int): Int {
+        return if (this >= 0) coerceAtMost(MAX_REMOTE_CAP_VALUE).toInt() else defaultValue
+    }
+
     private fun String.toExperimentName(): String {
         return trim()
             .lowercase(Locale.US)
@@ -74,4 +119,7 @@ object RemoteProductConfigMapper {
     }
 
     private const val EXPERIMENT_NAME_MAX_LENGTH = 36
+    private const val MIN_PERCENT = 0
+    private const val MAX_PERCENT = 100
+    private const val MAX_REMOTE_CAP_VALUE = 1_000L
 }

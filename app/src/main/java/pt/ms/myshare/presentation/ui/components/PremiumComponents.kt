@@ -40,10 +40,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import pt.ms.myshare.presentation.ui.theme.MyShareOnPrimary
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
-import androidx.compose.ui.viewinterop.AndroidView
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize
-import com.google.android.gms.ads.AdView
 import androidx.compose.ui.res.stringResource
 import pt.ms.myshare.R
 import androidx.compose.material.icons.filled.AutoAwesome
@@ -795,40 +791,6 @@ fun PremiumAppHeader(
                         colors = listOf(MySharePrimary, MySharePrimary.copy(alpha = 0.5f))
                     )
                 )
-        )
-    }
-}
-
-@Composable
-fun PremiumAdBanner(
-    modifier: Modifier = Modifier,
-    adUnitId: String = stringResource(R.string.admob_banner_ad_unit_id)
-) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(60.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-        contentAlignment = Alignment.Center
-    ) {
-        AndroidView(
-            modifier = Modifier.fillMaxWidth(),
-            factory = { context ->
-                AdView(context).apply {
-                    setAdSize(AdSize.BANNER)
-                    setAdUnitId(adUnitId)
-                    loadAd(AdRequest.Builder().build())
-                }
-            }
-        )
-        
-        // Overlay for debugging/identifying ad space if ads don't load in emulator
-        Text(
-            text = stringResource(R.string.advertisement_label),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-            modifier = Modifier.align(Alignment.TopStart).padding(4.dp)
         )
     }
 }

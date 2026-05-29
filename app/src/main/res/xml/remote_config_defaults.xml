@@ -32,4 +32,56 @@
         <key>onboarding_intro_variant</key>
         <value>plan_first</value>
     </entry>
+    <entry>
+        <key>ads_experiment_variant</key>
+        <value>revenue_standard</value>
+    </entry>
+    <entry>
+        <key>ads_rollout_percent</key>
+        <value>100</value>
+    </entry>
+    <entry>
+        <key>ads_anchored_banner_enabled</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>ads_native_more_enabled</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>ads_app_open_enabled</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>ads_interstitial_enabled</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>ads_rewarded_enabled</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>ads_min_sessions_app_open</key>
+        <value>3</value>
+    </entry>
+    <entry>
+        <key>ads_app_open_cooldown_hours</key>
+        <value>12</value>
+    </entry>
+    <entry>
+        <key>ads_interstitial_daily_cap</key>
+        <value>1</value>
+    </entry>
+    <entry>
+        <key>ads_rewarded_daily_cap</key>
+        <value>3</value>
+    </entry>
+    <entry>
+        <key>ads_native_daily_cap</key>
+        <value>3</value>
+    </entry>
+    <entry>
+        <key>ads_non_banner_daily_cap</key>
+        <value>3</value>
+    </entry>
 </defaultsMap>

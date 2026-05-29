@@ -1003,6 +1003,10 @@
     <string name="goal_add_error_missing">Dieses Ziel ist nicht mehr verfügbar.</string>
     <string name="goal_add_error_invalid_name_amount">Bitte geben Sie einen gültigen Namen und Betrag ein.</string>
     <string name="goal_add_error_premium_required">Für ein weiteres Ziel ist Premium erforderlich. Deine gespeicherten Ziele bleiben sicher, und zusätzliche Ziele werden wieder freigeschaltet, wenn Premium aktiv ist.</string>
+    <string name="goal_add_error_reward_unavailable">Die Anzeigen-Freischaltung ist gerade nicht verfügbar. Versuche es später erneut oder nutze Premium für unbegrenzte Ziele.</string>
+    <string name="goal_add_rewarded_extra_goal_title">Ein zusätzliches Ziel freischalten</string>
+    <string name="goal_add_rewarded_extra_goal_body">Sieh dir ein kurzes gesponsertes Video an, um dieses Ziel jetzt hinzuzufügen. Premium entfernt Anzeigen und schaltet mehrere Ziele dauerhaft frei.</string>
+    <string name="goal_add_rewarded_extra_goal_action">Anzeige ansehen</string>
     <string name="rule_add_error_missing">Diese Regel ist nicht mehr verfügbar.</string>
     <string name="rule_add_error_invalid_name_amount">Bitte geben Sie einen gültigen Namen und Betrag ein.</string>
     <string name="rule_add_error_exceeds_available">Diese Regel überschreitet das nach Fixkosten verfügbare Einkommen. Senken Sie den Betrag oder passen Sie eine andere Regel an.</string>

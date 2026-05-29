@@ -37,8 +37,10 @@ android {
         testInstrumentationRunner = "pt.ms.myshare.HiltTestRunner"
         manifestPlaceholders = [admobAppId: "ca-app-pub-3940256099942544~3347511713"]
         resValue "string", "admob_banner_ad_unit_id", '"ca-app-pub-3940256099942544/6300978111"'
+        resValue "string", "admob_native_ad_unit_id", '"ca-app-pub-3940256099942544/2247696110"'
         resValue "string", "admob_interstitial_ad_unit_id", '"ca-app-pub-3940256099942544/1033173712"'
         resValue "string", "admob_app_open_ad_unit_id", '"ca-app-pub-3940256099942544/9257395921"'
+        resValue "string", "admob_rewarded_ad_unit_id", '"ca-app-pub-3940256099942544/5224354917"'
     }
 
     buildTypes {
@@ -52,10 +54,12 @@ android {
             if (hasReleaseSigning) {
                 signingConfig = signingConfigs.release
             }
-            manifestPlaceholders = [admobAppId: "ca-app-pub-9538602323287593~1471105513"] // Production AdMob App ID
-            resValue "string", "admob_banner_ad_unit_id", '"ca-app-pub-9538602323287593/2154982867"' // Production Banner Ad Unit ID
-            resValue "string", "admob_interstitial_ad_unit_id", '""'
-            resValue "string", "admob_app_open_ad_unit_id", '"ca-app-pub-9538602323287593/1001683294"' // Production App Open Ad Unit ID
+            manifestPlaceholders = [admobAppId: project.findProperty("MYSHARE_ADMOB_APP_ID") ?: "ca-app-pub-9538602323287593~1471105513"]
+            resValue "string", "admob_banner_ad_unit_id", "\"${project.findProperty("MYSHARE_ADMOB_BANNER_AD_UNIT_ID") ?: "ca-app-pub-9538602323287593/2154982867"}\""
+            resValue "string", "admob_native_ad_unit_id", "\"${project.findProperty("MYSHARE_ADMOB_NATIVE_AD_UNIT_ID") ?: ""}\""
+            resValue "string", "admob_interstitial_ad_unit_id", "\"${project.findProperty("MYSHARE_ADMOB_INTERSTITIAL_AD_UNIT_ID") ?: ""}\""
+            resValue "string", "admob_app_open_ad_unit_id", "\"${project.findProperty("MYSHARE_ADMOB_APP_OPEN_AD_UNIT_ID") ?: "ca-app-pub-9538602323287593/1001683294"}\""
+            resValue "string", "admob_rewarded_ad_unit_id", "\"${project.findProperty("MYSHARE_ADMOB_REWARDED_AD_UNIT_ID") ?: ""}\""
 
         }
     }
@@ -124,8 +128,8 @@ dependencies {
     androidTestImplementation platform('androidx.compose:compose-bom:2025.02.00')
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
     // Hilt testing support
-    androidTestImplementation 'com.google.dagger:hilt-android-testing:2.57.2'
-    kspAndroidTest 'com.google.dagger:hilt-compiler:2.57.2'
+    androidTestImplementation 'com.google.dagger:hilt-android-testing:2.58'
+    kspAndroidTest 'com.google.dagger:hilt-compiler:2.58'
     // MockK for Android instrumented tests
     androidTestImplementation 'io.mockk:mockk-android:1.13.8'
 
@@ -137,8 +141,8 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment-ktx:2.8.8'
     implementation 'androidx.navigation:navigation-ui-ktx:2.8.8'
     implementation 'androidx.preference:preference-ktx:1.2.1'
-    implementation 'com.google.android.gms:play-services-ads:23.6.0'
-    implementation 'com.google.android.ump:user-messaging-platform:3.1.0'
+    implementation 'com.google.android.gms:play-services-ads:25.3.0'
+    implementation 'com.google.android.ump:user-messaging-platform:4.0.0'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
     testImplementation 'io.mockk:mockk:1.13.8'
@@ -189,8 +193,8 @@ dependencies {
     implementation 'com.jakewharton.timber:timber:5.0.1'
 
     // Hilt
-    implementation "com.google.dagger:hilt-android:2.57.2"
-    ksp "com.google.dagger:hilt-compiler:2.57.2"
+    implementation "com.google.dagger:hilt-android:2.58"
+    ksp "com.google.dagger:hilt-compiler:2.58"
     implementation "androidx.hilt:hilt-navigation-compose:1.2.0"
     implementation "androidx.hilt:hilt-work:1.2.0"
     ksp "androidx.hilt:hilt-compiler:1.2.0"

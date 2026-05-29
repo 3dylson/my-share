@@ -20,7 +20,7 @@ fun AppNavigation(
     onNotificationHomeDestinationConsumed: () -> Unit = {},
     onManageAdsConsent: () -> Unit = {},
     adsConsentManager: pt.ms.myshare.presentation.ui.ads.AdsConsentManager? = null,
-    onFreeHomeReady: () -> Unit = {}
+    onFreeHomeReady: (hasFirstPlan: Boolean, isPremium: Boolean) -> Unit = { _, _ -> }
 ) {
     NavHost(navController = navController, startDestination = "onboarding") {
         composable("onboarding") {

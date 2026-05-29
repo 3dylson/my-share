@@ -46,11 +46,25 @@ jobs:
 
       - name: Create CI Gradle Properties
         env:
+          MYSHARE_ADMOB_APP_ID: ${{ secrets.MYSHARE_ADMOB_APP_ID }}
+          MYSHARE_ADMOB_BANNER_AD_UNIT_ID: ${{ secrets.MYSHARE_ADMOB_BANNER_AD_UNIT_ID }}
+          MYSHARE_ADMOB_NATIVE_AD_UNIT_ID: ${{ secrets.MYSHARE_ADMOB_NATIVE_AD_UNIT_ID }}
+          MYSHARE_ADMOB_INTERSTITIAL_AD_UNIT_ID: ${{ secrets.MYSHARE_ADMOB_INTERSTITIAL_AD_UNIT_ID }}
           MYSHARE_ADMOB_APP_OPEN_AD_UNIT_ID: ${{ secrets.MYSHARE_ADMOB_APP_OPEN_AD_UNIT_ID }}
+          MYSHARE_ADMOB_REWARDED_AD_UNIT_ID: ${{ secrets.MYSHARE_ADMOB_REWARDED_AD_UNIT_ID }}
         run: |
-          if [[ -n "$MYSHARE_ADMOB_APP_OPEN_AD_UNIT_ID" ]]; then
-            echo "MYSHARE_ADMOB_APP_OPEN_AD_UNIT_ID=$MYSHARE_ADMOB_APP_OPEN_AD_UNIT_ID" >> gradle.properties
-          fi
+          for name in \
+            MYSHARE_ADMOB_APP_ID \
+            MYSHARE_ADMOB_BANNER_AD_UNIT_ID \
+            MYSHARE_ADMOB_NATIVE_AD_UNIT_ID \
+            MYSHARE_ADMOB_INTERSTITIAL_AD_UNIT_ID \
+            MYSHARE_ADMOB_APP_OPEN_AD_UNIT_ID \
+            MYSHARE_ADMOB_REWARDED_AD_UNIT_ID
+          do
+            if [[ -n "${!name}" ]]; then
+              echo "$name=${!name}" >> gradle.properties
+            fi
+          done
 
       - name: Create Google Services Config
         env:

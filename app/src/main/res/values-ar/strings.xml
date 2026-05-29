@@ -1003,6 +1003,10 @@
     <string name="goal_add_error_missing">هذا الهدف لم يعد متاحا.</string>
     <string name="goal_add_error_invalid_name_amount">الرجاء إدخال اسم صالح والمبلغ.</string>
     <string name="goal_add_error_premium_required">تحتاج إلى Premium لإضافة هدف آخر. تبقى أهدافك المحفوظة آمنة، وتُفتح الأهداف الإضافية مرة أخرى عندما يكون Premium نشطاً.</string>
+    <string name="goal_add_error_reward_unavailable">فتح الإعلان غير متاح الآن. حاول لاحقاً أو قم بالترقية إلى Premium للحصول على أهداف غير محدودة.</string>
+    <string name="goal_add_rewarded_extra_goal_title">فتح هدف إضافي واحد</string>
+    <string name="goal_add_rewarded_extra_goal_body">شاهد فيديو دعائياً قصيراً لإضافة هذا الهدف الآن. يزيل Premium الإعلانات ويفتح عدة أهداف بشكل دائم.</string>
+    <string name="goal_add_rewarded_extra_goal_action">مشاهدة إعلان للفتح</string>
     <string name="rule_add_error_missing">هذه القاعدة لم تعد متوفرة.</string>
     <string name="rule_add_error_invalid_name_amount">الرجاء إدخال اسم صالح والمبلغ.</string>
     <string name="rule_add_error_exceeds_available">تتجاوز هذه القاعدة الدخل المتاح بعد التكاليف الثابتة. خفّض المبلغ أو عدّل قاعدة أخرى.</string>

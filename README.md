@@ -9,7 +9,7 @@ My Share is a manual-first, salary and payday planning companion for Android. It
 - **The Hub**: A focused, Jetpack Compose-driven interface to allocate and preview upcoming paydays.
 - **Strategy & Drift**: Keep track of financial goals, payday rules, and budget drift before it happens.
 - **Paywall & Premium Options**: Google Play Billing (8.3.0) integration offering deeper review histories and multiple recurring rules.
-- **Privacy-First Ads**: AdMob integration fortified by the Google User Messaging Platform (UMP) SDK to respect GDPR/CCPA. Free-user ads are limited to low-sensitivity surfaces such as More, with capped interstitials only when leaving More and app-open ads only for returning free users after Home has loaded. Ads are never placed inside onboarding, paywall, plan, goal, review, or other financial decision flows, and are disabled entirely for Premium users.
+- **Revenue-First Free Ads**: AdMob integration fortified by the Google User Messaging Platform (UMP) SDK to respect GDPR/CCPA. Eligible free users see ads after their first salary plan value is delivered: anchored banners on read-only Home/More surfaces, a native sponsored card in More, app-open ads from session 3, capped completed-action interstitials, and opt-in rewarded unlocks. Ads remain disabled for Premium/trial users, onboarding, paywall/purchase flows, salary/allocation input, edit forms, reminder permission flow, active keyboard states, and notification reminder deep links.
 - **Background Reminders**: WorkManager-powered local notifications for payday and weekly check-ins.
 
 ## 🛠️ Architecture
@@ -28,7 +28,12 @@ My Share is a manual-first, salary and payday planning companion for Android. It
    MYSHARE_RELEASE_STORE_PASSWORD=***
    MYSHARE_RELEASE_KEY_ALIAS=***
    MYSHARE_RELEASE_KEY_PASSWORD=***
+   MYSHARE_ADMOB_APP_ID=***
+   MYSHARE_ADMOB_BANNER_AD_UNIT_ID=***
+   MYSHARE_ADMOB_NATIVE_AD_UNIT_ID=***
+   MYSHARE_ADMOB_INTERSTITIAL_AD_UNIT_ID=***
    MYSHARE_ADMOB_APP_OPEN_AD_UNIT_ID=***
+   MYSHARE_ADMOB_REWARDED_AD_UNIT_ID=***
    ```
 3. Sync Gradle and run on an Android Emulator or Device (Min SDK optimized for modern Android target).
 
@@ -37,4 +42,4 @@ My Share is a manual-first, salary and payday planning companion for Android. It
 * Agent and contributor rules live in [AGENTS.md](./AGENTS.md).
 * For the extensive UI/UX component guidance, explore [DESIGN.md](./DESIGN.md).
 * Dated files in `docs/ui-ux-qa-notes-*` are historical QA evidence. Use them for context, but treat `AGENTS.md` and `DESIGN.md` as the current source of truth.
-* For Play Console Data Safety constraints, refer to our internal Data Safety Artifacts.
+* For Play Console Data Safety constraints, follow [docs/play-data-safety.md](docs/play-data-safety.md).

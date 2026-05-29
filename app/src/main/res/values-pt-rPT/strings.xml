@@ -1020,6 +1020,10 @@
     <string name="goal_add_error_missing">Este objetivo já não está disponível.</string>
     <string name="goal_add_error_invalid_name_amount">Introduza um nome e um valor válidos.</string>
     <string name="goal_add_error_premium_required">O Premium é necessário para adicionar outro objetivo. Os objetivos guardados ficam seguros e os objetivos extra voltam a desbloquear quando o Premium estiver ativo.</string>
+    <string name="goal_add_error_reward_unavailable">O desbloqueio com anúncio não está disponível agora. Tente mais tarde ou faça upgrade para o Premium para objetivos ilimitados.</string>
+    <string name="goal_add_rewarded_extra_goal_title">Desbloquear um objetivo extra</string>
+    <string name="goal_add_rewarded_extra_goal_body">Veja um vídeo patrocinado curto para adicionar este objetivo agora. O Premium remove anúncios e desbloqueia vários objetivos permanentemente.</string>
+    <string name="goal_add_rewarded_extra_goal_action">Ver anúncio para desbloquear</string>
     <string name="rule_add_error_missing">Esta regra já não está disponível.</string>
     <string name="rule_add_error_invalid_name_amount">Introduza um nome e um valor válidos.</string>
     <string name="rule_add_error_exceeds_available">Esta regra excede o rendimento disponível depois dos custos fixos. Reduza o valor ou ajuste outra regra.</string>
