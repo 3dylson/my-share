@@ -63,12 +63,14 @@ Status after implementation pass on 2026-05-19:
 - Done: The founder pass is capped server-side to 100 claims through Cloud Function `claimLegacyPremiumGrant` and Firestore config `app_config/legacy_premium_grant`.
 - Done: Fresh installs are excluded by capturing an install-time eligibility snapshot before onboarding can write new planner values.
 - Done: Analytics events were added for founder pass viewed, claim started, claimed, not eligible, error, and dismissed.
-- Done: Firebase Remote Config now controls founder offer visibility, paywall default plan selection, onboarding paywall variant, Premium reminder messaging, and Premium proof variant so growth experiments can be rolled out or stopped without a new app release.
+- Done: Firebase Remote Config now controls founder offer visibility, paywall default plan selection, onboarding paywall variant, onboarding intro variant, Premium reminder messaging, and Premium proof variant so growth experiments can be rolled out or stopped without a new app release.
 - Done: The onboarding paywall supports a typed Remote Config copy variant, including the default `payday_proof` message and an experiment-ready `review_momentum` message that emphasizes each check-in becoming the next payday move.
+- Done: The onboarding welcome promise supports a typed Remote Config copy variant, including the default `plan_first` promise and an experiment-ready `spend_clarity` promise for testing whether spending-clarity framing improves activation and conversion without lengthening the flow.
 - Done: The first-review Premium proof moment supports the typed `premium_proof_variant`, including the default `next_move` proof and an experiment-ready `progress_loop` proof that frames Premium as a repeatable payday habit.
-- Done: Firebase A/B Testing is running through Remote Config parameters `onboarding_conversion_experiment` and `paywall_trial_framing`; paywall views, activation, plan selection, purchase start, and purchase completion carry the experiment values into Analytics.
+- Done: Firebase A/B Testing is running through Remote Config parameters `onboarding_conversion_experiment` and `paywall_trial_framing`; onboarding start, step views/completions, activation, trajectory bridge, paywall views, plan selection, purchase outcomes, reminder setup/skip, and onboarding completion carry experiment values into Analytics.
 - Done: Created and started Firebase A/B experiment `Onboarding trial framing` for Android app `pt.ms.myshare`, targeting 100% of eligible users with primary goal `app_store_subscription_convert` and secondary metrics `purchase_started`, `onboarding_activation_reached`, Retention (4 to 7 days), and crash-free users.
-- Experiment variants: baseline uses `paywall_trial_framing=seven_day` and `onboarding_conversion_experiment=baseline`; Variant A uses `paywall_trial_framing=first_checkin` and `onboarding_conversion_experiment=first_checkin_trial`.
+- Experiment variants: baseline uses `paywall_trial_framing=seven_day` and `onboarding_conversion_experiment=baseline`; Variant A uses `paywall_trial_framing=first_checkin` and `onboarding_conversion_experiment=first_checkin_trial`. The app and live Remote Config fallback now default to the winning/production framing `first_checkin_trial` + `first_checkin` when a user is not assigned by Firebase A/B Testing.
+- Done: Firebase Remote Config template version `4` includes `onboarding_intro_variant=plan_first`, ready for a future console-created A/B test against `spend_clarity`.
 - Done: Firebase Performance Monitoring is wired into the app with custom traces for weekly review save, onboarding purchase launch, and in-app Premium purchase launch so conversion-critical waits can be tracked alongside Analytics and Crashlytics.
 - Guardrail: Firebase Performance collection is disabled in debug builds after emulator validation showed startup ANR risk from debug instrumentation; release builds keep collection enabled.
 - Done: Home reminder setup now logs source-aware reminder settings and notification permission outcomes so retention prompts can be measured from More and Premium check-in surfaces.
@@ -242,7 +244,7 @@ Example outputs:
 ## Phase 4: Onboarding UX And Premium Feel
 
 Status after onboarding value-ladder pass on 2026-05-18:
-- Done: Plan Preview no longer presents two different choices that both lead to account setup; the CTA now honestly says `Continue to account setup`.
+- Done: Plan Preview no longer presents two different choices that both lead to account setup; account setup is no longer a blocking step before the Premium bridge.
 - Done: The onboarding paywall now shows a personalized adaptive-plan preview using the user's weekly spend guide and priority move.
 - Done: The paywall value copy now frames Premium around review-based adjustment guidance, while keeping the free manual path visible.
 - Done: The paywall now shows a concrete example Premium adjustment based on the user's plan, such as moving an unused buffer toward the selected goal while protecting the weekly guide.
@@ -365,12 +367,12 @@ Plan Preview:
 - Completed: make this the first true value reveal.
 - Lead with `Your payday plan is ready` and the user's safe weekly spend.
 - Show bills protected, priority move, and ordered payday actions before any Premium tease.
-- Keep `Continue to account setup` as the honest CTA.
+- Keep the CTA focused on the next value decision, not account setup.
 - Add Premium only after value is visible: free saves a static split, Premium reviews what happened and suggests the next adjustment.
 
 Signup:
-- Current compact layout is acceptable.
-- Keep Google optional and local mode clearly first-class.
+- Keep account setup contextual after value is proven or when it protects Premium access.
+- Keep Google optional and local mode clearly first-class where account protection is shown.
 
 Trajectory:
 - Completed: make the Premium bridge concrete.

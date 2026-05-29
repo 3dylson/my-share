@@ -17,6 +17,7 @@ import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.domain.model.ReviewInsight
 import pt.ms.myshare.domain.model.SalaryPlan
 import pt.ms.myshare.domain.model.UserPreferences
+import pt.ms.myshare.presentation.ui.localization.UiText
 import java.math.BigDecimal
 import java.time.YearMonth
 
@@ -239,7 +240,7 @@ data class MoreCardState(
     val selectedBillingPlan: BillingPlan = BillingPlan.MONTHLY,
     val hasUserSelectedBillingPlan: Boolean = false,
     val isBillingActionInProgress: Boolean = false,
-    val billingMessage: String? = null,
+    val billingMessage: UiText? = null,
     val isPremium: Boolean = false,
     val userEmail: String? = null,
     val canConnectGoogle: Boolean = false,

@@ -19,6 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -66,6 +68,7 @@ fun GoalPickerScreen(
     var goalAmountText by remember(userPreferences.languageTag) { mutableStateOf(LocalizedAmountFormatter.formatEditableAmount(initialGoalAmount, locale)) }
     var isCustomGoalSelected by remember { mutableStateOf(false) }
     var validationRequested by remember { mutableStateOf(false) }
+    val haptic = LocalHapticFeedback.current
 
     val currencySymbol = remember(locale, userPreferences.currencyCode) {
         LocalizedAmountFormatter.currencySymbol(locale, userPreferences.currencyCode)
@@ -77,8 +80,10 @@ fun GoalPickerScreen(
     val isGoalValid = goalName.isNotBlank() && goalAmount != null && goalAmount > BigDecimal.ZERO
 
     fun setDefaultsForFocus(focus: PlanningFocus) {
+        val focusChanged = selectedFocus != focus || isCustomGoalSelected
         isCustomGoalSelected = false
         selectedFocus = focus
+        if (focusChanged) haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
         when (focus) {
             PlanningFocus.SAVE_WITHOUT_STRESS -> {
                 goalName = defaultEmergencyGoalName
@@ -127,6 +132,7 @@ fun GoalPickerScreen(
             onInvestmentClick = { setDefaultsForFocus(PlanningFocus.INVEST_WITH_DISCIPLINE) },
             onPurchaseClick = { setDefaultsForFocus(PlanningFocus.PLAN_TOGETHER) },
             onCustomClick = {
+                if (!isCustomGoalSelected) haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 isCustomGoalSelected = true
                 selectedFocus = PlanningFocus.PLAN_TOGETHER
                 if (goalName in defaultGoalNames) goalName = ""

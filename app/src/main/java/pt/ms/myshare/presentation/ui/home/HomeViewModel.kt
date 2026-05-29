@@ -68,6 +68,7 @@ import pt.ms.myshare.domain.use_case.GetReviewHistoryUseCase
 import pt.ms.myshare.domain.use_case.UpdateGoalProgressUseCase
 import pt.ms.myshare.domain.use_case.GetPerformanceStatsUseCase
 import pt.ms.myshare.domain.use_case.GetCoachingInsightsUseCase
+import pt.ms.myshare.domain.use_case.SavePaydayReviewUseCase
 import pt.ms.myshare.domain.use_case.PerformanceStats
 import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 import pt.ms.myshare.presentation.ui.formatting.SubscriptionSavingsFormatter
@@ -111,6 +112,7 @@ class HomeViewModel @Inject constructor(
     private val getReviewHistoryUseCase: GetReviewHistoryUseCase,
     private val updateGoalProgressUseCase: UpdateGoalProgressUseCase,
     private val adjustGoalProgressForReviewCorrectionUseCase: AdjustGoalProgressForReviewCorrectionUseCase,
+    private val savePaydayReviewUseCase: SavePaydayReviewUseCase,
     private val getPerformanceStatsUseCase: GetPerformanceStatsUseCase,
     private val getCoachingInsightsUseCase: GetCoachingInsightsUseCase,
     private val reminderWorkScheduler: ReminderWorkScheduler,
@@ -854,7 +856,12 @@ class HomeViewModel @Inject constructor(
             null
         }
         val preview = plan?.let { calculatePlanPreviewUseCase.execute(it, BigDecimal.ZERO) }
-        val defaultFlexibleSpend = review?.actualFlexibleSpend ?: preview?.flexibleSpendPerPayday
+        val defaultFlexibleSpend = if (review != null) {
+            val plannedFlexible = review.plannedFlexibleSpend ?: preview?.flexibleSpendPerPayday ?: BigDecimal.ZERO
+            plannedFlexible.subtract(review.actualFlexibleSpend).max(BigDecimal.ZERO)
+        } else {
+            preview?.flexibleSpendPerPayday
+        }
         val defaultGoalContribution = review?.actualGoalContribution ?: preview?.priorityContributionPerPayday
         val flexibleMax = reviewRangeMax(defaultFlexibleSpend ?: BigDecimal.ZERO)
         val goalMax = reviewRangeMax(defaultGoalContribution ?: BigDecimal.ZERO)
@@ -931,9 +938,9 @@ class HomeViewModel @Inject constructor(
             return
         }
 
-        val actualFlexible = LocalizedAmountFormatter.parseAmount(uiState.value.reviewCard.actualFlexibleSpend, currentPreferences.locale)
+        val flexibleLeft = LocalizedAmountFormatter.parseAmount(uiState.value.reviewCard.actualFlexibleSpend, currentPreferences.locale)
         val actualGoal = LocalizedAmountFormatter.parseAmount(uiState.value.reviewCard.actualGoalContribution, currentPreferences.locale)
-        if (actualFlexible == null || actualGoal == null) {
+        if (flexibleLeft == null || actualGoal == null) {
             uiState.update { it.copy(reviewCard = it.reviewCard.copy(error = "home_review_error_invalid_amounts")) }
             return
         }
@@ -945,18 +952,12 @@ class HomeViewModel @Inject constructor(
                     "is_premium" to uiState.value.moreCard.isPremium.toString()
                 )
             ) { trace ->
-                val goals = plannerRepository.loadGoals()
-                val targetAmount = goals.firstOrNull()?.targetAmount ?: BigDecimal.ZERO
-                val preview = calculatePlanPreviewUseCase.execute(plan, targetAmount)
-
-                val review = ManualReview(
-                    actualFlexibleSpend = actualFlexible,
-                    actualGoalContribution = actualGoal,
-                    plannedFlexibleSpend = preview.flexibleSpendPerPayday,
-                    plannedGoalContribution = preview.priorityContributionPerPayday
+                val saveResult = savePaydayReviewUseCase.execute(
+                    plan = plan,
+                    leftInSpendingPot = flexibleLeft,
+                    movedToGoal = actualGoal
                 )
-                plannerRepository.saveReview(review)
-                updateGoalProgressUseCase.execute(actualGoal)
+                val review = saveResult.review
                 emitReviewSavedFeedback()
 
                 val historyAfterSave = currentReviews
@@ -977,6 +978,7 @@ class HomeViewModel @Inject constructor(
                         recommendationAfterSave?.direction?.name?.lowercase(Locale.US) ?: "none"
                     )
                     putString("recommendation_applyable", (recommendationAfterSave?.isApplyable == true).toString())
+                    putString("flexible_left", flexibleLeft.toPlainString())
                 })
                 recommendationAfterSave?.let { recommendation ->
                     FirebaseUtils.logEvent("premium_review_recommendation_generated", android.os.Bundle().apply {
@@ -1002,7 +1004,13 @@ class HomeViewModel @Inject constructor(
                     }
                 }
                 recordAppReviewPositiveAction(historyAfterSave.size)
-                Timber.tag(TAG).d("Review saved with snapshots. planFlex=%s planPriority=%s", preview.flexibleSpendPerPayday, preview.priorityContributionPerPayday)
+                Timber.tag(TAG).d(
+                    "Review saved with snapshots. planFlex=%s flexLeft=%s actualFlex=%s planPriority=%s",
+                    saveResult.plannedFlexibleSpend,
+                    saveResult.leftInSpendingPot,
+                    review.actualFlexibleSpend,
+                    saveResult.plannedGoalContribution
+                )
             }
         }
     }
@@ -1360,7 +1368,7 @@ class HomeViewModel @Inject constructor(
                                 )
                             )
                         }
-                        FirebaseUtils.logEvent("google_account_connect_failed")
+                        FirebaseUtils.logEvent("account_google_connect_failed")
                         Timber.tag(TAG).e("Google account connected but local state merge failed")
                         return@fold
                     }
@@ -1376,7 +1384,7 @@ class HomeViewModel @Inject constructor(
                             )
                         )
                     }
-                    FirebaseUtils.logEvent("google_account_connected")
+                    FirebaseUtils.logEvent("account_google_connected")
                     Timber.tag(TAG).d("Google account connected from Home")
                 },
                 onFailure = { throwable ->
@@ -1389,7 +1397,7 @@ class HomeViewModel @Inject constructor(
                             )
                         )
                     }
-                    FirebaseUtils.logEvent("google_account_connect_failed")
+                    FirebaseUtils.logEvent("account_google_connect_failed")
                     Timber.tag(TAG).e(throwable, "Google account connection failed from Home")
                 }
             )

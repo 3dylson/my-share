@@ -16,6 +16,9 @@
             android:exported="false"
             tools:node="merge">
             <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                tools:node="remove" />
+            <meta-data
                 android:name="pt.ms.myshare.utils.logs.initializers.StrictModeInitializer"
                 android:value="androidx.startup" />
         </provider>

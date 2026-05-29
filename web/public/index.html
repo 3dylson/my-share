@@ -114,7 +114,7 @@
 
   <header>
     <h1>My Share – Privacy Policy</h1>
-    <p>Effective: 2 May 2025 &nbsp;·&nbsp; Last updated: 2 May 2025</p>
+    <p>Effective: 2 May 2025 &nbsp;·&nbsp; Last updated: 29 May 2026</p>
   </header>
 
   <main>
@@ -129,8 +129,8 @@
       <h2>1. Who We Are</h2>
       <p>My Share ("we", "us", "our") is a personal finance planning app for Android. Our privacy
         contact email is <a href="mailto:edylson_frederico@outlook.com">edylson_frederico@outlook.com</a>.</p>
-      <p>This policy explains what data we collect, why we collect it, who we share it with, and
-        your rights over it.</p>
+      <p>This policy explains what data we collect, why we collect it, who we share it with, how we
+        protect it, how long we keep it, and your rights over it.</p>
     </div>
 
     <div class="card">
@@ -138,46 +138,58 @@
 
       <p><strong>Account &amp; Authentication</strong></p>
       <ul>
-        <li>When you sign in with Google (via Firebase Authentication), we receive your name, email
-          address, and Google profile photo URL. Anonymous sign-in creates a temporary account with
-          no personal identifiers.</li>
-        <li>If you use a local-only account, no authentication data is collected.</li>
+        <li>When you sign in with Google through Firebase Authentication, we receive your name,
+          email address, Google profile photo URL, and a Firebase user ID.</li>
+        <li>If you use a local-only account, authentication data is not sent to us.</li>
       </ul>
 
       <p><strong>Financial Planning Data</strong></p>
       <ul>
         <li>Your income, fixed costs, savings goals, allocation percentages, and check-in logs that
           you voluntarily enter into the app.</li>
-        <li>This data is stored in Cloud Firestore (Google Firebase) and associated with your user
-          account. It is never sold or used for advertising targeting.</li>
+        <li>For signed-in users, this data is stored in Cloud Firestore (Google Firebase) and
+          associated with your user account. In local-only mode, planning data stays on your device
+          unless you later choose to sign in and sync it.</li>
+        <li>We do not sell financial planning data, and we do not use salary, bills, goals,
+          allocations, debts, or check-in values for advertising targeting.</li>
       </ul>
 
       <p><strong>Usage &amp; Analytics</strong></p>
       <ul>
-        <li>We use <strong>Firebase Analytics</strong> to collect anonymised event data (e.g.,
-          onboarding steps completed, features used, session duration). This data does not include
-          your financial figures.</li>
+        <li>We use <strong>Firebase Analytics</strong> to collect app activity such as onboarding
+          steps completed, features used, ad eligibility, ad impressions, subscription funnel
+          events, and session activity. Analytics events do not include your financial figures.</li>
         <li>We use <strong>Firebase Crashlytics</strong> to receive crash reports and stack traces
           to improve stability. Crash reports may include device model, OS version, and app state at
           the time of the crash.</li>
         <li>We use <strong>Firebase Performance Monitoring</strong> to measure app responsiveness.</li>
+        <li>We use <strong>Firebase Remote Config</strong> to control product settings such as
+          onboarding variants, paywall variants, and ad kill switches.</li>
       </ul>
 
       <p><strong>Advertising</strong></p>
       <ul>
-        <li>For free users, we display ads via <strong>Google AdMob</strong>. AdMob uses device
-          identifiers (Advertising ID) to serve contextual or personalised ads depending on your
-          consent choice, which is collected via Google's User Messaging Platform (UMP / Consent
-          SDK).</li>
-        <li>Ads are never shown on screens where you enter sensitive financial data.</li>
-        <li>Subscribers and trial users see no ads.</li>
+        <li>For eligible free users, we display ads via <strong>Google AdMob</strong> after the
+          first salary plan has been created and shown. Ads can include anchored banners, native
+          sponsored cards, app-open ads, interstitial ads after completed actions, and opt-in
+          rewarded ads.</li>
+        <li>AdMob may collect and share IP address, app interactions, diagnostic information,
+          Android Advertising ID, app set ID, and other device or account identifiers for
+          advertising, analytics, and fraud prevention.</li>
+        <li>AdMob may use IP address to estimate approximate location. Personalised ads depend on
+          your consent where consent is required. Consent and privacy choices are managed through
+          Google's User Messaging Platform (UMP / Consent SDK).</li>
+        <li>Ads are never shown during onboarding, on the first plan result, in paywall or purchase
+          flows, on salary/allocation input screens, on goal/rule edit forms, in reminder permission
+          flows, while the keyboard is active, or from notification reminder deep links.</li>
+        <li>Premium subscribers and trial users do not see ads while their entitlement is active.</li>
       </ul>
 
       <p><strong>Subscriptions &amp; Purchases</strong></p>
       <ul>
         <li>Subscription transactions are processed entirely by <strong>Google Play Billing</strong>.
           We do not store your payment card details. We receive a purchase token and subscription
-          status from Google Play, which is verified server-side via a Firebase Cloud Function.</li>
+          status from Google Play, which is verified server-side via Firebase Cloud Functions.</li>
       </ul>
 
       <p><strong>Push Notifications</strong></p>
@@ -189,44 +201,73 @@
     </div>
 
     <div class="card">
-      <h2>3. How We Use Your Information</h2>
+      <h2>3. Google Play Data Safety Summary</h2>
+      <p>For the Google Play Data Safety section, My Share collects or shares the following data
+        types depending on your choices and app state:</p>
+      <ul>
+        <li><strong>Approximate location:</strong> estimated from IP address by advertising and
+          platform services.</li>
+        <li><strong>Personal info:</strong> name, email address, and user IDs when you sign in.</li>
+        <li><strong>Financial info:</strong> purchase history and other financial information you
+          enter, such as salary, bills, goals, allocations, and review values.</li>
+        <li><strong>App activity:</strong> app interactions, screens, feature usage, ad events, and
+          other in-app actions used for app functionality, analytics, advertising measurement, and
+          product improvement.</li>
+        <li><strong>App info and performance:</strong> crash logs, diagnostics, app launch time,
+          latency, and performance information.</li>
+        <li><strong>Device or other IDs:</strong> Android Advertising ID, Firebase installation ID,
+          app set ID, FCM token, and related device or app identifiers.</li>
+      </ul>
+      <p>All user data sent from the app is encrypted in transit. Users can request deletion of
+        account data as described below.</p>
+    </div>
+
+    <div class="card">
+      <h2>4. How We Use Your Information</h2>
       <ul>
         <li>To provide and sync your budget plan across sessions.</li>
         <li>To verify subscription entitlements and unlock premium features.</li>
         <li>To send check-in reminders you have configured.</li>
         <li>To improve app stability and performance using aggregated analytics.</li>
+        <li>To display, cap, measure, and troubleshoot ads for eligible free users.</li>
+        <li>To prevent fraud, abuse, and unauthorized backend access.</li>
         <li>To comply with legal obligations.</li>
       </ul>
       <p>We do <strong>not</strong> sell your personal data, use your financial figures for
-        advertising, or share your data with third parties except as described in Section 4.</p>
+        advertising, or share your data with third parties except as described in Section 5.</p>
     </div>
 
     <div class="card">
-      <h2>4. Third-Party Services</h2>
+      <h2>5. Third-Party Services</h2>
       <p>My Share relies on the following third-party services, each governed by their own privacy
         policy:</p>
       <ul>
-        <li><a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener">Google Firebase</a> — Authentication, Firestore, Analytics, Crashlytics, FCM, Performance, Cloud Functions</li>
-        <li><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google AdMob &amp; UMP</a> — Advertising (free tier only)</li>
-        <li><a href="https://play.google.com/about/privacy-security-deception/privacy-deception/" target="_blank" rel="noopener">Google Play Billing</a> — Subscription processing</li>
+        <li><a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener">Google Firebase</a> — Authentication, Firestore, Analytics, Crashlytics, FCM, Remote Config, Performance, App Check, Hosting, and Cloud Functions</li>
+        <li><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google AdMob &amp; UMP</a> — Advertising, consent management, ad analytics, and fraud prevention for eligible free users</li>
+        <li><a href="https://play.google.com/about/privacy-security-deception/privacy-deception/" target="_blank" rel="noopener">Google Play Billing</a> — Subscription processing and purchase status</li>
       </ul>
       <p>We do not integrate with any other analytics, marketing, or data brokers.</p>
     </div>
 
     <div class="card">
-      <h2>5. Data Retention</h2>
+      <h2>6. Data Retention</h2>
       <ul>
         <li><strong>Account &amp; Firestore data:</strong> Retained while your account exists and
           for 30 days after deletion to allow recovery.</li>
         <li><strong>Analytics &amp; Crashlytics:</strong> Aggregated event data is retained for up
           to 14 months per Google's standard retention.</li>
+        <li><strong>Advertising data:</strong> AdMob and UMP retain advertising, consent, and
+          diagnostic data according to Google's policies and your consent choices.</li>
+        <li><strong>Purchase records:</strong> Purchase tokens and entitlement state are kept as
+          long as needed to provide Premium, resolve billing issues, prevent fraud, and meet legal
+          obligations.</li>
         <li><strong>Local-only data:</strong> Stored in your device's shared preferences and removed
           when you uninstall the app.</li>
       </ul>
     </div>
 
     <div class="card">
-      <h2>6. Your Rights &amp; Account Deletion</h2>
+      <h2>7. Your Rights &amp; Account Deletion</h2>
       <p>Depending on your jurisdiction (including the EU/EEA under GDPR and California under CCPA),
         you have the right to:</p>
       <ul>
@@ -243,28 +284,28 @@
     </div>
 
     <div class="card">
-      <h2>7. Children's Privacy</h2>
+      <h2>8. Children's Privacy</h2>
       <p>My Share is not directed to children under the age of 13. We do not knowingly collect
         personal information from children. If you believe a child has provided us with personal
         data, please contact us immediately.</p>
     </div>
 
     <div class="card">
-      <h2>8. Security</h2>
-      <p>We use industry-standard measures including Firebase Security Rules, App Check, and
-        server-side subscription verification to protect your data. However, no method of
-        transmission over the internet is 100% secure.</p>
+      <h2>9. Security</h2>
+      <p>We use industry-standard measures including encryption in transit, Firebase Security Rules,
+        App Check, and server-side subscription verification to protect your data. However, no
+        method of transmission over the internet is 100% secure.</p>
     </div>
 
     <div class="card">
-      <h2>9. Changes to This Policy</h2>
+      <h2>10. Changes to This Policy</h2>
       <p>We may update this policy from time to time. When we do, we will update the "Last updated"
         date above. Continued use of the app after changes constitutes acceptance of the revised
         policy. Significant changes will also be communicated via an in-app notice.</p>
     </div>
 
     <div class="card">
-      <h2>10. Contact</h2>
+      <h2>11. Contact</h2>
       <p>Questions, concerns, or data requests:<br>
         <a href="mailto:edylson_frederico@outlook.com">edylson_frederico@outlook.com</a>
       </p>
@@ -273,7 +314,7 @@
   </main>
 
   <footer>
-    &copy; 2025 My Share. All rights reserved.
+    &copy; 2026 My Share. All rights reserved.
   </footer>
 
   <script>

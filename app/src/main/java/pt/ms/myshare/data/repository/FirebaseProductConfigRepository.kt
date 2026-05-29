@@ -61,9 +61,18 @@ class FirebaseProductConfigRepository @Inject constructor(
             FirebaseUtils.setCrashlyticsKey("remote_config_paywall_default", updated.paywallDefaultPlan.name)
             FirebaseUtils.setCrashlyticsKey("remote_config_founder_offer", updated.founderOfferEnabled)
             FirebaseUtils.setCrashlyticsKey("remote_config_onboarding_experiment", updated.onboardingConversionExperiment)
+            FirebaseUtils.setCrashlyticsKey("remote_config_onboarding_paywall", updated.onboardingPaywallVariant.remoteValue)
+            FirebaseUtils.setCrashlyticsKey("remote_config_trial_framing", updated.paywallTrialFraming.remoteValue)
+            FirebaseUtils.setCrashlyticsKey("remote_config_onboarding_intro", updated.onboardingIntroVariant.remoteValue)
+            FirebaseUtils.setCrashlyticsKey("remote_config_ads_variant", updated.adsExperimentVariant.remoteValue)
+            FirebaseUtils.setCrashlyticsKey("remote_config_ads_rollout", updated.adsRolloutPercent)
+            FirebaseUtils.setCrashlyticsKey("remote_config_ads_app_open", updated.adsAppOpenEnabled)
+            FirebaseUtils.setCrashlyticsKey("remote_config_ads_interstitial", updated.adsInterstitialEnabled)
             FirebaseUtils.setUserProperty("paywall_default_plan", updated.paywallDefaultPlan.name.lowercase())
             FirebaseUtils.setUserProperty("onboarding_exp", updated.onboardingConversionExperiment)
             FirebaseUtils.setUserProperty("trial_framing", updated.paywallTrialFraming.remoteValue)
+            FirebaseUtils.setUserProperty("onboarding_intro_variant", updated.onboardingIntroVariant.remoteValue)
+            FirebaseUtils.setUserProperty("ads_variant", updated.adsExperimentVariant.remoteValue)
             FirebaseUtils.logEvent(
                 "remote_config_refreshed",
                 android.os.Bundle().apply {
@@ -72,6 +81,10 @@ class FirebaseProductConfigRepository @Inject constructor(
                     putString("premium_proof_variant", updated.premiumProofVariant.remoteValue)
                     putString("onboarding_experiment", updated.onboardingConversionExperiment)
                     putString("paywall_trial_framing", updated.paywallTrialFraming.remoteValue)
+                    putString("onboarding_intro_variant", updated.onboardingIntroVariant.remoteValue)
+                    putString("ads_variant", updated.adsExperimentVariant.remoteValue)
+                    putInt("ads_rollout_percent", updated.adsRolloutPercent)
+                    putString("ads_formats_enabled", updated.enabledAdsFormatsLabel())
                     putString("source", if (activated) "activated" else "cached")
                 }
             )
@@ -96,8 +109,32 @@ class FirebaseProductConfigRepository @Inject constructor(
             premiumRemindersEnabled = getBoolean(FirebaseRemoteConfigKeys.PREMIUM_REMINDERS_ENABLED),
             premiumProofVariant = getString(FirebaseRemoteConfigKeys.PREMIUM_PROOF_VARIANT),
             onboardingConversionExperiment = getString(FirebaseRemoteConfigKeys.ONBOARDING_CONVERSION_EXPERIMENT),
-            paywallTrialFraming = getString(FirebaseRemoteConfigKeys.PAYWALL_TRIAL_FRAMING)
+            paywallTrialFraming = getString(FirebaseRemoteConfigKeys.PAYWALL_TRIAL_FRAMING),
+            onboardingIntroVariant = getString(FirebaseRemoteConfigKeys.ONBOARDING_INTRO_VARIANT),
+            adsExperimentVariant = getString(FirebaseRemoteConfigKeys.ADS_EXPERIMENT_VARIANT),
+            adsRolloutPercent = getLong(FirebaseRemoteConfigKeys.ADS_ROLLOUT_PERCENT),
+            adsAnchoredBannerEnabled = getBoolean(FirebaseRemoteConfigKeys.ADS_ANCHORED_BANNER_ENABLED),
+            adsNativeMoreEnabled = getBoolean(FirebaseRemoteConfigKeys.ADS_NATIVE_MORE_ENABLED),
+            adsAppOpenEnabled = getBoolean(FirebaseRemoteConfigKeys.ADS_APP_OPEN_ENABLED),
+            adsInterstitialEnabled = getBoolean(FirebaseRemoteConfigKeys.ADS_INTERSTITIAL_ENABLED),
+            adsRewardedEnabled = getBoolean(FirebaseRemoteConfigKeys.ADS_REWARDED_ENABLED),
+            adsMinSessionsAppOpen = getLong(FirebaseRemoteConfigKeys.ADS_MIN_SESSIONS_APP_OPEN),
+            adsAppOpenCooldownHours = getLong(FirebaseRemoteConfigKeys.ADS_APP_OPEN_COOLDOWN_HOURS),
+            adsInterstitialDailyCap = getLong(FirebaseRemoteConfigKeys.ADS_INTERSTITIAL_DAILY_CAP),
+            adsRewardedDailyCap = getLong(FirebaseRemoteConfigKeys.ADS_REWARDED_DAILY_CAP),
+            adsNativeDailyCap = getLong(FirebaseRemoteConfigKeys.ADS_NATIVE_DAILY_CAP),
+            adsNonBannerDailyCap = getLong(FirebaseRemoteConfigKeys.ADS_NON_BANNER_DAILY_CAP)
         )
+    }
+
+    private fun ProductExperienceConfig.enabledAdsFormatsLabel(): String {
+        return listOfNotNull(
+            "banner".takeIf { adsAnchoredBannerEnabled },
+            "native".takeIf { adsNativeMoreEnabled },
+            "app_open".takeIf { adsAppOpenEnabled },
+            "interstitial".takeIf { adsInterstitialEnabled },
+            "rewarded".takeIf { adsRewardedEnabled }
+        ).joinToString(separator = ",").ifBlank { "none" }
     }
 
     private fun fetchIntervalSeconds(): Long {

@@ -48,6 +48,7 @@ import pt.ms.myshare.domain.use_case.CalculatePlanPreviewUseCase
 import pt.ms.myshare.domain.use_case.ResolveAllocationStrategyRulesUseCase
 import pt.ms.myshare.domain.use_case.ResolvePricingStrategyUseCase
 import pt.ms.myshare.presentation.ui.localization.UserLocaleManager
+import pt.ms.myshare.presentation.ui.paywall.BillingStatusMessageKeys
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -388,9 +389,51 @@ class OnboardingViewModelTest {
         viewModel.logActivationReached()
         viewModel.logActivationReached()
 
-        verify { onboardingAnalyticsLogger.logStepViewed("goal_picker", 1, OnboardingViewModel.SETUP_STEP_TOTAL, any(), any()) }
-        verify { onboardingAnalyticsLogger.logStepCompleted("goal_picker", 1, OnboardingViewModel.SETUP_STEP_TOTAL, any(), any()) }
-        verify(exactly = 1) { onboardingAnalyticsLogger.logActivationReached(any(), any(), any(), any()) }
+        verify {
+            onboardingAnalyticsLogger.logStepViewed(
+                "goal_picker",
+                1,
+                OnboardingViewModel.SETUP_STEP_TOTAL,
+                any(),
+                any(),
+                ProductExperienceConfig.DEFAULT_ONBOARDING_PAYWALL_VARIANT,
+                ProductExperienceConfig.DEFAULT_ONBOARDING_CONVERSION_EXPERIMENT,
+                "first_checkin",
+                ProductExperienceConfig.DEFAULT_ONBOARDING_INTRO_VARIANT
+            )
+        }
+        verify {
+            onboardingAnalyticsLogger.logStepCompleted(
+                "goal_picker",
+                1,
+                OnboardingViewModel.SETUP_STEP_TOTAL,
+                any(),
+                any(),
+                ProductExperienceConfig.DEFAULT_ONBOARDING_PAYWALL_VARIANT,
+                ProductExperienceConfig.DEFAULT_ONBOARDING_CONVERSION_EXPERIMENT,
+                "first_checkin",
+                ProductExperienceConfig.DEFAULT_ONBOARDING_INTRO_VARIANT
+            )
+        }
+        verify(exactly = 1) { onboardingAnalyticsLogger.logActivationReached(any(), any(), any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `trajectory analytics carries experiment assignment`() = runTest {
+        advanceUntilIdle()
+
+        viewModel.logTrajectoryViewed()
+
+        verify {
+            onboardingAnalyticsLogger.logTrajectoryViewed(
+                focus = any(),
+                pricingStrategy = any(),
+                onboardingPaywallVariant = ProductExperienceConfig.DEFAULT_ONBOARDING_PAYWALL_VARIANT,
+                onboardingExperiment = ProductExperienceConfig.DEFAULT_ONBOARDING_CONVERSION_EXPERIMENT,
+                paywallTrialFraming = "first_checkin",
+                onboardingIntroVariant = ProductExperienceConfig.DEFAULT_ONBOARDING_INTRO_VARIANT
+            )
+        }
     }
 
     @Test
@@ -409,7 +452,7 @@ class OnboardingViewModelTest {
         viewModel.purchasePremium(activity)
         advanceUntilIdle()
         coVerify { entitlementRepository.purchasePlan(activity, monthlyProduct) }
-        assertEquals("paywall_billing_handoff", viewModel.uiState.value.billingMessage)
+        assertEquals(BillingStatusMessageKeys.HANDOFF, viewModel.uiState.value.billingMessage)
     }
 
     @Test
@@ -432,7 +475,7 @@ class OnboardingViewModelTest {
         viewModel.purchasePremium(mockk(relaxed = true))
         advanceUntilIdle()
 
-        assertEquals("paywall_billing_checkout_failed", viewModel.uiState.value.billingMessage)
+        assertEquals(BillingStatusMessageKeys.CHECKOUT_FAILED, viewModel.uiState.value.billingMessage)
         assertFalse(viewModel.uiState.value.isBillingActionInProgress)
     }
 
@@ -442,7 +485,7 @@ class OnboardingViewModelTest {
         val activity = mockk<android.app.Activity>(relaxed = true)
         viewModel.purchasePremium(activity)
         advanceUntilIdle()
-        assertEquals("paywall_billing_products_unavailable", viewModel.uiState.value.billingMessage)
+        assertEquals(BillingStatusMessageKeys.PRODUCTS_UNAVAILABLE, viewModel.uiState.value.billingMessage)
         assertFalse(viewModel.uiState.value.isBillingActionInProgress)
         coVerify(exactly = 0) { entitlementRepository.purchasePlan(any(), any()) }
     }
@@ -504,7 +547,7 @@ class OnboardingViewModelTest {
         advanceUntilIdle()
 
         assertTrue(viewModel.uiState.value.shouldSecurePremiumAccess)
-        assertEquals("paywall_billing_completed", viewModel.uiState.value.billingMessage)
+        assertEquals(BillingStatusMessageKeys.COMPLETED, viewModel.uiState.value.billingMessage)
         coVerify { plannerRepository.saveAutomationEnabled(true) }
     }
 

@@ -1,11 +1,17 @@
 package pt.ms.myshare.presentation.ui.paywall
 
+import pt.ms.myshare.R
+import pt.ms.myshare.presentation.ui.localization.UiText
+
 object BillingStatusMessageKeys {
-    const val STARTING = "paywall_billing_starting"
-    const val HANDOFF = "paywall_billing_handoff"
-    const val PRODUCTS_UNAVAILABLE = "paywall_billing_products_unavailable"
-    const val CHECKOUT_FAILED = "paywall_billing_checkout_failed"
-    const val CANCELED = "paywall_billing_canceled"
-    const val PENDING = "paywall_billing_pending"
-    const val COMPLETED = "paywall_billing_completed"
+    val STARTING = UiText.StringResource(R.string.paywall_billing_starting)
+    val HANDOFF = UiText.StringResource(R.string.paywall_billing_handoff)
+    val PRODUCTS_UNAVAILABLE = UiText.StringResource(R.string.paywall_billing_products_unavailable)
+    val CHECKOUT_FAILED = UiText.StringResource(R.string.paywall_billing_checkout_failed)
+    val CANCELED = UiText.StringResource(R.string.paywall_billing_canceled)
+    val PENDING = UiText.StringResource(R.string.paywall_billing_pending)
+    val COMPLETED = UiText.StringResource(R.string.paywall_billing_completed)
+    val RESTORE_CHECKING = UiText.StringResource(R.string.paywall_restore_checking)
+    val RESTORE_SUCCESS = UiText.StringResource(R.string.paywall_restore_success)
+    val RESTORE_NONE = UiText.StringResource(R.string.paywall_restore_none)
 }

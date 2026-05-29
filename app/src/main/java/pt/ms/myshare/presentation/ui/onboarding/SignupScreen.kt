@@ -7,7 +7,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -33,7 +32,7 @@ import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReadResult
 import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReader
 import pt.ms.myshare.presentation.ui.components.GoogleSignInButton
 import pt.ms.myshare.presentation.ui.components.KeyboardDismissEffect
-import pt.ms.myshare.presentation.ui.components.rememberKeyboardDismissOnScrollConnection
+import pt.ms.myshare.presentation.ui.components.dismissKeyboardOnUserDrag
 import pt.ms.myshare.presentation.ui.theme.*
 import timber.log.Timber
 
@@ -55,7 +54,6 @@ fun SignupScreen(
     var googleSignInError by remember { mutableStateOf<String?>(null) }
     var googleSignInLoading by remember { mutableStateOf(false) }
     var localContinueLoading by remember { mutableStateOf(false) }
-    val keyboardDismissOnScrollConnection = rememberKeyboardDismissOnScrollConnection()
 
     KeyboardDismissEffect()
 
@@ -144,7 +142,7 @@ fun SignupScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(horizontal = 24.dp)
-                .nestedScroll(keyboardDismissOnScrollConnection)
+                .dismissKeyboardOnUserDrag(debugLabel = "SignupScreen")
                 .verticalScroll(rememberScrollState())
         ) {
             Spacer(Modifier.height(28.dp))

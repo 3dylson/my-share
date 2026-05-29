@@ -265,7 +265,30 @@ class AddEditViewModelTest {
         advanceUntilIdle()
 
         assertEquals("goal_add_error_premium_required", viewModel.state.value.error)
+        assertTrue(viewModel.state.value.canUseRewardedExtraGoal)
         coVerify(exactly = 0) { repository.saveGoal(any<Goal>()) }
+    }
+
+    @Test
+    fun `free user can save second goal after rewarded ad grant`() = runTest {
+        val repository = mockk<PlannerRepository>(relaxed = true)
+        every { repository.loadGoals() } returns listOf(
+            Goal(id = "goal-1", name = "Emergency", targetAmount = BigDecimal("500"))
+        )
+        val viewModel = GoalAddViewModel(
+            repository = repository,
+            userPreferencesRepository = TestUserPreferencesRepository(),
+            checkEntitlementLimitUseCase = checkEntitlementLimitUseCase(isPro = false),
+            savedStateHandle = SavedStateHandle()
+        )
+
+        viewModel.onNameChanged("Investing")
+        viewModel.onAmountChanged("1000")
+        viewModel.saveGoalWithRewardedExtraGoal()
+        advanceUntilIdle()
+
+        assertTrue(viewModel.state.value.isSaved)
+        coVerify(exactly = 1) { repository.saveGoal(any<Goal>()) }
     }
 
     @Test

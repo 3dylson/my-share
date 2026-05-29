@@ -1,6 +1,7 @@
 package pt.ms.myshare.presentation.ui.onboarding
 
 import android.os.Bundle
+import android.os.SystemClock
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -71,6 +72,7 @@ class OnboardingViewModel @Inject constructor(
     val uiState: StateFlow<OnboardingState> = state.asStateFlow()
     private var activationLogged = false
     private var currentProductConfig = ProductExperienceConfig()
+    private val onboardingStartedAtElapsedRealtime = SystemClock.elapsedRealtime()
 
     init {
         val completed = plannerRepository.isOnboardingCompleted()
@@ -86,7 +88,14 @@ class OnboardingViewModel @Inject constructor(
             )
         }
         if (!completed) {
-            onboardingAnalyticsLogger.logStarted(pricing, preferences)
+            onboardingAnalyticsLogger.logStarted(
+                pricingStrategy = pricing,
+                preferences = preferences,
+                onboardingPaywallVariant = currentProductConfig.onboardingPaywallVariant.remoteValue,
+                onboardingExperiment = currentProductConfig.onboardingConversionExperiment,
+                paywallTrialFraming = currentProductConfig.paywallTrialFraming.remoteValue,
+                onboardingIntroVariant = currentProductConfig.onboardingIntroVariant.remoteValue
+            )
         }
         viewModelScope.launch {
             productConfigRepository.refresh()
@@ -97,6 +106,7 @@ class OnboardingViewModel @Inject constructor(
                 state.update { current ->
                     val currentPricing = current.pricingStrategy ?: pricing
                     current.copy(
+                        onboardingIntroVariant = productConfig.onboardingIntroVariant,
                         onboardingPaywallVariant = productConfig.onboardingPaywallVariant,
                         onboardingConversionExperiment = productConfig.onboardingConversionExperiment,
                         paywallTrialFraming = productConfig.paywallTrialFraming,
@@ -113,6 +123,7 @@ class OnboardingViewModel @Inject constructor(
                     putString("onboarding_paywall_variant", productConfig.onboardingPaywallVariant.remoteValue)
                     putString("onboarding_experiment", productConfig.onboardingConversionExperiment)
                     putString("paywall_trial_framing", productConfig.paywallTrialFraming.remoteValue)
+                    putString("onboarding_intro_variant", productConfig.onboardingIntroVariant.remoteValue)
                     putString("paywall_value_frame", PAYWALL_VALUE_FRAME)
                 })
                 Timber.tag(TAG).d(
@@ -215,7 +226,11 @@ class OnboardingViewModel @Inject constructor(
             stepIndex = stepIndex,
             setupStepTotal = stepTotal,
             focus = current.selectedFocus,
-            pricingStrategy = current.pricingStrategy
+            pricingStrategy = current.pricingStrategy,
+            onboardingPaywallVariant = current.onboardingPaywallVariant.remoteValue,
+            onboardingExperiment = current.onboardingConversionExperiment,
+            paywallTrialFraming = current.paywallTrialFraming.remoteValue,
+            onboardingIntroVariant = current.onboardingIntroVariant.remoteValue
         )
     }
 
@@ -226,7 +241,11 @@ class OnboardingViewModel @Inject constructor(
             stepIndex = stepIndex,
             setupStepTotal = stepTotal,
             focus = current.selectedFocus,
-            pricingStrategy = current.pricingStrategy
+            pricingStrategy = current.pricingStrategy,
+            onboardingPaywallVariant = current.onboardingPaywallVariant.remoteValue,
+            onboardingExperiment = current.onboardingConversionExperiment,
+            paywallTrialFraming = current.paywallTrialFraming.remoteValue,
+            onboardingIntroVariant = current.onboardingIntroVariant.remoteValue
         )
     }
 
@@ -238,7 +257,9 @@ class OnboardingViewModel @Inject constructor(
             focus = current.selectedFocus,
             pricingStrategy = current.pricingStrategy,
             onboardingExperiment = current.onboardingConversionExperiment,
-            paywallTrialFraming = current.paywallTrialFraming.remoteValue
+            paywallTrialFraming = current.paywallTrialFraming.remoteValue,
+            onboardingIntroVariant = current.onboardingIntroVariant.remoteValue,
+            timeToFirstValueMillis = SystemClock.elapsedRealtime() - onboardingStartedAtElapsedRealtime
         )
     }
 
@@ -372,6 +393,12 @@ class OnboardingViewModel @Inject constructor(
             FirebaseUtils.logEvent("create_plan_completed", Bundle().apply {
                 putString("country_cluster", current.pricingStrategy?.marketCluster)
                 putString("language", current.userPreferences.locale.language)
+                putString("selected_focus", current.selectedFocus.name.lowercase(Locale.US))
+                putString("onboarding_paywall_variant", current.onboardingPaywallVariant.remoteValue)
+                putString("onboarding_experiment", current.onboardingConversionExperiment)
+                putString("paywall_trial_framing", current.paywallTrialFraming.remoteValue)
+                putString("onboarding_intro_variant", current.onboardingIntroVariant.remoteValue)
+                putString("premium_value_frame", PAYWALL_VALUE_FRAME)
             })
         }
         return true
@@ -396,6 +423,7 @@ class OnboardingViewModel @Inject constructor(
             putString("onboarding_paywall_variant", state.value.onboardingPaywallVariant.remoteValue)
             putString("onboarding_experiment", state.value.onboardingConversionExperiment)
             putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
+            putString("onboarding_intro_variant", state.value.onboardingIntroVariant.remoteValue)
             putString("paywall_value_frame", PAYWALL_VALUE_FRAME)
         })
     }
@@ -447,7 +475,8 @@ class OnboardingViewModel @Inject constructor(
                     "billing_plan" to state.value.selectedBillingPlan.name.lowercase(Locale.US),
                     "paywall_variant" to state.value.onboardingPaywallVariant.remoteValue,
                     "onboarding_experiment" to state.value.onboardingConversionExperiment,
-                    "trial_framing" to state.value.paywallTrialFraming.remoteValue
+                    "trial_framing" to state.value.paywallTrialFraming.remoteValue,
+                    "intro_variant" to state.value.onboardingIntroVariant.remoteValue
                 )
             ) { trace ->
                 state.update {
@@ -477,6 +506,7 @@ class OnboardingViewModel @Inject constructor(
                         putString("onboarding_paywall_variant", state.value.onboardingPaywallVariant.remoteValue)
                         putString("onboarding_experiment", state.value.onboardingConversionExperiment)
                         putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
+                        putString("onboarding_intro_variant", state.value.onboardingIntroVariant.remoteValue)
                         putString("paywall_value_frame", PAYWALL_VALUE_FRAME)
                     })
                     Timber.tag("OnboardingBilling").e("Cannot purchase: Product %s not found in store", storeProductId)
@@ -492,6 +522,7 @@ class OnboardingViewModel @Inject constructor(
                     putString("onboarding_paywall_variant", state.value.onboardingPaywallVariant.remoteValue)
                     putString("onboarding_experiment", state.value.onboardingConversionExperiment)
                     putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
+                    putString("onboarding_intro_variant", state.value.onboardingIntroVariant.remoteValue)
                     putString("paywall_value_frame", PAYWALL_VALUE_FRAME)
                 })
                 val launchResult = entitlementRepository.purchasePlan(activity, product)
@@ -545,7 +576,7 @@ class OnboardingViewModel @Inject constructor(
                                 googleConnectionError = "home_more_account_connect_google_error_generic"
                             )
                         }
-                        FirebaseUtils.logEvent("google_account_connect_failed", Bundle().apply {
+                        FirebaseUtils.logEvent("account_google_connect_failed", Bundle().apply {
                             putString("source", "onboarding_paywall")
                         })
                         Timber.tag(TAG).e("Google account connected but onboarding local state merge failed")
@@ -562,7 +593,7 @@ class OnboardingViewModel @Inject constructor(
                             googleConnectionError = null
                         )
                     }
-                    FirebaseUtils.logEvent("google_account_connected", Bundle().apply {
+                    FirebaseUtils.logEvent("account_google_connected", Bundle().apply {
                         putString("source", "onboarding_paywall")
                     })
                     Timber.tag(TAG).d("Google account connected from onboarding paywall")
@@ -575,7 +606,7 @@ class OnboardingViewModel @Inject constructor(
                             googleConnectionError = "home_more_account_connect_google_error_generic"
                         )
                     }
-                    FirebaseUtils.logEvent("google_account_connect_failed", Bundle().apply {
+                    FirebaseUtils.logEvent("account_google_connect_failed", Bundle().apply {
                         putString("source", "onboarding_paywall")
                     })
                     Timber.tag(TAG).e(throwable, "Google account connection failed from onboarding paywall")
@@ -693,21 +724,22 @@ class OnboardingViewModel @Inject constructor(
 
     fun restorePurchases(onRestored: (Boolean) -> Unit) {
         viewModelScope.launch {
-            state.update { it.copy(isBillingActionInProgress = true, billingMessage = "paywall_restore_checking") }
-            FirebaseUtils.logEvent("purchase_restore_started", Bundle().apply {
-                putString("source", "onboarding_paywall")
-            })
+            state.update { it.copy(isBillingActionInProgress = true, billingMessage = BillingStatusMessageKeys.RESTORE_CHECKING) }
+            FirebaseUtils.logEvent("purchase_restore_started", onboardingExperimentBundle("onboarding_paywall"))
             entitlementRepository.restorePurchases()
             val restored = entitlementRepository.isPro.first()
             state.update {
                 it.copy(
                     isPremium = restored,
                     isBillingActionInProgress = false,
-                    billingMessage = if (restored) "paywall_restore_success" else "paywall_restore_none"
+                    billingMessage = if (restored) {
+                        BillingStatusMessageKeys.RESTORE_SUCCESS
+                    } else {
+                        BillingStatusMessageKeys.RESTORE_NONE
+                    }
                 )
             }
-            FirebaseUtils.logEvent("purchase_restore_completed", Bundle().apply {
-                putString("source", "onboarding_paywall")
+            FirebaseUtils.logEvent("purchase_restore_completed", onboardingExperimentBundle("onboarding_paywall").apply {
                 putBoolean("restored", restored)
             })
             Timber.tag("OnboardingBilling").d("Restore purchases completed. restored=%s", restored)
@@ -742,52 +774,48 @@ class OnboardingViewModel @Inject constructor(
     }
 
     private fun logBillingPurchaseEvent(event: BillingPurchaseEvent, source: String) {
+        val current = state.value
+        val productId = PremiumSubscriptionProducts.productIdFor(current.selectedBillingPlan)
+        val selectedProduct = current.availableProducts.firstOrNull { it.productId == productId }
+
+        fun purchaseBundle(): Bundle = Bundle().apply {
+            putString("source", source)
+            putString("billing_plan", current.selectedBillingPlan.name.lowercase(Locale.US))
+            putString("price_cluster", current.pricingStrategy?.marketCluster)
+            putString("product_id", productId)
+            putBoolean("has_trial", selectedProduct?.hasFreeTrial == true)
+            putString("onboarding_paywall_variant", current.onboardingPaywallVariant.remoteValue)
+            putString("onboarding_experiment", current.onboardingConversionExperiment)
+            putString("paywall_trial_framing", current.paywallTrialFraming.remoteValue)
+            putString("onboarding_intro_variant", current.onboardingIntroVariant.remoteValue)
+            putString("paywall_value_frame", PAYWALL_VALUE_FRAME)
+        }
+
         when (event) {
             BillingPurchaseEvent.Completed -> {
-                FirebaseUtils.logEvent("purchase_completed", Bundle().apply {
-                    putString("source", source)
-                    putString("billing_plan", state.value.selectedBillingPlan.name.lowercase(Locale.US))
-                    putString("product_id", PremiumSubscriptionProducts.productIdFor(state.value.selectedBillingPlan))
-                    putString("onboarding_experiment", state.value.onboardingConversionExperiment)
-                    putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
-                    putString("paywall_value_frame", PAYWALL_VALUE_FRAME)
-                })
+                FirebaseUtils.logEvent("purchase_completed", purchaseBundle())
                 Timber.tag("OnboardingBilling").d(
                     "Billing purchase completed source=%s",
                     source
                 )
             }
             BillingPurchaseEvent.Pending -> {
-                FirebaseUtils.logEvent("purchase_pending", Bundle().apply {
-                    putString("source", source)
-                    putString("product_id", PremiumSubscriptionProducts.productIdFor(state.value.selectedBillingPlan))
-                    putString("onboarding_experiment", state.value.onboardingConversionExperiment)
-                    putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
-                })
+                FirebaseUtils.logEvent("purchase_pending", purchaseBundle())
                 Timber.tag("OnboardingBilling").d(
                     "Billing purchase pending source=%s",
                     source
                 )
             }
             BillingPurchaseEvent.Canceled -> {
-                FirebaseUtils.logEvent("purchase_canceled", Bundle().apply {
-                    putString("source", source)
-                    putString("product_id", PremiumSubscriptionProducts.productIdFor(state.value.selectedBillingPlan))
-                    putString("onboarding_experiment", state.value.onboardingConversionExperiment)
-                    putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
-                })
+                FirebaseUtils.logEvent("purchase_canceled", purchaseBundle())
                 Timber.tag("OnboardingBilling").d(
                     "Billing purchase canceled source=%s",
                     source
                 )
             }
             is BillingPurchaseEvent.Failed -> {
-                FirebaseUtils.logEvent("purchase_failed", Bundle().apply {
-                    putString("source", source)
-                    putString("product_id", PremiumSubscriptionProducts.productIdFor(state.value.selectedBillingPlan))
+                FirebaseUtils.logEvent("purchase_failed", purchaseBundle().apply {
                     putInt("response_code", event.responseCode)
-                    putString("onboarding_experiment", state.value.onboardingConversionExperiment)
-                    putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
                 })
                 Timber.tag("OnboardingBilling").e(
                     "Billing purchase failed source=%s code=%d message=%s",
@@ -818,7 +846,13 @@ class OnboardingViewModel @Inject constructor(
                     enablePremiumWatchForOnboarding("existing_entitlement")
                 }
                 state.update { it.copy(onboardingCompleted = true) }
-                FirebaseUtils.logEvent("onboarding_completed")
+                FirebaseUtils.logEvent("onboarding_completed", onboardingExperimentBundle("reminder_setup").apply {
+                    putBoolean("is_premium", current.isPremium)
+                    putBoolean("reminder_saved", current.reminderSaved)
+                    putBoolean("reminder_skipped", current.reminderSkipped)
+                    putString("completion_path", if (current.isPremium) "premium" else "free")
+                    putLong("elapsed_ms", SystemClock.elapsedRealtime() - onboardingStartedAtElapsedRealtime)
+                })
             } else {
                 state.update { it.copy(error = "onboarding_error_valid_plan_required") }
             }
@@ -844,7 +878,12 @@ class OnboardingViewModel @Inject constructor(
             plannerRepository.saveReminderConfiguration(configuration)
             reminderWorkScheduler.sync(configuration)
             state.update { it.copy(reminderSaved = true, reminderSkipped = false) }
-            FirebaseUtils.logEvent("reminder_enabled")
+            FirebaseUtils.logEvent("reminder_enabled", onboardingExperimentBundle("reminder_setup").apply {
+                putString("cadence", cadence.name.lowercase(Locale.US))
+                putInt("hour", time.hour)
+                putInt("minute", time.minute)
+                putBoolean("is_premium", state.value.isPremium)
+            })
             onSaved()
         }
     }
@@ -855,7 +894,9 @@ class OnboardingViewModel @Inject constructor(
             plannerRepository.saveReminderConfiguration(configuration)
             reminderWorkScheduler.sync(configuration)
             state.update { it.copy(reminderSaved = false, reminderSkipped = true) }
-            FirebaseUtils.logEvent("reminder_skipped")
+            FirebaseUtils.logEvent("reminder_skipped", onboardingExperimentBundle("reminder_setup").apply {
+                putBoolean("is_premium", state.value.isPremium)
+            })
             onSkipped()
         }
     }
@@ -867,8 +908,25 @@ class OnboardingViewModel @Inject constructor(
             putString("onboarding_paywall_variant", state.value.onboardingPaywallVariant.remoteValue)
             putString("onboarding_experiment", state.value.onboardingConversionExperiment)
             putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
+            putString("onboarding_intro_variant", state.value.onboardingIntroVariant.remoteValue)
             putString("paywall_value_frame", PAYWALL_VALUE_FRAME)
         })
+    }
+
+    fun logOnboardingFreePlanSelected(source: String) {
+        FirebaseUtils.logEvent("onboarding_free_plan_selected", onboardingExperimentBundle(source))
+        Timber.tag(TAG).d("Onboarding free plan selected source=%s", source)
+    }
+
+    private fun onboardingExperimentBundle(source: String): Bundle = Bundle().apply {
+        putString("source", source)
+        putString("price_cluster", state.value.pricingStrategy?.marketCluster)
+        putString("billing_plan", state.value.selectedBillingPlan.name.lowercase(Locale.US))
+        putString("onboarding_paywall_variant", state.value.onboardingPaywallVariant.remoteValue)
+        putString("onboarding_experiment", state.value.onboardingConversionExperiment)
+        putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
+        putString("onboarding_intro_variant", state.value.onboardingIntroVariant.remoteValue)
+        putString("paywall_value_frame", PAYWALL_VALUE_FRAME)
     }
 
     fun logSignupStarted() {
@@ -876,7 +934,15 @@ class OnboardingViewModel @Inject constructor(
     }
 
     fun logTrajectoryViewed() {
-        FirebaseUtils.logEvent("trajectory_viewed")
+        val current = state.value
+        onboardingAnalyticsLogger.logTrajectoryViewed(
+            focus = current.selectedFocus,
+            pricingStrategy = current.pricingStrategy,
+            onboardingPaywallVariant = current.onboardingPaywallVariant.remoteValue,
+            onboardingExperiment = current.onboardingConversionExperiment,
+            paywallTrialFraming = current.paywallTrialFraming.remoteValue,
+            onboardingIntroVariant = current.onboardingIntroVariant.remoteValue
+        )
     }
 
     private fun buildPlan(current: OnboardingState, income: BigDecimal, fixedCosts: BigDecimal): SalaryPlan? {

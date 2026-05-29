@@ -34,10 +34,10 @@ class HomeCoachMarksOverlayTest {
             }
         }
 
-        composeTestRule.onNodeWithText("Plan").assertExists()
+        composeTestRule.onNodeWithText("Start here").assertExists()
         composeTestRule.onNodeWithText("1 of 4").assertExists()
         composeTestRule.onNodeWithText("Next").performClick()
-        composeTestRule.onNodeWithText("Strategy").assertExists()
+        composeTestRule.onNodeWithText("Tune the rules").assertExists()
         composeTestRule.onNodeWithText("2 of 4").assertExists()
 
         coachState.value = coachState.value.copy(currentStep = HomeCoachMarkStep.MORE)
@@ -60,7 +60,7 @@ class HomeCoachMarksOverlayTest {
             }
         }
 
-        composeTestRule.onNodeWithText("Review").assertExists()
+        composeTestRule.onNodeWithText("Teach Premium").assertExists()
         composeTestRule.onNodeWithText("Skip").performClick()
 
         assertTrue(skipped)

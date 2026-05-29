@@ -19,19 +19,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.google.android.gms.ads.MobileAds
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import pt.ms.myshare.BuildConfig
+import pt.ms.myshare.domain.model.ProductExperienceConfig
+import pt.ms.myshare.domain.repository.ProductConfigRepository
 import pt.ms.myshare.domain.repository.UserPreferencesRepository
-import pt.ms.myshare.presentation.AppOpenAdManager
 import pt.ms.myshare.presentation.ui.appupdate.AppUpdateGateState
 import pt.ms.myshare.presentation.ui.appupdate.AppUpdateLoadingScreen
 import pt.ms.myshare.presentation.ui.appupdate.ImmediateAppUpdateCoordinator
@@ -39,6 +38,8 @@ import pt.ms.myshare.presentation.ui.appupdate.RequiredUpdateScreen
 import pt.ms.myshare.presentation.ui.localization.UserLocaleProvider
 import pt.ms.myshare.presentation.ui.theme.MyShareTheme
 import pt.ms.myshare.presentation.ui.ads.AdsConsentManager
+import pt.ms.myshare.presentation.ui.ads.AdsOrchestrator
+import pt.ms.myshare.presentation.ui.ads.LocalAdsOrchestrator
 import pt.ms.myshare.domain.use_case.ResolveAppUpdateDecisionUseCase
 import pt.ms.myshare.domain.use_case.RefreshEntitlementUseCase
 import pt.ms.myshare.presentation.notifications.MyShareNotificationIntentFactory
@@ -60,15 +61,16 @@ class MainComposeActivity : ComponentActivity() {
     @Inject
     lateinit var userPreferencesRepository: UserPreferencesRepository
 
+    @Inject
+    lateinit var productConfigRepository: ProductConfigRepository
+
     private lateinit var consentManager: AdsConsentManager
+    private lateinit var adsOrchestrator: AdsOrchestrator
     private lateinit var immediateAppUpdateCoordinator: ImmediateAppUpdateCoordinator
     private lateinit var updateActivityResultLauncher: ActivityResultLauncher<IntentSenderRequest>
-    private val appOpenAdManager by lazy { AppOpenAdManager(application) }
     private var appUpdateGateState by mutableStateOf<AppUpdateGateState>(AppUpdateGateState.Loading)
-    private var canRequestAdsForSession = false
     private var hasCheckedAppOpenForSession = false
     private var hasGatheredAdsConsentForSession = false
-    private var hasInitializedAdsForSession = false
     private var sessionCountForAds = 1
     private var isAppUpdateGateEvaluationInFlight = false
     private var lastAppUpdateGateEvaluationElapsedRealtime = 0L
@@ -90,10 +92,10 @@ class MainComposeActivity : ComponentActivity() {
             }
         }
         
+        consentManager = AdsConsentManager(this)
+        adsOrchestrator = AdsOrchestrator(this, consentManager)
         updateSessionCountForAds()
         handleNotificationIntent(intent)
-
-        consentManager = AdsConsentManager(this)
         
         enableEdgeToEdge()
         
@@ -101,9 +103,15 @@ class MainComposeActivity : ComponentActivity() {
             val isDarkTheme = isSystemInDarkTheme()
             val userPreferences by userPreferencesRepository.observePreferences()
                 .collectAsStateWithLifecycle(initialValue = userPreferencesRepository.loadPreferences())
+            val productConfig by productConfigRepository.config
+                .collectAsStateWithLifecycle(initialValue = ProductExperienceConfig())
 
             LaunchedEffect(isDarkTheme) {
                 enableEdgeToEdge()
+            }
+
+            LaunchedEffect(productConfig) {
+                adsOrchestrator.updateConfig(productConfig)
             }
 
             UserLocaleProvider(languageTag = userPreferences.languageTag) {
@@ -114,35 +122,45 @@ class MainComposeActivity : ComponentActivity() {
                             LaunchedEffect(Unit) {
                                 logAppReady("home")
                             }
-                            Surface(
-                                modifier = Modifier.fillMaxSize()
-                                    .background(MaterialTheme.colorScheme.background)
-                            ) {
-                                AppNavigation(
-                                    notificationHomeDestination = notificationHomeDestination,
-                                    onNotificationHomeDestinationConsumed = {
-                                        notificationHomeDestination = null
-                                    },
-                                    onManageAdsConsent = {
-                                        ensureAdsConsentReady(sessionCountForAds) {
-                                            consentManager.showPrivacyOptionsForm { formError ->
-                                                if (formError != null) {
-                                                    Timber.tag("AdsConsent").w("Privacy options form error: %s", formError.message)
+                            CompositionLocalProvider(LocalAdsOrchestrator provides adsOrchestrator) {
+                                Surface(
+                                    modifier = Modifier.fillMaxSize()
+                                        .background(MaterialTheme.colorScheme.background)
+                                ) {
+                                    AppNavigation(
+                                        notificationHomeDestination = notificationHomeDestination,
+                                        onNotificationHomeDestinationConsumed = {
+                                            notificationHomeDestination = null
+                                        },
+                                        onManageAdsConsent = {
+                                            ensureAdsConsentReady {
+                                                consentManager.showPrivacyOptionsForm { formError ->
+                                                    if (formError != null) {
+                                                        Timber.tag("AdsConsent").w("Privacy options form error: %s", formError.message)
+                                                    }
+                                                    adsOrchestrator.updateConsent(consentManager.canRequestAds)
+                                                }
+                                            }
+                                        },
+                                        adsConsentManager = consentManager,
+                                        onFreeHomeReady = { hasFirstPlan, isPremium ->
+                                            ensureAdsConsentReady {
+                                                adsOrchestrator.prepareEligibleFreeSession(
+                                                    isPremium = isPremium,
+                                                    hasFirstPlan = hasFirstPlan
+                                                )
+                                                if (!hasCheckedAppOpenForSession) {
+                                                    hasCheckedAppOpenForSession = true
+                                                    adsOrchestrator.showAppOpenIfEligible(
+                                                        activity = this@MainComposeActivity,
+                                                        isPremium = isPremium,
+                                                        hasFirstPlan = hasFirstPlan
+                                                    )
                                                 }
                                             }
                                         }
-                                    },
-                                    adsConsentManager = consentManager,
-                                    onFreeHomeReady = {
-                                        canRequestAdsForSession = consentManager.canRequestAds && sessionCountForAds >= 2
-                                        if (canRequestAdsForSession && !hasCheckedAppOpenForSession) {
-                                            hasCheckedAppOpenForSession = true
-                                            initializeAdsForSession()
-                                            Timber.tag("AdsConsent").d("Checking app-open ad after existing consent")
-                                            appOpenAdManager.showAdIfAvailable(this@MainComposeActivity)
-                                        }
-                                    }
-                                )
+                                    )
+                                }
                             }
                         }
                         is AppUpdateGateState.RequiredUpdate -> RequiredUpdateScreen(
@@ -230,6 +248,9 @@ class MainComposeActivity : ComponentActivity() {
             ?.toHomeDestination()
         if (destination != null) {
             notificationHomeDestination = destination
+            if (::adsOrchestrator.isInitialized) {
+                adsOrchestrator.markNotificationLaunch(true)
+            }
             val type = intent.getStringExtra(MyShareNotificationIntentFactory.EXTRA_NOTIFICATION_TYPE).orEmpty()
             FirebaseUtils.logEvent("notification_opened", android.os.Bundle().apply {
                 putString("type", type)
@@ -241,12 +262,7 @@ class MainComposeActivity : ComponentActivity() {
 
     private fun updateSessionCountForAds() {
         lifecycleScope.launch {
-            sessionCountForAds = withContext(Dispatchers.IO) {
-                val prefs = getSharedPreferences("myshare_prefs", MODE_PRIVATE)
-                val sessions = prefs.getInt("session_count", 0) + 1
-                prefs.edit().putInt("session_count", sessions).apply()
-                sessions
-            }
+            sessionCountForAds = adsOrchestrator.incrementSessionCount()
             Timber.tag("AdsConsent").d("Session count updated for ads: %d", sessionCountForAds)
         }
     }
@@ -321,8 +337,9 @@ class MainComposeActivity : ComponentActivity() {
         )
     }
 
-    private fun ensureAdsConsentReady(sessionCount: Int, onReady: () -> Unit = {}) {
+    private fun ensureAdsConsentReady(onReady: () -> Unit = {}) {
         if (hasGatheredAdsConsentForSession) {
+            adsOrchestrator.updateConsent(consentManager.canRequestAds)
             onReady()
             return
         }
@@ -334,22 +351,10 @@ class MainComposeActivity : ComponentActivity() {
                     Timber.tag("AdsConsent").w("Consent error: %s", error)
                 }
 
-                canRequestAdsForSession = consentManager.canRequestAds && sessionCount >= 2
-                if (canRequestAdsForSession) {
-                    initializeAdsForSession()
-                }
+                adsOrchestrator.updateConsent(consentManager.canRequestAds)
                 onReady()
             }
         })
-    }
-
-    private fun initializeAdsForSession() {
-        if (hasInitializedAdsForSession) return
-        hasInitializedAdsForSession = true
-        MobileAds.initialize(this@MainComposeActivity) {
-            pt.ms.myshare.presentation.ui.ads.InterstitialAdManager.loadAd(this@MainComposeActivity)
-            appOpenAdManager.preload(this@MainComposeActivity)
-        }
     }
 
     private fun logAppStart() {

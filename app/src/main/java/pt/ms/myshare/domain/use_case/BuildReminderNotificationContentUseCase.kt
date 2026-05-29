@@ -24,6 +24,7 @@ class BuildReminderNotificationContentUseCase @Inject constructor(
         val flexibleSpend = currencyFormatter.format(preview.flexibleSpendPerPayday)
         val priorityMove = currencyFormatter.format(preview.priorityContributionPerPayday)
         val weeklyGuide = currencyFormatter.format(preview.weeklyFlexibleSpend)
+        val responseActions = ReminderResponseAction.entries
 
         return when (type) {
             ReminderNotificationType.PAYDAY_ACTION -> NotificationContent(
@@ -31,35 +32,40 @@ class BuildReminderNotificationContentUseCase @Inject constructor(
                 messageKey = "notification_payday_body",
                 messageArgs = listOf(fixedCosts, flexibleSpend, priorityMove),
                 destination = DESTINATION_PLAN,
-                analyticsType = "payday_action"
+                analyticsType = "payday_action",
+                responseActions = responseActions
             )
             ReminderNotificationType.PAYDAY_REVIEW_DUE -> NotificationContent(
                 titleKey = "notification_payday_review_due_title",
                 messageKey = "notification_payday_review_due_body",
                 messageArgs = listOf(weeklyGuide),
                 destination = DESTINATION_REVIEW,
-                analyticsType = "payday_review_due"
+                analyticsType = "payday_review_due",
+                responseActions = responseActions
             )
             ReminderNotificationType.WEEKLY_REVIEW -> NotificationContent(
                 titleKey = "notification_weekly_review_title",
                 messageKey = "notification_weekly_review_body",
                 messageArgs = listOf(weeklyGuide),
                 destination = DESTINATION_REVIEW,
-                analyticsType = "weekly_review"
+                analyticsType = "weekly_review",
+                responseActions = responseActions
             )
             ReminderNotificationType.PREMIUM_CHECK_IN_DUE -> NotificationContent(
                 titleKey = "notification_premium_checkin_due_title",
                 messageKey = "notification_premium_checkin_due_body",
                 messageArgs = listOf(weeklyGuide, priorityMove),
                 destination = DESTINATION_REVIEW,
-                analyticsType = "premium_checkin_due"
+                analyticsType = "premium_checkin_due",
+                responseActions = responseActions
             )
             ReminderNotificationType.PREMIUM_CHECK_IN_OVERDUE -> NotificationContent(
                 titleKey = "notification_premium_checkin_overdue_title",
                 messageKey = "notification_premium_checkin_overdue_body",
                 messageArgs = listOf(weeklyGuide, priorityMove),
                 destination = DESTINATION_REVIEW,
-                analyticsType = "premium_checkin_overdue"
+                analyticsType = "premium_checkin_overdue",
+                responseActions = responseActions
             )
         }
     }

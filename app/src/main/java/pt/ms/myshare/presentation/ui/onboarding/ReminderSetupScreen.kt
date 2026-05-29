@@ -12,14 +12,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -31,7 +32,7 @@ import pt.ms.myshare.domain.model.ReminderCadence
 import pt.ms.myshare.presentation.ui.components.KeyboardDismissEffect
 import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.components.PremiumChoiceCard
-import pt.ms.myshare.presentation.ui.components.rememberKeyboardDismissOnScrollConnection
+import pt.ms.myshare.presentation.ui.components.dismissKeyboardOnUserDrag
 import pt.ms.myshare.presentation.ui.theme.*
 import java.time.LocalTime
 
@@ -46,7 +47,7 @@ fun ReminderSetupScreen(
     var cadence by remember { mutableStateOf(ReminderCadence.PAYDAY) }
     var message by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
-    val keyboardDismissOnScrollConnection = rememberKeyboardDismissOnScrollConnection()
+    val haptic = LocalHapticFeedback.current
 
     KeyboardDismissEffect()
 
@@ -55,7 +56,7 @@ fun ReminderSetupScreen(
         onResult = { granted ->
             onPermissionResult(granted)
             if (granted) {
-                onConfirm(time, cadence)
+                confirmReminderSetup(time, cadence, haptic, onConfirm)
             } else {
                 message = context.getString(R.string.onboarding_reminder_error_permission)
             }
@@ -64,13 +65,13 @@ fun ReminderSetupScreen(
 
     fun requestPermissionIfNeeded() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            onConfirm(time, cadence)
+            confirmReminderSetup(time, cadence, haptic, onConfirm)
             return
         }
         val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
         if (granted) {
             onPermissionResult(true)
-            onConfirm(time, cadence)
+            confirmReminderSetup(time, cadence, haptic, onConfirm)
         } else {
             permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
@@ -112,7 +113,7 @@ fun ReminderSetupScreen(
                 .padding(innerPadding)
                 .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
                 .padding(horizontal = 24.dp)
-                .nestedScroll(keyboardDismissOnScrollConnection)
+                .dismissKeyboardOnUserDrag(debugLabel = "ReminderSetupScreen")
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -146,13 +147,19 @@ fun ReminderSetupScreen(
                     title = stringResource(R.string.onboarding_reminder_cadence_payday),
                     description = stringResource(R.string.onboarding_reminder_cadence_payday_desc),
                     isSelected = cadence == ReminderCadence.PAYDAY,
-                    onClick = { cadence = ReminderCadence.PAYDAY }
+                    onClick = {
+                        if (cadence != ReminderCadence.PAYDAY) haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        cadence = ReminderCadence.PAYDAY
+                    }
                 )
                 PremiumChoiceCard(
                     title = stringResource(R.string.onboarding_reminder_cadence_weekly),
                     description = stringResource(R.string.onboarding_reminder_cadence_weekly_desc),
                     isSelected = cadence == ReminderCadence.WEEKLY_REVIEW,
-                    onClick = { cadence = ReminderCadence.WEEKLY_REVIEW }
+                    onClick = {
+                        if (cadence != ReminderCadence.WEEKLY_REVIEW) haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        cadence = ReminderCadence.WEEKLY_REVIEW
+                    }
                 )
             }
 
@@ -184,6 +191,16 @@ fun ReminderSetupScreen(
             Spacer(Modifier.height(24.dp))
         }
     }
+}
+
+private fun confirmReminderSetup(
+    time: LocalTime,
+    cadence: ReminderCadence,
+    haptic: androidx.compose.ui.hapticfeedback.HapticFeedback,
+    onConfirm: (LocalTime, ReminderCadence) -> Unit
+) {
+    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+    onConfirm(time, cadence)
 }
 
 @Composable

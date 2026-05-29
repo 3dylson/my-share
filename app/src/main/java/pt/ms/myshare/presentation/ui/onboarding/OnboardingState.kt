@@ -6,11 +6,14 @@ import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.PayFrequency
 import pt.ms.myshare.domain.model.PaywallTrialFraming
 import pt.ms.myshare.domain.model.PlanPreview
+import pt.ms.myshare.domain.model.OnboardingIntroVariant
 import pt.ms.myshare.domain.model.OnboardingPaywallVariant
 import pt.ms.myshare.domain.model.PlanningFocus
 import pt.ms.myshare.domain.model.PricingStrategy
+import pt.ms.myshare.domain.model.ProductExperienceConfig
 import pt.ms.myshare.domain.model.StoreProduct
 import pt.ms.myshare.domain.model.UserPreferences
+import pt.ms.myshare.presentation.ui.localization.UiText
 import java.math.BigDecimal
 
 data class OnboardingState(
@@ -35,15 +38,16 @@ data class OnboardingState(
     val planPreview: PlanPreview? = null,
     val userPreferences: UserPreferences = UserPreferences.defaults(),
     val pricingStrategy: PricingStrategy? = null,
+    val onboardingIntroVariant: OnboardingIntroVariant = OnboardingIntroVariant.PLAN_FIRST,
     val onboardingPaywallVariant: OnboardingPaywallVariant = OnboardingPaywallVariant.PAYDAY_PROOF,
-    val onboardingConversionExperiment: String = "baseline",
-    val paywallTrialFraming: PaywallTrialFraming = PaywallTrialFraming.SEVEN_DAY,
+    val onboardingConversionExperiment: String = ProductExperienceConfig.DEFAULT_ONBOARDING_CONVERSION_EXPERIMENT,
+    val paywallTrialFraming: PaywallTrialFraming = PaywallTrialFraming.FIRST_CHECKIN,
     // Live prices fetched from Google Play Billing; empty until billing client connects
     val availableProducts: List<StoreProduct> = emptyList(),
     val selectedBillingPlan: BillingPlan = BillingPlan.MONTHLY,
     val hasUserSelectedBillingPlan: Boolean = false,
     val isBillingActionInProgress: Boolean = false,
-    val billingMessage: String? = null,
+    val billingMessage: UiText? = null,
     val planSaved: Boolean = false,
     val reminderSaved: Boolean = false,
     val reminderSkipped: Boolean = false,

@@ -19,10 +19,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
@@ -37,6 +37,7 @@ import kotlinx.coroutines.launch
 import pt.ms.myshare.BuildConfig
 import pt.ms.myshare.R
 import pt.ms.myshare.domain.model.BillingPlan
+import pt.ms.myshare.domain.model.AdPlacement
 import pt.ms.myshare.domain.model.LegacyPremiumGrantStatus
 import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
 import pt.ms.myshare.domain.model.ReminderCadence
@@ -44,6 +45,8 @@ import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReadResult
 import pt.ms.myshare.presentation.ui.auth.GoogleIdTokenReader
 import pt.ms.myshare.presentation.review.PlayInAppReviewRequester
 import pt.ms.myshare.presentation.review.PlayStoreListingOpener
+import pt.ms.myshare.presentation.ui.ads.AnchoredAdBanner
+import pt.ms.myshare.presentation.ui.ads.LocalAdsOrchestrator
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.paywall.BillingStatusMessageKeys
 import pt.ms.myshare.presentation.ui.preferences.CurrencyPickerDialog
@@ -64,7 +67,7 @@ fun HomeRoute(
     onNotificationHomeDestinationConsumed: () -> Unit = {},
     onManageAdsConsent: () -> Unit = {},
     adsConsentManager: pt.ms.myshare.presentation.ui.ads.AdsConsentManager? = null,
-    onFreeHomeReady: () -> Unit = {},
+    onFreeHomeReady: (hasFirstPlan: Boolean, isPremium: Boolean) -> Unit = { _, _ -> },
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
@@ -75,9 +78,10 @@ fun HomeRoute(
         }
     }
 
-    LaunchedEffect(uiState.isLoading, uiState.moreCard.isPremium) {
-        if (!uiState.isLoading && !uiState.moreCard.isPremium) {
-            onFreeHomeReady()
+    LaunchedEffect(uiState.isLoading, uiState.moreCard.isPremium, uiState.plan) {
+        val hasFirstPlan = uiState.plan != null
+        if (!uiState.isLoading && !uiState.moreCard.isPremium && hasFirstPlan) {
+            onFreeHomeReady(hasFirstPlan, uiState.moreCard.isPremium)
         }
     }
 
@@ -205,6 +209,8 @@ fun HomeScreen(
     }
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     val focusManager = LocalFocusManager.current
+    val adsOrchestrator = LocalAdsOrchestrator.current
+    val hasFirstPlan = state.plan != null
     val snackbarHostState = remember { SnackbarHostState() }
     val reviewSavedMessage = stringResource(R.string.home_review_saved_feedback)
     var showPaywallSheet by remember { mutableStateOf(false) }
@@ -230,7 +236,6 @@ fun HomeScreen(
     var isGoogleCredentialRequestInProgress by remember { mutableStateOf(false) }
     var pendingReminderSelection by remember { mutableStateOf<ReminderSettingsSelection?>(null) }
     var pendingReminderPermissionSource by remember { mutableStateOf("more") }
-    val clearFocusOnScrollConnection = rememberKeyboardDismissOnScrollConnection()
     val notificationPermissionDeniedMessage = stringResource(R.string.onboarding_reminder_error_permission)
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -280,6 +285,9 @@ fun HomeScreen(
         premiumGate = gate
         showPaywallSheet = true
         onPremiumGateViewed(gate)
+        if (!state.moreCard.isPremium) {
+            adsOrchestrator?.recordAdFreePremiumUpsellViewed(AdPlacement.HOME_ANCHORED_BANNER)
+        }
     }
     val startGoogleAccountConnection: () -> Unit = {
         if (!isGoogleCredentialRequestInProgress && !state.moreCard.isGoogleConnectionInProgress) {
@@ -312,6 +320,14 @@ fun HomeScreen(
                     message = reviewSavedMessage,
                     duration = SnackbarDuration.Short
                 )
+                val currentActivity = activity
+                if (currentActivity != null) {
+                    adsOrchestrator?.showInterstitialAfterCompletedAction(
+                        activity = currentActivity,
+                        isPremium = state.moreCard.isPremium,
+                        hasFirstPlan = hasFirstPlan
+                    )
+                }
             }
         }
     }
@@ -805,6 +821,7 @@ fun HomeScreen(
         showLanguagePicker ||
         showCurrencyPicker ||
         showSignOutDialog
+    val keyboardVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
 
     Box(modifier = modifier) {
         Scaffold(
@@ -843,45 +860,65 @@ fun HomeScreen(
             }
         },
         bottomBar = {
-            NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
-                tonalElevation = 8.dp,
-                modifier = Modifier
-                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.95f))
-            ) {
-                HomeDestination.entries.forEach { destination ->
-                    val isSelected = state.selectedDestination == destination
-                    NavigationBarItem(
-                        selected = isSelected,
-                        onClick = {
-                            focusManager.clearFocus(force = true)
-                            if (!isSelected) haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
-                            Timber.tag("HomeScreen").d("Home tab selected: %s", destination.name)
-                            onDestinationSelected(destination)
-                        },
-                        icon = {
-                            val icon = when (destination) {
-                                HomeDestination.PLAN -> if (isSelected) Icons.Filled.CalendarToday else Icons.Outlined.CalendarToday
-                                HomeDestination.STRATEGY -> if (isSelected) Icons.Filled.Lightbulb else Icons.Outlined.Lightbulb
-                                HomeDestination.REVIEW -> if (isSelected) Icons.Filled.AutoGraph else Icons.Outlined.AutoGraph
-                                HomeDestination.MORE -> if (isSelected) Icons.Filled.MoreHoriz else Icons.Outlined.MoreHoriz
-                            }
-                            Icon(icon, contentDescription = null)
-                        },
-                        label = {
-                            Text(
-                                stringResource(destination.labelRes),
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                            )
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = MySharePrimary,
-                            selectedTextColor = MySharePrimary,
-                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            indicatorColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f)
-                        )
+            val bottomNavHeight = if (LocalDensity.current.fontScale >= 1.2f) 104.dp else 88.dp
+            Column {
+                val bannerPlacement = if (state.selectedDestination == HomeDestination.MORE) {
+                    AdPlacement.MORE_ANCHORED_BANNER
+                } else {
+                    AdPlacement.HOME_ANCHORED_BANNER
+                }
+                if (state.selectedDestination != HomeDestination.REVIEW) {
+                    AnchoredAdBanner(
+                        placement = bannerPlacement,
+                        isPremium = state.moreCard.isPremium,
+                        hasFirstPlan = hasFirstPlan,
+                        isKeyboardVisible = keyboardVisible,
+                        isBlockedFlowActive = hasBlockingModal
                     )
+                }
+                NavigationBar(
+                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
+                    tonalElevation = 8.dp,
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.95f))
+                        .height(bottomNavHeight)
+                ) {
+                    HomeDestination.entries.forEach { destination ->
+                        val isSelected = state.selectedDestination == destination
+                        NavigationBarItem(
+                            selected = isSelected,
+                            onClick = {
+                                focusManager.clearFocus(force = true)
+                                if (!isSelected) haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                                Timber.tag("HomeScreen").d("Home tab selected: %s", destination.name)
+                                onDestinationSelected(destination)
+                            },
+                            icon = {
+                                val icon = when (destination) {
+                                    HomeDestination.PLAN -> if (isSelected) Icons.Filled.CalendarToday else Icons.Outlined.CalendarToday
+                                    HomeDestination.STRATEGY -> if (isSelected) Icons.Filled.Lightbulb else Icons.Outlined.Lightbulb
+                                    HomeDestination.REVIEW -> if (isSelected) Icons.Filled.AutoGraph else Icons.Outlined.AutoGraph
+                                    HomeDestination.MORE -> if (isSelected) Icons.Filled.MoreHoriz else Icons.Outlined.MoreHoriz
+                                }
+                                Icon(icon, contentDescription = null)
+                            },
+                            label = {
+                                Text(
+                                    stringResource(destination.labelRes),
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = MySharePrimary,
+                                selectedTextColor = MySharePrimary,
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                indicatorColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f)
+                            )
+                        )
+                    }
                 }
             }
         }
@@ -901,19 +938,21 @@ fun HomeScreen(
                 .togetherWith(fadeOut(animationSpec = tween(150)))
             },
             label = "TabTransition",
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
         ) { targetDestination ->
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .nestedScroll(clearFocusOnScrollConnection)
+                    .dismissKeyboardOnUserDrag(debugLabel = "HomeScreen")
                     .imePadding()
                     .background(MaterialTheme.colorScheme.background),
                 contentPadding = PaddingValues(
                     start = 24.dp,
                     end = 24.dp,
-                    top = innerPadding.calculateTopPadding() + 24.dp,
-                    bottom = innerPadding.calculateBottomPadding() + 24.dp
+                    top = 24.dp,
+                    bottom = 24.dp
                 ),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
@@ -1052,11 +1091,18 @@ fun HomeScreen(
                                 Timber.tag("HomeScreen").d("Smart adjustment review opened from More tab")
                                 onDestinationSelected(HomeDestination.REVIEW)
                             },
+                            onOpenPaydayRecommendation = {
+                                Timber.tag("HomeScreen").d("Smart adjustment recommendation opened from More tab")
+                                state.reviewCard.paydayRecommendation?.let { recommendation ->
+                                    recommendationPendingApply = recommendation
+                                } ?: onDestinationSelected(HomeDestination.REVIEW)
+                            },
                             onRateApp = {
                                 onOpenPlayStoreRateEntry()
                                 playStoreListingOpener.open(BuildConfig.APPLICATION_ID)
                             },
                             isGoogleCredentialRequestInProgress = isGoogleCredentialRequestInProgress,
+                            hasFirstPlan = hasFirstPlan,
                             onConnectGoogle = startGoogleAccountConnection,
                             onLogout = {
                                 if (state.moreCard.requiresPremiumAccountProtectionBeforeLogout) {
@@ -1125,19 +1171,32 @@ private fun HomePremiumStatusBadge(
             }
         }
     } else {
-        AssistChip(
+        Surface(
             modifier = modifier,
-            onClick = {},
-            enabled = false,
-            label = { Text(text = stringResource(R.string.premium_badge), maxLines = 1) },
-            leadingIcon = {
+            shape = MaterialTheme.shapes.medium,
+            color = MySharePrimary.copy(alpha = 0.16f),
+            border = androidx.compose.foundation.BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.42f))
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Icon(
                     imageVector = Icons.Default.WorkspacePremium,
                     contentDescription = null,
+                    tint = MySharePrimary,
                     modifier = Modifier.size(16.dp)
                 )
+                Text(
+                    text = stringResource(R.string.premium_badge),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MySharePrimary,
+                    fontWeight = FontWeight.Black,
+                    maxLines = 1
+                )
             }
-        )
+        }
     }
 }
 

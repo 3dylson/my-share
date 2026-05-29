@@ -33,6 +33,7 @@ data class GoalAddState(
     val isLoading: Boolean = false,
     val isSaved: Boolean = false,
     val isMissingExistingGoal: Boolean = false,
+    val canUseRewardedExtraGoal: Boolean = false,
     val error: String? = null
 )
 
@@ -100,6 +101,18 @@ class GoalAddViewModel @Inject constructor(
     }
 
     fun saveGoal() {
+        saveGoal(allowRewardedExtraGoal = false)
+    }
+
+    fun saveGoalWithRewardedExtraGoal() {
+        saveGoal(allowRewardedExtraGoal = true)
+    }
+
+    fun markRewardedExtraGoalUnavailable() {
+        _state.update { it.copy(error = "goal_add_error_reward_unavailable") }
+    }
+
+    private fun saveGoal(allowRewardedExtraGoal: Boolean) {
         if (_state.value.isMissingExistingGoal) {
             Timber.tag(TAG).w("Blocked save for missing goal edit route: %s", _state.value.requestedGoalId)
             return
@@ -113,13 +126,25 @@ class GoalAddViewModel @Inject constructor(
 
         viewModelScope.launch {
             val isNewGoal = _state.value.goalId == null
-            if (isNewGoal && !checkEntitlementLimitUseCase.canAddMultipleGoals(repository.loadGoals().size)) {
-                _state.update { it.copy(error = "goal_add_error_premium_required") }
+            val currentGoalCount = repository.loadGoals().size
+            if (isNewGoal &&
+                !allowRewardedExtraGoal &&
+                !checkEntitlementLimitUseCase.canAddMultipleGoals(currentGoalCount)
+            ) {
+                _state.update {
+                    it.copy(
+                        error = "goal_add_error_premium_required",
+                        canUseRewardedExtraGoal = true
+                    )
+                }
                 Timber.tag(TAG).w("Blocked extra goal save because Premium is inactive")
                 return@launch
             }
+            if (allowRewardedExtraGoal) {
+                Timber.tag(TAG).d("Saving extra free goal after rewarded ad grant")
+            }
 
-            _state.update { it.copy(isLoading = true, error = null) }
+            _state.update { it.copy(isLoading = true, error = null, canUseRewardedExtraGoal = false) }
             val finalGoal = Goal(
                 id = _state.value.goalId ?: UUID.randomUUID().toString(),
                 name = _state.value.name,

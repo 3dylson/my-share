@@ -25,6 +25,8 @@ skills-lock.json
 !/docs/ui-ux-qa-notes-2026-05-15.md
 !/docs/ui-ux-qa-notes-2026-05-18.md
 !/docs/premium-conversion-improvement-plan.md
+!/docs/ads-rollout.md
+!/docs/play-data-safety.md
 !/docs/release/
 !/docs/release/**
 /firebase/tests/node_modules/

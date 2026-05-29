@@ -40,7 +40,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.ms.myshare.R
@@ -315,8 +314,7 @@ private fun PremiumReviewResultMetricRow(
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                lineHeight = 17.sp
             )
             Spacer(Modifier.width(12.dp))
             Text(
@@ -324,8 +322,7 @@ private fun PremiumReviewResultMetricRow(
                 style = MaterialTheme.typography.titleSmall,
                 color = if (metric.isPositive) MySharePositive else MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Black,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                lineHeight = 19.sp
             )
         }
     }
@@ -396,8 +393,7 @@ private fun PremiumReviewResultMoveValue(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Black,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            lineHeight = 19.sp
         )
     }
 }

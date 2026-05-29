@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.ms.myshare.R
+import pt.ms.myshare.domain.model.OnboardingIntroVariant
 import pt.ms.myshare.domain.model.UserPreferences
 import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.preferences.CurrencyPickerDialog
@@ -37,6 +38,7 @@ import pt.ms.myshare.presentation.ui.theme.*
 @Composable
 fun WelcomeScreen(
     userPreferences: UserPreferences,
+    introVariant: OnboardingIntroVariant = OnboardingIntroVariant.PLAN_FIRST,
     onLanguageSelected: (String) -> Unit,
     onCurrencySelected: (String) -> Unit,
     onContinue: () -> Unit,
@@ -127,7 +129,7 @@ fun WelcomeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    stringResource(R.string.onboarding_welcome_title),
+                    stringResource(introVariant.titleRes),
                     style = titleStyle,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
@@ -136,7 +138,7 @@ fun WelcomeScreen(
                 )
 
                 Text(
-                    stringResource(R.string.onboarding_welcome_subtitle),
+                    stringResource(introVariant.subtitleRes),
                     style = subtitleStyle,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -146,7 +148,7 @@ fun WelcomeScreen(
 
                 Spacer(Modifier.height(heroSpacing))
 
-                PaydayChecklistCard()
+                PaydayChecklistCard(introVariant = introVariant)
 
                 Spacer(Modifier.height(16.dp))
 
@@ -173,7 +175,7 @@ fun WelcomeScreen(
 }
 
 @Composable
-private fun PaydayChecklistCard() {
+private fun PaydayChecklistCard(introVariant: OnboardingIntroVariant) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -189,7 +191,7 @@ private fun PaydayChecklistCard() {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = stringResource(R.string.onboarding_welcome_badge),
+                text = stringResource(introVariant.badgeRes),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold
@@ -197,20 +199,20 @@ private fun PaydayChecklistCard() {
             HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.16f))
             WelcomeOutcomeRow(
                 index = "1",
-                title = stringResource(R.string.onboarding_welcome_outcome_payday_title),
-                body = stringResource(R.string.onboarding_welcome_outcome_payday_body),
+                title = stringResource(introVariant.paydayTitleRes),
+                body = stringResource(introVariant.paydayBodyRes),
                 icon = Icons.Default.AccountBalance
             )
             WelcomeOutcomeRow(
                 index = "2",
-                title = stringResource(R.string.onboarding_welcome_outcome_weekly_title),
-                body = stringResource(R.string.onboarding_welcome_outcome_weekly_body),
+                title = stringResource(introVariant.weeklyTitleRes),
+                body = stringResource(introVariant.weeklyBodyRes),
                 icon = Icons.Default.Savings
             )
             WelcomeOutcomeRow(
                 index = "3",
-                title = stringResource(R.string.onboarding_welcome_outcome_trust_title),
-                body = stringResource(R.string.onboarding_welcome_outcome_trust_body),
+                title = stringResource(introVariant.trustTitleRes),
+                body = stringResource(introVariant.trustBodyRes),
                 icon = Icons.Default.CheckCircle
             )
         }
@@ -250,8 +252,7 @@ private fun WelcomeOutcomeRow(
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                lineHeight = 19.sp
             )
             Text(
                 text = body,
@@ -268,6 +269,60 @@ private fun WelcomeOutcomeRow(
         )
     }
 }
+
+private val OnboardingIntroVariant.titleRes: Int
+    get() = when (this) {
+        OnboardingIntroVariant.PLAN_FIRST -> R.string.onboarding_welcome_title
+        OnboardingIntroVariant.SPEND_CLARITY -> R.string.onboarding_welcome_spend_clarity_title
+    }
+
+private val OnboardingIntroVariant.subtitleRes: Int
+    get() = when (this) {
+        OnboardingIntroVariant.PLAN_FIRST -> R.string.onboarding_welcome_subtitle
+        OnboardingIntroVariant.SPEND_CLARITY -> R.string.onboarding_welcome_spend_clarity_subtitle
+    }
+
+private val OnboardingIntroVariant.badgeRes: Int
+    get() = when (this) {
+        OnboardingIntroVariant.PLAN_FIRST -> R.string.onboarding_welcome_badge
+        OnboardingIntroVariant.SPEND_CLARITY -> R.string.onboarding_welcome_spend_clarity_badge
+    }
+
+private val OnboardingIntroVariant.paydayTitleRes: Int
+    get() = when (this) {
+        OnboardingIntroVariant.PLAN_FIRST -> R.string.onboarding_welcome_outcome_payday_title
+        OnboardingIntroVariant.SPEND_CLARITY -> R.string.onboarding_welcome_spend_clarity_outcome_payday_title
+    }
+
+private val OnboardingIntroVariant.paydayBodyRes: Int
+    get() = when (this) {
+        OnboardingIntroVariant.PLAN_FIRST -> R.string.onboarding_welcome_outcome_payday_body
+        OnboardingIntroVariant.SPEND_CLARITY -> R.string.onboarding_welcome_spend_clarity_outcome_payday_body
+    }
+
+private val OnboardingIntroVariant.weeklyTitleRes: Int
+    get() = when (this) {
+        OnboardingIntroVariant.PLAN_FIRST -> R.string.onboarding_welcome_outcome_weekly_title
+        OnboardingIntroVariant.SPEND_CLARITY -> R.string.onboarding_welcome_spend_clarity_outcome_weekly_title
+    }
+
+private val OnboardingIntroVariant.weeklyBodyRes: Int
+    get() = when (this) {
+        OnboardingIntroVariant.PLAN_FIRST -> R.string.onboarding_welcome_outcome_weekly_body
+        OnboardingIntroVariant.SPEND_CLARITY -> R.string.onboarding_welcome_spend_clarity_outcome_weekly_body
+    }
+
+private val OnboardingIntroVariant.trustTitleRes: Int
+    get() = when (this) {
+        OnboardingIntroVariant.PLAN_FIRST -> R.string.onboarding_welcome_outcome_trust_title
+        OnboardingIntroVariant.SPEND_CLARITY -> R.string.onboarding_welcome_spend_clarity_outcome_trust_title
+    }
+
+private val OnboardingIntroVariant.trustBodyRes: Int
+    get() = when (this) {
+        OnboardingIntroVariant.PLAN_FIRST -> R.string.onboarding_welcome_outcome_trust_body
+        OnboardingIntroVariant.SPEND_CLARITY -> R.string.onboarding_welcome_spend_clarity_outcome_trust_body
+    }
 
 @Composable
 private fun WelcomePreferenceRow(

@@ -4,6 +4,8 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,8 +23,9 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 @HiltAndroidApp
-class MyShareApp : Application() {
+class MyShareApp : Application(), Configuration.Provider {
 
+    @Inject lateinit var workerFactory: HiltWorkerFactory
     @Inject lateinit var userPreferencesRepositoryProvider: Provider<UserPreferencesRepository>
     @Inject lateinit var legacyPremiumGrantEligibilityStoreProvider: Provider<LegacyPremiumGrantEligibilityStore>
     @Inject lateinit var userLocaleManager: UserLocaleManager
@@ -46,6 +49,11 @@ class MyShareApp : Application() {
         createNotificationChannel()
         Timber.tag(TAG).d("Application created")
     }
+
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 
     private fun applyStoredLocale() {
         applicationScope.launch {

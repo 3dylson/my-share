@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.TextOverflow
@@ -30,7 +31,15 @@ import pt.ms.myshare.domain.model.PremiumCheckInStatus
 import pt.ms.myshare.domain.model.PremiumProofVariant
 import pt.ms.myshare.domain.model.PremiumReviewMomentumStatus
 import pt.ms.myshare.presentation.ui.components.*
+import pt.ms.myshare.presentation.ui.components.PremiumBenefitCard
+import pt.ms.myshare.presentation.ui.components.PremiumButton
+import pt.ms.myshare.presentation.ui.components.PremiumSectionHeader
+import pt.ms.myshare.presentation.ui.components.PremiumSparkline
+import pt.ms.myshare.presentation.ui.components.bringFocusedInputIntoView
+import pt.ms.myshare.presentation.ui.components.rememberInputKeyboardActions
 import pt.ms.myshare.presentation.ui.theme.*
+import pt.ms.myshare.presentation.ui.theme.MySharePositive
+import pt.ms.myshare.presentation.ui.theme.MySharePrimary
 import java.math.BigDecimal
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,9 +48,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.graphics.vector.ImageVector
+import timber.log.Timber
 
 /**
  * Responsibility: Renders the Manual Review form and historical performance records.
@@ -69,6 +84,27 @@ fun LazyListScope.homeReviewTab(
     val paydayRecommendation = state.paydayRecommendation
     val premiumCheckIn = state.premiumCheckIn
     val premiumMomentum = state.premiumMomentum
+
+    item {
+        val context = LocalContext.current
+        val errorMessage = remember(state.error) {
+            state.error?.let {
+                val resId = context.resources.getIdentifier(it, "string", context.packageName)
+                if (resId != 0) context.getString(resId) else it
+            }
+        }
+        CompactReviewEntryCard(
+            flexibleSpend = state.actualFlexibleSpend,
+            goalContribution = state.actualGoalContribution,
+            currencySymbol = state.currencySymbol,
+            isUpdatingSavedReview = state.savedReviewDate != null,
+            errorMessage = errorMessage,
+            onFlexibleSpendChanged = onFlexibleSpendChanged,
+            onGoalContributionChanged = onGoalContributionChanged,
+            onSaveReview = onSaveReview
+        )
+        Spacer(Modifier.height(16.dp))
+    }
 
     if (isPremium && premiumCheckIn != null) {
         item {
@@ -118,7 +154,11 @@ fun LazyListScope.homeReviewTab(
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                text = stringResource(R.string.home_review_score_count, performanceStats.totalReviews),
+                                text = pluralStringResource(
+                                    R.plurals.home_review_score_count_quantity,
+                                    performanceStats.totalReviews,
+                                    performanceStats.totalReviews
+                                ),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -140,8 +180,9 @@ fun LazyListScope.homeReviewTab(
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = stringResource(
-                                    R.string.home_review_paycycle_consistency_count,
+                                text = pluralStringResource(
+                                    R.plurals.home_review_paycycle_consistency_count_quantity,
+                                    performanceStats.payCycleReviewStreak,
                                     performanceStats.payCycleReviewStreak
                                 ),
                                 style = MaterialTheme.typography.titleLarge,
@@ -253,25 +294,6 @@ fun LazyListScope.homeReviewTab(
             )
             Spacer(Modifier.height(16.dp))
         }
-    }
-
-    item {
-        val context = LocalContext.current
-        val errorMessage = remember(state.error) {
-            state.error?.let {
-                val resId = context.resources.getIdentifier(it, "string", context.packageName)
-                if (resId != 0) context.getString(resId) else it
-            }
-        }
-        CompactReviewEntryCard(
-            flexibleSpend = state.actualFlexibleSpend,
-            goalContribution = state.actualGoalContribution,
-            currencySymbol = state.currencySymbol,
-            errorMessage = errorMessage,
-            onFlexibleSpendChanged = onFlexibleSpendChanged,
-            onGoalContributionChanged = onGoalContributionChanged,
-            onSaveReview = onSaveReview
-        )
     }
 
     if (history.isNotEmpty()) {
@@ -393,12 +415,20 @@ private fun PremiumReviewMomentumCard(
                 val shouldStack = maxWidth < 340.dp || LocalDensity.current.fontScale >= 1.25f
                 val chips = listOf(
                     Triple(
-                        stringResource(R.string.home_review_momentum_reviews, momentum.totalReviews),
+                        pluralStringResource(
+                            R.plurals.home_review_momentum_reviews_quantity,
+                            momentum.totalReviews,
+                            momentum.totalReviews
+                        ),
                         Icons.Default.CheckCircle,
                         MySharePrimary
                     ),
                     Triple(
-                        stringResource(R.string.home_review_momentum_streak, momentum.currentStreak),
+                        pluralStringResource(
+                            R.plurals.home_review_momentum_streak_quantity,
+                            momentum.currentStreak,
+                            momentum.currentStreak
+                        ),
                         Icons.Default.LocalFireDepartment,
                         MySharePositive
                     ),
@@ -1023,7 +1053,7 @@ fun ReviewCorrectionBottomSheet(
                 if (shouldStack) {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         ReviewAmountField(
-                            label = stringResource(R.string.home_review_input_flex_exact),
+                            label = stringResource(R.string.home_review_edit_input_spent_exact),
                             value = flexibleSpend,
                             currencySymbol = currencySymbol,
                             onValueChange = {
@@ -1050,7 +1080,7 @@ fun ReviewCorrectionBottomSheet(
                 } else {
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         ReviewAmountField(
-                            label = stringResource(R.string.home_review_input_flex_exact),
+                            label = stringResource(R.string.home_review_edit_input_spent_exact),
                             value = flexibleSpend,
                             currencySymbol = currencySymbol,
                             onValueChange = {
@@ -1225,8 +1255,9 @@ private fun PaydayAdjustmentRecommendationCard(
                     )
                 }
                 Text(
-                    text = stringResource(
-                        R.string.home_review_recommendation_review_count,
+                    text = pluralStringResource(
+                        R.plurals.home_review_recommendation_review_count_quantity,
+                        recommendation.analyzedReviewCount,
                         recommendation.analyzedReviewCount
                     ),
                     style = MaterialTheme.typography.labelSmall,
@@ -2266,6 +2297,21 @@ private fun CompactHistoryMetric(
 
 private const val PREMIUM_INLINE_HISTORY_LIMIT = 3
 
+private enum class ReviewQuickChoice {
+    ON_TRACK,
+    TIGHT,
+    ALMOST_GONE,
+    SKIPPED_GOAL
+}
+
+private data class ReviewQuickChoiceUi(
+    val choice: ReviewQuickChoice,
+    val labelRes: Int,
+    val descriptionRes: Int,
+    val icon: ImageVector,
+    val accent: Color
+)
+
 @Composable
 private fun ReviewAmountField(
     label: String,
@@ -2274,8 +2320,16 @@ private fun ReviewAmountField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     imeAction: ImeAction,
-    keyboardActions: KeyboardActions
+    keyboardActions: KeyboardActions,
+    focusRequester: FocusRequester? = null,
+    onFocusChanged: (Boolean) -> Unit = {}
 ) {
+    val focusModifier = if (focusRequester != null) {
+        Modifier.focusRequester(focusRequester)
+    } else {
+        Modifier
+    }
+
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -2287,7 +2341,10 @@ private fun ReviewAmountField(
             imeAction = imeAction
         ),
         keyboardActions = keyboardActions,
-        modifier = modifier.bringFocusedInputIntoView(debugLabel = label),
+        modifier = modifier
+            .then(focusModifier)
+            .onFocusChanged { focusState -> onFocusChanged(focusState.isFocused) }
+            .bringFocusedInputIntoView(debugLabel = label),
         shape = RoundedCornerShape(16.dp)
     )
 }
@@ -2297,12 +2354,30 @@ private fun CompactReviewEntryCard(
     flexibleSpend: String,
     goalContribution: String,
     currencySymbol: String,
+    isUpdatingSavedReview: Boolean,
     errorMessage: String?,
     onFlexibleSpendChanged: (String) -> Unit,
     onGoalContributionChanged: (String) -> Unit,
     onSaveReview: () -> Unit
 ) {
-    val inputKeyboardActions = rememberInputKeyboardActions(onDone = onSaveReview)
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val goalContributionFocusRequester = remember { FocusRequester() }
+    var selectedQuickChoice by remember { mutableStateOf<ReviewQuickChoice?>(null) }
+    val inputKeyboardActions = remember(focusManager, keyboardController, goalContributionFocusRequester, onSaveReview) {
+        KeyboardActions(
+            onNext = {
+                Timber.tag("HomeReviewTab").d("Review flexible spend input advancing focus to goal contribution")
+                goalContributionFocusRequester.requestFocus()
+            },
+            onDone = {
+                focusManager.clearFocus(force = true)
+                keyboardController?.hide()
+                Timber.tag("HomeReviewTab").d("Review goal contribution input submitted from keyboard")
+                onSaveReview()
+            }
+        )
+    }
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -2345,48 +2420,99 @@ private fun CompactReviewEntryCard(
                 }
             }
 
+            ReviewQuickChoices(
+                selectedChoice = selectedQuickChoice,
+                onChoiceSelected = { choice ->
+                    selectedQuickChoice = choice
+                    when (choice) {
+                        ReviewQuickChoice.ON_TRACK -> {
+                            Timber.tag("HomeReviewTab").d("Quick review selected: on track")
+                        }
+                        ReviewQuickChoice.TIGHT -> {
+                            onFlexibleSpendChanged("0")
+                            Timber.tag("HomeReviewTab").d("Quick review selected: tight")
+                        }
+                        ReviewQuickChoice.ALMOST_GONE -> {
+                            onFlexibleSpendChanged("0")
+                            onGoalContributionChanged("0")
+                            Timber.tag("HomeReviewTab").d("Quick review selected: almost gone")
+                        }
+                        ReviewQuickChoice.SKIPPED_GOAL -> {
+                            onGoalContributionChanged("0")
+                            Timber.tag("HomeReviewTab").d("Quick review selected: skipped goal")
+                        }
+                    }
+                }
+            )
+
             BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
                 val shouldStack = maxWidth < 360.dp || LocalDensity.current.fontScale >= 1.3f
                 if (shouldStack) {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         ReviewAmountField(
-                            label = stringResource(R.string.home_review_input_flex_exact),
+                            label = stringResource(R.string.home_review_input_left_exact),
                             value = flexibleSpend,
                             currencySymbol = currencySymbol,
-                            onValueChange = onFlexibleSpendChanged,
+                            onValueChange = {
+                                selectedQuickChoice = null
+                                onFlexibleSpendChanged(it)
+                            },
                             modifier = Modifier.fillMaxWidth(),
                             imeAction = ImeAction.Next,
-                            keyboardActions = inputKeyboardActions
+                            keyboardActions = inputKeyboardActions,
+                            onFocusChanged = { isFocused ->
+                                if (isFocused) Timber.tag("HomeReviewTab").d("Review flexible spend input focused")
+                            }
                         )
                         ReviewAmountField(
                             label = stringResource(R.string.home_review_input_goal_exact),
                             value = goalContribution,
                             currencySymbol = currencySymbol,
-                            onValueChange = onGoalContributionChanged,
+                            onValueChange = {
+                                selectedQuickChoice = null
+                                onGoalContributionChanged(it)
+                            },
                             modifier = Modifier.fillMaxWidth(),
                             imeAction = ImeAction.Done,
-                            keyboardActions = inputKeyboardActions
+                            keyboardActions = inputKeyboardActions,
+                            focusRequester = goalContributionFocusRequester,
+                            onFocusChanged = { isFocused ->
+                                if (isFocused) Timber.tag("HomeReviewTab").d("Review goal contribution input focused")
+                            }
                         )
                     }
                 } else {
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         ReviewAmountField(
-                            label = stringResource(R.string.home_review_input_flex_exact),
+                            label = stringResource(R.string.home_review_input_left_exact),
                             value = flexibleSpend,
                             currencySymbol = currencySymbol,
-                            onValueChange = onFlexibleSpendChanged,
+                            onValueChange = {
+                                selectedQuickChoice = null
+                                onFlexibleSpendChanged(it)
+                            },
                             modifier = Modifier.weight(1f),
                             imeAction = ImeAction.Next,
-                            keyboardActions = inputKeyboardActions
+                            keyboardActions = inputKeyboardActions,
+                            onFocusChanged = { isFocused ->
+                                if (isFocused) Timber.tag("HomeReviewTab").d("Review flexible spend input focused")
+                            }
                         )
                         ReviewAmountField(
                             label = stringResource(R.string.home_review_input_goal_exact),
                             value = goalContribution,
                             currencySymbol = currencySymbol,
-                            onValueChange = onGoalContributionChanged,
+                            onValueChange = {
+                                selectedQuickChoice = null
+                                onGoalContributionChanged(it)
+                            },
                             modifier = Modifier.weight(1f),
                             imeAction = ImeAction.Done,
-                            keyboardActions = inputKeyboardActions
+                            keyboardActions = inputKeyboardActions,
+                            focusRequester = goalContributionFocusRequester,
+                            onFocusChanged = { isFocused ->
+                                if (isFocused) Timber.tag("HomeReviewTab").d("Review goal contribution input focused")
+                            }
                         )
                     }
                 }
@@ -2402,8 +2528,176 @@ private fun CompactReviewEntryCard(
             }
 
             PremiumButton(
-                text = stringResource(R.string.home_review_submit),
+                text = stringResource(
+                    if (isUpdatingSavedReview) {
+                        R.string.home_review_update
+                    } else {
+                        R.string.home_review_submit
+                    }
+                ),
                 onClick = onSaveReview
+            )
+        }
+    }
+}
+
+@Composable
+private fun ReviewQuickChoices(
+    selectedChoice: ReviewQuickChoice?,
+    onChoiceSelected: (ReviewQuickChoice) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val choices = listOf(
+        ReviewQuickChoiceUi(
+            choice = ReviewQuickChoice.ON_TRACK,
+            labelRes = R.string.home_review_quick_on_track,
+            descriptionRes = R.string.home_review_quick_on_track_desc,
+            icon = Icons.Default.CheckCircle,
+            accent = MySharePositive
+        ),
+        ReviewQuickChoiceUi(
+            choice = ReviewQuickChoice.TIGHT,
+            labelRes = R.string.home_review_quick_tight,
+            descriptionRes = R.string.home_review_quick_tight_desc,
+            icon = Icons.AutoMirrored.Filled.TrendingDown,
+            accent = MaterialTheme.colorScheme.tertiary
+        ),
+        ReviewQuickChoiceUi(
+            choice = ReviewQuickChoice.ALMOST_GONE,
+            labelRes = R.string.home_review_quick_almost_gone,
+            descriptionRes = R.string.home_review_quick_almost_gone_desc,
+            icon = Icons.Default.Warning,
+            accent = MaterialTheme.colorScheme.error
+        ),
+        ReviewQuickChoiceUi(
+            choice = ReviewQuickChoice.SKIPPED_GOAL,
+            labelRes = R.string.home_review_quick_skipped_goal,
+            descriptionRes = R.string.home_review_quick_skipped_goal_desc,
+            icon = Icons.Default.RemoveCircleOutline,
+            accent = MaterialTheme.colorScheme.secondary
+        )
+    )
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.home_review_quick_title),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = FontWeight.Bold
+        )
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            val shouldStack = maxWidth < 300.dp || LocalDensity.current.fontScale >= 1.3f
+            if (shouldStack) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    choices.forEach { choice ->
+                        ReviewQuickChoiceChip(
+                            choice = choice,
+                            isSelected = selectedChoice == choice.choice,
+                            onClick = { onChoiceSelected(choice.choice) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            } else {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    choices.chunked(2).forEach { rowChoices ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            rowChoices.forEach { choice ->
+                                ReviewQuickChoiceChip(
+                                    choice = choice,
+                                    isSelected = selectedChoice == choice.choice,
+                                    onClick = { onChoiceSelected(choice.choice) },
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        selectedChoice?.let { selected ->
+            val selectedUi = choices.first { it.choice == selected }
+            ReviewQuickChoiceSelectedNote(choice = selectedUi)
+        }
+    }
+}
+
+@Composable
+private fun ReviewQuickChoiceChip(
+    choice: ReviewQuickChoiceUi,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val borderColor = if (isSelected) choice.accent.copy(alpha = 0.52f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.16f)
+    val containerColor = if (isSelected) choice.accent.copy(alpha = 0.13f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.34f)
+    Surface(
+        modifier = modifier
+            .heightIn(min = 52.dp)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
+        color = containerColor,
+        border = BorderStroke(1.dp, borderColor)
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = choice.icon,
+                contentDescription = null,
+                tint = choice.accent,
+                modifier = Modifier.size(18.dp)
+            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                Text(
+                    text = stringResource(choice.labelRes),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Black,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReviewQuickChoiceSelectedNote(
+    choice: ReviewQuickChoiceUi,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        color = choice.accent.copy(alpha = 0.10f),
+        border = BorderStroke(1.dp, choice.accent.copy(alpha = 0.24f))
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Icon(
+                imageVector = choice.icon,
+                contentDescription = null,
+                tint = choice.accent,
+                modifier = Modifier.size(16.dp)
+            )
+            Text(
+                text = stringResource(choice.descriptionRes),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                lineHeight = 18.sp,
+                modifier = Modifier.weight(1f)
             )
         }
     }

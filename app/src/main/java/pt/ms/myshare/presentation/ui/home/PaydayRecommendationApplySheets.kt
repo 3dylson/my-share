@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -364,8 +365,9 @@ private fun RecommendationEvidenceRow(
                 modifier = Modifier.size(18.dp)
             )
             Text(
-                text = stringResource(
-                    R.string.home_review_recommendation_confirm_evidence,
+                text = pluralStringResource(
+                    R.plurals.home_review_recommendation_confirm_evidence_count,
+                    recommendation.analyzedReviewCount,
                     recommendation.confidencePercent,
                     recommendation.analyzedReviewCount
                 ),

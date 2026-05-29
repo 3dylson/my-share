@@ -33,7 +33,9 @@ import pt.ms.myshare.domain.model.BillingPlan
 import pt.ms.myshare.domain.model.PaydayAdjustmentRecommendationDirection
 import pt.ms.myshare.domain.model.PremiumAdjustmentStatus
 import pt.ms.myshare.domain.model.PremiumCheckInStatus
+import pt.ms.myshare.presentation.ui.ads.NativeSponsoredAdCard
 import pt.ms.myshare.presentation.ui.components.*
+import pt.ms.myshare.presentation.ui.localization.resolve
 import pt.ms.myshare.presentation.ui.preferences.currencyLabel
 import pt.ms.myshare.presentation.ui.preferences.languageLabel
 import pt.ms.myshare.presentation.ui.theme.*
@@ -58,8 +60,10 @@ fun LazyListScope.homeMoreTab(
     onManageSubscription: () -> Unit,
     onOpenAdjustmentHistory: () -> Unit,
     onOpenReview: () -> Unit,
+    onOpenPaydayRecommendation: () -> Unit,
     onRateApp: () -> Unit,
     isGoogleCredentialRequestInProgress: Boolean,
+    hasFirstPlan: Boolean,
     onConnectGoogle: () -> Unit,
     onLogout: () -> Unit
 ) {
@@ -84,13 +88,14 @@ fun LazyListScope.homeMoreTab(
 
     if (state.isPremium) {
         item {
-            SmartAdjustmentControlCard(
-                state = state,
-                onToggleAutomation = onToggleAutomation,
-                onConfigureReminder = onConfigureReminder,
-                onOpenReview = onOpenReview,
-                modifier = Modifier.padding(bottom = 20.dp)
-            )
+                SmartAdjustmentControlCard(
+                    state = state,
+                    onToggleAutomation = onToggleAutomation,
+                    onConfigureReminder = onConfigureReminder,
+                    onOpenReview = onOpenReview,
+                    onOpenPaydayRecommendation = onOpenPaydayRecommendation,
+                    modifier = Modifier.padding(bottom = 20.dp)
+                )
         }
         state.adjustmentMemory?.let { memory ->
             item {
@@ -219,6 +224,16 @@ fun LazyListScope.homeMoreTab(
         }
     }
 
+    if (!state.isPremium) {
+        item {
+            NativeSponsoredAdCard(
+                isPremium = state.isPremium,
+                hasFirstPlan = hasFirstPlan,
+                modifier = Modifier.padding(bottom = 20.dp)
+            )
+        }
+    }
+
     item {
         val uriHandler = LocalUriHandler.current
         PremiumSettingsGroup(title = stringResource(R.string.home_more_legal_title)) {
@@ -315,12 +330,6 @@ fun LazyListScope.homeMoreTab(
                 }
             )
         }
-
-        if (!state.isPremium) {
-            Spacer(modifier = Modifier.height(24.dp))
-            PremiumAdBanner()
-        }
-        
         Spacer(modifier = Modifier.height(48.dp))
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -492,8 +501,7 @@ private fun MoreRoutineMetric(
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    lineHeight = 15.sp
                 )
                 Text(
                     text = value,
@@ -514,6 +522,7 @@ private fun SmartAdjustmentControlCard(
     onToggleAutomation: (Boolean) -> Unit,
     onConfigureReminder: () -> Unit,
     onOpenReview: () -> Unit,
+    onOpenPaydayRecommendation: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val smartAdjustment = state.smartAdjustment
@@ -553,6 +562,11 @@ private fun SmartAdjustmentControlCard(
         stringResource(R.string.home_more_smart_adjustments_waiting_action)
     } else {
         stringResource(R.string.home_more_smart_adjustments_review)
+    }
+    val reviewAction = if (smartAdjustment.hasRecommendation) {
+        onOpenPaydayRecommendation
+    } else {
+        onOpenReview
     }
 
     Surface(
@@ -654,7 +668,7 @@ private fun SmartAdjustmentControlCard(
                         SmartAdjustmentReviewButton(
                             label = reviewActionLabel,
                             enabled = reviewActionEnabled,
-                            onClick = onOpenReview,
+                            onClick = reviewAction,
                             modifier = Modifier.fillMaxWidth()
                         )
                         OutlinedButton(
@@ -677,7 +691,7 @@ private fun SmartAdjustmentControlCard(
                         SmartAdjustmentReviewButton(
                             label = reviewActionLabel,
                             enabled = reviewActionEnabled,
-                            onClick = onOpenReview,
+                            onClick = reviewAction,
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -1193,8 +1207,9 @@ private fun SmartAdjustmentSignalGrid(
         else -> stringResource(R.string.home_more_routine_not_set)
     }
     val evidenceValue = if (smartAdjustment.hasRecommendation) {
-        stringResource(
-            R.string.home_more_smart_adjustments_evidence_value,
+        pluralStringResource(
+            R.plurals.home_more_smart_adjustments_evidence_value_quantity,
+            smartAdjustment.analyzedReviewCount,
             smartAdjustment.confidencePercent,
             smartAdjustment.analyzedReviewCount
         )
@@ -1509,9 +1524,8 @@ private fun MorePremiumUpgradeSection(
             )
         }
         if (state.billingMessage != null) {
-            val billingMessage = remember(state.billingMessage) {
-                val resId = context.resources.getIdentifier(state.billingMessage, "string", context.packageName)
-                if (resId != 0) context.getString(resId) else state.billingMessage
+            val billingMessage = remember(state.billingMessage, context) {
+                state.billingMessage.resolve(context)
             }
             PremiumInfoCard(
                 title = billingMessage,

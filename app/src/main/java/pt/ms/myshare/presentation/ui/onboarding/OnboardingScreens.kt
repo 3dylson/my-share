@@ -9,7 +9,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -47,8 +46,10 @@ import pt.ms.myshare.presentation.ui.components.KeyboardDismissEffect
 import pt.ms.myshare.presentation.ui.components.PremiumButton
 import pt.ms.myshare.presentation.ui.components.PremiumInfoCard
 import pt.ms.myshare.presentation.ui.components.PremiumPaywallCard
-import pt.ms.myshare.presentation.ui.components.rememberKeyboardDismissOnScrollConnection
+import pt.ms.myshare.presentation.ui.components.dismissKeyboardOnUserDrag
 import pt.ms.myshare.presentation.ui.formatting.SubscriptionSavingsFormatter
+import pt.ms.myshare.presentation.ui.localization.UiText
+import pt.ms.myshare.presentation.ui.localization.resolve
 import pt.ms.myshare.presentation.ui.paywall.PaywallAutopilotPreviewMapper
 import pt.ms.myshare.presentation.ui.paywall.PaywallAutopilotPreviewUiState
 import pt.ms.myshare.presentation.ui.theme.*
@@ -66,7 +67,7 @@ fun PaywallScreen(
     paywallVariant: OnboardingPaywallVariant = OnboardingPaywallVariant.PAYDAY_PROOF,
     trialFraming: PaywallTrialFraming = PaywallTrialFraming.SEVEN_DAY,
     isBillingActionInProgress: Boolean = false,
-    billingMessage: String? = null,
+    billingMessage: UiText? = null,
     showSecurePremiumAccessPrompt: Boolean = false,
     isGoogleConnectionInProgress: Boolean = false,
     googleConnectionMessage: String? = null,
@@ -95,7 +96,6 @@ fun PaywallScreen(
         )
     }
     val scrollState = rememberScrollState()
-    val keyboardDismissOnScrollConnection = rememberKeyboardDismissOnScrollConnection()
     var isGoogleCredentialRequestInProgress by remember { mutableStateOf(false) }
     val monthlyProduct = PremiumStoreProductSelector.standardProduct(availableProducts, BillingPlan.MONTHLY)
     val annualProduct = PremiumStoreProductSelector.standardProduct(availableProducts, BillingPlan.ANNUAL)
@@ -144,10 +144,7 @@ fun PaywallScreen(
     }
     val isPurchaseReady = selectedProduct != null && !isBillingActionInProgress
     val resolvedBillingMessage = remember(billingMessage, context) {
-        billingMessage?.let {
-            val resId = context.resources.getIdentifier(it, "string", context.packageName)
-            if (resId != 0) context.getString(resId) else it
-        }
+        billingMessage?.resolve(context)
     }
     val googleConnectionFeedback = remember(googleConnectionMessage, googleConnectionError, context) {
         val messageKey = googleConnectionError ?: googleConnectionMessage
@@ -219,7 +216,7 @@ fun PaywallScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(horizontal = 24.dp)
-                .nestedScroll(keyboardDismissOnScrollConnection)
+                .dismissKeyboardOnUserDrag(debugLabel = "PaywallScreen")
                 .verticalScroll(scrollState)
         ) {
             Spacer(Modifier.height(16.dp))

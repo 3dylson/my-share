@@ -22,6 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import pt.ms.myshare.R
+import pt.ms.myshare.presentation.ui.ads.LocalAdsOrchestrator
 import pt.ms.myshare.presentation.ui.components.*
 import pt.ms.myshare.presentation.ui.formatting.LocalizedAmountFormatter
 
@@ -31,6 +32,8 @@ fun GoalAddRoute(
     viewModel: GoalAddViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val activity = androidx.activity.compose.LocalActivity.current
+    val adsOrchestrator = LocalAdsOrchestrator.current
 
     LaunchedEffect(state.isSaved) {
         if (state.isSaved) {
@@ -43,6 +46,21 @@ fun GoalAddRoute(
         onNameChanged = viewModel::onNameChanged,
         onAmountChanged = viewModel::onAmountChanged,
         onSave = viewModel::saveGoal,
+        onRewardedExtraGoal = {
+            val currentActivity = activity
+            val orchestrator = adsOrchestrator
+            if (currentActivity == null || orchestrator == null) {
+                viewModel.markRewardedExtraGoalUnavailable()
+            } else {
+                orchestrator.showRewardedExtraGoal(
+                    activity = currentActivity,
+                    isPremium = false,
+                    hasFirstPlan = true,
+                    onRewardGranted = viewModel::saveGoalWithRewardedExtraGoal,
+                    onUnavailable = viewModel::markRewardedExtraGoalUnavailable
+                )
+            }
+        },
         onDelete = viewModel::deleteGoal,
         onBack = { navController.popBackStack() }
     )
@@ -55,6 +73,7 @@ fun GoalAddScreen(
     onNameChanged: (String) -> Unit,
     onAmountChanged: (String) -> Unit,
     onSave: () -> Unit,
+    onRewardedExtraGoal: () -> Unit,
     onDelete: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -191,6 +210,21 @@ fun GoalAddScreen(
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodyMedium
                     )
+                }
+
+                if (state.canUseRewardedExtraGoal && !isEditMode) {
+                    PremiumInfoCard(
+                        title = stringResource(R.string.goal_add_rewarded_extra_goal_title),
+                        body = stringResource(R.string.goal_add_rewarded_extra_goal_body),
+                        icon = Icons.Default.Flag
+                    )
+                    OutlinedButton(
+                        onClick = onRewardedExtraGoal,
+                        enabled = !state.isLoading,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.goal_add_rewarded_extra_goal_action))
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
