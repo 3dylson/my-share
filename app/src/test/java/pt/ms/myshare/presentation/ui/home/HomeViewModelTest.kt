@@ -158,7 +158,11 @@ class HomeViewModelTest {
             savePaydayReviewUseCase = SavePaydayReviewUseCase(
                 fakePlannerRepository,
                 calculatePlanPreviewUseCase,
-                mockUpdateGoalProgressUseCase
+                mockUpdateGoalProgressUseCase,
+                AdjustGoalProgressForReviewCorrectionUseCase(
+                    fakePlannerRepository,
+                    fakeEntitlementRepository
+                )
             ),
             getPerformanceStatsUseCase = GetPerformanceStatsUseCase(fakePlannerRepository),
             getCoachingInsightsUseCase = GetCoachingInsightsUseCase(calculatePlanPreviewUseCase),

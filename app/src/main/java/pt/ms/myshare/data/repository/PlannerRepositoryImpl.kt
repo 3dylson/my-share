@@ -452,7 +452,7 @@ class PlannerRepositoryImpl @Inject constructor(
                         paydayDate = doc.getString("paydayDate")?.takeIf { it.isNotEmpty() }?.let { LocalDate.parse(it) }
                     )
                 }.getOrNull()
-            }
+            }.sortedForTimeline()
             reviewState.value = reviews
             persistReviews(reviews)
         } catch (e: Exception) {
@@ -848,16 +848,20 @@ class PlannerRepositoryImpl @Inject constructor(
 
     private fun readReviews(): List<ManualReview> {
         val persistedReviews = PlannerCollectionPreferenceCodec.decodeReviews(prefs.getString(KEY_REVIEWS_V2, null))
-        if (persistedReviews.isNotEmpty()) return persistedReviews
-        return listOfNotNull(readLatestReview())
+        if (persistedReviews.isNotEmpty()) return persistedReviews.sortedForTimeline()
+        return listOfNotNull(readLatestReview()).sortedForTimeline()
     }
 
     private fun persistReviews(reviews: List<ManualReview>) {
-        Timber.tag(TAG).d("Persisting local reviews count=%d", reviews.size)
+        val sortedReviews = reviews.sortedForTimeline()
+        Timber.tag(TAG).d("Persisting local reviews count=%d", sortedReviews.size)
         prefs.edit()
-            .putString(KEY_REVIEWS_V2, PlannerCollectionPreferenceCodec.encodeReviews(reviews))
+            .putString(KEY_REVIEWS_V2, PlannerCollectionPreferenceCodec.encodeReviews(sortedReviews))
             .apply()
     }
+
+    private fun List<ManualReview>.sortedForTimeline(): List<ManualReview> =
+        sortedBy { it.paydayDate ?: it.createdAt }
 
 
     private fun readLatestReview(): ManualReview? {

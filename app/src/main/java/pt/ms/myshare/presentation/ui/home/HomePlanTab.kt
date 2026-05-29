@@ -7,13 +7,11 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
-import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.AutoGraph
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.EventAvailable
-import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.PlayCircle
@@ -69,6 +67,7 @@ fun LazyListScope.homePlanTab(
             }
             TodayPaydayMoveCard(
                 nextPaydayText = nextPaydayText,
+                incomeLabel = card.incomeLabel,
                 fixedCostsLabel = card.fixedCostsLabel,
                 weeklyGuideLabel = card.weeklySpendLabel,
                 priorityMoveLabel = card.savingsLabel
@@ -91,36 +90,6 @@ fun LazyListScope.homePlanTab(
                     weeklyGuideLabel = card.weeklySpendLabel,
                     priorityMoveLabel = card.savingsLabel
                 )
-            }
-        }
-        item {
-            PremiumSectionHeader(title = stringResource(R.string.home_plan_metrics_title))
-            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-                val shouldStack = maxWidth < 360.dp || LocalDensity.current.fontScale >= 1.3f
-                if (shouldStack) {
-                    CompactPlanMetricsPanel(
-                        incomeLabel = stringResource(R.string.home_plan_label_income),
-                        incomeValue = card.incomeLabel,
-                        weeklyLabel = stringResource(R.string.home_plan_label_weekly),
-                        weeklyValue = card.weeklySpendLabel
-                    )
-                } else {
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        CompactPlanMetric(
-                            label = stringResource(R.string.home_plan_label_income),
-                            value = card.incomeLabel,
-                            icon = Icons.Default.Payments,
-                            modifier = Modifier.weight(1f)
-                        )
-                        CompactPlanMetric(
-                            label = stringResource(R.string.home_plan_label_weekly),
-                            value = card.weeklySpendLabel,
-                            icon = Icons.Default.AccountBalanceWallet,
-                            accentColor = MySharePositive,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                }
             }
         }
         item {
@@ -176,6 +145,7 @@ fun LazyListScope.homePlanTab(
 @Composable
 private fun TodayPaydayMoveCard(
     nextPaydayText: String,
+    incomeLabel: String,
     fixedCostsLabel: String,
     weeklyGuideLabel: String,
     priorityMoveLabel: String,
@@ -231,6 +201,11 @@ private fun TodayPaydayMoveCard(
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                TodayMoveRow(
+                    icon = Icons.Default.Payments,
+                    label = stringResource(R.string.home_plan_today_move_income),
+                    value = incomeLabel
+                )
                 TodayMoveRow(
                     icon = Icons.Default.Savings,
                     label = stringResource(R.string.home_plan_today_move_priority),
@@ -326,6 +301,11 @@ private fun PremiumPlanBriefCard(
     } else {
         stringResource(R.string.home_plan_premium_brief_title_paused)
     }
+    val label = if (isWatching) {
+        stringResource(R.string.home_plan_premium_brief_label).uppercase()
+    } else {
+        stringResource(R.string.home_plan_premium_brief_label_paused).uppercase()
+    }
     val checkInLabel = premiumCheckIn?.relativeLabel()
         ?: stringResource(R.string.home_plan_premium_brief_checkin_waiting)
     val watchLabel = if (!isWatching) {
@@ -366,7 +346,7 @@ private fun PremiumPlanBriefCard(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.home_plan_premium_brief_label).uppercase(),
+                        text = label,
                         style = MaterialTheme.typography.labelSmall,
                         color = MySharePrimary,
                         fontWeight = FontWeight.Black
@@ -635,184 +615,6 @@ private fun SmartAdjustmentPill(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = 16.sp
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun CompactPaydaySummary(
-    headline: String,
-    body: String,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
-        color = MySharePrimary,
-        shadowElevation = 4.dp
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(14.dp)
-        ) {
-            Surface(
-                shape = RoundedCornerShape(14.dp),
-                color = Color.White.copy(alpha = 0.16f)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Flag,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.padding(10.dp).size(22.dp)
-                )
-            }
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = headline,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Black,
-                    color = Color.White
-                )
-                Text(
-                    text = body,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.88f),
-                    lineHeight = 20.sp,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun CompactPlanMetricsPanel(
-    incomeLabel: String,
-    incomeValue: String,
-    weeklyLabel: String,
-    weeklyValue: String,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
-        color = MaterialTheme.colorScheme.surface,
-        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.24f))
-    ) {
-        Column(
-            modifier = Modifier.padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            CompactPlanMetricRow(
-                label = incomeLabel,
-                value = incomeValue,
-                icon = Icons.Default.Payments
-            )
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
-            ) {
-                Spacer(modifier = Modifier.height(1.dp))
-            }
-            CompactPlanMetricRow(
-                label = weeklyLabel,
-                value = weeklyValue,
-                icon = Icons.Default.AccountBalanceWallet,
-                accentColor = MySharePositive
-            )
-        }
-    }
-}
-
-@Composable
-private fun CompactPlanMetricRow(
-    label: String,
-    value: String,
-    icon: ImageVector,
-    modifier: Modifier = Modifier,
-    accentColor: Color = MySharePrimary
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = 58.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Surface(
-            shape = RoundedCornerShape(12.dp),
-            color = accentColor.copy(alpha = 0.12f)
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = accentColor,
-                modifier = Modifier.padding(8.dp).size(20.dp)
-            )
-        }
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = label.uppercase(),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = value,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Black,
-                modifier = Modifier.padding(top = 2.dp)
-            )
-        }
-    }
-}
-
-@Composable
-private fun CompactPlanMetric(
-    label: String,
-    value: String,
-    icon: ImageVector,
-    modifier: Modifier = Modifier,
-    accentColor: Color = MySharePrimary
-) {
-    Surface(
-        modifier = modifier.heightIn(min = 124.dp),
-        shape = RoundedCornerShape(18.dp),
-        color = MaterialTheme.colorScheme.surface,
-        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.24f))
-    ) {
-        Column(
-            modifier = Modifier.padding(14.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = accentColor.copy(alpha = 0.12f)
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = accentColor,
-                    modifier = Modifier.padding(8.dp).size(20.dp)
-                )
-            }
-            Column(modifier = Modifier.padding(top = 16.dp)) {
-                Text(
-                    text = label.uppercase(),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = value,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Black,
-                    modifier = Modifier.padding(top = 4.dp)
                 )
             }
         }

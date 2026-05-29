@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.TextOverflow
@@ -96,6 +97,7 @@ fun LazyListScope.homeReviewTab(
             flexibleSpend = state.actualFlexibleSpend,
             goalContribution = state.actualGoalContribution,
             currencySymbol = state.currencySymbol,
+            isUpdatingSavedReview = state.savedReviewDate != null,
             errorMessage = errorMessage,
             onFlexibleSpendChanged = onFlexibleSpendChanged,
             onGoalContributionChanged = onGoalContributionChanged,
@@ -152,7 +154,11 @@ fun LazyListScope.homeReviewTab(
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                text = stringResource(R.string.home_review_score_count, performanceStats.totalReviews),
+                                text = pluralStringResource(
+                                    R.plurals.home_review_score_count_quantity,
+                                    performanceStats.totalReviews,
+                                    performanceStats.totalReviews
+                                ),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -174,8 +180,9 @@ fun LazyListScope.homeReviewTab(
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = stringResource(
-                                    R.string.home_review_paycycle_consistency_count,
+                                text = pluralStringResource(
+                                    R.plurals.home_review_paycycle_consistency_count_quantity,
+                                    performanceStats.payCycleReviewStreak,
                                     performanceStats.payCycleReviewStreak
                                 ),
                                 style = MaterialTheme.typography.titleLarge,
@@ -408,12 +415,20 @@ private fun PremiumReviewMomentumCard(
                 val shouldStack = maxWidth < 340.dp || LocalDensity.current.fontScale >= 1.25f
                 val chips = listOf(
                     Triple(
-                        stringResource(R.string.home_review_momentum_reviews, momentum.totalReviews),
+                        pluralStringResource(
+                            R.plurals.home_review_momentum_reviews_quantity,
+                            momentum.totalReviews,
+                            momentum.totalReviews
+                        ),
                         Icons.Default.CheckCircle,
                         MySharePrimary
                     ),
                     Triple(
-                        stringResource(R.string.home_review_momentum_streak, momentum.currentStreak),
+                        pluralStringResource(
+                            R.plurals.home_review_momentum_streak_quantity,
+                            momentum.currentStreak,
+                            momentum.currentStreak
+                        ),
                         Icons.Default.LocalFireDepartment,
                         MySharePositive
                     ),
@@ -1240,8 +1255,9 @@ private fun PaydayAdjustmentRecommendationCard(
                     )
                 }
                 Text(
-                    text = stringResource(
-                        R.string.home_review_recommendation_review_count,
+                    text = pluralStringResource(
+                        R.plurals.home_review_recommendation_review_count_quantity,
+                        recommendation.analyzedReviewCount,
                         recommendation.analyzedReviewCount
                     ),
                     style = MaterialTheme.typography.labelSmall,
@@ -2338,6 +2354,7 @@ private fun CompactReviewEntryCard(
     flexibleSpend: String,
     goalContribution: String,
     currencySymbol: String,
+    isUpdatingSavedReview: Boolean,
     errorMessage: String?,
     onFlexibleSpendChanged: (String) -> Unit,
     onGoalContributionChanged: (String) -> Unit,
@@ -2511,7 +2528,13 @@ private fun CompactReviewEntryCard(
             }
 
             PremiumButton(
-                text = stringResource(R.string.home_review_submit),
+                text = stringResource(
+                    if (isUpdatingSavedReview) {
+                        R.string.home_review_update
+                    } else {
+                        R.string.home_review_submit
+                    }
+                ),
                 onClick = onSaveReview
             )
         }

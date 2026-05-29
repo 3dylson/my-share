@@ -1052,6 +1052,12 @@ fun HomeScreen(
                                 Timber.tag("HomeScreen").d("Smart adjustment review opened from More tab")
                                 onDestinationSelected(HomeDestination.REVIEW)
                             },
+                            onOpenPaydayRecommendation = {
+                                Timber.tag("HomeScreen").d("Smart adjustment recommendation opened from More tab")
+                                state.reviewCard.paydayRecommendation?.let { recommendation ->
+                                    recommendationPendingApply = recommendation
+                                } ?: onDestinationSelected(HomeDestination.REVIEW)
+                            },
                             onRateApp = {
                                 onOpenPlayStoreRateEntry()
                                 playStoreListingOpener.open(BuildConfig.APPLICATION_ID)
@@ -1125,19 +1131,32 @@ private fun HomePremiumStatusBadge(
             }
         }
     } else {
-        AssistChip(
+        Surface(
             modifier = modifier,
-            onClick = {},
-            enabled = false,
-            label = { Text(text = stringResource(R.string.premium_badge), maxLines = 1) },
-            leadingIcon = {
+            shape = MaterialTheme.shapes.medium,
+            color = MySharePrimary.copy(alpha = 0.16f),
+            border = androidx.compose.foundation.BorderStroke(1.dp, MySharePrimary.copy(alpha = 0.42f))
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Icon(
                     imageVector = Icons.Default.WorkspacePremium,
                     contentDescription = null,
+                    tint = MySharePrimary,
                     modifier = Modifier.size(16.dp)
                 )
+                Text(
+                    text = stringResource(R.string.premium_badge),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MySharePrimary,
+                    fontWeight = FontWeight.Black,
+                    maxLines = 1
+                )
             }
-        )
+        }
     }
 }
 

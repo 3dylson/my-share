@@ -1449,10 +1449,10 @@ fun PremiumProfileHeader(
                 )
                 Text(
                     text = email,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Black,
+                    style = MaterialTheme.typography.bodyLarge.copy(lineHeight = 22.sp),
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 2,
+                    maxLines = 3,
                     overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.height(4.dp))

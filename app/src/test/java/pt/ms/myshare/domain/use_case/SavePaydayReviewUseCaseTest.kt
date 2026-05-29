@@ -21,15 +21,18 @@ import pt.ms.myshare.domain.model.ReminderConfiguration
 import pt.ms.myshare.domain.model.SalaryPlan
 import pt.ms.myshare.domain.repository.PlannerRepository
 import java.math.BigDecimal
+import java.time.LocalDate
 
 class SavePaydayReviewUseCaseTest {
 
     private val plannerRepository = SaveReviewFakePlannerRepository()
     private val updateGoalProgressUseCase = mockk<UpdateGoalProgressUseCase>(relaxed = true)
+    private val adjustGoalProgressForReviewCorrectionUseCase = mockk<AdjustGoalProgressForReviewCorrectionUseCase>(relaxed = true)
     private val useCase = SavePaydayReviewUseCase(
         plannerRepository = plannerRepository,
         calculatePlanPreviewUseCase = CalculatePlanPreviewUseCase(ResolveAllocationStrategyRulesUseCase()),
-        updateGoalProgressUseCase = updateGoalProgressUseCase
+        updateGoalProgressUseCase = updateGoalProgressUseCase,
+        adjustGoalProgressForReviewCorrectionUseCase = adjustGoalProgressForReviewCorrectionUseCase
     )
 
     @Test
@@ -90,6 +93,66 @@ class SavePaydayReviewUseCaseTest {
         assertEquals(BigDecimal("300.00"), result.plannedGoalContribution)
     }
 
+    @Test
+    fun `updates today's review and adjusts goal progress by contribution delta`() = runTest {
+        val existingReview = ManualReview(
+            actualFlexibleSpend = BigDecimal("120"),
+            actualGoalContribution = BigDecimal("80"),
+            plannedFlexibleSpend = BigDecimal("300"),
+            plannedGoalContribution = BigDecimal("300")
+        )
+        plannerRepository.seedReview(existingReview)
+
+        val result = useCase.execute(
+            plan = plan(),
+            leftInSpendingPot = BigDecimal("150"),
+            movedToGoal = BigDecimal("125")
+        )
+
+        assertEquals(existingReview.id, result.review.id)
+        assertEquals(0, BigDecimal("150").compareTo(result.review.actualFlexibleSpend))
+        assertEquals(BigDecimal("300"), result.review.plannedFlexibleSpend)
+        assertEquals(BigDecimal("300"), result.review.plannedGoalContribution)
+        assertEquals(result.review, plannerRepository.savedReviews.single())
+        coVerify(exactly = 0) { updateGoalProgressUseCase.execute(BigDecimal("125")) }
+        coVerify(exactly = 1) {
+            adjustGoalProgressForReviewCorrectionUseCase.execute(BigDecimal("45"))
+        }
+    }
+
+    @Test
+    fun `updates today's review even when stored history is not ordered`() = runTest {
+        val todaysReview = ManualReview(
+            id = "today",
+            actualFlexibleSpend = BigDecimal("120"),
+            actualGoalContribution = BigDecimal("80"),
+            plannedFlexibleSpend = BigDecimal("300"),
+            plannedGoalContribution = BigDecimal("300")
+        )
+        val olderReviewAfterTodayInStorage = ManualReview(
+            id = "older",
+            actualFlexibleSpend = BigDecimal("200"),
+            actualGoalContribution = BigDecimal("200"),
+            plannedFlexibleSpend = BigDecimal("300"),
+            plannedGoalContribution = BigDecimal("300"),
+            createdAt = LocalDate.now().minusMonths(1),
+            paydayDate = LocalDate.now().minusMonths(1)
+        )
+        plannerRepository.seedReviews(listOf(todaysReview, olderReviewAfterTodayInStorage))
+
+        val result = useCase.execute(
+            plan = plan(),
+            leftInSpendingPot = BigDecimal("150"),
+            movedToGoal = BigDecimal("125")
+        )
+
+        assertEquals("today", result.review.id)
+        assertEquals(2, plannerRepository.savedReviews.size)
+        coVerify(exactly = 1) {
+            adjustGoalProgressForReviewCorrectionUseCase.execute(BigDecimal("45"))
+        }
+    }
+
     private fun plan(): SalaryPlan = SalaryPlan(
         focus = PlanningFocus.SAVE_WITHOUT_STRESS,
         netIncomePerPayday = BigDecimal("1000"),
@@ -130,7 +193,19 @@ private class SaveReviewFakePlannerRepository : PlannerRepository {
         reviewsFlow.emit(reviewsFlow.value + review)
         latestReviewFlow.emit(review)
     }
-    override suspend fun updateReview(review: ManualReview) = saveReview(review)
+    override suspend fun updateReview(review: ManualReview) {
+        val updated = reviewsFlow.value.map { if (it.id == review.id) review else it }
+        reviewsFlow.emit(updated)
+        latestReviewFlow.emit(review)
+    }
+    fun seedReview(review: ManualReview) {
+        seedReviews(listOf(review))
+    }
+
+    fun seedReviews(reviews: List<ManualReview>) {
+        reviewsFlow.value = reviews
+        latestReviewFlow.value = reviews.lastOrNull()
+    }
     override suspend fun deleteReview(reviewId: String) {
         val updated = reviewsFlow.value.filterNot { it.id == reviewId }
         reviewsFlow.emit(updated)

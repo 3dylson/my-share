@@ -95,8 +95,12 @@
     <string name="home_coach_marks_next">Weiter</string>
     <string name="home_coach_marks_done">Fertig</string>
     <string name="home_review_streak_label">Aktueller Streak</string>
-    <string name="home_review_paycycle_consistency_label">Geprüfte Zahltage</string>
+    <string name="home_review_paycycle_consistency_label">Geprüfte Zahltage in Folge</string>
     <string name="home_review_paycycle_consistency_count">%1$d in Folge</string>
+    <plurals name="home_review_paycycle_consistency_count_quantity">
+        <item quantity="one">1 in Folge</item>
+        <item quantity="other">%1$d in Folge</item>
+    </plurals>
     <string name="more_app_name" translatable="false">My Share</string>
     <string name="goal_add_delete_confirm_title">Ziel löschen</string>
     <string name="goal_add_delete_confirm_msg">Sind Sie sicher, dass Sie diesen finanziellen Meilenstein entfernen möchten? Diese Aktion kann nicht rückgängig gemacht werden.</string>
@@ -339,12 +343,13 @@
     <string name="home_plan_metrics_title">Kernkennzahlen</string>
     <string name="home_plan_today_move_label">Zahltagsschritt</string>
     <string name="home_plan_today_move_title">Tu das am Zahltag</string>
+    <string name="home_plan_today_move_income">Einkommen</string>
     <string name="home_plan_today_move_priority">Zum Ziel verschieben</string>
     <string name="home_plan_today_move_weekly">Pro Woche behalten</string>
     <string name="home_plan_today_move_bills">Für Rechnungen schützen</string>
     <string name="home_plan_label_income">Einkommen pro Zahltag</string>
     <string name="home_plan_label_weekly">Wöchentlicher Führer</string>
-    <string name="home_plan_allocation_title">Zuordnungsvorschau</string>
+    <string name="home_plan_allocation_title">Wohin dieser Zahltag geht</string>
     <string name="home_plan_readiness_label">Zahltag-Bereitschaft</string>
     <string name="home_plan_readiness_title_ready">Bereit für den Zahltag</string>
     <string name="home_plan_readiness_title_almost_ready">Fast bereit</string>
@@ -364,8 +369,8 @@
     <string name="home_plan_payday_cue_body_keep_guide">Halte diesen Leitwert bereit, damit der Zahltag mit einem klaren Plan beginnt.</string>
     <string name="home_plan_payday_cue_body_review">Prüfe diesen Zahltag, solange die Zahlen noch frisch sind.</string>
     <string name="home_plan_payday_cue_body_review_premium">Prüfe diesen Zahltag, damit Premium den nächsten Schritt anpassen kann.</string>
-    <string name="home_plan_label_fixed">Behoben</string>
-    <string name="home_plan_label_flexible">Flexibel</string>
+    <string name="home_plan_label_fixed">Rechnungen</string>
+    <string name="home_plan_label_flexible">Ausgaben</string>
     <string name="home_plan_label_investing">Investieren</string>
     <string name="home_plan_smart_preview_label">Gesperrte Premium-Vorschau</string>
     <string name="home_plan_smart_preview_title">Was Premium als Nächstes anpassen würde</string>
@@ -374,20 +379,21 @@
     <string name="home_plan_smart_preview_free_body">Du aktualisierst diese Aufteilung selbst.</string>
     <string name="home_plan_smart_preview_premium_label">Abo</string>
     <string name="home_plan_smart_preview_premium_body">Einmal prüfen, nächste Änderung sehen.</string>
-    <string name="home_plan_smart_preview_action">Adaptive Anpassung ansehen</string>
+    <string name="home_plan_smart_preview_action">Nächsten Schritt ansehen</string>
     <string name="home_plan_premium_brief_label">Premium arbeitet</string>
+    <string name="home_plan_premium_brief_label_paused">Premium bereit</string>
     <string name="home_plan_premium_brief_title_active">Premium beobachtet diesen Plan</string>
-    <string name="home_plan_premium_brief_title_paused">Premium ist bereit, wenn du es bist</string>
+    <string name="home_plan_premium_brief_title_paused">Premium kann den nächsten Zahltag führen</string>
     <string name="home_plan_premium_brief_body_pending">Premium hat einen nächsten Leitwert von %1$s für Ausgaben und %2$s für deinen Prioritätsschritt gefunden. Prüfe ihn, bevor sich etwas ändert.</string>
     <string name="home_plan_premium_brief_body_steady">Dein Wochenleitwert von %1$s und der Prioritätsschritt von %2$s wirken weiter passend.</string>
-    <string name="home_plan_premium_brief_body_paused">Schalte die Überwachung in Mehr ein, um nach jeder Prüfung den nächsten Schritt zu sehen.</string>
-    <string name="home_plan_premium_brief_body_waiting">Premium hält deinen Wochenrahmen von %1$s und deinen Prioritätsschritt von %2$s bereit. Nach dem ersten Check-in zeigt es, was sich ändern sollte.</string>
+    <string name="home_plan_premium_brief_body_paused">Schalte die Überwachung ein, um nach jeder Prüfung zu sehen, ob der Prioritätsschritt gleich bleibt, sinkt oder steigt.</string>
+    <string name="home_plan_premium_brief_body_waiting">Nach der ersten Prüfung zeigt Premium, ob der Prioritätsschritt von %2$s gleich bleibt, sinkt oder steigt, während der Wochenleitwert von %1$s geschützt bleibt.</string>
     <string name="home_plan_premium_brief_checkin_label">Nächste Prüfung</string>
     <string name="home_plan_premium_brief_checkin_waiting">Nach dem Zahltag</string>
     <string name="home_plan_premium_brief_watch_label">Planüberwachung</string>
     <string name="home_plan_premium_brief_watch_active">Ein</string>
     <string name="home_plan_premium_brief_watch_paused">Pausiert</string>
-    <string name="home_plan_premium_brief_action">Überwachung einschalten</string>
+    <string name="home_plan_premium_brief_action">Überwachung verwalten</string>
     <string name="home_strategy_goals_title">Finanzielle Ziele</string>
     <string name="home_strategy_workspace_title">Strategie-Arbeitsbereich</string>
     <string name="home_strategy_workspace_body">Beginnen Sie mit einem Meilenstein und einer Zahltagregel. Sie können beides verfeinern, wenn Ihr Geldrhythmus klarer wird.</string>
@@ -424,13 +430,13 @@
         <item quantity="other">%1$d zusätzliche Premium-Ziele gesperrt</item>
     </plurals>
     <string name="home_strategy_goal_locked_hidden_desc">Deine gespeicherten Ziele bleiben sicher. Premium entsperrt die gesamte Liste und teilt Zahltagsschritte auf sie auf.</string>
-    <string name="home_strategy_rules_title">Automatisierte Regeln</string>
+    <string name="home_strategy_rules_title">Zahltagregeln</string>
     <string name="home_strategy_rule_empty_title">Erstellen Sie eine Regel</string>
-    <string name="home_strategy_rule_empty_desc">Automatisieren Sie eine Zahltagzuweisung.</string>
+    <string name="home_strategy_rule_empty_desc">Wähle, wohin ein Teil jedes Zahltags gehen soll.</string>
     <string name="home_strategy_rule_add_title">Fügen Sie eine weitere Regel hinzu</string>
-    <string name="home_strategy_rule_add_desc_free">Erstellen Sie eine automatisierte Übertragungsregel.</string>
+    <string name="home_strategy_rule_add_desc_free">Füge eine weitere Zahltagaufteilung hinzu.</string>
     <string name="home_strategy_rule_mix_title">Regeln am nächsten Zahltag</string>
-    <string name="home_strategy_rule_mix_body">Dein nächster Prioritätsschritt von %1$s folgt %2$d gespeicherten Regeln.</string>
+    <string name="home_strategy_rule_mix_body">Dein nächster Prioritätsschritt von %1$s folgt %2$d gespeicherten Prioritätsregeln.</string>
     <string name="home_strategy_rule_mix_total_label">Prioritätsschritt</string>
     <string name="home_strategy_rule_mix_item_body">%1$s - %2$s des Schritts</string>
     <string name="home_strategy_rule_mix_hidden_single">1 weitere Regel enthalten</string>
@@ -446,15 +452,15 @@
     <string name="home_strategy_rule_sheet_body">Alle %1$d Regeln bleiben an einem Ort, damit du siehst, wie jeder Zahltag aufgeteilt wird.</string>
     <string name="home_strategy_archive_sheet_close">Schließen</string>
     <string name="home_strategy_rule_card_subtitle">Regel für wiederkehrende Zahltage</string>
-    <string name="home_strategy_rule_static_badge">Statische manuelle Regel</string>
+    <string name="home_strategy_rule_static_badge">Manuelle Regel</string>
     <string name="home_strategy_rule_adjusted_badge">Nach Prüfung angepasst</string>
-    <string name="home_strategy_rule_preview_title">Aus einer Regel ein Zahltagsystem machen</string>
-    <string name="home_strategy_rule_preview_body">Premium kann die Regel %1$s nach jeder Prüfung mit Investieren, Schulden und Puffern koordinieren.</string>
+    <string name="home_strategy_rule_preview_title">Lass Prüfungen die nächste Aufteilung führen</string>
+    <string name="home_strategy_rule_preview_body">Premium nutzt jede Prüfung, um zu entscheiden, ob die Regel %1$s am nächsten Zahltag gleich bleibt, sinkt oder steigt.</string>
     <string name="home_strategy_rule_preview_free_label">Manuell</string>
     <string name="home_strategy_rule_preview_free_body">Eine statische wiederkehrende Regel</string>
-    <string name="home_strategy_rule_preview_premium_label">Adaptives Abo</string>
-    <string name="home_strategy_rule_preview_premium_body">Mehrere Regeln, die aus Prüfungen lernen</string>
-    <string name="home_strategy_rule_preview_action">Adaptive Regeln ansehen</string>
+    <string name="home_strategy_rule_preview_premium_label">Mit Premium</string>
+    <string name="home_strategy_rule_preview_premium_body">Nächste Aufteilung durch Prüfungen geführt</string>
+    <string name="home_strategy_rule_preview_action">Nächste Aufteilung ansehen</string>
     <string name="home_strategy_rule_locked_hidden_title">Gesperrte Premium-Regeln: %1$d</string>
     <plurals name="home_strategy_rule_locked_hidden_title_count">
         <item quantity="one">%1$d zusätzliche Premium-Regel gesperrt</item>
@@ -466,6 +472,10 @@
     <string name="home_review_score_percent">%1$d%%</string>
     <string name="home_review_streak_count">%1$d Tagessträhne</string>
     <string name="home_review_score_count">%1$s Bewertungen</string>
+    <plurals name="home_review_score_count_quantity">
+        <item quantity="one">1 Prüfung</item>
+        <item quantity="other">%1$d Prüfungen</item>
+    </plurals>
     <string name="home_review_savings_title">Überschüssige Einsparungen: %1$s</string>
     <string name="home_review_savings_desc">Insgesamt eingesparte flexible Ausgaben über die Bewertungen hinweg.</string>
     <string name="home_review_performance_locked_label">Gesperrter Premium-Trend</string>
@@ -513,6 +523,10 @@
     <string name="home_review_recommendation_next_priority">Nächster Schritt</string>
     <string name="home_review_recommendation_confidence">%1$d%% Vertrauen</string>
     <string name="home_review_recommendation_review_count">Basierend auf %1$d Prüfung(en)</string>
+    <plurals name="home_review_recommendation_review_count_quantity">
+        <item quantity="one">Basierend auf 1 Prüfung</item>
+        <item quantity="other">Basierend auf %1$d Prüfungen</item>
+    </plurals>
     <string name="paywall_recommendation_evidence_single">Basierend auf dieser Zahltagsprüfung. Speichere weitere Prüfungen, um den nächsten Schritt zu schärfen.</string>
     <string name="paywall_recommendation_evidence_multiple">Basierend auf deinen letzten %1$d Zahltagsprüfungen.</string>
     <string name="paywall_recommendation_move_title">Premium hat zusätzlichen Raum für Ziele gefunden</string>
@@ -529,6 +543,10 @@
     <string name="home_review_recommendation_confirm_flexible">Flexibler Leitwert</string>
     <string name="home_review_recommendation_confirm_priority">Prioritätsschritt</string>
     <string name="home_review_recommendation_confirm_evidence">%1$d%% Vertrauen aus %2$d aktuellen Prüfung(en).</string>
+    <plurals name="home_review_recommendation_confirm_evidence_count">
+        <item quantity="one">%1$d%% Vertrauen aus 1 aktueller Prüfung.</item>
+        <item quantity="other">%1$d%% Vertrauen aus %2$d aktuellen Prüfungen.</item>
+    </plurals>
     <string name="home_review_recommendation_applied_title">Anpassung angewendet</string>
     <string name="home_review_recommendation_applied_desc">Deine Regeln für den nächsten Zahltag entsprechen jetzt dieser Empfehlung. Prüfe die Regeln, wenn du eine Überweisung feinabstimmen möchtest.</string>
     <string name="home_review_recommendation_review_rules">Regeln prüfen</string>
@@ -550,7 +568,15 @@
     <string name="home_review_momentum_headline_streaking">Deine Check-in-Serie wirkt</string>
     <string name="home_review_momentum_body">Noch %1$d bis zu %2$d Check-ins. Mehr Check-ins helfen Premium, den nächsten Zahltag-Schritt früher zu erkennen.</string>
     <string name="home_review_momentum_reviews">%1$d Check-ins</string>
-    <string name="home_review_momentum_streak">%1$d-Tage-Serie</string>
+    <string name="home_review_momentum_streak">Im Plan: %1$d</string>
+    <plurals name="home_review_momentum_reviews_quantity">
+        <item quantity="one">1 Check-in</item>
+        <item quantity="other">%1$d Check-ins</item>
+    </plurals>
+    <plurals name="home_review_momentum_streak_quantity">
+        <item quantity="one">Im Plan: 1</item>
+        <item quantity="other">Im Plan: %1$d</item>
+    </plurals>
     <string name="home_review_momentum_next">Ziel: %1$d Check-ins</string>
     <string name="home_review_result_label">Premium-Check-in</string>
     <string name="home_review_result_title">Check-in gespeichert</string>
@@ -613,6 +639,7 @@
     <string name="home_review_edit_input_spent_exact">Aus flexiblem Geld ausgegeben</string>
     <string name="home_review_input_goal_exact">Zum Ziel verschoben</string>
     <string name="home_review_submit">Bewertung abgeben</string>
+    <string name="home_review_update">Bewertung aktualisieren</string>
     <string name="home_review_saved_feedback">Überprüfung gespeichert. Dein Zahltag-Bild ist aktualisiert.</string>
     <string name="home_review_history_title">Zahltag-Verlauf</string>
     <string name="home_review_empty_history_title">Noch keine Geschichte</string>
@@ -650,7 +677,7 @@
     <string name="home_more_routine_rules_label">Regeln</string>
     <string name="home_more_routine_reviews_label">Prüfungen</string>
     <string name="home_more_routine_not_set">Nicht festgelegt</string>
-    <string name="home_more_smart_adjustments_label">Smarte Anpassungen</string>
+    <string name="home_more_smart_adjustments_label">Nächster Zahltag</string>
     <string name="home_more_smart_adjustments_title">Premium-Prüfschleife</string>
     <string name="home_more_smart_adjustments_status_watching">Beobachtet</string>
     <string name="home_more_smart_adjustments_status_paused">Pausiert</string>
@@ -663,6 +690,10 @@
     <string name="home_more_smart_adjustments_signal">Hinweis</string>
     <string name="home_more_smart_adjustments_evidence">Nachweis</string>
     <string name="home_more_smart_adjustments_evidence_value">%1$d%% / %2$d Prüfung(en)</string>
+    <plurals name="home_more_smart_adjustments_evidence_value_quantity">
+        <item quantity="one">%1$d%% / 1 Prüfung</item>
+        <item quantity="other">%1$d%% / %2$d Prüfungen</item>
+    </plurals>
     <string name="home_more_smart_adjustments_evidence_waiting">Braucht Prüfungen</string>
     <string name="home_more_smart_adjustments_direction_move">Mehr verschieben</string>
     <string name="home_more_smart_adjustments_direction_restore">Puffer stärken</string>
@@ -701,7 +732,7 @@
     <string name="home_more_smart_checkin_ready_body">Speichere die heutige Prüfung, damit Premium echte Ergebnisse in die nächste Empfehlung umwandelt.</string>
     <string name="home_more_smart_checkin_overdue_body">Premium wartet auf den Check-in vom %1$s, bevor der nächste Zahltag angepasst werden kann.</string>
     <string name="home_more_smart_checkin_scheduled_body">Premium ist geplant, diesen Plan am %1$s erneut zu vergleichen.</string>
-    <string name="home_more_smart_checkin_reviewed_body">Der letzte Zahltag ist abgedeckt. Premium beobachtet wieder am %1$s.</string>
+    <string name="home_more_smart_checkin_reviewed_body">Der letzte Zahltag ist abgedeckt. Premium beobachtet wieder am %1$s</string>
     <string name="home_premium_checkin_relative_today">Heute fällig</string>
     <string name="home_premium_checkin_relative_tomorrow">Morgen</string>
     <string name="home_premium_checkin_relative_in_days">In %1$s Tagen</string>
@@ -903,7 +934,7 @@
     <string name="notification_action_moved_goal_money">Zielgeld verschoben</string>
     <string name="home_plan_next_payday">Nächster Zahltag: %1$s</string>
     <string name="home_goal_mission_accomplished">Mission erfüllt!</string>
-    <string name="home_goal_on_pace">Auf Tempo für %1$s</string>
+    <string name="home_goal_on_pace">Bei diesem Tempo bis %1$s</string>
     <string name="home_goal_no_trajectory">Füge diesem Ziel mehr hinzu, um ein Zieldatum zu sehen</string>
     <string name="home_goal_progress_label">%1$s von %2$s</string>
     <string name="home_goal_note_completed">Ziel erreicht. Starten Sie Ihre nächste Vision!</string>
