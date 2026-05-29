@@ -28,4 +28,8 @@
         <key>paywall_trial_framing</key>
         <value>first_checkin</value>
     </entry>
+    <entry>
+        <key>onboarding_intro_variant</key>
+        <value>plan_first</value>
+    </entry>
 </defaultsMap>

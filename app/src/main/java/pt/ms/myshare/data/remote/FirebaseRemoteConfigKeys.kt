@@ -8,4 +8,5 @@ object FirebaseRemoteConfigKeys {
     const val PREMIUM_PROOF_VARIANT = "premium_proof_variant"
     const val ONBOARDING_CONVERSION_EXPERIMENT = "onboarding_conversion_experiment"
     const val PAYWALL_TRIAL_FRAMING = "paywall_trial_framing"
+    const val ONBOARDING_INTRO_VARIANT = "onboarding_intro_variant"
 }

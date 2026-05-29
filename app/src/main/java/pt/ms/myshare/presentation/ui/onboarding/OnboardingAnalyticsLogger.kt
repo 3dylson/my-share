@@ -11,10 +11,22 @@ import javax.inject.Inject
 
 class OnboardingAnalyticsLogger @Inject constructor() {
 
-    fun logStarted(pricingStrategy: PricingStrategy, preferences: UserPreferences) {
+    fun logStarted(
+        pricingStrategy: PricingStrategy,
+        preferences: UserPreferences,
+        onboardingPaywallVariant: String,
+        onboardingExperiment: String,
+        paywallTrialFraming: String,
+        onboardingIntroVariant: String
+    ) {
         FirebaseUtils.logEvent("onboarding_started", Bundle().apply {
             putString("price_cluster", pricingStrategy.marketCluster)
             putString("language", preferences.locale.language)
+            putString("onboarding_paywall_variant", onboardingPaywallVariant)
+            putString("onboarding_experiment", onboardingExperiment)
+            putString("paywall_trial_framing", paywallTrialFraming)
+            putString("onboarding_intro_variant", onboardingIntroVariant)
+            putString("premium_value_frame", "payday_cycle_proof")
         })
     }
 
@@ -23,9 +35,26 @@ class OnboardingAnalyticsLogger @Inject constructor() {
         stepIndex: Int,
         setupStepTotal: Int,
         focus: PlanningFocus,
-        pricingStrategy: PricingStrategy?
+        pricingStrategy: PricingStrategy?,
+        onboardingPaywallVariant: String,
+        onboardingExperiment: String,
+        paywallTrialFraming: String,
+        onboardingIntroVariant: String
     ) {
-        FirebaseUtils.logEvent("onboarding_step_viewed", stepBundle(route, stepIndex, setupStepTotal, focus, pricingStrategy))
+        FirebaseUtils.logEvent(
+            "onboarding_step_viewed",
+            stepBundle(
+                route = route,
+                stepIndex = stepIndex,
+                setupStepTotal = setupStepTotal,
+                focus = focus,
+                pricingStrategy = pricingStrategy,
+                onboardingPaywallVariant = onboardingPaywallVariant,
+                onboardingExperiment = onboardingExperiment,
+                paywallTrialFraming = paywallTrialFraming,
+                onboardingIntroVariant = onboardingIntroVariant
+            )
+        )
         Timber.tag(TAG).d("Onboarding step viewed route=%s step=%d/%d", route, stepIndex, setupStepTotal)
     }
 
@@ -34,9 +63,26 @@ class OnboardingAnalyticsLogger @Inject constructor() {
         stepIndex: Int,
         setupStepTotal: Int,
         focus: PlanningFocus,
-        pricingStrategy: PricingStrategy?
+        pricingStrategy: PricingStrategy?,
+        onboardingPaywallVariant: String,
+        onboardingExperiment: String,
+        paywallTrialFraming: String,
+        onboardingIntroVariant: String
     ) {
-        FirebaseUtils.logEvent("onboarding_step_completed", stepBundle(route, stepIndex, setupStepTotal, focus, pricingStrategy))
+        FirebaseUtils.logEvent(
+            "onboarding_step_completed",
+            stepBundle(
+                route = route,
+                stepIndex = stepIndex,
+                setupStepTotal = setupStepTotal,
+                focus = focus,
+                pricingStrategy = pricingStrategy,
+                onboardingPaywallVariant = onboardingPaywallVariant,
+                onboardingExperiment = onboardingExperiment,
+                paywallTrialFraming = paywallTrialFraming,
+                onboardingIntroVariant = onboardingIntroVariant
+            )
+        )
         Timber.tag(TAG).d("Onboarding step completed route=%s step=%d/%d", route, stepIndex, setupStepTotal)
     }
 
@@ -44,13 +90,17 @@ class OnboardingAnalyticsLogger @Inject constructor() {
         focus: PlanningFocus,
         pricingStrategy: PricingStrategy?,
         onboardingExperiment: String? = null,
-        paywallTrialFraming: String? = null
+        paywallTrialFraming: String? = null,
+        onboardingIntroVariant: String? = null,
+        timeToFirstValueMillis: Long? = null
     ) {
         FirebaseUtils.logEvent("onboarding_activation_reached", Bundle().apply {
             putString("selected_focus", focus.analyticsName())
             putString("price_cluster", pricingStrategy?.marketCluster)
             onboardingExperiment?.let { putString("onboarding_experiment", it) }
             paywallTrialFraming?.let { putString("paywall_trial_framing", it) }
+            onboardingIntroVariant?.let { putString("onboarding_intro_variant", it) }
+            timeToFirstValueMillis?.let { putLong("time_to_first_value_ms", it) }
             putString("premium_value_frame", "payday_cycle_proof")
         })
         Timber.tag(TAG).d("Onboarding activation reached focus=%s", focus.analyticsName())
@@ -77,6 +127,32 @@ class OnboardingAnalyticsLogger @Inject constructor() {
         })
     }
 
+    fun logTrajectoryViewed(
+        focus: PlanningFocus,
+        pricingStrategy: PricingStrategy?,
+        onboardingPaywallVariant: String,
+        onboardingExperiment: String,
+        paywallTrialFraming: String,
+        onboardingIntroVariant: String
+    ) {
+        FirebaseUtils.logEvent("trajectory_viewed", Bundle().apply {
+            putString("selected_focus", focus.analyticsName())
+            putString("price_cluster", pricingStrategy?.marketCluster)
+            putString("onboarding_paywall_variant", onboardingPaywallVariant)
+            putString("onboarding_experiment", onboardingExperiment)
+            putString("paywall_trial_framing", paywallTrialFraming)
+            putString("onboarding_intro_variant", onboardingIntroVariant)
+            putString("premium_value_frame", "payday_cycle_proof")
+            putString("decision_frame", "fixed_vs_adaptive")
+        })
+        Timber.tag(TAG).d(
+            "Onboarding trajectory viewed focus=%s experiment=%s trialFraming=%s",
+            focus.analyticsName(),
+            onboardingExperiment,
+            paywallTrialFraming
+        )
+    }
+
     fun logSignupMode(mode: String, focus: PlanningFocus, pricingStrategy: PricingStrategy?) {
         FirebaseUtils.logEvent("onboarding_signup_mode_selected", Bundle().apply {
             putString("signup_mode", mode)
@@ -90,13 +166,22 @@ class OnboardingAnalyticsLogger @Inject constructor() {
         stepIndex: Int,
         setupStepTotal: Int,
         focus: PlanningFocus,
-        pricingStrategy: PricingStrategy?
+        pricingStrategy: PricingStrategy?,
+        onboardingPaywallVariant: String,
+        onboardingExperiment: String,
+        paywallTrialFraming: String,
+        onboardingIntroVariant: String
     ): Bundle = Bundle().apply {
         putString("route", route)
         putInt("step_index", stepIndex)
         putInt("setup_step_total", setupStepTotal)
         putString("selected_focus", focus.analyticsName())
         putString("price_cluster", pricingStrategy?.marketCluster)
+        putString("onboarding_paywall_variant", onboardingPaywallVariant)
+        putString("onboarding_experiment", onboardingExperiment)
+        putString("paywall_trial_framing", paywallTrialFraming)
+        putString("onboarding_intro_variant", onboardingIntroVariant)
+        putString("premium_value_frame", "payday_cycle_proof")
     }
 
     private fun PlanningFocus.analyticsName(): String = name.lowercase(Locale.US)

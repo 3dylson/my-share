@@ -61,9 +61,13 @@ class FirebaseProductConfigRepository @Inject constructor(
             FirebaseUtils.setCrashlyticsKey("remote_config_paywall_default", updated.paywallDefaultPlan.name)
             FirebaseUtils.setCrashlyticsKey("remote_config_founder_offer", updated.founderOfferEnabled)
             FirebaseUtils.setCrashlyticsKey("remote_config_onboarding_experiment", updated.onboardingConversionExperiment)
+            FirebaseUtils.setCrashlyticsKey("remote_config_onboarding_paywall", updated.onboardingPaywallVariant.remoteValue)
+            FirebaseUtils.setCrashlyticsKey("remote_config_trial_framing", updated.paywallTrialFraming.remoteValue)
+            FirebaseUtils.setCrashlyticsKey("remote_config_onboarding_intro", updated.onboardingIntroVariant.remoteValue)
             FirebaseUtils.setUserProperty("paywall_default_plan", updated.paywallDefaultPlan.name.lowercase())
             FirebaseUtils.setUserProperty("onboarding_exp", updated.onboardingConversionExperiment)
             FirebaseUtils.setUserProperty("trial_framing", updated.paywallTrialFraming.remoteValue)
+            FirebaseUtils.setUserProperty("onboarding_intro_variant", updated.onboardingIntroVariant.remoteValue)
             FirebaseUtils.logEvent(
                 "remote_config_refreshed",
                 android.os.Bundle().apply {
@@ -72,6 +76,7 @@ class FirebaseProductConfigRepository @Inject constructor(
                     putString("premium_proof_variant", updated.premiumProofVariant.remoteValue)
                     putString("onboarding_experiment", updated.onboardingConversionExperiment)
                     putString("paywall_trial_framing", updated.paywallTrialFraming.remoteValue)
+                    putString("onboarding_intro_variant", updated.onboardingIntroVariant.remoteValue)
                     putString("source", if (activated) "activated" else "cached")
                 }
             )
@@ -96,7 +101,8 @@ class FirebaseProductConfigRepository @Inject constructor(
             premiumRemindersEnabled = getBoolean(FirebaseRemoteConfigKeys.PREMIUM_REMINDERS_ENABLED),
             premiumProofVariant = getString(FirebaseRemoteConfigKeys.PREMIUM_PROOF_VARIANT),
             onboardingConversionExperiment = getString(FirebaseRemoteConfigKeys.ONBOARDING_CONVERSION_EXPERIMENT),
-            paywallTrialFraming = getString(FirebaseRemoteConfigKeys.PAYWALL_TRIAL_FRAMING)
+            paywallTrialFraming = getString(FirebaseRemoteConfigKeys.PAYWALL_TRIAL_FRAMING),
+            onboardingIntroVariant = getString(FirebaseRemoteConfigKeys.ONBOARDING_INTRO_VARIANT)
         )
     }
 

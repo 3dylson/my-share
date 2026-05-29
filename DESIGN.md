@@ -913,12 +913,13 @@ This flow is the default source of truth for first-session UX.
 2. Intent selection
 3. Salary + cadence
 4. Fixed obligations
-5. Allocation priorities
-6. Immediate plan preview
-7. Signup to save
-8. Deeper plan / trajectory view
-9. Paywall
-10. Notification permission only after reminder intent
+5. Immediate plan preview from the user's own numbers
+6. Optional allocation tuning from the plan preview
+7. Fixed free plan versus adaptive Premium bridge
+8. Paywall earned by the user's plan and next-payday adaptation promise
+9. Reminder setup after the plan and Premium choice are clear
+
+Account protection is contextual, not a blocking onboarding step. Ask for it only when it protects a real entitlement or saved state.
 
 ### Hard rules
 - No bank sync before first plan preview
@@ -1078,20 +1079,37 @@ Rules:
 
 The design system must leave room for instrumentation of key product events.
 
-Required events to support visibly and structurally:
-- onboarding started
-- onboarding completed
-- first plan created
-- first goal added
-- reminder enabled
-- weekly review completed
-- paywall viewed
-- monthly selected
-- annual selected
-- subscription started
-- second session within 7 days
+Required Firebase events to support visibly and structurally:
+- `onboarding_started`
+- `onboarding_step_viewed`
+- `onboarding_step_completed`
+- `create_plan_completed`
+- `onboarding_activation_reached`
+- `trajectory_viewed`
+- `paywall_viewed`
+- `paywall_plan_selected`
+- `purchase_started`
+- `purchase_completed`
+- `purchase_canceled`
+- `purchase_failed`
+- `onboarding_free_plan_selected`
+- `reminder_enabled`
+- `reminder_skipped`
+- `onboarding_completed`
+- `review_completed`
+- second-session and Day 7 retention cohorts
 
 The UI should make these moments legible and intentional.
+
+Onboarding conversion events must carry low-cardinality attribution when available:
+- `onboarding_paywall_variant`
+- `onboarding_experiment`
+- `paywall_trial_framing`
+- `onboarding_intro_variant`
+- `premium_value_frame`
+- `price_cluster`
+- `billing_plan` for paywall and purchase events
+- `time_to_first_value_ms` on `onboarding_activation_reached`
 
 ---
 

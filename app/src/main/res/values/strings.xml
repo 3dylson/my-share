@@ -26,14 +26,23 @@
     <string name="id_amount_for_savings" translatable="false">amount_for_savings</string>
     <!-- Welcome Screen -->
     <string name="onboarding_welcome_title">Plan payday\nbefore you spend</string>
-    <string name="onboarding_welcome_subtitle">Add what comes in, what must go out, and one goal. My Share turns it into a simple payday checklist.</string>
-    <string name="onboarding_welcome_badge">Your first payday checklist</string>
+    <string name="onboarding_welcome_subtitle">Answer three things. Get a payday plan you can use today.</string>
+    <string name="onboarding_welcome_badge">First win</string>
     <string name="onboarding_welcome_outcome_payday_title">Set bills aside first</string>
-    <string name="onboarding_welcome_outcome_payday_body">Know the amount to keep untouched before daily spending starts.</string>
+    <string name="onboarding_welcome_outcome_payday_body">Know what stays untouched.</string>
     <string name="onboarding_welcome_outcome_weekly_title">Keep the week clear</string>
-    <string name="onboarding_welcome_outcome_weekly_body">See a weekly spending number that is easier to follow.</string>
+    <string name="onboarding_welcome_outcome_weekly_body">Get one weekly spending number.</string>
     <string name="onboarding_welcome_outcome_trust_title">Move money to one goal</string>
-    <string name="onboarding_welcome_outcome_trust_body">Start manually, without a bank connection, and keep Premium for later.</string>
+    <string name="onboarding_welcome_outcome_trust_body">Start without connecting a bank.</string>
+    <string name="onboarding_welcome_spend_clarity_title">Know what you can spend\nbefore you spend</string>
+    <string name="onboarding_welcome_spend_clarity_subtitle">Enter payday, bills, and one goal. My Share shows the safe weekly number.</string>
+    <string name="onboarding_welcome_spend_clarity_badge">First answer</string>
+    <string name="onboarding_welcome_spend_clarity_outcome_payday_title">Bills stay protected</string>
+    <string name="onboarding_welcome_spend_clarity_outcome_payday_body">Set essentials aside first.</string>
+    <string name="onboarding_welcome_spend_clarity_outcome_weekly_title">One weekly number</string>
+    <string name="onboarding_welcome_spend_clarity_outcome_weekly_body">See what is safe to spend.</string>
+    <string name="onboarding_welcome_spend_clarity_outcome_trust_title">No bank link needed</string>
+    <string name="onboarding_welcome_spend_clarity_outcome_trust_body">Start manually today.</string>
     <string name="onboarding_welcome_flow_income">Income</string>
     <string name="onboarding_welcome_flow_bills">Bills</string>
     <string name="onboarding_welcome_flow_weekly">Weekly</string>
@@ -69,24 +78,30 @@
     <string name="onboarding_priorities_subtitle">You have %1$s after essentials. Choose the split for today’s plan.</string>
 
     <!-- Trajectory Screen -->
-    <string name="onboarding_trajectory_title">Your payday plan is ready</string>
-    <string name="onboarding_trajectory_subtitle">Premium can keep improving it after each quick review.</string>
+    <string name="onboarding_trajectory_title">Keep this plan fixed or adaptive?</string>
+    <string name="onboarding_trajectory_subtitle">Free keeps today’s split. Premium adjusts the next payday after a quick review.</string>
     <string name="onboarding_trajectory_goal_subtitle">At this pace, \"%1$s\" has a clear path.</string>
-    <string name="onboarding_trajectory_footer">Keep this plan free, or let Premium guide the next move after each review.</string>
-    <string name="onboarding_trajectory_button">See my Premium plan</string>
-    <string name="onboarding_trajectory_free_button">Keep free plan</string>
-    <string name="onboarding_trajectory_premium_bridge_label">Premium preview</string>
-    <string name="onboarding_trajectory_premium_bridge_title">Turn reviews into the next move</string>
-    <string name="onboarding_trajectory_premium_bridge_body">Premium watches your %1$s weekly guide and shows whether %2$s toward %3$s should change next payday.</string>
-    <string name="onboarding_trajectory_premium_bridge_body_without_priority">Premium watches your %1$s weekly guide and shows what to tighten or relax next payday.</string>
-    <string name="onboarding_trajectory_adjustment_label">Premium next move</string>
-    <string name="onboarding_trajectory_adjustment_title">A small review can change the next payday</string>
+    <string name="onboarding_trajectory_footer">You can change this later from Home.</string>
+    <string name="onboarding_trajectory_button">Make next payday adaptive</string>
+    <string name="onboarding_trajectory_free_button">Continue fixed for free</string>
+    <string name="onboarding_trajectory_premium_bridge_label">Adaptive plan</string>
+    <string name="onboarding_trajectory_premium_bridge_title">How Premium stays useful</string>
+    <string name="onboarding_trajectory_premium_bridge_body">If %1$s is left over, Premium can suggest moving it to %2$s while keeping %3$s/week safe.</string>
+    <string name="onboarding_trajectory_premium_bridge_body_without_priority">If %1$s is left over, Premium shows whether to tighten or relax while keeping %2$s/week safe.</string>
+    <string name="onboarding_trajectory_timeline_today_title">Today</string>
+    <string name="onboarding_trajectory_timeline_today_body">Use the split you just built.</string>
+    <string name="onboarding_trajectory_timeline_review_title">Review</string>
+    <string name="onboarding_trajectory_timeline_review_body">Save what was left in seconds.</string>
+    <string name="onboarding_trajectory_timeline_next_title">Next payday</string>
+    <string name="onboarding_trajectory_timeline_next_body">Get the safer adjustment.</string>
+    <string name="onboarding_trajectory_adjustment_label">Choose your plan</string>
+    <string name="onboarding_trajectory_adjustment_title">The difference is what happens when life changes</string>
     <string name="onboarding_trajectory_adjustment_body">If your review shows %1$s unused, Premium can remember that pattern and suggest moving it to %2$s while keeping your %3$s weekly guide safe.</string>
     <string name="onboarding_trajectory_adjustment_body_without_priority">If your review shows %1$s unused, Premium can remember that pattern and show what to tighten or relax while keeping your %2$s weekly guide safe.</string>
-    <string name="onboarding_trajectory_adjustment_free_label">Manual plan</string>
-    <string name="onboarding_trajectory_adjustment_free_body">Keep today’s split until you change it.</string>
-    <string name="onboarding_trajectory_adjustment_premium_label">Premium</string>
-    <string name="onboarding_trajectory_adjustment_premium_body">Use each review to choose the next move.</string>
+    <string name="onboarding_trajectory_adjustment_free_label">Fixed free</string>
+    <string name="onboarding_trajectory_adjustment_free_body">You adjust it manually.</string>
+    <string name="onboarding_trajectory_adjustment_premium_label">Adaptive Premium</string>
+    <string name="onboarding_trajectory_adjustment_premium_body">Reviews suggest next payday.</string>
 
     <!-- Bank Sync Screen -->
 
@@ -188,7 +203,7 @@
 
     <!-- Onboarding: Plan Preview -->
     <string name="onboarding_plan_preview_title">Your payday plan is ready</string>
-    <string name="onboarding_plan_preview_subtitle">When money arrives on %1$s, these are the moves to make.</string>
+    <string name="onboarding_plan_preview_subtitle">When money arrives on %1$s, use this split before spending.</string>
     <string name="onboarding_plan_preview_unlock_label">Your first win</string>
     <string name="onboarding_plan_preview_weekly_safe_title">Spend up to %1$s per week</string>
     <string name="onboarding_plan_preview_reveal_body">Protect %1$s for bills, move %2$s toward %3$s, then spend from the weekly guide.</string>

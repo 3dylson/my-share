@@ -31,6 +31,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
         composable(OnboardingRoute.Welcome.route) {
             WelcomeScreen(
                 userPreferences = state.userPreferences,
+                introVariant = state.onboardingIntroVariant,
                 onLanguageSelected = viewModel::updateLanguage,
                 onCurrencySelected = viewModel::updateCurrency,
                 onContinue = { navController.navigate(OnboardingRoute.GoalPicker.route) },
@@ -140,7 +141,6 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                 PlanPreviewScreen(
                     preview = preview,
                     goalName = state.goalName,
-                    goalAmount = state.goalAmount,
                     userPreferences = state.userPreferences,
                     onTuneAllocation = {
                         viewModel.logAllocationTuneStarted()
@@ -148,7 +148,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                     },
                     onContinue = {
                         viewModel.logSetupStepCompleted(OnboardingRoute.PlanPreview, 4)
-                        navController.navigate(OnboardingRoute.Signup.route)
+                        navController.navigate(OnboardingRoute.Trajectory.route)
                     }
                 )
             }
@@ -176,7 +176,6 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                 goalName = state.goalName,
                 userPreferences = state.userPreferences,
                 onNext = {
-                    viewModel.logPaywallViewed()
                     navController.navigate(OnboardingRoute.Paywall.route)
                 },
                 onContinueFree = {
@@ -188,6 +187,8 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
         composable(OnboardingRoute.Paywall.route) {
             val pricing = state.pricingStrategy
             val isPremium = state.isPremium
+
+            LaunchedEffect(Unit) { viewModel.logPaywallViewed() }
             
             LaunchedEffect(isPremium, state.shouldSecurePremiumAccess) {
                 if (isPremium && !state.shouldSecurePremiumAccess) {

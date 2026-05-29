@@ -389,9 +389,51 @@ class OnboardingViewModelTest {
         viewModel.logActivationReached()
         viewModel.logActivationReached()
 
-        verify { onboardingAnalyticsLogger.logStepViewed("goal_picker", 1, OnboardingViewModel.SETUP_STEP_TOTAL, any(), any()) }
-        verify { onboardingAnalyticsLogger.logStepCompleted("goal_picker", 1, OnboardingViewModel.SETUP_STEP_TOTAL, any(), any()) }
-        verify(exactly = 1) { onboardingAnalyticsLogger.logActivationReached(any(), any(), any(), any()) }
+        verify {
+            onboardingAnalyticsLogger.logStepViewed(
+                "goal_picker",
+                1,
+                OnboardingViewModel.SETUP_STEP_TOTAL,
+                any(),
+                any(),
+                ProductExperienceConfig.DEFAULT_ONBOARDING_PAYWALL_VARIANT,
+                ProductExperienceConfig.DEFAULT_ONBOARDING_CONVERSION_EXPERIMENT,
+                "first_checkin",
+                ProductExperienceConfig.DEFAULT_ONBOARDING_INTRO_VARIANT
+            )
+        }
+        verify {
+            onboardingAnalyticsLogger.logStepCompleted(
+                "goal_picker",
+                1,
+                OnboardingViewModel.SETUP_STEP_TOTAL,
+                any(),
+                any(),
+                ProductExperienceConfig.DEFAULT_ONBOARDING_PAYWALL_VARIANT,
+                ProductExperienceConfig.DEFAULT_ONBOARDING_CONVERSION_EXPERIMENT,
+                "first_checkin",
+                ProductExperienceConfig.DEFAULT_ONBOARDING_INTRO_VARIANT
+            )
+        }
+        verify(exactly = 1) { onboardingAnalyticsLogger.logActivationReached(any(), any(), any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `trajectory analytics carries experiment assignment`() = runTest {
+        advanceUntilIdle()
+
+        viewModel.logTrajectoryViewed()
+
+        verify {
+            onboardingAnalyticsLogger.logTrajectoryViewed(
+                focus = any(),
+                pricingStrategy = any(),
+                onboardingPaywallVariant = ProductExperienceConfig.DEFAULT_ONBOARDING_PAYWALL_VARIANT,
+                onboardingExperiment = ProductExperienceConfig.DEFAULT_ONBOARDING_CONVERSION_EXPERIMENT,
+                paywallTrialFraming = "first_checkin",
+                onboardingIntroVariant = ProductExperienceConfig.DEFAULT_ONBOARDING_INTRO_VARIANT
+            )
+        }
     }
 
     @Test

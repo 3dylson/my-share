@@ -19,6 +19,7 @@ import kotlinx.coroutines.delay
 import pt.ms.myshare.R
 import pt.ms.myshare.presentation.ui.components.KeyboardDismissEffect
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
+import timber.log.Timber
 
 @Composable
 fun BuildingPlanScreen(onBuilt: () -> Unit) {
@@ -26,20 +27,32 @@ fun BuildingPlanScreen(onBuilt: () -> Unit) {
     var step2Visible by remember { mutableStateOf(false) }
     var step3Visible by remember { mutableStateOf(false) }
     var progress by remember { mutableStateOf(0f) }
+    val motionEnabled = rememberOnboardingMotionEnabled()
 
     KeyboardDismissEffect()
 
-    LaunchedEffect(Unit) {
-        delay(400)
+    LaunchedEffect(motionEnabled) {
+        if (!motionEnabled) {
+            step1Visible = true
+            step2Visible = true
+            step3Visible = true
+            progress = 1.0f
+            Timber.d("Building plan skipped motion because animator duration scale is disabled")
+            onBuilt()
+            return@LaunchedEffect
+        }
+
+        delay(OnboardingMotionSpec.BUILDING_STEP_DELAY_MILLIS)
         step1Visible = true
         progress = 0.33f
-        delay(700)
+        delay(OnboardingMotionSpec.BUILDING_STEP_DELAY_MILLIS)
         step2Visible = true
         progress = 0.66f
-        delay(700)
+        delay(OnboardingMotionSpec.BUILDING_STEP_DELAY_MILLIS)
         step3Visible = true
         progress = 1.0f
-        delay(1200)
+        delay(OnboardingMotionSpec.BUILDING_COMPLETE_DELAY_MILLIS)
+        Timber.d("Building plan motion completed")
         onBuilt()
     }
 
@@ -83,38 +96,64 @@ fun BuildingPlanScreen(onBuilt: () -> Unit) {
             Spacer(modifier = Modifier.height(32.dp))
             
             Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
-                AnimatedStep(visible = step1Visible, text = stringResource(R.string.onboarding_building_step_goals))
-                AnimatedStep(visible = step2Visible, text = stringResource(R.string.onboarding_building_step_costs))
-                AnimatedStep(visible = step3Visible, text = stringResource(R.string.onboarding_building_step_savings))
+                AnimatedStep(
+                    visible = step1Visible,
+                    motionEnabled = motionEnabled,
+                    text = stringResource(R.string.onboarding_building_step_goals)
+                )
+                AnimatedStep(
+                    visible = step2Visible,
+                    motionEnabled = motionEnabled,
+                    text = stringResource(R.string.onboarding_building_step_costs)
+                )
+                AnimatedStep(
+                    visible = step3Visible,
+                    motionEnabled = motionEnabled,
+                    text = stringResource(R.string.onboarding_building_step_savings)
+                )
             }
         }
     }
 }
 
 @Composable
-private fun AnimatedStep(visible: Boolean, text: String) {
+private fun AnimatedStep(
+    visible: Boolean,
+    motionEnabled: Boolean,
+    text: String
+) {
+    if (!motionEnabled) {
+        if (visible) BuildingStep(text = text)
+        return
+    }
     AnimatedVisibility(
         visible = visible,
-        enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { 20 }
+        enter = fadeIn(tween(OnboardingMotionSpec.TRAJECTORY_REVEAL_DURATION_MILLIS)) +
+            slideInVertically(tween(OnboardingMotionSpec.TRAJECTORY_REVEAL_DURATION_MILLIS)) { 20 }
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Icon(
-                imageVector = Icons.Default.CheckCircle,
-                contentDescription = null,
-                tint = MySharePrimary,
-                modifier = Modifier.size(28.dp)
-            )
-            Spacer(Modifier.width(20.dp))
-            Text(
-                text = text,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.weight(1f)
-            )
-        }
+        BuildingStep(text = text)
+    }
+}
+
+@Composable
+private fun BuildingStep(text: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Icon(
+            imageVector = Icons.Default.CheckCircle,
+            contentDescription = null,
+            tint = MySharePrimary,
+            modifier = Modifier.size(28.dp)
+        )
+        Spacer(Modifier.width(20.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f)
+        )
     }
 }

@@ -7,12 +7,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoGraph
@@ -28,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
@@ -37,6 +42,7 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import pt.ms.myshare.R
 
@@ -57,20 +63,27 @@ fun HomeCoachMarksOverlay(
         step.stepNumber,
         state.totalSteps
     )
+    val fontScale = LocalDensity.current.fontScale
+    val bottomNavHeight = if (fontScale >= 1.2f) 104.dp else 88.dp
     val bottomNavClearance = if (LocalDensity.current.fontScale >= 1.2f) 112.dp else 96.dp
 
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.42f))
-            .padding(start = 20.dp, end = 20.dp, top = 16.dp)
-            .padding(bottom = bottomNavClearance)
-            .navigationBarsPadding()
     ) {
+        CoachMarkScrim(
+            destination = step.destination,
+            bottomNavHeight = bottomNavHeight,
+            modifier = Modifier.fillMaxSize()
+        )
+
         Surface(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
+                .padding(start = 20.dp, end = 20.dp, top = 16.dp)
+                .padding(bottom = bottomNavClearance)
+                .navigationBarsPadding()
                 .semantics {
                     this.paneTitle = paneTitle
                     liveRegion = LiveRegionMode.Polite
@@ -82,11 +95,24 @@ fun HomeCoachMarksOverlay(
         ) {
             Column(
                 modifier = Modifier
-                    .heightIn(max = 360.dp)
+                    .heightIn(max = 388.dp)
                     .verticalScroll(rememberScrollState())
                     .padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = paneTitle,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+                    CoachMarkProgressRail(
+                        currentStep = step.stepNumber,
+                        totalSteps = state.totalSteps
+                    )
+                }
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -123,7 +149,8 @@ fun HomeCoachMarksOverlay(
                 Text(
                     text = stringResource(step.bodyRes),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = MaterialTheme.typography.bodyLarge.lineHeight
                 )
 
                 Row(
@@ -154,6 +181,70 @@ fun HomeCoachMarksOverlay(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun CoachMarkScrim(
+    destination: HomeDestination,
+    bottomNavHeight: Dp,
+    modifier: Modifier = Modifier
+) {
+    val scrimColor = Color.Black.copy(alpha = 0.42f)
+    Box(modifier = modifier) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = bottomNavHeight)
+                .background(scrimColor)
+        )
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .height(bottomNavHeight),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            HomeDestination.entries.forEach { tab ->
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .background(if (tab == destination) Color.Transparent else scrimColor)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CoachMarkProgressRail(
+    currentStep: Int,
+    totalSteps: Int
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        repeat(totalSteps) { index ->
+            val isActive = index < currentStep
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(5.dp)
+                    .clip(RoundedCornerShape(999.dp))
+                    .background(
+                        if (isActive) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.outline.copy(alpha = 0.22f)
+                        }
+                    )
+            )
+        }
+        Spacer(Modifier.width(2.dp))
     }
 }
 

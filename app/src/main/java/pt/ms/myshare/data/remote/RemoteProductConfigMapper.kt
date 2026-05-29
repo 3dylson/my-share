@@ -1,6 +1,7 @@
 package pt.ms.myshare.data.remote
 
 import pt.ms.myshare.domain.model.ProductExperienceConfig
+import pt.ms.myshare.domain.model.OnboardingIntroVariant
 import pt.ms.myshare.domain.model.OnboardingPaywallVariant
 import pt.ms.myshare.domain.model.PaywallTrialFraming
 import pt.ms.myshare.domain.model.PremiumProofVariant
@@ -16,7 +17,8 @@ object RemoteProductConfigMapper {
         premiumRemindersEnabled: Boolean,
         premiumProofVariant: String,
         onboardingConversionExperiment: String,
-        paywallTrialFraming: String
+        paywallTrialFraming: String,
+        onboardingIntroVariant: String
     ): ProductExperienceConfig {
         return ProductExperienceConfig(
             paywallDefaultPlan = paywallDefaultPlan.toRemoteBillingPlanDefault(),
@@ -25,7 +27,8 @@ object RemoteProductConfigMapper {
             premiumRemindersEnabled = premiumRemindersEnabled,
             premiumProofVariant = premiumProofVariant.toPremiumProofVariant(),
             onboardingConversionExperiment = onboardingConversionExperiment.toExperimentName(),
-            paywallTrialFraming = paywallTrialFraming.toPaywallTrialFraming()
+            paywallTrialFraming = paywallTrialFraming.toPaywallTrialFraming(),
+            onboardingIntroVariant = onboardingIntroVariant.toOnboardingIntroVariant()
         )
     }
 
@@ -53,6 +56,12 @@ object RemoteProductConfigMapper {
         val normalized = trim().lowercase(Locale.US)
         return PaywallTrialFraming.entries.firstOrNull { it.remoteValue == normalized }
             ?: PaywallTrialFraming.FIRST_CHECKIN
+    }
+
+    private fun String.toOnboardingIntroVariant(): OnboardingIntroVariant {
+        val normalized = trim().lowercase(Locale.US)
+        return OnboardingIntroVariant.entries.firstOrNull { it.remoteValue == normalized }
+            ?: OnboardingIntroVariant.PLAN_FIRST
     }
 
     private fun String.toExperimentName(): String {
