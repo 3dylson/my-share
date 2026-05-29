@@ -127,6 +127,25 @@ class StringResourceLocalizationTest {
         }
     }
 
+    @Test
+    fun `localized plurals define lint required quantity buckets`() {
+        val requiredLocaleQuantities = mapOf(
+            "values-ar/strings.xml" to setOf("zero", "one", "two", "few", "many", "other"),
+            "values-es/strings.xml" to setOf("one", "many", "other"),
+            "values-fr/strings.xml" to setOf("one", "many", "other"),
+            "values-pt-rPT/strings.xml" to setOf("one", "many", "other")
+        )
+
+        requiredLocaleQuantities.forEach { (path, requiredQuantities) ->
+            resourceDirectory.resolve(path).readPluralResources().forEach { (name, quantities) ->
+                assertTrue(
+                    "Plural $name in $path must define $requiredQuantities",
+                    quantities.containsAll(requiredQuantities)
+                )
+            }
+        }
+    }
+
     private fun File.readStringResources(): Map<String, String> {
         val builder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
         val document = builder.parse(this)
@@ -160,6 +179,28 @@ class StringResourceLocalizationTest {
         return buildList {
             for (itemIndex in 0 until nodes.length) {
                 add(nodes.item(itemIndex).textContent)
+            }
+        }
+    }
+
+    private fun File.readPluralResources(): Map<String, Set<String>> {
+        val builder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+        val document = builder.parse(this)
+        val nodes = document.getElementsByTagName("plurals")
+        return buildMap {
+            for (pluralIndex in 0 until nodes.length) {
+                val element = nodes.item(pluralIndex) as Element
+                put(element.getAttribute("name"), element.readPluralQuantities())
+            }
+        }
+    }
+
+    private fun Element.readPluralQuantities(): Set<String> {
+        val nodes = getElementsByTagName("item")
+        return buildSet {
+            for (itemIndex in 0 until nodes.length) {
+                val element = nodes.item(itemIndex) as Element
+                add(element.getAttribute("quantity"))
             }
         }
     }

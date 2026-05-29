@@ -113,7 +113,11 @@
     <string name="home_review_paycycle_consistency_label">أيام دفع متتالية تمت مراجعتها</string>
     <string name="home_review_paycycle_consistency_count">%1$d متتالية</string>
     <plurals name="home_review_paycycle_consistency_count_quantity">
+        <item quantity="zero">%1$d متتالية</item>
         <item quantity="one">1 متتالية</item>
+        <item quantity="two">%1$d متتالية</item>
+        <item quantity="few">%1$d متتالية</item>
+        <item quantity="many">%1$d متتالية</item>
         <item quantity="other">%1$d متتالية</item>
     </plurals>
     <string name="more_app_name" translatable="false">My Share</string>
@@ -441,7 +445,11 @@
     <string name="home_strategy_goal_preview_action">معاينة خطة متعددة الأهداف</string>
     <string name="home_strategy_goal_locked_hidden_title">%1$d هدف Premium إضافي مقفل</string>
     <plurals name="home_strategy_goal_locked_hidden_title_count">
+        <item quantity="zero">%1$d أهداف Premium إضافية مقفلة</item>
         <item quantity="one">%1$d هدف Premium إضافي مقفل</item>
+        <item quantity="two">%1$d هدفان Premium إضافيان مقفلان</item>
+        <item quantity="few">%1$d أهداف Premium إضافية مقفلة</item>
+        <item quantity="many">%1$d هدف Premium إضافي مقفل</item>
         <item quantity="other">%1$d أهداف Premium إضافية مقفلة</item>
     </plurals>
     <string name="home_strategy_goal_locked_hidden_desc">تبقى أهدافك المحفوظة آمنة. يفتح Premium القائمة كاملة ويوزع حركات يوم الدفع بينها.</string>
@@ -478,7 +486,11 @@
     <string name="home_strategy_rule_preview_action">عرض التقسيم التالي</string>
     <string name="home_strategy_rule_locked_hidden_title">%1$d قاعدة Premium إضافية مقفلة</string>
     <plurals name="home_strategy_rule_locked_hidden_title_count">
+        <item quantity="zero">%1$d قواعد Premium إضافية مقفلة</item>
         <item quantity="one">%1$d قاعدة Premium إضافية مقفلة</item>
+        <item quantity="two">%1$d قاعدتان Premium إضافيتان مقفلتان</item>
+        <item quantity="few">%1$d قواعد Premium إضافية مقفلة</item>
+        <item quantity="many">%1$d قاعدة Premium إضافية مقفلة</item>
         <item quantity="other">%1$d قواعد Premium إضافية مقفلة</item>
     </plurals>
     <string name="home_strategy_rule_locked_hidden_desc">تبقى قواعدك المحفوظة آمنة. يفتح Premium كل القواعد ويحافظ على تنسيقها بعد المراجعات.</string>
@@ -488,7 +500,11 @@
     <string name="home_review_streak_count">%1$d يوم متتالي</string>
     <string name="home_review_score_count">%1$s مراجعات</string>
     <plurals name="home_review_score_count_quantity">
+        <item quantity="zero">%1$d مراجعات</item>
         <item quantity="one">مراجعة واحدة</item>
+        <item quantity="two">%1$d مراجعتان</item>
+        <item quantity="few">%1$d مراجعات</item>
+        <item quantity="many">%1$d مراجعة</item>
         <item quantity="other">%1$d مراجعات</item>
     </plurals>
     <string name="home_review_savings_title">المدخرات الزائدة: %1$s</string>
@@ -539,7 +555,11 @@
     <string name="home_review_recommendation_confidence">ثقة %1$d%%</string>
     <string name="home_review_recommendation_review_count">بناءً على %1$d مراجعة</string>
     <plurals name="home_review_recommendation_review_count_quantity">
+        <item quantity="zero">بناءً على %1$d مراجعات</item>
         <item quantity="one">بناءً على مراجعة واحدة</item>
+        <item quantity="two">بناءً على %1$d مراجعتين</item>
+        <item quantity="few">بناءً على %1$d مراجعات</item>
+        <item quantity="many">بناءً على %1$d مراجعة</item>
         <item quantity="other">بناءً على %1$d مراجعة</item>
     </plurals>
     <string name="paywall_recommendation_evidence_single">بناءً على مراجعة يوم الدفع هذه. احفظ مراجعات أكثر لتحسين الحركة التالية.</string>
@@ -559,7 +579,11 @@
     <string name="home_review_recommendation_confirm_priority">حركة الأولوية</string>
     <string name="home_review_recommendation_confirm_evidence">ثقة %1$d%% من %2$d مراجعة حديثة.</string>
     <plurals name="home_review_recommendation_confirm_evidence_count">
+        <item quantity="zero">ثقة %1$d%% من %2$d مراجعات حديثة.</item>
         <item quantity="one">ثقة %1$d%% من مراجعة حديثة واحدة.</item>
+        <item quantity="two">ثقة %1$d%% من %2$d مراجعتين حديثتين.</item>
+        <item quantity="few">ثقة %1$d%% من %2$d مراجعات حديثة.</item>
+        <item quantity="many">ثقة %1$d%% من %2$d مراجعة حديثة.</item>
         <item quantity="other">ثقة %1$d%% من %2$d مراجعة حديثة.</item>
     </plurals>
     <string name="home_review_recommendation_applied_title">تم تطبيق التعديل</string>
@@ -585,11 +609,19 @@
     <string name="home_review_momentum_reviews">%1$d مراجعات</string>
     <string name="home_review_momentum_streak">ضمن الخطة: %1$d</string>
     <plurals name="home_review_momentum_reviews_quantity">
+        <item quantity="zero">%1$d مراجعات</item>
         <item quantity="one">مراجعة واحدة</item>
+        <item quantity="two">%1$d مراجعتان</item>
+        <item quantity="few">%1$d مراجعات</item>
+        <item quantity="many">%1$d مراجعة</item>
         <item quantity="other">%1$d مراجعات</item>
     </plurals>
     <plurals name="home_review_momentum_streak_quantity">
+        <item quantity="zero">ضمن الخطة: %1$d</item>
         <item quantity="one">ضمن الخطة: 1</item>
+        <item quantity="two">ضمن الخطة: %1$d</item>
+        <item quantity="few">ضمن الخطة: %1$d</item>
+        <item quantity="many">ضمن الخطة: %1$d</item>
         <item quantity="other">ضمن الخطة: %1$d</item>
     </plurals>
     <string name="home_review_momentum_next">هدف %1$d مراجعات</string>
@@ -597,7 +629,11 @@
     <string name="home_review_result_title">تم حفظ المراجعة</string>
     <string name="home_review_result_desc">حدّث Premium خطتك من مراجعة %1$s ولديه الآن %2$d مراجعات للتعلم منها.</string>
     <plurals name="home_review_result_desc_quantity">
+        <item quantity="zero">حدّث Premium خطتك من مراجعة %1$s ولديه الآن %2$d مراجعات للتعلم منها.</item>
         <item quantity="one">حدّث Premium خطتك من مراجعة %1$s ولديه الآن مراجعة واحدة للتعلم منها.</item>
+        <item quantity="two">حدّث Premium خطتك من مراجعة %1$s ولديه الآن %2$d مراجعتان للتعلم منهما.</item>
+        <item quantity="few">حدّث Premium خطتك من مراجعة %1$s ولديه الآن %2$d مراجعات للتعلم منها.</item>
+        <item quantity="many">حدّث Premium خطتك من مراجعة %1$s ولديه الآن %2$d مراجعة للتعلم منها.</item>
         <item quantity="other">حدّث Premium خطتك من مراجعة %1$s ولديه الآن %2$d مراجعات للتعلم منها.</item>
     </plurals>
     <string name="home_review_result_pattern_title">ما تعلمه Premium</string>
@@ -615,7 +651,11 @@
     <string name="home_review_saved_milestone_title">تم تحديث صورة يوم الدفع</string>
     <string name="home_review_saved_milestone_title_first_cycle">اكتملت أول دورة ليوم الدفع</string>
     <plurals name="home_review_saved_milestone_body">
+        <item quantity="zero">تم حفظ مراجعة %1$s. لديك الآن %2$d أيام دفع تمت مراجعتها.</item>
         <item quantity="one">تم حفظ مراجعة %1$s. لديك الآن يوم دفع واحد تمت مراجعته.</item>
+        <item quantity="two">تم حفظ مراجعة %1$s. لديك الآن %2$d يوما دفع تمت مراجعتهما.</item>
+        <item quantity="few">تم حفظ مراجعة %1$s. لديك الآن %2$d أيام دفع تمت مراجعتها.</item>
+        <item quantity="many">تم حفظ مراجعة %1$s. لديك الآن %2$d يوم دفع تمت مراجعته.</item>
         <item quantity="other">تم حفظ مراجعة %1$s. لديك الآن %2$d أيام دفع تمت مراجعتها.</item>
     </plurals>
     <string name="home_review_saved_milestone_next_move_title">الخطوة التالية جاهزة للمعاينة</string>
@@ -706,7 +746,11 @@
     <string name="home_more_smart_adjustments_evidence">الدليل</string>
     <string name="home_more_smart_adjustments_evidence_value">%1$d%% / %2$d مراجعة</string>
     <plurals name="home_more_smart_adjustments_evidence_value_quantity">
+        <item quantity="zero">%1$d%% / %2$d مراجعات</item>
         <item quantity="one">%1$d%% / مراجعة واحدة</item>
+        <item quantity="two">%1$d%% / %2$d مراجعتان</item>
+        <item quantity="few">%1$d%% / %2$d مراجعات</item>
+        <item quantity="many">%1$d%% / %2$d مراجعة</item>
         <item quantity="other">%1$d%% / %2$d مراجعة</item>
     </plurals>
     <string name="home_more_smart_adjustments_evidence_waiting">يحتاج مراجعات</string>
@@ -733,7 +777,11 @@
     <string name="home_more_adjustment_memory_change">%1$s إلى %2$s</string>
     <string name="home_more_adjustment_memory_rules">%1$d قاعدة حدّثها Premium</string>
     <plurals name="home_more_adjustment_memory_rules_count">
+        <item quantity="zero">%1$d قواعد حدّثها Premium</item>
         <item quantity="one">%1$d قاعدة حدّثها Premium</item>
+        <item quantity="two">%1$d قاعدتان حدّثهما Premium</item>
+        <item quantity="few">%1$d قواعد حدّثها Premium</item>
+        <item quantity="many">%1$d قاعدة حدّثها Premium</item>
         <item quantity="other">%1$d قواعد حدّثها Premium</item>
     </plurals>
     <string name="home_more_adjustment_memory_history_action">عرض سجل التعديلات</string>
@@ -758,13 +806,21 @@
     <string name="home_more_premium_preview_title">اجعل الخطة تتحسن باستمرار</string>
     <string name="home_more_premium_preview_body_with_reviews">يمكن لـ Premium استخدام %1$d مراجعات محفوظة لمقارنة دليلك الأسبوعي %2$s، وحماية حركة الأولوية %3$s، واقتراح التعديل التالي.</string>
     <plurals name="home_more_premium_preview_body_with_reviews_count">
+        <item quantity="zero">يمكن لـ Premium استخدام %1$d مراجعات محفوظة لمقارنة دليلك الأسبوعي %2$s، وحماية حركة الأولوية %3$s، واقتراح التعديل التالي.</item>
         <item quantity="one">يمكن لـ Premium استخدام مراجعة محفوظة واحدة لمقارنة دليلك الأسبوعي %2$s، وحماية حركة الأولوية %3$s، واقتراح التعديل التالي.</item>
+        <item quantity="two">يمكن لـ Premium استخدام %1$d مراجعتين محفوظتين لمقارنة دليلك الأسبوعي %2$s، وحماية حركة الأولوية %3$s، واقتراح التعديل التالي.</item>
+        <item quantity="few">يمكن لـ Premium استخدام %1$d مراجعات محفوظة لمقارنة دليلك الأسبوعي %2$s، وحماية حركة الأولوية %3$s، واقتراح التعديل التالي.</item>
+        <item quantity="many">يمكن لـ Premium استخدام %1$d مراجعة محفوظة لمقارنة دليلك الأسبوعي %2$s، وحماية حركة الأولوية %3$s، واقتراح التعديل التالي.</item>
         <item quantity="other">يمكن لـ Premium استخدام %1$d مراجعات محفوظة لمقارنة دليلك الأسبوعي %2$s، وحماية حركة الأولوية %3$s، واقتراح التعديل التالي.</item>
     </plurals>
     <string name="home_more_premium_preview_body_first_review">بعد أول تسجيل وصول، يقارن Premium الدليل الأسبوعي %1$s بما حدث ويحمي حركة الأولوية %2$s قبل يوم الدفع التالي.</string>
     <string name="home_more_premium_preview_body_reviews_generic">يمكن لـ Premium استخدام %1$d مراجعات محفوظة لاكتشاف الانحراف واقتراح ما يجب تعديله قبل يوم الدفع التالي.</string>
     <plurals name="home_more_premium_preview_body_reviews_generic_count">
+        <item quantity="zero">يمكن لـ Premium استخدام %1$d مراجعات محفوظة لاكتشاف الانحراف واقتراح ما يجب تعديله قبل يوم الدفع التالي.</item>
         <item quantity="one">يمكن لـ Premium استخدام مراجعة محفوظة واحدة لاكتشاف الانحراف واقتراح ما يجب تعديله قبل يوم الدفع التالي.</item>
+        <item quantity="two">يمكن لـ Premium استخدام %1$d مراجعتين محفوظتين لاكتشاف الانحراف واقتراح ما يجب تعديله قبل يوم الدفع التالي.</item>
+        <item quantity="few">يمكن لـ Premium استخدام %1$d مراجعات محفوظة لاكتشاف الانحراف واقتراح ما يجب تعديله قبل يوم الدفع التالي.</item>
+        <item quantity="many">يمكن لـ Premium استخدام %1$d مراجعة محفوظة لاكتشاف الانحراف واقتراح ما يجب تعديله قبل يوم الدفع التالي.</item>
         <item quantity="other">يمكن لـ Premium استخدام %1$d مراجعات محفوظة لاكتشاف الانحراف واقتراح ما يجب تعديله قبل يوم الدفع التالي.</item>
     </plurals>
     <string name="home_more_premium_preview_body_generic">يبدأ Premium بالتعلم بعد أول مراجعة، ثم يحوّل كل تسجيل وصول إلى التعديل التالي.</string>

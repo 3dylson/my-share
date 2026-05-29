@@ -113,7 +113,8 @@
     <string name="home_review_paycycle_consistency_label">Paies revues d’affilée</string>
     <string name="home_review_paycycle_consistency_count">%1$d d’affilée</string>
     <plurals name="home_review_paycycle_consistency_count_quantity">
-        <item quantity="one">1 d’affilée</item>
+        <item quantity="one">%1$d d’affilée</item>
+        <item quantity="many">%1$d d’affilée</item>
         <item quantity="other">%1$d d’affilée</item>
     </plurals>
     <string name="more_app_name" translatable="false">My Share</string>
@@ -442,6 +443,7 @@
     <string name="home_strategy_goal_locked_hidden_title">Objectifs Premium verrouillés : %1$d</string>
     <plurals name="home_strategy_goal_locked_hidden_title_count">
         <item quantity="one">%1$d objectif Premium supplémentaire verrouillé</item>
+        <item quantity="many">%1$d objectifs Premium supplémentaires verrouillés</item>
         <item quantity="other">%1$d objectifs Premium supplémentaires verrouillés</item>
     </plurals>
     <string name="home_strategy_goal_locked_hidden_desc">Vos objectifs enregistrés restent protégés. Premium déverrouille toute la liste et répartit les mouvements de paie entre eux.</string>
@@ -479,6 +481,7 @@
     <string name="home_strategy_rule_locked_hidden_title">Règles Premium verrouillées : %1$d</string>
     <plurals name="home_strategy_rule_locked_hidden_title_count">
         <item quantity="one">%1$d règle Premium supplémentaire verrouillée</item>
+        <item quantity="many">%1$d règles Premium supplémentaires verrouillées</item>
         <item quantity="other">%1$d règles Premium supplémentaires verrouillées</item>
     </plurals>
     <string name="home_strategy_rule_locked_hidden_desc">Vos règles enregistrées restent protégées. Premium déverrouille toutes les règles et les garde coordonnées après les bilans.</string>
@@ -488,7 +491,8 @@
     <string name="home_review_streak_count">%1$d jours consécutifs</string>
     <string name="home_review_score_count">%1$s avis</string>
     <plurals name="home_review_score_count_quantity">
-        <item quantity="one">1 bilan</item>
+        <item quantity="one">%1$d bilan</item>
+        <item quantity="many">%1$d bilans</item>
         <item quantity="other">%1$d bilans</item>
     </plurals>
     <string name="home_review_savings_title">Économies excédentaires : %1$s</string>
@@ -539,7 +543,8 @@
     <string name="home_review_recommendation_confidence">%1$d%% de confiance</string>
     <string name="home_review_recommendation_review_count">Bilans utilisés : %1$d</string>
     <plurals name="home_review_recommendation_review_count_quantity">
-        <item quantity="one">1 bilan utilisé</item>
+        <item quantity="one">%1$d bilan utilisé</item>
+        <item quantity="many">%1$d bilans utilisés</item>
         <item quantity="other">%1$d bilans utilisés</item>
     </plurals>
     <string name="paywall_recommendation_evidence_single">Basé sur ce bilan de paie. Enregistrez d’autres bilans pour affiner le prochain mouvement.</string>
@@ -560,6 +565,7 @@
     <string name="home_review_recommendation_confirm_evidence">%1$d%% de confiance d’après bilans récents : %2$d.</string>
     <plurals name="home_review_recommendation_confirm_evidence_count">
         <item quantity="one">%1$d%% de confiance d’après 1 bilan récent.</item>
+        <item quantity="many">%1$d%% de confiance d’après %2$d bilans récents.</item>
         <item quantity="other">%1$d%% de confiance d’après %2$d bilans récents.</item>
     </plurals>
     <string name="home_review_recommendation_applied_title">Ajustement appliqué</string>
@@ -585,11 +591,13 @@
     <string name="home_review_momentum_reviews">%1$d bilans</string>
     <string name="home_review_momentum_streak">Dans le plan : %1$d</string>
     <plurals name="home_review_momentum_reviews_quantity">
-        <item quantity="one">1 bilan</item>
+        <item quantity="one">%1$d bilan</item>
+        <item quantity="many">%1$d bilans</item>
         <item quantity="other">%1$d bilans</item>
     </plurals>
     <plurals name="home_review_momentum_streak_quantity">
-        <item quantity="one">Dans le plan : 1</item>
+        <item quantity="one">Dans le plan : %1$d</item>
+        <item quantity="many">Dans le plan : %1$d</item>
         <item quantity="other">Dans le plan : %1$d</item>
     </plurals>
     <string name="home_review_momentum_next">Objectif %1$d bilans</string>
@@ -598,6 +606,7 @@
     <string name="home_review_result_desc">Premium a actualisé votre plan avec le bilan du %1$s et dispose maintenant de %2$d bilans pour apprendre.</string>
     <plurals name="home_review_result_desc_quantity">
         <item quantity="one">Premium a actualisé ton plan avec le bilan du %1$s et dispose maintenant de %2$d bilan pour apprendre.</item>
+        <item quantity="many">Premium a actualisé ton plan avec le bilan du %1$s et dispose maintenant de %2$d bilans pour apprendre.</item>
         <item quantity="other">Premium a actualisé ton plan avec le bilan du %1$s et dispose maintenant de %2$d bilans pour apprendre.</item>
     </plurals>
     <string name="home_review_result_pattern_title">Ce que Premium a appris</string>
@@ -616,6 +625,7 @@
     <string name="home_review_saved_milestone_title_first_cycle">Premier cycle de paie terminé</string>
     <plurals name="home_review_saved_milestone_body">
         <item quantity="one">Le bilan du %1$s est enregistré. Tu as maintenant %2$d paie revue.</item>
+        <item quantity="many">Le bilan du %1$s est enregistré. Tu as maintenant %2$d paies revues.</item>
         <item quantity="other">Le bilan du %1$s est enregistré. Tu as maintenant %2$d paies revues.</item>
     </plurals>
     <string name="home_review_saved_milestone_next_move_title">Le prochain mouvement est prêt à prévisualiser</string>
@@ -707,6 +717,7 @@
     <string name="home_more_smart_adjustments_evidence_value">%1$d%% / bilans : %2$d</string>
     <plurals name="home_more_smart_adjustments_evidence_value_quantity">
         <item quantity="one">%1$d%% / 1 bilan</item>
+        <item quantity="many">%1$d%% / %2$d bilans</item>
         <item quantity="other">%1$d%% / %2$d bilans</item>
     </plurals>
     <string name="home_more_smart_adjustments_evidence_waiting">Besoin de bilans</string>
@@ -734,6 +745,7 @@
     <string name="home_more_adjustment_memory_rules">Règles mises à jour par Premium : %1$d</string>
     <plurals name="home_more_adjustment_memory_rules_count">
         <item quantity="one">%1$d règle mise à jour par Premium</item>
+        <item quantity="many">%1$d règles mises à jour par Premium</item>
         <item quantity="other">%1$d règles mises à jour par Premium</item>
     </plurals>
     <string name="home_more_adjustment_memory_history_action">Voir l’historique des ajustements</string>
@@ -759,12 +771,14 @@
     <string name="home_more_premium_preview_body_with_reviews">Premium peut utiliser vos %1$d bilans enregistrés pour comparer le guide hebdomadaire de %2$s, protéger l’action prioritaire de %3$s et suggérer le prochain ajustement.</string>
     <plurals name="home_more_premium_preview_body_with_reviews_count">
         <item quantity="one">Premium peut utiliser 1 bilan enregistré pour comparer le guide hebdomadaire de %2$s, protéger l’action prioritaire de %3$s et suggérer le prochain ajustement.</item>
+        <item quantity="many">Premium peut utiliser %1$d bilans enregistrés pour comparer le guide hebdomadaire de %2$s, protéger l’action prioritaire de %3$s et suggérer le prochain ajustement.</item>
         <item quantity="other">Premium peut utiliser %1$d bilans enregistrés pour comparer le guide hebdomadaire de %2$s, protéger l’action prioritaire de %3$s et suggérer le prochain ajustement.</item>
     </plurals>
     <string name="home_more_premium_preview_body_first_review">Après le premier check-in, Premium compare le guide hebdomadaire de %1$s avec ce qui s’est passé et protège l’action prioritaire de %2$s avant la prochaine paie.</string>
     <string name="home_more_premium_preview_body_reviews_generic">Premium peut utiliser vos %1$d bilans enregistrés pour repérer les écarts et suggérer quoi ajuster avant la prochaine paie.</string>
     <plurals name="home_more_premium_preview_body_reviews_generic_count">
-        <item quantity="one">Premium peut utiliser 1 bilan enregistré pour repérer les écarts et suggérer quoi ajuster avant la prochaine paie.</item>
+        <item quantity="one">Premium peut utiliser %1$d bilan enregistré pour repérer les écarts et suggérer quoi ajuster avant la prochaine paie.</item>
+        <item quantity="many">Premium peut utiliser %1$d bilans enregistrés pour repérer les écarts et suggérer quoi ajuster avant la prochaine paie.</item>
         <item quantity="other">Premium peut utiliser %1$d bilans enregistrés pour repérer les écarts et suggérer quoi ajuster avant la prochaine paie.</item>
     </plurals>
     <string name="home_more_premium_preview_body_generic">Premium commence à apprendre après le premier bilan, puis transforme chaque check-in en prochain ajustement.</string>

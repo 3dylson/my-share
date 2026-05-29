@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.core.os.ConfigurationCompat
 import pt.ms.myshare.presentation.ui.theme.MyShareOnPrimary
 import pt.ms.myshare.presentation.ui.theme.MySharePrimary
 import androidx.compose.ui.res.stringResource
@@ -51,6 +52,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.foundation.Canvas
+import java.util.Locale
 
 @Composable
 fun PremiumCard(
@@ -258,7 +260,7 @@ fun PremiumGoalCard(
     onClick: (() -> Unit)? = null
 ) {
     val actualIcon = icon ?: Icons.Default.Flag
-    val locale = java.util.Locale.forLanguageTag(LocalConfiguration.current.locales[0].toLanguageTag())
+    val locale = currentConfigurationLocale()
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -1474,7 +1476,7 @@ fun PremiumSliderCard(
     formatValue: ((Float) -> String)? = null
 ) {
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
-    val locale = java.util.Locale.forLanguageTag(LocalConfiguration.current.locales[0].toLanguageTag())
+    val locale = currentConfigurationLocale()
     val resolvedFormatValue = formatValue ?: {
         java.text.NumberFormat.getNumberInstance(locale).apply {
             minimumFractionDigits = 2
@@ -1568,4 +1570,9 @@ fun PremiumSliderCard(
             }
         }
     }
+}
+
+@Composable
+private fun currentConfigurationLocale(): Locale {
+    return ConfigurationCompat.getLocales(LocalConfiguration.current).get(0) ?: Locale.getDefault()
 }

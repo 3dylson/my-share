@@ -1043,7 +1043,7 @@
     <string name="plan_summary_custom_strategy">Eine eigene Aufteilung nach Ihren Zahltagsregeln.</string>
     <string name="subscription_retention_title">Bevor du Premium verlässt</string>
     <string name="subscription_retention_body">Dein Plan wird bereits begleitet. Wenn der Preis das Problem ist, kannst du ein Angebot nutzen, bevor du Google Play öffnest.</string>
-    <string name="subscription_retention_primary">50 % sichern</string>
+    <string name="subscription_retention_primary">50 Prozent sichern</string>
     <string name="subscription_retention_secondary">Weiter zu Google Play</string>
     <string name="subscription_retention_reason_review">Premium lernt aus jedem Zahltag-Check weiter.</string>
     <string name="subscription_retention_reason_watch">Dein nächster Schritt bleibt vor dem nächsten Zahltag bereit.</string>

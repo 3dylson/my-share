@@ -114,7 +114,8 @@
     <string name="home_review_paycycle_consistency_label">Pagamentos seguidos revistos</string>
     <string name="home_review_paycycle_consistency_count">%1$d seguidos</string>
     <plurals name="home_review_paycycle_consistency_count_quantity">
-        <item quantity="one">1 seguido</item>
+        <item quantity="one">%1$d seguido</item>
+        <item quantity="many">%1$d seguidos</item>
         <item quantity="other">%1$d seguidos</item>
     </plurals>
     <string name="more_app_name" translatable="false">My Share</string>
@@ -443,6 +444,7 @@
     <string name="home_strategy_goal_locked_hidden_title">Objetivos Premium bloqueados: %1$d</string>
     <plurals name="home_strategy_goal_locked_hidden_title_count">
         <item quantity="one">%1$d objetivo Premium extra bloqueado</item>
+        <item quantity="many">%1$d objetivos Premium extra bloqueados</item>
         <item quantity="other">%1$d objetivos Premium extra bloqueados</item>
     </plurals>
     <string name="home_strategy_goal_locked_hidden_desc">Os objetivos guardados ficam seguros. O Premium desbloqueia a lista completa e reparte os movimentos de pagamento entre eles.</string>
@@ -480,6 +482,7 @@
     <string name="home_strategy_rule_locked_hidden_title">Regras Premium bloqueadas: %1$d</string>
     <plurals name="home_strategy_rule_locked_hidden_title_count">
         <item quantity="one">%1$d regra Premium extra bloqueada</item>
+        <item quantity="many">%1$d regras Premium extra bloqueadas</item>
         <item quantity="other">%1$d regras Premium extra bloqueadas</item>
     </plurals>
     <string name="home_strategy_rule_locked_hidden_desc">As regras guardadas ficam seguras. O Premium desbloqueia todas as regras e mantém-nas coordenadas depois das revisões.</string>
@@ -489,7 +492,8 @@
     <string name="home_review_streak_count">Sequência de %1$d dias</string>
     <string name="home_review_score_count">%1$s comentários</string>
     <plurals name="home_review_score_count_quantity">
-        <item quantity="one">1 revisão</item>
+        <item quantity="one">%1$d revisão</item>
+        <item quantity="many">%1$d revisões</item>
         <item quantity="other">%1$d revisões</item>
     </plurals>
     <string name="home_review_savings_title">Excesso de poupança: %1$s</string>
@@ -540,7 +544,8 @@
     <string name="home_review_recommendation_confidence">%1$d%% de confiança</string>
     <string name="home_review_recommendation_review_count">Com base em %1$d revisão(ões)</string>
     <plurals name="home_review_recommendation_review_count_quantity">
-        <item quantity="one">Com base em 1 revisão</item>
+        <item quantity="one">Com base em %1$d revisão</item>
+        <item quantity="many">Com base em %1$d revisões</item>
         <item quantity="other">Com base em %1$d revisões</item>
     </plurals>
     <string name="paywall_recommendation_evidence_single">Com base nesta revisão do pagamento. Guarda mais revisões para afinar o próximo movimento.</string>
@@ -561,6 +566,7 @@
     <string name="home_review_recommendation_confirm_evidence">%1$d%% de confiança com base em %2$d revisão(ões) recentes.</string>
     <plurals name="home_review_recommendation_confirm_evidence_count">
         <item quantity="one">%1$d%% de confiança com base em 1 revisão recente.</item>
+        <item quantity="many">%1$d%% de confiança com base em %2$d revisões recentes.</item>
         <item quantity="other">%1$d%% de confiança com base em %2$d revisões recentes.</item>
     </plurals>
     <string name="home_review_recommendation_applied_title">Ajuste aplicado</string>
@@ -586,11 +592,13 @@
     <string name="home_review_momentum_reviews">%1$d revisões</string>
     <string name="home_review_momentum_streak">No plano: %1$d</string>
     <plurals name="home_review_momentum_reviews_quantity">
-        <item quantity="one">1 revisão</item>
+        <item quantity="one">%1$d revisão</item>
+        <item quantity="many">%1$d revisões</item>
         <item quantity="other">%1$d revisões</item>
     </plurals>
     <plurals name="home_review_momentum_streak_quantity">
-        <item quantity="one">No plano: 1</item>
+        <item quantity="one">No plano: %1$d</item>
+        <item quantity="many">No plano: %1$d</item>
         <item quantity="other">No plano: %1$d</item>
     </plurals>
     <string name="home_review_momentum_next">Meta de %1$d revisões</string>
@@ -599,6 +607,7 @@
     <string name="home_review_result_desc">O Premium atualizou o teu plano com a revisão de %1$s e agora tem %2$d check-ins para aprender.</string>
     <plurals name="home_review_result_desc_quantity">
         <item quantity="one">O Premium atualizou o teu plano com a revisão de %1$s e agora tem %2$d check-in para aprender.</item>
+        <item quantity="many">O Premium atualizou o teu plano com a revisão de %1$s e agora tem %2$d check-ins para aprender.</item>
         <item quantity="other">O Premium atualizou o teu plano com a revisão de %1$s e agora tem %2$d check-ins para aprender.</item>
     </plurals>
     <string name="home_review_result_pattern_title">O que o Premium aprendeu</string>
@@ -617,6 +626,7 @@
     <string name="home_review_saved_milestone_title_first_cycle">Primeiro ciclo de pagamento concluído</string>
     <plurals name="home_review_saved_milestone_body">
         <item quantity="one">A revisão de %1$s foi guardada. Tens agora %2$d pagamento revisto.</item>
+        <item quantity="many">A revisão de %1$s foi guardada. Tens agora %2$d pagamentos revistos.</item>
         <item quantity="other">A revisão de %1$s foi guardada. Tens agora %2$d pagamentos revistos.</item>
     </plurals>
     <string name="home_review_saved_milestone_next_move_title">O próximo movimento está pronto para pré-visualizar</string>
@@ -708,6 +718,7 @@
     <string name="home_more_smart_adjustments_evidence_value">%1$d%% / %2$d revisão(ões)</string>
     <plurals name="home_more_smart_adjustments_evidence_value_quantity">
         <item quantity="one">%1$d%% / 1 revisão</item>
+        <item quantity="many">%1$d%% / %2$d revisões</item>
         <item quantity="other">%1$d%% / %2$d revisões</item>
     </plurals>
     <string name="home_more_smart_adjustments_evidence_waiting">Precisa de revisões</string>
@@ -735,6 +746,7 @@
     <string name="home_more_adjustment_memory_rules">Regras atualizadas pelo Premium: %1$d</string>
     <plurals name="home_more_adjustment_memory_rules_count">
         <item quantity="one">%1$d regra atualizada pelo Premium</item>
+        <item quantity="many">%1$d regras atualizadas pelo Premium</item>
         <item quantity="other">%1$d regras atualizadas pelo Premium</item>
     </plurals>
     <string name="home_more_adjustment_memory_history_action">Ver histórico de ajustes</string>
@@ -760,12 +772,14 @@
     <string name="home_more_premium_preview_body_with_reviews">O Premium pode usar as tuas %1$d revisões guardadas para comparar o guia semanal de %2$s, proteger o movimento prioritário de %3$s e sugerir o próximo ajuste.</string>
     <plurals name="home_more_premium_preview_body_with_reviews_count">
         <item quantity="one">O Premium pode usar 1 revisão guardada para comparar o guia semanal de %2$s, proteger o movimento prioritário de %3$s e sugerir o próximo ajuste.</item>
+        <item quantity="many">O Premium pode usar %1$d revisões guardadas para comparar o guia semanal de %2$s, proteger o movimento prioritário de %3$s e sugerir o próximo ajuste.</item>
         <item quantity="other">O Premium pode usar %1$d revisões guardadas para comparar o guia semanal de %2$s, proteger o movimento prioritário de %3$s e sugerir o próximo ajuste.</item>
     </plurals>
     <string name="home_more_premium_preview_body_first_review">Depois do primeiro check-in, o Premium compara o guia semanal de %1$s com o que aconteceu e protege o movimento prioritário de %2$s antes do próximo pagamento.</string>
     <string name="home_more_premium_preview_body_reviews_generic">O Premium pode usar as tuas %1$d revisões guardadas para detetar desvios e sugerir o que ajustar antes do próximo pagamento.</string>
     <plurals name="home_more_premium_preview_body_reviews_generic_count">
-        <item quantity="one">O Premium pode usar 1 revisão guardada para detetar desvios e sugerir o que ajustar antes do próximo pagamento.</item>
+        <item quantity="one">O Premium pode usar %1$d revisão guardada para detetar desvios e sugerir o que ajustar antes do próximo pagamento.</item>
+        <item quantity="many">O Premium pode usar %1$d revisões guardadas para detetar desvios e sugerir o que ajustar antes do próximo pagamento.</item>
         <item quantity="other">O Premium pode usar %1$d revisões guardadas para detetar desvios e sugerir o que ajustar antes do próximo pagamento.</item>
     </plurals>
     <string name="home_more_premium_preview_body_generic">O Premium começa a aprender depois da primeira revisão e transforma cada check-in no próximo ajuste.</string>

@@ -26,8 +26,8 @@ fun MyShareTheme(
         sdkInt = Build.VERSION.SDK_INT
     )
     val colorScheme = when {
-        useDynamicColor && darkTheme -> dynamicDarkColorScheme(context)
-        useDynamicColor -> dynamicLightColorScheme(context)
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && darkTheme -> dynamicDarkColorScheme(context)
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> dynamicLightColorScheme(context)
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
