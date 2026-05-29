@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
@@ -841,11 +842,13 @@ fun HomeScreen(
             }
         },
         bottomBar = {
+            val bottomNavHeight = if (LocalDensity.current.fontScale >= 1.2f) 104.dp else 88.dp
             NavigationBar(
                 containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
                 tonalElevation = 8.dp,
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.95f))
+                    .height(bottomNavHeight)
             ) {
                 HomeDestination.entries.forEach { destination ->
                     val isSelected = state.selectedDestination == destination
@@ -869,7 +872,9 @@ fun HomeScreen(
                         label = {
                             Text(
                                 stringResource(destination.labelRes),
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         },
                         colors = NavigationBarItemDefaults.colors(

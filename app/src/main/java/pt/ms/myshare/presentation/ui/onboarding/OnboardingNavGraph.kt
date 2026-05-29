@@ -180,6 +180,7 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                     navController.navigate(OnboardingRoute.Paywall.route)
                 },
                 onContinueFree = {
+                    viewModel.logOnboardingFreePlanSelected("trajectory")
                     navController.navigate(OnboardingRoute.ReminderSetup.route)
                 }
             )
@@ -211,7 +212,10 @@ fun OnboardingEntryRoute(parentNavController: NavController) {
                     googleConnectionMessage = state.googleConnectionMessage,
                     googleConnectionError = state.googleConnectionError,
                     onPlanSelected = viewModel::setSelectedBillingPlan,
-                    onClose = { navController.navigate(OnboardingRoute.ReminderSetup.route) },
+                    onClose = {
+                        viewModel.logOnboardingFreePlanSelected("paywall_close")
+                        navController.navigate(OnboardingRoute.ReminderSetup.route)
+                    },
                     onRestore = {
                         viewModel.restorePurchases { restored ->
                             if (restored) {

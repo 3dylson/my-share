@@ -171,7 +171,7 @@ fun PlanPreviewScreen(
                 PaydayMovesCard(
                     fixedCosts = currency.format(preview.fixedCostsPerPayday),
                     priorityContribution = currency.format(preview.priorityContributionPerPayday),
-                    flexibleSpend = currency.format(preview.flexibleSpendPerPayday),
+                    weeklySpend = currency.format(preview.weeklyFlexibleSpend),
                     goalLabel = goalLabel,
                     hasPriorityContribution = hasPriorityContribution
                 )
@@ -363,7 +363,7 @@ private fun PlanPreviewMetric(
 private fun PaydayMovesCard(
     fixedCosts: String,
     priorityContribution: String,
-    flexibleSpend: String,
+    weeklySpend: String,
     goalLabel: String,
     hasPriorityContribution: Boolean
 ) {
@@ -420,7 +420,7 @@ private fun PaydayMovesCard(
                 step = "3",
                 title = stringResource(R.string.onboarding_plan_preview_step_flex_title),
                 body = stringResource(R.string.onboarding_plan_preview_step_flex_body),
-                amount = flexibleSpend,
+                amount = weeklySpend,
                 icon = Icons.Default.Celebration,
                 iconColor = MyShareWarning
             )

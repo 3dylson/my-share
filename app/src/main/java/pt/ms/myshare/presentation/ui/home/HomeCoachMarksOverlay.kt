@@ -1,13 +1,15 @@
 package pt.ms.myshare.presentation.ui.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -28,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
@@ -54,12 +57,14 @@ fun HomeCoachMarksOverlay(
         step.stepNumber,
         state.totalSteps
     )
+    val bottomNavClearance = if (LocalDensity.current.fontScale >= 1.2f) 112.dp else 96.dp
 
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(Color.Black.copy(alpha = 0.42f))
-            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .padding(start = 20.dp, end = 20.dp, top = 16.dp)
+            .padding(bottom = bottomNavClearance)
             .navigationBarsPadding()
     ) {
         Surface(
@@ -76,7 +81,10 @@ fun HomeCoachMarksOverlay(
             shadowElevation = 10.dp
         ) {
             Column(
-                modifier = Modifier.padding(20.dp),
+                modifier = Modifier
+                    .heightIn(max = 360.dp)
+                    .verticalScroll(rememberScrollState())
+                    .padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 Row(
@@ -123,11 +131,14 @@ fun HomeCoachMarksOverlay(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    OutlinedButton(onClick = onSkip) {
+                    OutlinedButton(
+                        modifier = Modifier.weight(1f),
+                        onClick = onSkip
+                    ) {
                         Text(text = stringResource(R.string.home_coach_marks_skip))
                     }
-                    Spacer(modifier = Modifier.weight(1f))
                     Button(
+                        modifier = Modifier.weight(1f),
                         onClick = if (step.isLast) onDone else onNext
                     ) {
                         Text(

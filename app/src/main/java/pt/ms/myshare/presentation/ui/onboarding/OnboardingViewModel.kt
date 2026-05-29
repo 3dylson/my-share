@@ -875,6 +875,21 @@ class OnboardingViewModel @Inject constructor(
         })
     }
 
+    fun logOnboardingFreePlanSelected(source: String) {
+        FirebaseUtils.logEvent("onboarding_free_plan_selected", onboardingExperimentBundle(source))
+        Timber.tag(TAG).d("Onboarding free plan selected source=%s", source)
+    }
+
+    private fun onboardingExperimentBundle(source: String): Bundle = Bundle().apply {
+        putString("source", source)
+        putString("price_cluster", state.value.pricingStrategy?.marketCluster)
+        putString("billing_plan", state.value.selectedBillingPlan.name.lowercase(Locale.US))
+        putString("onboarding_paywall_variant", state.value.onboardingPaywallVariant.remoteValue)
+        putString("onboarding_experiment", state.value.onboardingConversionExperiment)
+        putString("paywall_trial_framing", state.value.paywallTrialFraming.remoteValue)
+        putString("paywall_value_frame", PAYWALL_VALUE_FRAME)
+    }
+
     fun logSignupStarted() {
         FirebaseUtils.logEvent("signup_started")
     }

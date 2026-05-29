@@ -97,16 +97,16 @@
     <string name="onboarding_reminder_cadence_weekly_desc">A quick pulse: fine, tight, or running low. No bank homework.</string>
 
     <!-- Home: Plan Tab -->
-    <string name="home_coach_marks_pane_title">Home tour</string>
+    <string name="home_coach_marks_pane_title">First payday guide</string>
     <string name="home_coach_marks_progress">%1$d of %2$d</string>
-    <string name="home_coach_marks_plan_title">Plan</string>
-    <string name="home_coach_marks_plan_body">See what is safe to spend before payday.</string>
-    <string name="home_coach_marks_strategy_title">Strategy</string>
-    <string name="home_coach_marks_strategy_body">Adjust goals and payday rules when your plan changes.</string>
-    <string name="home_coach_marks_review_title">Review</string>
-    <string name="home_coach_marks_review_body">Check what happened and learn the next move.</string>
-    <string name="home_coach_marks_more_title">More</string>
-    <string name="home_coach_marks_more_body">Manage reminders, Premium, account, and settings.</string>
+    <string name="home_coach_marks_plan_title">Start here</string>
+    <string name="home_coach_marks_plan_body">On payday, protect bills, move the goal amount, then follow the weekly spend guide.</string>
+    <string name="home_coach_marks_strategy_title">Tune the rules</string>
+    <string name="home_coach_marks_strategy_body">Only change this when the split feels wrong. Goals, rules, and priority moves live here.</string>
+    <string name="home_coach_marks_review_title">Teach Premium</string>
+    <string name="home_coach_marks_review_body">After payday, save what was left and what moved. That creates the next adjustment.</string>
+    <string name="home_coach_marks_more_title">Control the routine</string>
+    <string name="home_coach_marks_more_body">Manage reminders, language, account, and Premium watch without changing the plan.</string>
     <string name="home_coach_marks_skip">Skip</string>
     <string name="home_coach_marks_next">Next</string>
     <string name="home_coach_marks_done">Done</string>
